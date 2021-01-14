@@ -1,10 +1,10 @@
 # Windows Driver Developer Supplemental Tools
 
-This repository contains supplemental open-source components for use in developing device drivers for Windows.
+This repository contains supplemental open-source components for use in developing device drivers for Windows.  When initially cloning, please use "git clone --recurse-submodules" to ensure you clone necessary dependencies.
 
 ## CodeQL
 
-The CodeQL subfolder contains queries and suites recommended for checking Windows Drivers for security issues.  For full documentation, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/static-tools-and-codeql) on MSDN.
+The CodeQL subfolder contains queries and suites required for certification of Windows drivers.  For full documentation, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/static-tools-and-codeql) on Microsoft Docs.
 
 ## Contributing
 
