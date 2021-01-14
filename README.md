@@ -4,7 +4,7 @@ This repository contains supplemental open-source components for use in developi
 
 ## CodeQL
 
-The CodeQL subfolder contains queries and suites required for certification of Windows drivers.  For full documentation, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/static-tools-and-codeql) on Microsoft Docs.
+The CodeQL subfolder contains queries and suites required for certification of Windows drivers.  For full documentation, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql) on Microsoft Docs.
 
 ## Contributing
 
