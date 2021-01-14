@@ -1,0 +1,3 @@
+[submodule "codeql/codeql-queries"]
+	path = codeql/codeql-queries
+	url = https://github.com/github/codeql.git

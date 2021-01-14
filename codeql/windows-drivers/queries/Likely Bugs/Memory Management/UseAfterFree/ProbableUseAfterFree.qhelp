@@ -1,0 +1,11 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+<overview>
+  <p>This version of the query has lower precision than <code>cpp/use-after-free-high-precision</code>. It detects some additional scenarios, but also has a higher rate of false positives.</p>
+</overview>
+
+  <include src="UseAfterFreeLib.qhelp" />
+
+</qhelp>

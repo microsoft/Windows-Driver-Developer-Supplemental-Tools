@@ -1,0 +1,7 @@
+{ "provide": [ "codeql/codeql-queries/*/ql/src/qlpack.yml",
+               "codeql/codeql-queries/*/ql/test/qlpack.yml",
+               "codeql/codeql-queries/*/ql/examples/qlpack.yml",
+               "codeql/codeql-queries/*/upgrades/qlpack.yml",
+               "codeql/codeql-queries/misc/legacy-support/*/qlpack.yml",
+               "codeql/codeql-queries/misc/suite-helpers/qlpack.yml",
+               "codeql/windows-drivers/qlpack.yml"] }
