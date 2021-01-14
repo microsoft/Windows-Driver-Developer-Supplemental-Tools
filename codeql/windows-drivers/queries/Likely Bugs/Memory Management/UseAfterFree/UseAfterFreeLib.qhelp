@@ -1,0 +1,21 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+<overview>
+  <p>An allocated memory block is used after it has been freed (also known as dangling pointer).</p>
+  <p>Behavior in such cases is undefined and in practice can have many unintended consequences including memory corruption, use incorrect values, or arbitrary code execution.</p>
+</overview>
+
+<recommendation>
+  <p>If possible set the pointers to NULL immediately after they are freed.</p>
+</recommendation>
+
+<example>
+  <p>In the following example, <code>pSomePointer</code> is freed only if <code>Status</code> value was not zero, and before deferrencing <code>pSomePointer</code> to call <code>Method</code>, we check again <code>Status</code>; unfortunately <code>Status</code> was changed between the two references to <code>pSomePointer</code>, which allows for the possiblity that the call to <code>pSomePointer->Method()</code> is being performed over a previously freed pointer.</p>
+<sample src="UseAfterFree_bad.c"/>
+<p>In the corrected example, <code>pSomePointer</code> is set to <code>NULL</code> immediately after being freed, and the condition to check if it is safe to call <code>pSomePointer->Method()</code> checks for this additional condition to prevent the possible bug.</p>
+<sample src="UseAfterFree_good.c"/>
+</example>
+
+</qhelp>

@@ -1,0 +1,21 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+<overview>
+<p>For the Windows 10 Version 2004 release, Microsoft has introduced new pool APIs that zero by default: <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2">ExAllocatePool2</a> and <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool3">ExAllocatePool3</a>.</p>
+<p>ExAllocatePool2 takes less parameters making it easier to use. It covers the most common scenarios.</p>
+<p>Less common scenarios (such as priority allocations) that require more flexible parameters go through ExAllocatePool3. Both APIs are designed to be extensible for the future so we do not need to continue adding new APIs.</p>
+</overview>
+
+<recommendation>
+<p>It is recommended to use the new APIs for any driver code with a minimum supported target of versions of Windows 10, version 2004.</p>
+<p>If you are building a driver that targets versions of Windows prior to Windows 10, version 2004, use ExAllocatePoolZero, ExAllocatePoolUninitialized, ExAllocatePoolQuotaZero, or ExAllocatePoolQuotaUninitialized.</p>
+</recommendation>
+
+<references>
+<li><a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2">ExAllocatePool2 function (wdm.h)</a></li>
+<li><a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool3">ExAllocatePool3 function (wdm.h)</a></li>
+<li><a href="https://msrc-blog.microsoft.com/2020/07/02/solving-uninitialized-kernel-pool-memory-on-windows/">Solving Uninitialized Kernel Pool Memory on Windows</a></li>
+</references>
+</qhelp>

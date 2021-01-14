@@ -1,0 +1,20 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+- description: Security queries required to fix when certifying Windows Drivers
+- qlpack: codeql-cpp
+- include:
+    query path: 
+      - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql
+      - Likely Bugs/Memory Management/PointerOverflow.ql
+      - Likely Bugs/Memory Management/UninitializedLocal.ql
+      - Likely Bugs/Underspecified Functions/TooFewArguments.ql
+      - Security/CWE/CWE-190/ComparisonWithWiderType.ql
+      - Security/CWE/CWE-253/HResultBooleanConversion.ql
+      - Security/CWE/CWE-457/ConditionallyUninitializedVariable.ql
+      - Security/CWE/CWE-704/WcharCharConversion.ql
+- qlpack: windows-drivers
+- include:
+    query path: 
+      - queries/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - queries/Windows/wdk/wdk-deprecated-api.ql

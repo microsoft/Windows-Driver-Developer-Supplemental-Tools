@@ -1,14 +1,10 @@
-# Project
+# Windows Driver Developer Supplemental Tools
 
-> This repo has been populated by an initial template to help get you started. Please
-> make sure to update the content to build a great experience for community-building.
+This repository contains supplemental open-source components for use in developing device drivers for Windows.
 
-As the maintainer of this project, please make a few updates:
+## CodeQL
 
-- Improving this README.MD file to provide a great experience
-- Updating SUPPORT.MD with content about this project's support experience
-- Understanding the security reporting process in SECURITY.MD
-- Remove this section from the README
+The CodeQL subfolder contains queries and suites recommended for checking Windows Drivers for security issues.  For full documentation, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/static-tools-and-codeql) on MSDN.
 
 ## Contributing
 

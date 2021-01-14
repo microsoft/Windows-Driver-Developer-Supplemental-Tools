@@ -1,0 +1,11 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+<overview>
+  <p>This version of the query has high precision, which helps in bug automation, but there are some limitations and therefore it will not be able to detect some cases.</p>
+</overview>
+
+  <include src="UseAfterFreeLib.qhelp" />
+
+</qhelp>
