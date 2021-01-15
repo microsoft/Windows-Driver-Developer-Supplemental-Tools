@@ -27,6 +27,5 @@
 - qlpack: windows-drivers
 - include:
     query path: 
-      - queries/Likely Bugs/Memory Management/UseAfterFree/ProbableUseAfterFree.ql
       - queries/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
       - queries/Windows/wdk/wdk-deprecated-api.ql
