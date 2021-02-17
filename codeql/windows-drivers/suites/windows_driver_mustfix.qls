@@ -7,7 +7,6 @@
     query path: 
       - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql
       - Likely Bugs/Memory Management/PointerOverflow.ql
-      - Likely Bugs/Memory Management/UninitializedLocal.ql
       - Likely Bugs/Underspecified Functions/TooFewArguments.ql
       - Security/CWE/CWE-190/ComparisonWithWiderType.ql
       - Security/CWE/CWE-253/HResultBooleanConversion.ql
