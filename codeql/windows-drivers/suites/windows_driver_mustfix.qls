@@ -10,7 +10,6 @@
       - Likely Bugs/Underspecified Functions/TooFewArguments.ql
       - Security/CWE/CWE-190/ComparisonWithWiderType.ql
       - Security/CWE/CWE-253/HResultBooleanConversion.ql
-      - Security/CWE/CWE-457/ConditionallyUninitializedVariable.ql
       - Security/CWE/CWE-704/WcharCharConversion.ql
 - qlpack: windows-drivers
 - include:
