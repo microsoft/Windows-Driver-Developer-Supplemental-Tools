@@ -1,0 +1,21 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+  <overview>
+    <p>A pointer field which was not initialized during or since class construction will cause a null pointer dereference.</p>
+  </overview>
+
+  <recommendation>
+    <p>Make sure to initialize all pointer fields before usage.</p>
+  </recommendation>
+
+  <example>
+    <p>The following example shows a scenario where the field <code>ptr_</code> is not initialzied and later dereferenced.</p>
+    <sample src="UninitializedPtrFieldBadCode.c" />
+
+    <p>To correct the problem, we set the field before usage.</p>
+    <sample src="UninitializedPtrFieldGoodCode.c" />
+  </example>
+
+</qhelp>

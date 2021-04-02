@@ -1,0 +1,22 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+  <overview>
+    <p>A newly allocated struct or class that is initialized member-by-member may leak information if it includes padding bytes.</p>
+  </overview>
+
+  <recommendation>
+    <p>Make sure that all padding bytes in the struct or class are initialized.</p>
+    <p>If possible, use <code>memset</code> to initialize the whole structure/class.</p>
+  </recommendation>
+
+  <example>
+    <p>The following example shows a scenario where padding between the first and second elements are not initialized.</p>
+    <sample src="PaddingByteInformationDisclosureBadCode.c" />
+
+    <p>To correct it, we will initialize all bytes using <code>memset</code>.</p>
+    <sample src="PaddingByteInformationDisclosureGoodCode.c" />
+  </example>
+
+</qhelp>
