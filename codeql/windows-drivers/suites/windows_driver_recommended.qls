@@ -27,5 +27,10 @@
 - qlpack: windows-drivers
 - include:
     query path: 
+      - queries/Likely Bugs/Boundary Violations/PaddingByteInformation.ql
+      - queries/Likely Bugs/Conversion/BadOverflowGuard.ql
+      - queries/Likely Bugs/Conversion/InfiniteLoop.ql
       - queries/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - queries/Likely Bugs/UninitializedPtrField.ql
+      - queries/Security/Crytpography/HardcodedIVCNG.ql
       - queries/Windows/wdk/wdk-deprecated-api.ql
