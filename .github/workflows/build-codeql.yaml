@@ -1,0 +1,43 @@
+# This is a basic workflow to help you get started with Actions
+
+name: CI
+
+# Controls when the action will run. 
+on:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - name: Set Git environment
+      shell: cmd
+      run: git config --global core.longpaths true
+        
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v2
+      with:
+        path: windows-driver-developer-supplemental-tools
+        submodules: recursive
+    - name: Download CodeQL CLI
+      uses: i3h/download-release-asset@v1.2.0
+      with:
+        owner: "github"
+        repo: "codeql-cli-binaries"
+        tag: "latest"
+        file: "codeql-win64.zip"
+    - name: Unzip CodeQL CLI
+      shell: cmd
+      run: powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('codeql-win64.zip', '.'); }"
+    - name: Test build
+      shell: cmd
+      run: .\codeql\codeql.cmd query compile --check-only windows_driver_recommended.qls
