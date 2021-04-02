@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /**
  * @name Comparison of narrow type with wide type in loop condition
  * @description Comparisons between types of different widths in a loop

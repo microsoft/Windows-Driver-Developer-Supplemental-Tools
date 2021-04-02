@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 NTSTATUS Status = x();
 
 if (Status != 0)

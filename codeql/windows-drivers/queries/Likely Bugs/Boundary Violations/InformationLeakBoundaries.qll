@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /**
  * Provides the class `InformationLeakBoundary`, which models data-flow sinks
  * where information is passed across a trust boundary.
