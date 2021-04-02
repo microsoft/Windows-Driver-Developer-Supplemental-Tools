@@ -1,0 +1,20 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+<overview>
+  <p>Comparisons between types of different widths in a loop condition can cause the loop to fail to terminate.</p>
+</overview>
+  
+<recommendation>
+<p>Use appropriate types in the loop condition.</p>
+</recommendation>
+
+<example>
+  <p>In this example, the result of the comparison may result in an infinite loop if the value for argument <code>a</code> is larger than <code>SHRT_MAX</code>.</p>
+  <sample src="InfiniteLoopBadCode.c" />
+
+  <p>To fix the bug, we are changing the type for the variable <code>i</code> to match the width of <code>a</code>.</p>
+  <sample src="InfiniteLoopGoodCode.c" />
+</example>
+</qhelp>
