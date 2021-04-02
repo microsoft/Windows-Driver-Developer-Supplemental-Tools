@@ -25,7 +25,8 @@ jobs:
     steps:
     - name: Set Git environment
       shell: cmd
-      run: "\"C:\\Program Files\\Git\\bin\\git.exe\" config --global core.longpaths true"
+      run: "where git"
+      #run: "\"C:\\Program Files\\Git\\bin\\git.exe\" config --global core.longpaths true"
         
     - name: Clone self (windows-driver-developer-supplemental-tools)
       uses: actions/checkout@v2
