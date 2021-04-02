@@ -17,7 +17,12 @@ on:
 jobs:
   build:
 
+      
     runs-on: windows-latest
+    
+    defaults:
+      run:
+        working-directory: a
 
     steps:
     - name: Clone self (windows-driver-developer-supplemental-tools)
