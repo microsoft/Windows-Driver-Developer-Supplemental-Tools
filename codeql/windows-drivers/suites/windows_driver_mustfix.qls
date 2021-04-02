@@ -11,7 +11,8 @@
       - Security/CWE/CWE-190/ComparisonWithWiderType.ql
       - Security/CWE/CWE-253/HResultBooleanConversion.ql
       - Security/CWE/CWE-704/WcharCharConversion.ql
-- qlpack: windows-drivers
+- queries: queries
+  from: windows-drivers
 - include:
     query path: 
       - queries/Windows/wdk/wdk-deprecated-api.ql
