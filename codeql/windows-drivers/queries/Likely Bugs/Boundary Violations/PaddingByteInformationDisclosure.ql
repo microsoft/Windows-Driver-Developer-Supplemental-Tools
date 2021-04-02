@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /**
  * @name Possible information leakage from uninitialized padding bytes.
  * @description A newly allocated struct or class that is initialized member-by-member may

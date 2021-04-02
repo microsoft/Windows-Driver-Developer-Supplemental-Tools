@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /**
  * Provides classes and predicates for identifying variables and expression that have a static
  * value.
