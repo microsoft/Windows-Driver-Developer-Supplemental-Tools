@@ -37,7 +37,7 @@ jobs:
         file: "codeql-win64.zip"
     - name: Unzip CodeQL CLI
       shell: cmd
-      run: powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('codeql-win64.zip', 'codeql'); }"
+      run: powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('codeql-win64.zip', '.'); }"
     - name: Test build
       shell: cmd
       run: .\codeql\codeql.cmd query compile --check-only ..\Windows-Driver-Developer-Supplemental-Tools\codeql\
