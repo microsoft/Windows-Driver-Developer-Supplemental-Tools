@@ -24,7 +24,8 @@ jobs:
 
     steps:
     - name: Set Git environment
-      run: "C:\\Program Files\\Git\\bin\\git.exe config --system core.longpaths true"
+      shell: cmd
+      run: "C:\\Program Files\\Git\\bin\\git.exe config --global core.longpaths true"
         
     - name: Clone self (windows-driver-developer-supplemental-tools)
       uses: actions/checkout@v2
@@ -38,7 +39,9 @@ jobs:
         version: "latest"
         file: "codeql-win64.zip"
     - name: Unzip CodeQL CLI
+	  shell: cmd
       run: powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('codeql-win64.zip', 'codeql'); }"
     - name: Test build
+	  shell: cmd
       run: .\codeql\codeql.cmd query compile --check-only ..\Windows-Driver-Developer-Supplemental-Tools\codeql\
     
