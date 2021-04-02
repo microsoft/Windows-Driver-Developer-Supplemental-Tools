@@ -17,7 +17,7 @@ on:
 jobs:
   build:
 
-    runs-on: windows
+    runs-on: windows-latest
 
     steps:
     - name: Clone self (windows-driver-developer-supplemental-tools)
