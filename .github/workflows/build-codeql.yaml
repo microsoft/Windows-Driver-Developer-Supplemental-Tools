@@ -32,7 +32,7 @@ jobs:
       uses: i3h/download-release-asset@v1.2.0
       with:
         repo: "github/codeql-cli-binaries"
-        version: "latest"
+        tag: "latest"
         file: "codeql-win64.zip"
     - name: Unzip CodeQL CLI
       shell: cmd
