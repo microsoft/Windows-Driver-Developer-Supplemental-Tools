@@ -31,7 +31,8 @@ jobs:
     - name: Download CodeQL CLI
       uses: i3h/download-release-asset@v1.2.0
       with:
-        repo: "github/codeql-cli-binaries"
+        owner: "github"
+        repo: "codeql-cli-binaries"
         tag: "latest"
         file: "codeql-win64.zip"
     - name: Unzip CodeQL CLI
