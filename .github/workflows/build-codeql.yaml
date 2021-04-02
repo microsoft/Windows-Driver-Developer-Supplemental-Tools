@@ -40,4 +40,4 @@ jobs:
       run: powershell.exe -nologo -noprofile -command "& { Add-Type -A 'System.IO.Compression.FileSystem'; [IO.Compression.ZipFile]::ExtractToDirectory('codeql-win64.zip', '.'); }"
     - name: Test build
       shell: cmd
-      run: .\codeql\codeql.cmd query compile --check-only ..\Windows-Driver-Developer-Supplemental-Tools\codeql\windows-drivers
+      run: .\codeql\codeql.cmd query compile --check-only windows_driver_recommended.qls
