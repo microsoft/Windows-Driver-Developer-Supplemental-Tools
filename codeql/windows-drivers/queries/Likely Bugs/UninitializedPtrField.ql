@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /**
  * @name Dereference of potentially uninitialized pointer field
  * @description A pointer field which was not initialized during or since class 

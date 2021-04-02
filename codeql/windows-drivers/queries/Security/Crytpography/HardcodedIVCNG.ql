@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /**
  * @name Weak cryptography
  * @description Finds usage of a static (hardcoded) IV. (CNG)

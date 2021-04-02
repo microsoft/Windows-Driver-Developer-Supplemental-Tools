@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /**
  * @name Bad overflow check
  * @description Checking for overflow of an addition by comparing against one
