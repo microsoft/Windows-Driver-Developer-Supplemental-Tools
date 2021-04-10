@@ -32,7 +32,7 @@ jobs:
     - name: Clone self (windows-driver-developer-supplemental-tools)
       uses: actions/checkout@v2
       with:
-        path: windows-driver-developer-supplemental-tools
+        path: .
         submodules: recursive
     - name: Download CodeQL CLI
       if: steps.cli-cache.outputs.cache-hit != 'true'
@@ -47,4 +47,4 @@ jobs:
       run: Expand-Archive -Path codeql-win64.zip -DestinationPath . -Force
     - name: Build recommended query suite
       shell: cmd
-      run: .\codeql\codeql.cmd query compile --check-only windows_driver_recommended.qls
+      run: .\codeql\codeql.cmd query compile --check-only .\windows-driver-developer-supplemental-tools\windows-driver-developer-supplemental-tools\codeql\windows-drivers
