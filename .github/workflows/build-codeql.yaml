@@ -49,7 +49,7 @@ jobs:
       shell: cmd
       if: steps.cli-cache.outputs.cache-hit != 'true'
       continue-on-error: true # Required because robocopy returns 1 on success
-      run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\codeql
+      run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\
     - name: Build all Windows queries
       shell: cmd
-      run: .\codeql-cli\codeql\codeql.cmd query compile --check-only .\codeql\windows-drivers
+      run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers
