@@ -25,7 +25,7 @@ jobs:
         cache-name: cached-cli
       with:
         path: .\codeql-cli
-        key: codeql-cli-v2.5.0
+        key: codeql-cli-v2.5.0-actionfix1
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
