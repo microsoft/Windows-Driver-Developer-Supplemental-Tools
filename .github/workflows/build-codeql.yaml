@@ -48,7 +48,7 @@ jobs:
     - name: Move CodeQL CLI folder to correct location
       shell: cmd
       if: steps.cli-cache.outputs.cache-hit != 'true'
-      run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\codeql
+      run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\codeql && if %ERRORLEVEL% EQU 1 exit /b 0
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql\codeql.cmd query compile --check-only .\codeql\windows-drivers
