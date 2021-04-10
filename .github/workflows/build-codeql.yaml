@@ -1,7 +1,7 @@
 # Continuous integration action for the CodeQL components of this repo.
-# This downloads the CodeQL CLI and then builds all the queries in the "windows_driver_recommended.qls" suite.
+# This downloads the CodeQL CLI and then builds all the queries in the "windows-drivers" folder.
 
-name: Build recommended CodeQL queries
+name: Build Windows CodeQL queries
 
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
@@ -22,7 +22,7 @@ jobs:
       uses: actions/cache@v2
       id: cli-cache
       env:
-        cache-name: cache-node-modules
+        cache-name: cached-cli
       with:
         path: .\codeql-cli
         key: codeql-cli-v2.5.0
@@ -44,7 +44,7 @@ jobs:
         file: "codeql-win64.zip"
     - name: Unzip CodeQL CLI
       if: steps.cli-cache.outputs.cache-hit != 'true'
-      run: Expand-Archive -Path codeql-win64.zip -DestinationPath . -Force
-    - name: Build recommended query suite
+      run: Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-cli -Force
+    - name: Build all windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers
