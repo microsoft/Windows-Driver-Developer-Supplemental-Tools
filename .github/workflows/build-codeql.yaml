@@ -24,7 +24,7 @@ jobs:
       env:
         cache-name: cache-node-modules
       with:
-        path: .\codeql
+        path: .\codeql-cli
         key: codeql-cli-v2.5.0
     - name: Enable long git paths
       shell: cmd
@@ -47,4 +47,4 @@ jobs:
       run: Expand-Archive -Path codeql-win64.zip -DestinationPath . -Force
     - name: Build recommended query suite
       shell: cmd
-      run: .\codeql\codeql.cmd query compile --check-only .\windows-driver-developer-supplemental-tools\windows-driver-developer-supplemental-tools\codeql\windows-drivers
+      run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers
