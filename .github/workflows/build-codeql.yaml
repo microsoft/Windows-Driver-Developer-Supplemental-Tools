@@ -46,6 +46,7 @@ jobs:
       if: steps.cli-cache.outputs.cache-hit != 'true'
       run: Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force
     - name: Move CodeQL CLI folder to correct location
+      if: steps.cli-cache.outputs.cache-hit != 'true'
       run: move .\codeql-zip\codeql .\codeql-cli\codeql
     - name: Build all Windows queries
       shell: cmd
