@@ -53,3 +53,6 @@ jobs:
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers
+    - name: Build recommended driver suite
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers\suites\windows_driver_recommended.qls
