@@ -18,14 +18,6 @@ jobs:
     runs-on: windows-latest
 
     steps:
-    - name: Get cached CLI
-      uses: actions/cache@v2
-      id: cli-cache
-      env:
-        cache-name: cached-cli
-      with:
-        path: .\codeql-cli
-        key: codeql-cli-v2.5.0-actionfix1
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
@@ -35,7 +27,6 @@ jobs:
         path: .
         submodules: recursive
     - name: Download CodeQL CLI
-      if: steps.cli-cache.outputs.cache-hit != 'true'
       uses: i3h/download-release-asset@v1.2.0
       with:
         owner: "github"
@@ -43,13 +34,14 @@ jobs:
         tag: "v2.5.0"
         file: "codeql-win64.zip"
     - name: Unzip CodeQL CLI
-      if: steps.cli-cache.outputs.cache-hit != 'true'
       run: Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force
     - name: Move CodeQL CLI folder to correct location
       shell: cmd
-      if: steps.cli-cache.outputs.cache-hit != 'true'
       continue-on-error: true # Required because robocopy returns 1 on success
       run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers
+    - name: Build recommended driver suite
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers\suites\windows_driver_recommended.qls
