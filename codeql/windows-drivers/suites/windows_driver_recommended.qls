@@ -2,7 +2,7 @@
 # Licensed under the MIT license.
 
 - description: Security queries recommended for Windows Drivers
-- import: windows_driver_mustfix.qls
+- import: suites\windows_driver_mustfix.qls
 - qlpack: codeql-cpp
 - include:
     query path: 
