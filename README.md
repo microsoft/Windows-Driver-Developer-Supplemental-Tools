@@ -2,6 +2,12 @@
 
 This repository contains supplemental open-source components for use in developing device drivers for Windows.  When initially cloning, please use "git clone --recurse-submodules" to ensure you clone necessary dependencies.
 
+## About this branch
+
+The WHCP_21H2 branch contains the CodeQL queries and suites used for certifying for Windows Server 2022 and the Windows October 2021 Release.  It should be used when running CodeQL as part of the Static Tools Logo test for these releases.
+
+This branch uses [version 1.27.0 of the CodeQL common queries](https://github.com/github/codeql/tree/v1.27.0) and should be used with [version 2.4.6 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6).
+
 ## CodeQL
 
 The CodeQL subfolder contains queries and suites required for certification of Windows drivers.  For full documentation, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql) on Microsoft Docs.
