@@ -36,7 +36,7 @@ abstract class HeapAllocation extends Allocation, FunctionCall {
 	 * Gets the expression representing the allocation size in this call.
 	 */
 	abstract Expr getAllocatedSize();
-	string toString() { result = FunctionCall.super.toString() }
+	override string toString() { result = FunctionCall.super.toString() }
 }
 
 /**
