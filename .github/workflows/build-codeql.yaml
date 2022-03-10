@@ -31,7 +31,7 @@ jobs:
       with:
         owner: "github"
         repo: "codeql-cli-binaries"
-        tag: "v2.5.0"
+        tag: "v2.6.3"
         file: "codeql-win64.zip"
     - name: Unzip CodeQL CLI
       run: Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force
