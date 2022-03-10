@@ -3,7 +3,8 @@
 
 - description: Security queries recommended for Windows Drivers
 - import: suites\windows_driver_mustfix.qls
-- qlpack: codeql-cpp
+- queries: . 
+  from: codeql/cpp-queries
 - include:
     query path: 
       - Best Practices/Likely Errors/OffsetUseBeforeRangeCheck.ql
