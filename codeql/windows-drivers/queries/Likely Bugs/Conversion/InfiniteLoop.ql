@@ -20,7 +20,7 @@ import cpp
 import microsoft.code.cpp.commons.Literals
 
 class ReferenceFix extends ReferenceType {
-	int getSize() { result = this.getBaseType().getSize() }
+	override int getSize() { result = this.getBaseType().getSize() }
 }
 
 /**
