@@ -2,7 +2,8 @@
 # Licensed under the MIT license.
 
 - description: Security queries required to fix when certifying Windows Drivers
-- qlpack: codeql-cpp
+- queries: . 
+  from: codeql/cpp-queries
 - include:
     query path: 
       - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql
