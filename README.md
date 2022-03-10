@@ -6,6 +6,13 @@ This repository contains supplemental open-source components for use in developi
 
 The CodeQL subfolder contains queries and suites required for certification of Windows drivers.  For full documentation, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql) on Microsoft Docs.
 
+The main branch of this repo currently uses [version 2.6.3 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) and [version lgtm/1.9.0 of the CodeQL queries](https://github.com/github/codeql/releases/tag/lgtm%2Fv1.29.0).  When using this repo to certify a driver, please use the appropriate sub-branch for the Windows release in question:
+
+| Release                  | Branch to use |
+--------------------------------------------
+| Windows Server 2022      | WHCP_21H2     |
+| Windows 11	         | WHCP_21H2     |
+
 ## Contributing
 
 This project welcomes contributions and suggestions.  Most contributions require you to agree to a
