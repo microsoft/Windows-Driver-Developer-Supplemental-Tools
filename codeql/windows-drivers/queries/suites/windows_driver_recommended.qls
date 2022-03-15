@@ -20,7 +20,7 @@
       - Security/CWE/CWE-468/IncorrectPointerScalingVoid.ql
       - Security/CWE/CWE-468/SuspiciousAddWithSizeof.ql
       - Security/CWE/CWE-676/PotentiallyDangerousFunction.ql
-- queries: queries
+- queries: .
   from: windows-drivers
 - include:
     query path: 
