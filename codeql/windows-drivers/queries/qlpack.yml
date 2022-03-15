@@ -3,6 +3,10 @@
 
 name: windows-drivers
 version: 0.9.6
+libraryPathDependencies: 
+    - codeql/cpp-queries
+    - codeql/cpp-all
 dependencies:
-  codeql/cpp-all: "*"
+    codeql/cpp-queries: "*"
 suites: suites
+extractor: cpp

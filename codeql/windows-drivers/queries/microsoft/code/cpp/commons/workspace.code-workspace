@@ -1,0 +1,27 @@
+{
+	"folders": [
+		{
+			"path": "..\\..\\..\\..\\..\\..\\.."
+		},
+		{
+			"name": "[windows-driver-samples source archive]",
+			"uri": "codeql-zip-archive://1-63/c:\\codeql-home\\codeql\\databases\\windows-driver-samples\\src.zip"
+		},
+		{
+			"name": "[SDV-FailDriver-WDM source archive]",
+			"uri": "codeql-zip-archive://1-59/c:\\codeql-home\\codeql\\databases\\SDV-FailDriver-WDM\\src.zip"
+		},
+		{
+			"path": "F:\\Documents\\CodeQL-Demo\\Demo"
+		},
+		{
+			"name": "[ScrapDatabase source archive]",
+			"uri": "codeql-zip-archive://1-54/c:\\codeql-home\\codeql\\databases\\ScrapDatabase\\src.zip"
+		},
+		{
+			"name": "[ItpDrivers source archive]",
+			"uri": "codeql-zip-archive://1-51/c:\\codeql-home\\codeql\\databases\\ItpDrivers\\src.zip"
+		}
+	],
+	"settings": {}
+}
