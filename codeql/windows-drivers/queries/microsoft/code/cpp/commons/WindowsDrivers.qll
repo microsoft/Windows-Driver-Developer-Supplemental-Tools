@@ -1,38 +1,21 @@
 import cpp
 import Microsoft.SAL
 
-// TODO: Query to match Dispatch Type (in what's declared in DriverEntry) to annotated dispatch notes
-
-class DispatchMacroInvocation extends SALAnnotation {
-    DispatchMacroInvocation ()
-    {
-        this.getMacroName().matches("_Dispatch_type_")
-    }
-}
-
-class HeaderElem extends Element {
-    HeaderElem ()
-    {
-        this.getFile().getBaseName().matches("%fail_driver1.h")
-        and this instanceof SALAnnotation
-    }
-
-    string getBaseTypeLocal ()
-    {
-        result = this.getAPrimaryQlClass()
-    }
-}
-
-// TODO: Handle chained definitions 
-class DispatchTypeDefinition extends DispatchMacroInvocation {
+// Define a use of a _Dispatch_type_, etc. macro
+class DispatchTypeDefinition extends SALAnnotation {
 
     string dispatchType;
 
     DispatchTypeDefinition ()
     {
-        exists (DispatchMacroInvocation dm, MacroInvocation mi |
-            dm = this
-            and mi.getParentInvocation() = this
+        this.getMacroName().matches(["_Dispatch_type_", "__drv_dispatchType"])
+        and 
+
+        // References to IRP_MJ_CREATE, etc. are themselves MacroInvocations
+        // that are expanded to 0x[value].  For two IRP types they expand
+        // to another macro ref, so we handle those cases below.
+        exists (MacroInvocation mi |
+            mi.getParentInvocation() = this
             and mi.getMacroName().matches("%IRP_M%")
             and dispatchType = mi.getMacro().getBody()
         )
@@ -40,7 +23,11 @@ class DispatchTypeDefinition extends DispatchMacroInvocation {
 
     string getDispatchType()
     {
-        result = dispatchType
+        // Note that these are the _post_expanded macros.  The cases below are actually
+        // capturing the IRP_MJ_PNP_POWER and IRP_MJ_SCSI cases.
+        if (dispatchType = "IRP_MJ_PNP") then result = "0x1b"
+        else if (dispatchType = "IRP_MJ_INTERNAL_DEVICE_CONTROL") then result = "0x0f"
+        else result = dispatchType
     }
 }
 
@@ -57,13 +44,8 @@ class WdmCallbackRoutineTypedef extends TypedefType {
     }
 }
 
-class WdmDriverUnload extends WdmCallbackRoutine {
-    WdmDriverUnload() 
-    {
-        this.getName().matches("DRIVER_UNLOAD")
-    }
-}
-
+// Define a function as a callback routine if its typedef
+// matches one of the typedefs above.
 class WdmCallbackRoutine extends Function
 {
     WdmCallbackRoutineTypedef callbackType;
@@ -76,9 +58,23 @@ class WdmCallbackRoutine extends Function
     }
 }
 
+class WdmDriverUnload extends WdmCallbackRoutine {
+    WdmDriverUnload() 
+    {
+        this.getName().matches("DRIVER_UNLOAD")
+    }
+}
+
+// WDM dispatch routine class.
+// We hold a routine to be a dispatch routine if there is
+// an assignment in DriverEntry that assigns the function to
+// the dispatch table.
 cached class WdmDispatchRoutine extends WdmCallbackRoutine
 {
-    Literal dispatchType; //IRP_MJ_XXX, etc.
+    Literal dispatchType; // IRP_MJ_XXX, etc.  CodeQL evaluates these to raw 
+                          // numbers because we are looking at an array ref.
+
+    WdmDriverEntry driverEntry; // The DriverEntry function this assignment happened in
 
     cached WdmDispatchRoutine()
     {
@@ -90,7 +86,7 @@ cached class WdmDispatchRoutine extends WdmCallbackRoutine
             and va.getTarget().getType().getName().matches("PDRIVER_OBJECT")
             and ae.getArrayOffset() = dispatchType
             and dra.getTarget() = this 
-            and dra.getEnclosingFunction() instanceof WdmDriverEntry)      
+            and dra.getEnclosingFunction() = driverEntry)      
     }
 
     cached Literal getDispatchType()
@@ -98,9 +94,15 @@ cached class WdmDispatchRoutine extends WdmCallbackRoutine
         result = dispatchType
     }
 
+    cached WdmDriverEntry getDriverEntry()
+    {
+        result = driverEntry
+    }
+
     cached abstract predicate matchesAnnotation(DispatchTypeDefinition dtd);
 }
 
+// An assignment from a function to a WDM dispatch routine table.
 class DispatchRoutineAssignment extends AssignExpr
 {
     // A common paradigm in dispatch routine setup is to chain assignments.
@@ -129,7 +131,6 @@ class DispatchRoutineAssignment extends AssignExpr
 
 // We can't include this predicate in the body of
 // the class above, so it is split out here.
-
 private predicate isDispatchRoutineAssignment(AssignExpr ae) {
     exists (FunctionAccess fa |
         ae.getRValue() = fa 
@@ -138,6 +139,7 @@ private predicate isDispatchRoutineAssignment(AssignExpr ae) {
     and isDispatchRoutineAssignment((AssignExpr)ae.getRValue()))
 }
 
+// DriverEntry actually uses a typedef called DRIVER_INITIALIZE.
 class WdmDriverEntry extends WdmCallbackRoutine
 {
     WdmDriverEntry()
