@@ -13,6 +13,9 @@
  * @query-version 0.9
  */
 
+ // NOTE: This query requires a change to SAL.qll in the CodeQL core library to work.
+ // "driverspecs.h" must be added to the characteristic predicate of SALMacro.
+
 import microsoft.code.cpp.commons.WindowsDrivers
 
 from DispatchTypeDefinition dmi, WdmDispatchRoutine wdr, FunctionDeclarationEntry fde
