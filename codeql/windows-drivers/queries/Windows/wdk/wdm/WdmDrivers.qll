@@ -1,35 +1,5 @@
 import cpp
-import Microsoft.SAL
-
-// Define a use of a _Dispatch_type_, etc. macro
-class DispatchTypeDefinition extends SALAnnotation {
-
-    string dispatchType;
-
-    DispatchTypeDefinition ()
-    {
-        this.getMacroName().matches(["_Dispatch_type_", "__drv_dispatchType"])
-        and 
-
-        // References to IRP_MJ_CREATE, etc. are themselves MacroInvocations
-        // that are expanded to 0x[value].  For two IRP types they expand
-        // to another macro ref, so we handle those cases below.
-        exists (MacroInvocation mi |
-            mi.getParentInvocation() = this
-            and mi.getMacroName().matches("%IRP_M%")
-            and dispatchType = mi.getMacro().getBody()
-        )
-    }
-
-    string getDispatchType()
-    {
-        // Note that these are the _post_expanded macros.  The cases below are actually
-        // capturing the IRP_MJ_PNP_POWER and IRP_MJ_SCSI cases.
-        if (dispatchType = "IRP_MJ_PNP") then result = "0x1b"
-        else if (dispatchType = "IRP_MJ_INTERNAL_DEVICE_CONTROL") then result = "0x0f"
-        else result = dispatchType
-    }
-}
+import SAL
 
 // Standard WDM callback routines.
 class WdmCallbackRoutineTypedef extends TypedefType {
@@ -148,7 +118,38 @@ class WdmDriverEntry extends WdmCallbackRoutine
     }
 }
 
-// WDM.h IRP types.  Auto-generated.
+
+// Define a use of a _Dispatch_type_, etc. macro
+class DispatchTypeDefinition extends SALAnnotation {
+
+    string dispatchType;
+
+    DispatchTypeDefinition ()
+    {
+        this.getMacroName().matches(["_Dispatch_type_", "__drv_dispatchType"])
+        and 
+
+        // References to IRP_MJ_CREATE, etc. are themselves MacroInvocations
+        // that are expanded to 0x[value].  For two IRP types they expand
+        // to another macro ref, so we handle those cases below.
+        exists (MacroInvocation mi |
+            mi.getParentInvocation() = this
+            and mi.getMacroName().matches("%IRP_M%")
+            and dispatchType = mi.getMacro().getBody()
+        )
+    }
+
+    string getDispatchType()
+    {
+        // Note that these are the _post_expanded macros.  The cases below are actually
+        // capturing the IRP_MJ_PNP_POWER and IRP_MJ_SCSI cases.
+        if (dispatchType = "IRP_MJ_PNP") then result = "0x1b"
+        else if (dispatchType = "IRP_MJ_INTERNAL_DEVICE_CONTROL") then result = "0x0f"
+        else result = dispatchType
+    }
+}
+
+// WDM.h IRP function types.  Auto-generated.
 // IRP_MJ_CREATE
 class WdmIrpMjCreate extends WdmDispatchRoutine { WdmIrpMjCreate() { dispatchType.toString().matches("0") } override predicate matchesAnnotation(DispatchTypeDefinition dtd) { dtd.getDispatchType().toLowerCase().matches("0x00") }  }
 // IRP_MJ_CREATE_NAMED_PIPE
@@ -291,19 +292,3 @@ class WdmIrpMnReginfo extends WdmDispatchRoutine { WdmIrpMnReginfo() { dispatchT
 class WdmIrpMnExecuteMethod extends WdmDispatchRoutine { WdmIrpMnExecuteMethod() { dispatchType.toString().matches("9") } override predicate matchesAnnotation(DispatchTypeDefinition dtd) { dtd.getDispatchType().toLowerCase().matches("0x09") }  }
 // IRP_MN_REGINFO_EX
 class WdmIrpMnReginfoEx extends WdmDispatchRoutine { WdmIrpMnReginfoEx() { dispatchType.toString().matches("11") } override predicate matchesAnnotation(DispatchTypeDefinition dtd) { dtd.getDispatchType().toLowerCase().matches("0x0b") }  }
-
-/*
-class DriverObject extends Struct {
-    
-   // PDRIVER_INITIALIZE DriverInit;
-   // PDRIVER_STARTIO DriverStartIo;
-   // PDRIVER_UNLOAD DriverUnload;
-   // PDRIVER_DISPATCH MajorFunction[IRP_MJ_MAXIMUM_FUNCTION + 1];
-
-    DriverObject()
-    {
-        this.getFile().getAbsolutePath().matches("%wdm.h")
-        and this.getName().matches("_DRIVER_OBJECT")
-    }
-}
-*/
