@@ -5,7 +5,7 @@
 
 import cpp
 import semmle.code.cpp.commons.Synchronization
-import microsoft.code.cpp.commons.SpinLockAsMutexType
+import Windows.wdk.experimental.SpinLockAsMutexType
 
 /**
  * Holds if `cond` is a test for whether locking `access` succeeded,

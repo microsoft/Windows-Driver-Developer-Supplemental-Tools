@@ -13,7 +13,7 @@
 
 import cpp
 import semmle.code.cpp.commons.Synchronization
-import microsoft.code.cpp.commons.SpinLockAsMutexType
+import Windows.wdk.experimental.SpinLockAsMutexType
 import LockFlow
 
 /**
