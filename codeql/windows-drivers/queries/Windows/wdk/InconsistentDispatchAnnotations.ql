@@ -22,4 +22,4 @@ from DispatchTypeDefinition dmi, WdmDispatchRoutine wdr, FunctionDeclarationEntr
 where fde = wdr.getADeclarationEntry() and
 dmi.getDeclarationEntry() = fde and
 not (wdr.matchesAnnotation(dmi))
-select fde, "Function declaration of " + fde.getFunction().getName() + " is annotated as a different dispatch type than it is assigned to in the driver's DRIVER_INITIALIZE function ($@).", wdr.getDriverEntry(), wdr.getDriverEntry().getName()
+select fde, "Function declaration of " + fde.getFunction().getName() + " is annotated as a different dispatch type than it is assigned as in the driver's DRIVER_INITIALIZE function ($@).", wdr.getDriverEntry(), wdr.getDriverEntry().getName()
