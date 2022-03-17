@@ -26,7 +26,8 @@ predicate isFreeExpr(Expr e, Variable v, Access va) {
           fc.getTarget().hasGlobalOrStdName("NdisFreeMdl") or
           fc.getTarget().hasGlobalOrStdName("NdisFreeGenericObject") or
           fc.getTarget().hasGlobalOrStdName("NdisFreeNetBufferPool") or
-          fc.getTarget().hasGlobalOrStdName("NdisFreeNetBufferListPool")
+          fc.getTarget().hasGlobalOrStdName("NdisFreeNetBufferListPool") or
+          fc.getTarget().hasGlobalOrStdName("free")
         ) and
         va = fc.getArgument(0)
       ) or

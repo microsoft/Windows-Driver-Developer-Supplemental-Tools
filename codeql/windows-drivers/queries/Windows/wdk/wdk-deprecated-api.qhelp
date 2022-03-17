@@ -11,6 +11,7 @@
 <recommendation>
 <p>It is recommended to use the new APIs for any driver code with a minimum supported target of versions of Windows 10, version 2004.</p>
 <p>If you are building a driver that targets versions of Windows prior to Windows 10, version 2004, use ExAllocatePoolZero, ExAllocatePoolUninitialized, ExAllocatePoolQuotaZero, or ExAllocatePoolQuotaUninitialized.</p>
+<p>NOTE: Do not use <code>POOL_FLAG_UNINITIALIZED</code>.</p>
 </recommendation>
 
 <references>
