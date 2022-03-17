@@ -13,7 +13,6 @@
  * @id cpp/windows/wdk/deprecated-api
  * @problem.severity warning
  * @query-version 1.2
- * @owner.email raulga@microsoft.com
  */
 
 import cpp
