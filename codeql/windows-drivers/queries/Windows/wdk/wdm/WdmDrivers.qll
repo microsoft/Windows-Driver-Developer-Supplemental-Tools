@@ -24,7 +24,8 @@ class WdmCallbackRoutine extends Function
     {
         exists (FunctionDeclarationEntry fde |
             fde.getFunction() = this 
-            and fde.getTypedefType() = callbackType)
+            and fde.getTypedefType() = callbackType
+            and fde.getFile().getAnIncludedFile().getBaseName().matches("%wdm.h"))
     }
 }
 
