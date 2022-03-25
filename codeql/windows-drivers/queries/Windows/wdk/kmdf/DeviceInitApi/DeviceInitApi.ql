@@ -8,7 +8,7 @@
  * @tags correctness
  */
 
-import KmdfDrivers
+import Windows.wdk.kmdf.KmdfDrivers
 import semmle.code.cpp.controlflow.StackVariableReachability
 import semmle.code.cpp.dataflow.DataFlow
 import DataFlow::PathGraph
