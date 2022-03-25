@@ -85,9 +85,9 @@ class InitAPIDataFlow extends DataFlow::Configuration {
     }
 
     override predicate isAdditionalFlowStep(DataFlow::Node source, DataFlow::Node sink) {
-        sink.getFunction().getName().matches("WdfDeviceCreate")
-        and exists (FunctionCall fc | 
+        exists (FunctionCall fc | 
             fc.getTarget().getName().matches("WdfDeviceCreate")
+            and fc.getTarget() = sink.getFunction()
             and fc.getArgument(0).getAChild*() = source.asExpr())
     }
 
