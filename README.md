@@ -2,19 +2,15 @@
 
 This repository contains supplemental open-source components for use in developing device drivers for Windows.  When initially cloning, please use "git clone --recurse-submodules" to ensure you clone necessary dependencies.
 
+## About this branch
+
+The WHCP_22H2 branch contains the CodeQL queries and suites used for certifying for Windows 11 Version 22H2.  It should be used when running CodeQL as part of the Static Tools Logo test for this release.
+
+This branch uses [version lgtm/1.29.0 of the CodeQL queries](https://github.com/github/codeql/releases/tag/lgtm%2Fv1.29.0) and should be used with [version 2.6.3 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3).
+
 ## CodeQL
 
 The CodeQL subfolder contains queries and suites required for certification of Windows drivers.  For full documentation, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql) on Microsoft Docs.
-
-The main branch of this repo currently uses [version 2.6.3 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) and [version lgtm/1.29.0 of the CodeQL queries](https://github.com/github/codeql/releases/tag/lgtm%2Fv1.29.0).  When using this repo to certify a driver, please use the appropriate sub-branch for the Windows release in question:
-
-| Release                  | Branch to use |
-|--------------------------|---------------|
-| Windows Server 2022      | WHCP_21H2     |
-| Windows 11               | WHCP_21H2     |
-| Windows 11, version 22H2 | WHCP_22H2     |
-
-Release branches may differ in the version of the CodeQL CLI and queries they use.  Check the branch's README.md for details.
 
 ## Contributing
 
