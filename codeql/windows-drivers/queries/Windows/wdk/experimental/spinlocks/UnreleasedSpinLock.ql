@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import SpinLock
 
 // CFG to check if, for a given spinlock acquire call, there is *no* release call.

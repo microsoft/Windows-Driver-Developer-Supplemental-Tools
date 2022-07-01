@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import cpp
 import Windows.wdk.wdm.WdmDrivers
 import semmle.code.cpp.ir.dataflow.DataFlow

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 /**
  * @name Access of WDF init API after WdfDeviceCreate
  * @description Calling a WDF init API on a device init object after calling WdfDeviceCreate can cause system instability.

@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import SpinLock
 import semmle.code.cpp.ir.dataflow.DataFlow
 import semmle.code.cpp.ir.dataflow.TaintTracking

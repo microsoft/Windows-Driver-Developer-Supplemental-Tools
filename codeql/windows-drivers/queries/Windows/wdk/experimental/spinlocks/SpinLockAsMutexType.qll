@@ -1,3 +1,6 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 import Windows.wdk.wdm.WdmDrivers
 import SpinLock
 import semmle.code.cpp.commons.Synchronization
