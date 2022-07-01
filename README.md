@@ -12,6 +12,7 @@ The main branch of this repo currently uses [version 2.6.3 of the CodeQL CLI](ht
 |--------------------------|---------------|
 | Windows Server 2022      | WHCP_21H2     |
 | Windows 11               | WHCP_21H2     |
+| Windows 11, version 22H2 | WHCP_22H2     |
 
 Release branches may differ in the version of the CodeQL CLI and queries they use.  Check the branch's README.md for details.
 
