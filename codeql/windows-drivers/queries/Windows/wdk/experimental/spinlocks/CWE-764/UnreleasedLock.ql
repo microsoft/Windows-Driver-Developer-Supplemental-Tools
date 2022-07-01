@@ -13,7 +13,7 @@
 
 import cpp
 import semmle.code.cpp.commons.Synchronization
-import Windows.wdk.experimental.SpinLockAsMutexType
+import Windows.wdk.experimental.spinlocks.SpinLockAsMutexType
 
 predicate lockBlock(MutexType t, BasicBlock b, int locks) {
   locks = strictcount(int i | b.getNode(i) = t.getLockAccess())
