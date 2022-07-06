@@ -1,0 +1,3 @@
+provide:
+  - codeql/codeql-queries/qlpack.yml
+  - codeql/windows-drivers/queries/qlpack.yml

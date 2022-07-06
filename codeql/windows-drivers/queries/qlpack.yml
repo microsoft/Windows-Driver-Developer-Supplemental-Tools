@@ -4,5 +4,7 @@
 name: windows-drivers
 version: 0.9.6
 dependencies:
-  codeql/cpp-all: "*"
+    codeql/cpp-queries: ^0.3.0
+    codeql/cpp-all: ^0.3.0
 suites: suites
+extractor: cpp

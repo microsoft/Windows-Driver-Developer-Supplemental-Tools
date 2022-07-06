@@ -1,2 +1,0 @@
-{ "provide": [ "codeql/codeql-queries/.codeqlmanifest.json",
-               "codeql/windows-drivers/queries/qlpack.yml"] }
