@@ -1,10 +1,12 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-name: windows-drivers
-version: 0.9.6
+name: microsoft/windows-drivers
+version: 0.1.0
 dependencies:
-    codeql/cpp-queries: ^0.3.0
+    codeql/cpp-queries: ^0.2.0
     codeql/cpp-all: ^0.3.0
 suites: suites
 extractor: cpp
+licenses: MIT
+description: CodeQL queries designed for Windows device driver development.
