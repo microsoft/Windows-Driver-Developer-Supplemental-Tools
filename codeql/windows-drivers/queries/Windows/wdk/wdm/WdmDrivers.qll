@@ -4,7 +4,7 @@
 import cpp
 import SAL
 
-// Standard WDM callback routines.
+/** A typedef for the standard WDM callback routines. */
 class WdmCallbackRoutineTypedef extends TypedefType {
 
     WdmCallbackRoutineTypedef() {
@@ -17,10 +17,15 @@ class WdmCallbackRoutineTypedef extends TypedefType {
     }
 }
 
-// Define a function as a callback routine if its typedef
-// matches one of the typedefs above.
+/*
+ * A function implementing a WDM callback routine.
+ * Defines a function to be a callback routine iff it has a typedef
+ * in its definition which matches the WDM callback typedefs, and it
+ * is in a WDM driver (includes wdm.h.)
+ */
 class WdmCallbackRoutine extends Function
 {
+    /** The callback routine type, i.e. DRIVER_UNLOAD. */
     WdmCallbackRoutineTypedef callbackType;
 
     WdmCallbackRoutine()
@@ -32,6 +37,7 @@ class WdmCallbackRoutine extends Function
     }
 }
 
+/** A WDM DriverUnload callback routine. */
 class WdmDriverUnload extends WdmCallbackRoutine {
     WdmDriverUnload() 
     {
@@ -39,81 +45,7 @@ class WdmDriverUnload extends WdmCallbackRoutine {
     }
 }
 
-// WDM dispatch routine class.
-// We hold a routine to be a dispatch routine if there is
-// an assignment in DriverEntry that assigns the function to
-// the dispatch table.
-cached class WdmDispatchRoutine extends WdmCallbackRoutine
-{
-    Literal dispatchType; // IRP_MJ_XXX, etc.  CodeQL evaluates these to raw 
-                          // numbers because we are looking at an array ref.
-
-    WdmDriverEntry driverEntry; // The DriverEntry function this assignment happened in
-
-    cached WdmDispatchRoutine()
-    {
-        callbackType.getName().matches("DRIVER_DISPATCH") and
-        exists (DispatchRoutineAssignment dra, ArrayExpr ae, PointerFieldAccess pfa, VariableAccess va |
-            dra.getLValue() = ae
-            and ae.getArrayBase() = pfa
-            and pfa.getQualifier() = va 
-            and va.getTarget().getType().getName().matches("PDRIVER_OBJECT")
-            and ae.getArrayOffset() = dispatchType
-            and dra.getTarget() = this 
-            and dra.getEnclosingFunction() = driverEntry)      
-    }
-
-    cached Literal getDispatchType()
-    {
-        result = dispatchType
-    }
-
-    cached WdmDriverEntry getDriverEntry()
-    {
-        result = driverEntry
-    }
-
-    cached abstract predicate matchesAnnotation(DispatchTypeDefinition dtd);
-}
-
-// An assignment from a function to a WDM dispatch routine table.
-class DispatchRoutineAssignment extends AssignExpr
-{
-    // A common paradigm in dispatch routine setup is to chain assignments.
-    // To cover that, we'll need to handle this recursively.
-
-    DispatchRoutineAssignment() {
-        isDispatchRoutineAssignment(this)
-    }
-
-    cached WdmCallbackRoutine getTarget() {
-        if exists (FunctionAccess fa |
-            this.getRValue() = fa 
-            and fa.getTarget() instanceof WdmCallbackRoutine)
-        then result = ((FunctionAccess)(this.getRValue())).getTarget()
-        else result = getTarget_aux(this.getRValue())
-    }
-
-    WdmCallbackRoutine getTarget_aux(AssignExpr ae) {
-        if exists (FunctionAccess fa |
-            ae.getRValue() = fa 
-            and fa.getTarget() instanceof WdmCallbackRoutine)
-        then result = ((FunctionAccess)(ae.getRValue())).getTarget()
-        else result = getTarget_aux(ae.getRValue())
-    }
-}
-
-// We can't include this predicate in the body of
-// the class above, so it is split out here.
-private predicate isDispatchRoutineAssignment(AssignExpr ae) {
-    exists (FunctionAccess fa |
-        ae.getRValue() = fa 
-        and fa.getTarget() instanceof WdmCallbackRoutine)
-    or (ae.getRValue() instanceof AssignExpr
-    and isDispatchRoutineAssignment((AssignExpr)ae.getRValue()))
-}
-
-// DriverEntry actually uses a typedef called DRIVER_INITIALIZE.
+/** A WDM DriverEntry callback routine. */
 class WdmDriverEntry extends WdmCallbackRoutine
 {
     WdmDriverEntry()
@@ -122,38 +54,228 @@ class WdmDriverEntry extends WdmCallbackRoutine
     }
 }
 
+/*
+ * WDM dispatch routine class.
+ * We hold a routine to be a dispatch routine if there is
+ * an assignment in DriverEntry that assigns the function to
+ * the dispatch table.
+*/
+cached class WdmDispatchRoutine extends WdmCallbackRoutine
+{
+    /** 
+     * The IRP type covered by this dispatch routine.  
+     * Although this appears in the code as the string IRP_MJ_ZZZ,
+     * these are macros that expand to hex values that CodeQL interprets
+     * as decimal numbers.  
+     */
+    Literal dispatchType;
 
-// Define a use of a _Dispatch_type_, etc. macro
+    /** The DriverEntry function this dispatch routine was assigned in. */
+    WdmDriverEntry driverEntry;
+
+    /**
+     * Dispatch routines are defined by assignments of the form
+     * DriverObject->MajorFunction[IRP_MJ_CREATE] = CreateRoutine;
+     * This characteristic predicate thus looks for assignments of this form 
+     * where the right-side value is a function with the DRIVER_DISPATCH typedef.
+    */
+    cached WdmDispatchRoutine()
+    {
+        callbackType.getName().matches("DRIVER_DISPATCH") and
+        exists (CallbackRoutineAssignment cra, ArrayExpr dispatchTable, PointerFieldAccess fieldAccess, VariableAccess driverObjectAccess |
+            cra.getLValue() = dispatchTable
+            and dispatchTable.getArrayBase() = fieldAccess
+            and dispatchTable.getArrayOffset() = dispatchType
+            and fieldAccess.getQualifier() = driverObjectAccess 
+            and driverObjectAccess.getTarget().getType().getName().matches("PDRIVER_OBJECT")
+            and cra.getTarget() = this 
+            and cra.getEnclosingFunction() = driverEntry)      
+    }
+
+    /** Gets the IRP type this dispatch routine handles, as a number. */
+    cached Literal getDispatchType()
+    {
+        result = dispatchType
+    }
+
+    /** Gets the DriverEntry this dispatch routine was assigned in. */
+    cached WdmDriverEntry getDriverEntry()
+    {
+        result = driverEntry
+    }
+
+    /** Returns true if the given SAL annotation matches the dispatch type of this function. */
+    cached abstract predicate matchesAnnotation(DispatchTypeDefinition dtd);
+}
+
+/** An assignment where the right-hand side is a WDM callback routine. */ 
+class CallbackRoutineAssignment extends AssignExpr
+{
+    /* 
+     * A common paradigm in dispatch routine setup is to chain assignments to cover multiple IRPs.
+     * As such, it's necessary to recursively walk the assignment to handle cases such as
+     *   DriverObject->MajorFunction[IRP_MJ_CREATE] =
+     *   DriverObject->MajorFunction[IRP_MJ_OPEN] =
+     *   MyMultiFunctionIrpHandler;
+     * However, characterstic predicates cannot be recurisve, so the logic is placed in a separate
+     * predicate below, isCallbackRoutineAssignment.
+     */
+
+    CallbackRoutineAssignment() {
+        isCallbackRoutineAssignment(this)
+    }
+
+    /** Gets the callback routine that this dispatch routine assignment is targeting. */
+    cached WdmCallbackRoutine getTarget() {
+        if exists (FunctionAccess fa |
+            this.getRValue() = fa 
+            and fa.getTarget() instanceof WdmCallbackRoutine)
+        then result = ((FunctionAccess)(this.getRValue())).getTarget()
+        else result = getTarget_aux(this.getRValue())
+    }
+
+    /** Auxilliary function to getTarget(). */
+    private WdmCallbackRoutine getTarget_aux(AssignExpr ae) {
+        if exists (FunctionAccess fa |
+            ae.getRValue() = fa 
+            and fa.getTarget() instanceof WdmCallbackRoutine)
+        then result = ((FunctionAccess)(ae.getRValue())).getTarget()
+        else result = getTarget_aux(ae.getRValue())
+    }
+}
+
+/** Determines if a given assignment, recursively, has a WDM callback routine as the right-hand side. */
+private predicate isCallbackRoutineAssignment(AssignExpr ae) {
+    exists (FunctionAccess fa |
+        ae.getRValue() = fa 
+        and fa.getTarget() instanceof WdmCallbackRoutine)
+    or (ae.getRValue() instanceof AssignExpr
+    and isCallbackRoutineAssignment((AssignExpr)ae.getRValue()))
+}
+
+/** A SAL _Dispatch_type_ or __drv_dispatchType macro, i.e. _Dispatch_type_(IRP_MJ_READ) */
 class DispatchTypeDefinition extends SALAnnotation {
 
+    /** 
+     * The dispatch/IRP type referred to by this annotation.
+     * When a _Dispatch_type_ annotation refers to IRP_MJ_READ or another IRP type,
+     * "IRP_MJ_READ" is itself a preprocessor macro which expands to a hex value, and
+     * that hex value is what is stored in this field.
+      */ 
     string dispatchType;
+
+    /** 
+     * The dispatch/IRP type referred to by this annotation.
+     * This is the raw name, i.e. IRP_MJ_CREATE.
+     */
+    string dispatchTypeName;
 
     DispatchTypeDefinition ()
     {
         this.getMacroName().matches(["_Dispatch_type_", "__drv_dispatchType"])
-        and 
-
-        // References to IRP_MJ_CREATE, etc. are themselves MacroInvocations
-        // that are expanded to 0x[value].  For two IRP types they expand
-        // to another macro ref, so we handle those cases below.
-        exists (MacroInvocation mi |
+        and exists (MacroInvocation mi |
             mi.getParentInvocation() = this
-            and mi.getMacroName().matches("%IRP_M%")
+            and mi.getMacroName().matches( ["IRP_MJ_CREATE",
+                                            "IRP_MJ_CREATE_NAMED_PIPE",
+                                            "IRP_MJ_CLOSE",
+                                            "IRP_MJ_READ",
+                                            "IRP_MJ_WRITE",
+                                            "IRP_MJ_QUERY_INFORMATION",
+                                            "IRP_MJ_SET_INFORMATION",
+                                            "IRP_MJ_QUERY_EA",
+                                            "IRP_MJ_SET_EA",
+                                            "IRP_MJ_FLUSH_BUFFERS",
+                                            "IRP_MJ_QUERY_VOLUME_INFORMATION",
+                                            "IRP_MJ_SET_VOLUME_INFORMATION",
+                                            "IRP_MJ_DIRECTORY_CONTROL",
+                                            "IRP_MJ_FILE_SYSTEM_CONTROL",
+                                            "IRP_MJ_DEVICE_CONTROL",
+                                            "IRP_MJ_INTERNAL_DEVICE_CONTROL",
+                                            "IRP_MJ_SHUTDOWN",
+                                            "IRP_MJ_LOCK_CONTROL",
+                                            "IRP_MJ_CLEANUP",
+                                            "IRP_MJ_CREATE_MAILSLOT",
+                                            "IRP_MJ_QUERY_SECURITY",
+                                            "IRP_MJ_SET_SECURITY",
+                                            "IRP_MJ_POWER",
+                                            "IRP_MJ_SYSTEM_CONTROL",
+                                            "IRP_MJ_DEVICE_CHANGE",
+                                            "IRP_MJ_QUERY_QUOTA",
+                                            "IRP_MJ_SET_QUOTA",
+                                            "IRP_MJ_PNP",
+                                            "IRP_MJ_PNP_POWER",
+                                            "IRP_MJ_MAXIMUM_FUNCTION",
+                                            "IRP_MJ_SCSI",
+                                            "IRP_MN_SCSI_CLASS",
+                                            "IRP_MN_START_DEVICE",
+                                            "IRP_MN_QUERY_REMOVE_DEVICE",
+                                            "IRP_MN_REMOVE_DEVICE",
+                                            "IRP_MN_CANCEL_REMOVE_DEVICE",
+                                            "IRP_MN_STOP_DEVICE",
+                                            "IRP_MN_QUERY_STOP_DEVICE",
+                                            "IRP_MN_CANCEL_STOP_DEVICE",
+                                            "IRP_MN_QUERY_DEVICE_RELATIONS",
+                                            "IRP_MN_QUERY_INTERFACE",
+                                            "IRP_MN_QUERY_CAPABILITIES",
+                                            "IRP_MN_QUERY_RESOURCES",
+                                            "IRP_MN_QUERY_RESOURCE_REQUIREMENTS",
+                                            "IRP_MN_QUERY_DEVICE_TEXT",
+                                            "IRP_MN_FILTER_RESOURCE_REQUIREMENTS",
+                                            "IRP_MN_READ_CONFIG",
+                                            "IRP_MN_WRITE_CONFIG",
+                                            "IRP_MN_EJECT",
+                                            "IRP_MN_SET_LOCK",
+                                            "IRP_MN_QUERY_ID",
+                                            "IRP_MN_QUERY_PNP_DEVICE_STATE",
+                                            "IRP_MN_QUERY_BUS_INFORMATION",
+                                            "IRP_MN_DEVICE_USAGE_NOTIFICATION",
+                                            "IRP_MN_SURPRISE_REMOVAL",
+                                            "IRP_MN_DEVICE_ENUMERATED",
+                                            "IRP_MN_WAIT_WAKE",
+                                            "IRP_MN_POWER_SEQUENCE",
+                                            "IRP_MN_SET_POWER",
+                                            "IRP_MN_QUERY_POWER",
+                                            "IRP_MN_QUERY_ALL_DATA",
+                                            "IRP_MN_QUERY_SINGLE_INSTANCE",
+                                            "IRP_MN_CHANGE_SINGLE_INSTANCE",
+                                            "IRP_MN_CHANGE_SINGLE_ITEM",
+                                            "IRP_MN_ENABLE_EVENTS",
+                                            "IRP_MN_DISABLE_EVENTS",
+                                            "IRP_MN_ENABLE_COLLECTION",
+                                            "IRP_MN_DISABLE_COLLECTION",
+                                            "IRP_MN_REGINFO",
+                                            "IRP_MN_EXECUTE_METHOD",
+                                            "IRP_MN_REGINFO_EX"] )
             and dispatchType = mi.getMacro().getBody()
+            and dispatchTypeName = mi.getMacroName()
         )
     }
 
+    /** Gets the dispatch/IRP type this annotation is denoting, i.e. IRP_MJ_READ, as a hex value. */
     string getDispatchType()
     {
-        // Note that these are the _post_expanded macros.  The cases below are actually
-        // capturing the IRP_MJ_PNP_POWER and IRP_MJ_SCSI cases.
+        /*
+        * Two IRP types, IRP_MJ_PNP_POWER and IRP_MJ_SCSI, share an identifier with IRP_MJ_PNP
+        * and IRP_MJ_INTERNAL_DEVICE_CONTROL and as such expand to those strings rather than
+        * a hex value, and are handled as a special case.
+        */
         if (dispatchType = "IRP_MJ_PNP") then result = "0x1b"
         else if (dispatchType = "IRP_MJ_INTERNAL_DEVICE_CONTROL") then result = "0x0f"
         else result = dispatchType
     }
+
+    string getDispatchTypeAsName()
+    {
+        result = dispatchTypeName
+    }
 }
 
-// WDM.h IRP function types.  Auto-generated.
+/* 
+ * Classes representing each dispatch routine type, auto-generated from WDM.h.
+ * Due to differences in how CodeQL parses IRP macros when used in an array access
+ * as opposed to an annotation, each uses the matchesAnnotation() function to map from
+ * the hex value of the IRP ID to the decimal value.
+ */
 // IRP_MJ_CREATE
 class WdmIrpMjCreate extends WdmDispatchRoutine { WdmIrpMjCreate() { dispatchType.toString().matches("0") } override predicate matchesAnnotation(DispatchTypeDefinition dtd) { dtd.getDispatchType().toLowerCase().matches("0x00") }  }
 // IRP_MJ_CREATE_NAMED_PIPE

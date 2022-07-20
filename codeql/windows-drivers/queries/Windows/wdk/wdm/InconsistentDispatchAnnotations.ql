@@ -10,7 +10,7 @@
  * @kind problem
  * @id cpp/windows/wdk/inconsistent-dispatch-annotation
  * @problem.severity warning
- * @query-version 0.9
+ * @query-version v1
  */
 
 import WdmDrivers
@@ -19,4 +19,4 @@ from DispatchTypeDefinition dmi, WdmDispatchRoutine wdr, FunctionDeclarationEntr
 where fde = wdr.getADeclarationEntry() and
 dmi.getDeclarationEntry() = fde and
 not (wdr.matchesAnnotation(dmi))
-select fde, "Function declaration of " + fde.getFunction().getName() + " is annotated as a different dispatch type than it is assigned as in the driver's DRIVER_INITIALIZE function ($@).", wdr.getDriverEntry(), wdr.getDriverEntry().getName()
+select fde, "Function declaration of " + fde.getFunction().getName() + " is annotated as a different dispatch type (" + dmi.getDispatchTypeAsName() + ") than it is assigned to in the driver's DriverEntry function ($@). Dispatch type annotations should match the assigned dispatch type of the function.  Please review, as this may indicate a mistake in dispatch assignment.", wdr.getDriverEntry(), wdr.getDriverEntry().getName()

@@ -3,19 +3,21 @@
 
 import cpp
 
-// Standard WDM callback routines.
+/** A typedef for standard KMDF callbacks.  This class is incomplete. */
 class KmdfCallbackRoutineTypedef extends TypedefType {
 
     KmdfCallbackRoutineTypedef() {
         this.getName().matches("DRIVER_INITIALIZE")
-        or this.getName().matches("EVT_WDF_DRIVER_DEVICe_ADD")
+        or this.getName().matches("EVT_WDF_DRIVER_DEVICE_ADD")
     }
 }
 
-// Define a function as a callback routine if its typedef
-// matches one of the typedefs above.
+/** A KMDF callback routine, defined by having a typedef in its definition 
+ * that matches the standard KMDF callbacks.
+ */
 class KmdfCallbackRoutine extends Function
 {
+    /** The typedef representing what callback this is. */
     KmdfCallbackRoutineTypedef callbackType;
 
     KmdfCallbackRoutine()
@@ -27,20 +29,21 @@ class KmdfCallbackRoutine extends Function
     }
 }
 
-
-// DriverEntry actually uses a typedef called DRIVER_INITIALIZE.
-class KmdfDriverEntry extends KmdfCallbackRoutine
+/** The KMDF DriverEntry function.  KMDF enforces that the function is named DriverEntry. 
+ * Additionally, the driver may use the DRIVER_INIRIALIZE typedef.
+*/
+class KmdfDriverEntry extends Function
 {
     KmdfDriverEntry()
     {
-        callbackType.getName().matches("DRIVER_INITIALIZE")
+        this.getName().matches("DriverEntry")
     }
 }
 
-// DriverEntry actually uses a typedef called DRIVER_INITIALIZE.
-class KmdfDeviceAdd extends KmdfCallbackRoutine
+/** The DeviceAdd callback.  Its callback typedef is "EVT_WDF_DRIVER_DEVICE_ADD". */
+class KmdfEvtDriverDeviceAdd extends KmdfCallbackRoutine
 {
-    KmdfDeviceAdd()
+    KmdfEvtDriverDeviceAdd()
     {
         callbackType.getName().matches("EVT_WDF_DRIVER_DEVICE_ADD")
     }

@@ -2,8 +2,9 @@
 // Licensed under the MIT license.
 
 /**
- * @name Access of WDF init API after WdfDeviceCreate
- * @description Calling a WDF init API on a device init object after calling WdfDeviceCreate can cause system instability.
+ * @name Calling WDF object initialization API after WdfDeviceCreate
+ * @description Calling a WDF init API on a WDFDEVICE_INIT structure after calling WdfDeviceCreate can cause system instability, as the framework takes ownership of the structure. 
+ * Partially ported from the Static Driver Verifier (SDV) rule DeviceInitAPI; see https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/kmdf-deviceinitapi for details.
  * @kind path-problem
  * @problem.severity error
  * @precision medium
@@ -12,12 +13,12 @@
  */
 
 import Windows.wdk.kmdf.KmdfDrivers
-import semmle.code.cpp.controlflow.StackVariableReachability
 import semmle.code.cpp.dataflow.DataFlow
 import DataFlow::PathGraph
 
-class PostInitApi extends Function {
-    PostInitApi() {
+/** A function that initializes or changes a WDFDEVICE_INIT struct, and which must not be called after WDFDeviceCreate. */
+class WdfInitializationApi extends Function {
+    WdfInitializationApi() {
         this.getName() = 
         ["WdfDeviceInitSetPnpPowerEventCallbacks",
         "WdfDeviceInitSetFileObjectConfig",
@@ -49,20 +50,25 @@ class PostInitApi extends Function {
     }
 }
 
-class BannedAPICall extends FunctionCall{
-    BannedAPICall() {
-        isBannedAPICall(this)
+/** A call to a WDF initialization API. */
+class WdfInitiailzationApiCall extends FunctionCall{
+    WdfInitiailzationApiCall() {
+        isWdfInitializationApiCall_aux(this)
     }
 }
-
-predicate isBannedAPICall(FunctionCall fc)
+/** Recursive predicate to determine if a function call directly or 
+ * indirectly calls a WDF initialization API.
+ */
+predicate isWdfInitializationApiCall_aux(FunctionCall fc)
 {
-    fc.getTarget() instanceof PostInitApi
+    fc.getTarget() instanceof WdfInitializationApi
     or exists (FunctionCall fc2 | 
         fc2.getControlFlowScope() = fc.getTarget()
-        and isBannedAPICall(fc2))
+        and isWdfInitializationApiCall_aux(fc2))
 }
-
+/** A predicate to determine if a given expression is a direct or indirect
+ * child of a given function call.
+ */
 predicate isChildExpr(Expr e, FunctionCall func) {
     func.getAChild*() = e or
     exists (FunctionCall fc2 | 
@@ -70,6 +76,9 @@ predicate isChildExpr(Expr e, FunctionCall func) {
         and isChildExpr(e, fc2))
 }
 
+/** A data-flow model to determine if a use of a WDFDEVICE_INIT struct is 
+ * used in an initialization function after WdfDeviceCreate is called.
+*/
 class InitAPIDataFlow extends DataFlow::Configuration {
     InitAPIDataFlow() {
         this = "KMDFDeviceInitApiFlow"
@@ -83,7 +92,7 @@ class InitAPIDataFlow extends DataFlow::Configuration {
 
     override predicate isSink(DataFlow::Node sink) {
         exists (FunctionCall fc | 
-            fc.getTarget() instanceof PostInitApi 
+            fc.getTarget() instanceof WdfInitializationApi 
             and fc.getArgument(0).getAChild*() = sink.asExpr())
     }
 
@@ -97,9 +106,9 @@ class InitAPIDataFlow extends DataFlow::Configuration {
 }
 
 from InitAPIDataFlow iadf, DataFlow::PathNode e1, DataFlow::PathNode e2
-where exists (FunctionCall driverCreateCall, BannedAPICall apiCall |
+where exists (FunctionCall driverCreateCall, WdfInitiailzationApiCall apiCall |
     driverCreateCall.getAChild*() = e1.getNode().asExpr()
     and isChildExpr(e2.getNode().asExpr(), apiCall)
     and driverCreateCall.getASuccessor*() = apiCall)
     and iadf.hasFlowPath(e1, e2)
-select e1.getNode(), e1, e2, "Called a WDF API after DeviceCreate"
+select e1.getNode(), e1, e2, "A WDF device object initialization method was called after WdfDeviceCreate was called on the same WDFDEVICE_INIT struct.  This can lead to system instability."
