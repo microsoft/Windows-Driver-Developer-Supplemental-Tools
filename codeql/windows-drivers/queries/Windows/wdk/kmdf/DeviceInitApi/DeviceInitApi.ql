@@ -9,6 +9,7 @@
  * @precision medium
  * @id cpp/windows/wdk/kmdf/DeviceInitApi
  * @tags correctness
+ * @query-version v1
  */
 
 import Windows.wdk.kmdf.KmdfDrivers
