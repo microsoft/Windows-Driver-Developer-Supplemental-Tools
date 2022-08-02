@@ -12,7 +12,7 @@
  * @query-version v1
  */
 
-import Windows.wdk.kmdf.KmdfDrivers
+import drivers.kmdf.libraries.KmdfDrivers
 import semmle.code.cpp.dataflow.DataFlow
 import DataFlow::PathGraph
 

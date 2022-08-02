@@ -16,4 +16,4 @@
   from: windows-drivers
 - include:
     query path: 
-      - Windows/wdk/wdk-deprecated-api.ql
+      - drivers/queries/wdk-deprecated-api.ql

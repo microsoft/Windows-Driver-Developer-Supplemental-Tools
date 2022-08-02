@@ -12,7 +12,7 @@
  * @query-version v1
  */
 
-import WdmDrivers
+import drivers.wdm.libraries.WdmDrivers
 
 from DispatchTypeDefinition dmi, WdmDispatchRoutine wdr, FunctionDeclarationEntry fde
 where

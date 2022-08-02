@@ -1,3 +1,2 @@
 # query compilation caches
-*/codeql/**/*.cache
-codeql/**/*.cache
+**/*.cache

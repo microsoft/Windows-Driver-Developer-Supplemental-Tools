@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 import cpp
-import SAL
+import drivers.libraries.SAL
 
 /** A typedef for the standard WDM callback routines. */
 class WdmCallbackRoutineTypedef extends TypedefType {
