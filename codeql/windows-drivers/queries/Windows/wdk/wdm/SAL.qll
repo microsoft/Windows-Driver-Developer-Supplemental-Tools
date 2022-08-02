@@ -4,6 +4,9 @@
  * 
  * This version of this file has been updated to include driverspecs.h as a valid SAL header.
  * It will be removed if and when that change is upstreamed to the main CodeQL repo.
+ * 
+ * TODO: Create PR to bring into main CodeQL repo or recieve feedback on how to more cleanly
+ * extend this module in our own file without copying the existing library.
  */
 
 import cpp

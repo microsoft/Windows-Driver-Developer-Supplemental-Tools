@@ -1,7 +1,7 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-- description: Security queries recommended for Windows Drivers
+- description: Recommended and required queries for Windows Drivers.
 - import: suites/windows_driver_mustfix.qls
 - queries: . 
   from: codeql/cpp-queries
