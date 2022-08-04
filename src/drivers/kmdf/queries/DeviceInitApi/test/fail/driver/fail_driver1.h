@@ -5,6 +5,9 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 Module Name:
 
     fail_driver1.h
+    
+    TODO: Remove all references to SDV throughout these drivers, or replace
+    with unit test code snippets to be used with Abenezer's test framework.
 
 Environment:
 

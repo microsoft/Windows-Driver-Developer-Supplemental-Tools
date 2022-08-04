@@ -12,6 +12,9 @@ Abstract:
     CodeQL query, in contrast to the "fail" variation in a sibling folder.
     This driver is not functional and not intended as a sample for real 
     driver development projects.
+    
+    TODO: Remove all references to SDV throughout these drivers, or replace
+    with unit test code snippets to be used with Abenezer's test framework.
 
 Environment:
 

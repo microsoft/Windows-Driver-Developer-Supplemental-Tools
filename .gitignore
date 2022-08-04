@@ -1,2 +1,5 @@
 # query compilation caches
 **/*.cache
+
+# IDE folders
+.vscode/*
