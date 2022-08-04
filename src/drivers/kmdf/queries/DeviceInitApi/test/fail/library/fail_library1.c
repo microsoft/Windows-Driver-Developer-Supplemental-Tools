@@ -8,10 +8,10 @@ Module Name:
 
 Abstract:
 
-    Template library that can be used together with a driver for testing the 
-    seamless build feature of SDV via defect injection. This library is not 
-    functional and not intended as a sample for real software development 
-    projects. It only provides a skeleton for building a defective library.
+    This is a sample library that is designed to fail the "DeviceInitApi"
+    CodeQL query, in contrast to the "pass" variation in a sibling folder.
+    This library is not functional and not intended as a sample for real 
+    driver development projects.
 
 Environment:
 

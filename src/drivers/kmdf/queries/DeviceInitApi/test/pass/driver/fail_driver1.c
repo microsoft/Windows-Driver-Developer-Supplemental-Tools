@@ -8,10 +8,10 @@ Module Name:
 
 Abstract:
 
-    This is a sample driver that contains intentionally placed code defects 
-    in order to illustrate how Static Driver Verifier works. This driver is
-    not functional and not intended as a sample for real driver development
-    projects.
+    This is a sample driver that is designed to pass the "DeviceInitApi"
+    CodeQL query, in contrast to the "fail" variation in a sibling folder.
+    This driver is not functional and not intended as a sample for real 
+    driver development projects.
 
 Environment:
 
