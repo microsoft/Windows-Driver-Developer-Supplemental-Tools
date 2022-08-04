@@ -1,8 +1,8 @@
 # Copyright (c) Microsoft Corporation.
 # Licensed under the MIT license.
 
-- description: Security queries recommended for Windows Drivers
-- import: suites\windows_driver_mustfix.qls
+- description: Recommended and required queries for Windows Drivers.
+- import: suites/windows_driver_mustfix.qls
 - queries: . 
   from: codeql/cpp-queries
 - include:
@@ -24,9 +24,9 @@
   from: windows-drivers
 - include:
     query path: 
-      - Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
-      - Likely Bugs/Conversion/BadOverflowGuard.ql
-      - Likely Bugs/Conversion/InfiniteLoop.ql
-      - Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
-      - Likely Bugs/UninitializedPtrField.ql
-      - Security/Crytpography/HardcodedIVCNG.ql
+      - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
+      - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
+      - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
+      - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - microsoft/Likely Bugs/UninitializedPtrField.ql
+      - microsoft/Security/Crytpography/HardcodedIVCNG.ql

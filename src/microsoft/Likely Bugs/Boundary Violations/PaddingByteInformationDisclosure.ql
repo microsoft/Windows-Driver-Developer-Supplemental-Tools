@@ -15,7 +15,7 @@
  */
 
 import cpp
-import microsoft.code.cpp.commons.MemoryAllocation
+import microsoft.commons.MemoryAllocation
 import semmle.code.cpp.padding.Padding
 
 /**

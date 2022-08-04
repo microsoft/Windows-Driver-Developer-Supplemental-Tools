@@ -1,8 +1,0 @@
-# Copyright (c) Microsoft Corporation.
-# Licensed under the MIT license.
-
-name: windows-drivers
-version: 0.9.6
-dependencies:
-  codeql/cpp-all: "*"
-suites: suites
