@@ -38,10 +38,10 @@ class IncorrectMDLFieldAccess extends FieldAccess {
 
   IncorrectMDLFieldAccess() {
     accessedField = this.getTarget() and
+    not accessedField.getName().matches(["Next", "MdlFlags"]) and
+    not this.getFile().getBaseName().matches("wdm.h") and
     exists(MDL mdl |
       this.getTarget() = mdl.getAMember() and
-      not accessedField.getName().matches(["Next", "MdlFlags"]) and
-      not this.getFile().getBaseName().matches("wdm.h") and
       not (
         this.isInMacroExpansion() and
         exists(SafeMDLMacro m | m.getAnInvocation().getAnExpandedElement() = this)
