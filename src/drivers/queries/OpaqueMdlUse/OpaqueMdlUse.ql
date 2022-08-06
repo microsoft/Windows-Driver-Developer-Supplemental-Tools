@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Direct access of opaque MDL field (C28145)
- * @description Direct access of opaque MDL fields should be avoided, as mistakes can lead to instability.  This is a port of the Code Analysis rule C28145.
+ * @name Direct access of opaque MDL field
+ * @description Direct access of opaque MDL fields should be avoided, as mistakes can lead to instability.
  * @platform Desktop
  * @feature.area Multiple
  * @repro.text The following code locations directly access an opaque MDL field.
@@ -15,25 +15,7 @@
  */
 
 import cpp
-
-/**A class representing a Memory Descriptor List structure. */
-class MDL extends Struct {
-  MDL() {
-    this.getName().matches("_MDL") and
-    this.getFile().getBaseName().matches("wdm.h")
-  }
-}
-
-/** A class representing a macro used to access opaque members of an MDL struct. */
-class SafeMDLMacro extends Macro {
-  SafeMDLMacro() {
-    this.getName().matches(["MmGetMdlVirtualAddress", "MmGetMdlByteCount", "MmGetMdlByteOffset"]) and
-    this.getFile().getBaseName().matches("wdm.h")
-    or
-    this.getName().matches(["NdisAdjustMdlLength"]) and
-    this.getFile().getBaseName().matches("ndis.h")
-  }
-}
+import Mdl
 
 /**
  * A class representing an access to a member of an MDL which is neither:
@@ -41,17 +23,19 @@ class SafeMDLMacro extends Macro {
  * - Part of the WDM header files
  * - The result of expanding a safe macro to access these structs
  */
-class IncorrectMDLFieldAccess extends FieldAccess {
+class IncorrectMdlFieldAccess extends FieldAccess {
   Field accessedField;
 
-  IncorrectMDLFieldAccess() {
+  IncorrectMdlFieldAccess() {
     accessedField = this.getTarget() and
-    exists(MDL mdl | this.getTarget() = mdl.getAMember()) and
+    exists(Mdl mdl | this.getTarget() = mdl.getAMember()) and
     not accessedField.getName().matches(["Next", "MdlFlags"]) and
     not this.getFile().getBaseName().matches("wdm.h") and
     not (
       this.isInMacroExpansion() and
-      exists(SafeMDLMacro safeMacro | safeMacro.getAnInvocation().getAnExpandedElement() = this)
+      exists(SafeMdlAccessMacro safeMacro |
+        safeMacro.getAnInvocation().getAnExpandedElement() = this
+      )
     )
   }
 
@@ -70,14 +54,19 @@ class IncorrectMDLFieldAccess extends FieldAccess {
         if accessedField.getName().matches("MappedSystemVa")
         then
           result =
-            "Direct access of opaque MDL field (MappedSystemVa). This field should not be directly accessed.  Please use the MmGetMdlVirtualAddress() macro instead."
+            "Direct access of opaque MDL field (MappedSystemVa). This field should not be directly accessed.  Please use the MmGetSystemAddressForMdlSafe() macro instead."
         else
-          result =
-            "Direct access of opaque MDL field (" + accessedField.getName() +
-              "). This field should not be accessed."
+          if accessedField.getName().matches("StartVa")
+          then
+            result =
+              "Direct access of opaque MDL field (StartVa).  This field should not be directly accessed.  If you are using this access in conjunction with the ByteOffset to calculate the virtual address of the buffer described by an MDL, please use the MmGetMdlVirtualAddress() macro instead."
+          else
+            result =
+              "Direct access of opaque MDL field (" + accessedField.getName() +
+                "). This field should not be accessed."
   }
 }
 
-from IncorrectMDLFieldAccess incorrectAccess
+from IncorrectMdlFieldAccess incorrectAccess
 select incorrectAccess, incorrectAccess.getMessage()
 //TODO: test cases
