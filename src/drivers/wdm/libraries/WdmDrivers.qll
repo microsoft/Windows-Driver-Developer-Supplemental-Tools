@@ -6,12 +6,20 @@ import drivers.libraries.SAL
 /** A typedef for the standard WDM callback routines. */
 class WdmCallbackRoutineTypedef extends TypedefType {
   WdmCallbackRoutineTypedef() {
-    this.getName().matches("DRIVER_UNLOAD") or
-    this.getName().matches("DRIVER_DISPATCH") or
-    this.getName().matches("DRIVER_INITIALIZE") or
-    this.getName().matches("IO_COMPLETION_ROUTINE") or
-    this.getName().matches("KSERVICE_ROUTINE") or
-    this.getName().matches("IO_DPC_ROUTINE")
+    (
+      this.getName().matches("DRIVER_UNLOAD")
+      or
+      this.getName().matches("DRIVER_DISPATCH")
+      or
+      this.getName().matches("DRIVER_INITIALIZE")
+      or
+      this.getName().matches("IO_COMPLETION_ROUTINE")
+      or
+      this.getName().matches("KSERVICE_ROUTINE")
+      or
+      this.getName().matches("IO_DPC_ROUTINE")
+    ) and
+    this.getFile().getBaseName().matches("%wdm.h")
   }
 }
 
@@ -29,8 +37,7 @@ class WdmCallbackRoutine extends Function {
   WdmCallbackRoutine() {
     exists(FunctionDeclarationEntry fde |
       fde.getFunction() = this and
-      fde.getTypedefType() = callbackType and
-      fde.getFile().getAnIncludedFile().getBaseName().matches("%wdm.h")
+      fde.getTypedefType() = callbackType
     )
   }
 }
