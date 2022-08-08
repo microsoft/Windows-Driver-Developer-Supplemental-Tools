@@ -19,7 +19,7 @@ class WdmCallbackRoutineTypedef extends TypedefType {
       or
       this.getName().matches("IO_DPC_ROUTINE")
     ) and
-    this.getFile().getBaseName().matches("%wdm.h")
+    this.getFile().getBaseName().matches("wdm.h")
   }
 }
 
