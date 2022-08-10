@@ -3,3 +3,9 @@
 
 # IDE folders
 .vscode/*
+**/.vs/*
+Debug/*
+
+src/drivers/PortFolders/**/driver/Debug/*
+src/drivers/PortFolders/**/driver/x64/*
+src/drivers/PortFolder/TestDB/*
