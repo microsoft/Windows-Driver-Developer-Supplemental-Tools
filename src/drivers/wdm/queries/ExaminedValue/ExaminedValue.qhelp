@@ -1,0 +1,26 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			This warning indicates that the calling function is not checking the value of the specified variable, which was supplied by a function. 
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			1. Make sure to check the result of the function that is annotated with _Check_result_ or _Must_check_result
+			2. Reorder the code so that the string length is only returned along the path where it is needed.
+			
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/cpp/code-quality/c28193?view=msvc-170">
+				C28193
+			</a>
+		</li>
+		
+	</references>
+</qhelp>
