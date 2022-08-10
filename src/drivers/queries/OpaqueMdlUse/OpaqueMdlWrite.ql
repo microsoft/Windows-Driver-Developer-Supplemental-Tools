@@ -48,5 +48,3 @@ select incorrectWrite,
   "The driver is writing to an opaque MDL field (" + incorrectWrite.getAccessedField().getName() +
     ").  MDLs are semi-opaque and opaque fields should not be modified."
 //TODO: test cases
-//TODO: Do we support drivers that support Win98/Win2000? If so, we need to allow writes to MdlFlags for certain values
-//TODO: How do we handle NDIS APIs where NDIS_BUFFERS are frequently used, since NDIS_BUFFERs are actually MDLs?

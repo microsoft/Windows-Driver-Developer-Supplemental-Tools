@@ -21,7 +21,7 @@ class SafeMdlWriteMacro extends Macro {
   }
 }
 
-/** A class representing a macro used to access opaque members of an DL struct. */
+/** A class representing a macro used to safely access opaque members of an DL struct. */
 class SafeMdlAccessMacro extends Macro {
   SafeMdlAccessMacro() {
     this.getName()
