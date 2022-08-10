@@ -202,7 +202,7 @@ DispatchPower (
     return status;
 }
 
-// MOVE THIS TO A SIMPLE FUNCTION CALL
+//TODO: move the PAGED_CODE_SEG to a simple call
 PAGED_CODE_SEG
 _Use_decl_annotations_
 NTSTATUS
