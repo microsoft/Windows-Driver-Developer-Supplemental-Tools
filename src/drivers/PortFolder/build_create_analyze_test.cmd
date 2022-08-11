@@ -1,7 +1,6 @@
 call :test PendingStatusError WDMTestingTemplate
-@REM I only having this call because this PR is for PendingStatusError check. 
-@REM Normally it will contain all calls to ported checks. For example, 
-@REM call :test NoPagedCode KMDFTestingTemplate
+call :test OpaqueMdlUse WDMTestingTemplate
+call :test OpaqueMdlWrite WDMTestingTemplate
 
 exit /b 0
 
