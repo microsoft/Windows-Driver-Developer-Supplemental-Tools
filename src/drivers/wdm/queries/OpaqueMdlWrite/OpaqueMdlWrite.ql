@@ -47,4 +47,3 @@ from IncorrectMdlWrite incorrectWrite
 select incorrectWrite,
   "The driver is writing to an opaque MDL field (" + incorrectWrite.getAccessedField().getName() +
     ").  MDLs are semi-opaque and opaque fields should not be modified."
-//TODO: test cases

@@ -69,4 +69,3 @@ class IncorrectMdlFieldAccess extends FieldAccess {
 
 from IncorrectMdlFieldAccess incorrectAccess
 select incorrectAccess, incorrectAccess.getMessage()
-//TODO: test cases
