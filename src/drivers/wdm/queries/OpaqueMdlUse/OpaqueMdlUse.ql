@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 /**
  * @name Direct access of opaque MDL field
- * @description Direct access of opaque MDL fields should be avoided, as mistakes can lead to instability.
+ * @description Direct access of opaque MDL fields should be avoided, as opaque struct layouts may change without warning.
  * @platform Desktop
  * @feature.area Multiple
  * @repro.text The following code locations directly access an opaque MDL field.

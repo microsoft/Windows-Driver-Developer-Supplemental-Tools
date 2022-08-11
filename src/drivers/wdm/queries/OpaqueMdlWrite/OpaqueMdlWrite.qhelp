@@ -1,0 +1,28 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Drivers should not write to opaque MDL fields.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			If the driver is using an MDL in an NDIS driver, you can call the <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/ndis/nf-ndis-ndisadjustmdllength">NdisAdjustMdlLength</a> macro to modify the length of the data that is associated with an MDL.  Otherwise, you should avoid modifying MDL fields after creation.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/using-mdls">
+				Using MDLs (MSDN)
+			</a>
+		</li>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28145-opaque-mdl-structure-should-not-be-modified">
+				C28145 (Code Analysis for Drivers)
+			</a>
+		</li>
+	</references>
+</qhelp>
