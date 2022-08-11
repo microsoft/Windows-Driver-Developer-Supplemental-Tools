@@ -1,8 +1,11 @@
 /**
  * @name StrSafe
  * @kind problem
- * @description Kernel Mode drivers should use ntstrsafe.h, not strsafe.h. Found in source file
+ * @description Kernel Mode drivers should use ntstrsafe.h, not strsafe.h. The header ntstrsafe.h contains versions of the functions found in strsafe.h that are suitable for use in kernel mode code.
  * @problem.severity warning
+ * @platform Desktop
+ * @repro.text The following include directive is unsafe for Kernel Mode drivers.
+ * @feature.area Multiple
  * @id cpp/portedqueries/str-safe
  * @version 1.0
  */

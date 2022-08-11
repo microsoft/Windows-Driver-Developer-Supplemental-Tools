@@ -21,11 +21,6 @@ Environment:
 #include <wdfusb.h>
 #include <initguid.h>
 
-//The include below is a failing check for C28146
-#include <strsafe.h>
-//The include below is a passing check for C28146
-#include <ntstrsafe.h>
-
 #include "device.h"
 #include "queue.h"
 #include "trace.h"

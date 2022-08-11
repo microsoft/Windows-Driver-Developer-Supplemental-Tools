@@ -54,12 +54,6 @@ DRIVER_INITIALIZE DriverEntry;
 DRIVER_ADD_DEVICE DriverAddDevice;
 
 
-_Dispatch_type_(IRP_MJ_PNP)
-DRIVER_DISPATCH DispatchPnp; 
-
-_Dispatch_type_(IRP_MJ_CREATE) 
-DRIVER_DISPATCH DispatchCreate;
-
 _Dispatch_type_(IRP_MJ_READ) 
 DRIVER_DISPATCH DispatchRead;
 

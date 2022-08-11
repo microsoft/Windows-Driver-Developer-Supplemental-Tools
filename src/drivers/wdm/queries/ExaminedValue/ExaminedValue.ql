@@ -1,16 +1,20 @@
 /**
  * @name ExaminedValue
  * @kind problem
- * @description The returned value is annotated with the _Check_return_ annotation, but the calling function is either not using the value or is overwriting the value without examining it.
+ * @description The returned value is annotated with the _Check_return_ or _Must_inspect_result_ annotation, but the calling function is either not using the value or is overwriting the value without examining it.
  * @problem.severity warning
  * @id cpp/portedqueries/examined-value
+ * @platform Desktop
+ * @feature.area Multiple
+ * @repro.text The following code locations potentially contain function calls whose return values are not checked.
+ * @version 1.0
  */
 
-
 import cpp
-import Windows.wdk.wdm.SAL
-import Windows.wdk.wdm.WdmDrivers
+import drivers.wdm.libraries.WdmDrivers
+import drivers.libraries.SAL
 
+//Represents functions that are annotated with either _Check_return_ or _Must_inspect_result_
 class ReturnMustBeCheckedFunction extends Function {
   SALCheckReturn scr;
 
@@ -18,39 +22,37 @@ class ReturnMustBeCheckedFunction extends Function {
 }
 
 class ReturnMustBeCheckedFunctionCall extends FunctionCall {
-  SALCheckReturn scr;
-
   ReturnMustBeCheckedFunctionCall() { this.getTarget() instanceof ReturnMustBeCheckedFunction }
 }
 
-predicate unused(Expr e) { e instanceof ExprInVoidContext }
+//Holds if an expression (a call to ReturnMustBeCheckedFunction in this case) is occuring in a void context.
+predicate unUsed(Expr e) { e instanceof ExprInVoidContext }
 
-predicate important(Function f, string message) {
-  message = "the result of this function must always be checked." and
-  getOptions().alwaysCheckReturnValue(f)
-}
-
-// statistically dubious ignored return values
-predicate dubious(Function f, string message) {
-  not important(f, _) and
+//Evaluates to true for ReturnMustBeCheckedFunctionCall's whose return values have been used in at aleast 90% of the total number of calls.
+predicate statisticallyUseful(ReturnMustBeCheckedFunction f, string message) {
   exists(Options opts, int used, int total, int percentage |
     used =
       count(ReturnMustBeCheckedFunctionCall fc |
-       
-        fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc) and not unused(fc)
+        fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc) and not unUsed(fc)
       ) and
-    total = count(ReturnMustBeCheckedFunctionCall fc |  fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc)) and
+    total =
+      count(ReturnMustBeCheckedFunctionCall fc |
+        fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc)
+      ) and
     // used != total and
     percentage = used * 100 / total and
     percentage >= 0 and
-    message = percentage.toString() + "% of calls to this function have their result used."
+    message =
+      percentage.toString() +
+        "% of calls to this function have their result used. Used return values = " +
+        used.toString() + " total calls = " + total.toString()
   )
 }
 
 from ReturnMustBeCheckedFunctionCall unused, string message
 where
-  unused(unused) and
+  unUsed(unused) and
   not exists(Options opts | opts.okToIgnoreReturnValue(unused)) and
-  (important(unused.getTarget(), message) or dubious(unused.getTarget(), message)) and
+  statisticallyUseful(unused.getTarget(), message) and
   not unused.getTarget().getName().matches("operator%") // exclude user defined operators
 select unused, "Result of call to " + unused.getTarget().getName() + " is ignored; " + message
