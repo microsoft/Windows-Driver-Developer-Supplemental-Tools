@@ -23,7 +23,7 @@ import drivers.wdm.libraries.Mdl
  * - Part of the WDM header files
  * - The result of expanding a safe macro to adjust a field
  */
-class IncorrectMdlWrite extends AssignExpr {
+class IncorrectMdlWrite extends Assignment {
   FieldAccess access;
 
   IncorrectMdlWrite() {

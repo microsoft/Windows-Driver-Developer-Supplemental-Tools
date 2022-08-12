@@ -44,7 +44,7 @@ class IncorrectMdlFieldAccess extends FieldAccess {
     if accessedField.getName().matches("ByteCount")
     then
       result =
-        "Direct access of opaque MDL field (ByteCount). This field should not be directly accessed.  Please use the MmGetMdlByteCount() macro isntead."
+        "Direct access of opaque MDL field (ByteCount). This field should not be directly accessed.  Please use the MmGetMdlByteCount() macro instead."
     else
       if accessedField.getName().matches("ByteOffset")
       then
