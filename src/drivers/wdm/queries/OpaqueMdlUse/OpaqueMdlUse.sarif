@@ -14,7 +14,7 @@
             "text" : "Direct access of opaque MDL field"
           },
           "fullDescription" : {
-            "text" : "Direct access of opaque MDL fields should be avoided, as mistakes can lead to instability."
+            "text" : "Direct access of opaque MDL fields should be avoided, as opaque struct layouts may change without warning."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -22,7 +22,7 @@
           },
           "properties" : {
             "tags" : [ "correctness" ],
-            "description" : "Direct access of opaque MDL fields should be avoided, as mistakes can lead to instability.",
+            "description" : "Direct access of opaque MDL fields should be avoided, as opaque struct layouts may change without warning.",
             "feature.area" : "Multiple",
             "id" : "cpp/windows/drivers/queries/opaquemdluse",
             "kind" : "problem",
@@ -387,7 +387,7 @@
         } ]
       }, {
         "name" : "windows-drivers",
-        "semanticVersion" : "0.9.6+0d6aaf31044509b9fc625850beb5251f605c10da",
+        "semanticVersion" : "0.9.6+24f938e9c97e822f7f41b318ee96c1f9b5eed983",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -598,7 +598,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "Direct access of opaque MDL field (ByteCount). This field should not be directly accessed.  Please use the MmGetMdlByteCount() macro isntead."
+        "text" : "Direct access of opaque MDL field (ByteCount). This field should not be directly accessed.  Please use the MmGetMdlByteCount() macro instead."
       },
       "locations" : [ {
         "physicalLocation" : {
