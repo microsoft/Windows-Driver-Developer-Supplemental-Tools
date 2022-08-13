@@ -1,6 +1,6 @@
-@REM call :test PendingStatusError WDMTestingTemplate
+call :test PendingStatusError WDMTestingTemplate
 call :test ExaminedValue WDMTestingTemplate
-@REM call :test StrSafe KMDFTestTemplate
+call :test StrSafe KMDFTestTemplate
 
 
 exit /b 0
