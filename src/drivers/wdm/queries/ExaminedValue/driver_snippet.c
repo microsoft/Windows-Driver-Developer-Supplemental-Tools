@@ -7,48 +7,29 @@ NTSTATUS func1(){
     return STATUS_SUCCESS;
 }
 
-_Check_return_
+
+_Must_inspect_result_
 NTSTATUS func2(){
-    return STATUS_SUCCESS;
-}
-
-_Must_inspect_result_
-NTSTATUS func3(){
-    return STATUS_SUCCESS;
-}
-
-_Must_inspect_result_
-NTSTATUS func4(){
-    return STATUS_SUCCESS;
+    return STATUS_PENDING;
 }
 
 void top_level_call(){
-    NTSTATUS status1, status2, status3, status4, status5;
+    NTSTATUS status1, status2, status3;
     //Passes
     status1 = func1();
+    //Fails
+    status2 = func2();
     //Passes
     status2 = func2();
     //Fails
-    status3 = func3();
-    //Fails
-    status4 = func4();
-    //Passes
-    status4 = func3();
-    //Passes
-    status5 = func1();
+    status3 = func1();
 
     if(NT_SUCCESS(status1)){
     }
 
     if(!NT_SUCCESS(status2)){
-    }
- 
-    if(status4){
-    }
-
-    if(status5){
-    }
-    
+    } 
     //Fails
-    func4();
+    func2();
+
 }

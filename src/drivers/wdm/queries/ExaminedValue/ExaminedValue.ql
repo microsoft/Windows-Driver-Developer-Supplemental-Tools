@@ -26,10 +26,17 @@ class ReturnMustBeCheckedFunctionCall extends FunctionCall {
 }
 
 //Holds if an expression (a call to ReturnMustBeCheckedFunction in this case) is occuring in a void context.
-predicate unUsed(Expr e) { e instanceof ExprInVoidContext }
+predicate unUsed(Expr e) {
+  e instanceof ExprInVoidContext
+  or
+  definition(_, e.getParent()) and
+  not definitionUsePair(_, e.getParent(), _)
+}
 
-//Evaluates to true for ReturnMustBeCheckedFunctionCall's whose return values have been used in at aleast 90% of the total number of calls.
-predicate statisticallyUseful(ReturnMustBeCheckedFunction f, string message) {
+/**
+ * In the general case this predicate is used to calculate the number of checked & total calls to a ReturnMustBeCheckedFunction. In the other case (if the two lines below are uncommented), it evaluates to true for ReturnMustBeCheckedFunctionCall's whose return values have been used in at aleast "X" % of the total number of calls.
+ */
+predicate callFrequency(ReturnMustBeCheckedFunction f, string message) {
   exists(Options opts, int used, int total, int percentage |
     used =
       count(ReturnMustBeCheckedFunctionCall fc |
@@ -41,10 +48,10 @@ predicate statisticallyUseful(ReturnMustBeCheckedFunction f, string message) {
       ) and
     // used != total and
     percentage = used * 100 / total and
-    percentage >= 0 and
+    // percentage >= 90 and
     message =
       percentage.toString() +
-        "% of calls to this function have their result used. Used return values = " +
+        "% of calls to this function have their result checked. Checked return values = " +
         used.toString() + " total calls = " + total.toString()
   )
 }
@@ -53,6 +60,6 @@ from ReturnMustBeCheckedFunctionCall unused, string message
 where
   unUsed(unused) and
   not exists(Options opts | opts.okToIgnoreReturnValue(unused)) and
-  statisticallyUseful(unused.getTarget(), message) and
+  callFrequency(unused.getTarget(), message) and
   not unused.getTarget().getName().matches("operator%") // exclude user defined operators
 select unused, "Result of call to " + unused.getTarget().getName() + " is ignored; " + message

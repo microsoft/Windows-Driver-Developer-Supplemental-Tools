@@ -581,7 +581,7 @@
         } ]
       }, {
         "name" : "windows-drivers",
-        "semanticVersion" : "0.9.6+7516962a2014403a9903b09d761ade68d5d16b0b",
+        "semanticVersion" : "0.9.6+1e16158d2af11f0c9a982eed573117e70a585108",
         "locations" : [ {
           "uri" : "file:///D:/new%20branch/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

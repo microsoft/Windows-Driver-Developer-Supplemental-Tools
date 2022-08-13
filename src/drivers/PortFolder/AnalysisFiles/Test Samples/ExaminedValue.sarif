@@ -581,7 +581,7 @@
         } ]
       }, {
         "name" : "windows-drivers",
-        "semanticVersion" : "0.9.6+7516962a2014403a9903b09d761ade68d5d16b0b",
+        "semanticVersion" : "0.9.6+1e16158d2af11f0c9a982eed573117e70a585108",
         "locations" : [ {
           "uri" : "file:///D:/new%20branch/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -610,7 +610,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "Result of call to func4 is ignored; 50% of calls to this function have their result used. Used return values = 1 total calls = 2"
+        "text" : "Result of call to func2 is ignored; 33% of calls to this function have their result checked. Checked return values = 1 total calls = 3"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -620,14 +620,70 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 53,
+            "startLine" : 21,
+            "startColumn" : 15,
+            "endColumn" : 20
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "1e1e37a5eef1ad76:1",
+        "primaryLocationStartColumnFingerprint" : "10"
+      }
+    }, {
+      "ruleId" : "cpp/portedqueries/examined-value",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/portedqueries/examined-value",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Result of call to func1 is ignored; 50% of calls to this function have their result checked. Checked return values = 1 total calls = 2"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 25,
+            "startColumn" : 15,
+            "endColumn" : 20
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "f1369d73b6312db4:1",
+        "primaryLocationStartColumnFingerprint" : "10"
+      }
+    }, {
+      "ruleId" : "cpp/portedqueries/examined-value",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/portedqueries/examined-value",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Result of call to func2 is ignored; 33% of calls to this function have their result checked. Checked return values = 1 total calls = 3"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 33,
             "startColumn" : 5,
             "endColumn" : 10
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "f72e6feb9f03e5c0:1",
+        "primaryLocationLineHash" : "abc0227aff28e2a8:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     } ],

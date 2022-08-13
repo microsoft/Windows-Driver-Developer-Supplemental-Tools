@@ -34,76 +34,6 @@
         } ]
       },
       "extensions" : [ {
-        "name" : "codeql/csharp-upgrades",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/upgrades/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/upgrades/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/java-queries",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/src/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/src/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/python-all",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/lib/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/lib/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "windows-drivers",
-        "semanticVersion" : "0.9.6+5bdde59d9ea81544d433b45306fbc9c4daeb9973",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/windows-drivers/queries/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/windows-drivers/queries/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/ruby-tests",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/test/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/test/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
         "name" : "codeql-java-examples",
         "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
@@ -113,132 +43,6 @@
           }
         }, {
           "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/examples/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "legacy-libraries-csharp",
-        "semanticVersion" : "0.0.0+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/csharp/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/csharp/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/ruby-all",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/lib/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/lib/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/javascript-upgrades",
-        "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/upgrades/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/upgrades/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/javascript-queries",
-        "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/src/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/src/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/ruby-queries",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/src/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/src/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql-csharp-tests",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/test/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/test/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql-csharp-examples",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/examples/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/examples/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/java-upgrades",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/upgrades/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/upgrades/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "legacy-upgrades",
-        "semanticVersion" : "0.0.0",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/codeql/legacy-upgrades/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/codeql/legacy-upgrades/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -258,15 +62,15 @@
           }
         } ]
       }, {
-        "name" : "codeql/cpp-upgrades",
+        "name" : "codeql/ruby-all",
         "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/upgrades/",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/lib/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/upgrades/qlpack.yml",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/lib/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -286,15 +90,43 @@
           }
         } ]
       }, {
-        "name" : "codeql/javascript-all",
+        "name" : "codeql/javascript-tests",
         "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/lib/",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/test/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/lib/qlpack.yml",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/test/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "legacy-upgrades",
+        "semanticVersion" : "0.0.0",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/codeql/legacy-upgrades/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/codeql/legacy-upgrades/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/python-tests",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/test/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/test/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -314,127 +146,15 @@
           }
         } ]
       }, {
-        "name" : "codeql/python-examples",
+        "name" : "codeql/cpp-examples",
         "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/examples/",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/examples/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/examples/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/cpp-all",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/lib/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/lib/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql-javascript-examples",
-        "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/examples/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/examples/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "legacy-libraries-javascript",
-        "semanticVersion" : "0.0.0+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/javascript/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/javascript/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/csharp-all",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/lib/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/lib/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/cpp-tests",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/test/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/test/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "legacy-libraries-java",
-        "semanticVersion" : "0.0.0+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/java/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/java/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/cpp-tests-cwe-190-tainted",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/test/query-tests/Security/CWE/CWE-190/semmle/tainted/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/test/query-tests/Security/CWE/CWE-190/semmle/tainted/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "codeql/java-tests",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
-        "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/test/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/test/qlpack.yml",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/examples/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -468,15 +188,43 @@
           }
         } ]
       }, {
-        "name" : "codeql/python-tests",
+        "name" : "codeql/java-tests",
         "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/test/",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/test/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/test/qlpack.yml",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/test/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql-javascript-examples",
+        "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/examples/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/examples/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/cpp-all",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/lib/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/lib/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -496,43 +244,57 @@
           }
         } ]
       }, {
-        "name" : "codeql/javascript-tests",
-        "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "name" : "codeql/csharp-upgrades",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/test/",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/upgrades/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/test/qlpack.yml",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/upgrades/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
         } ]
       }, {
-        "name" : "codeql/python-queries",
+        "name" : "codeql/java-upgrades",
         "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/src/",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/upgrades/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/src/qlpack.yml",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/upgrades/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
         } ]
       }, {
-        "name" : "codeql/ruby-examples",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "name" : "legacy-libraries-javascript",
+        "semanticVersion" : "0.0.0+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/examples/",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/javascript/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/examples/qlpack.yml",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/javascript/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/python-examples",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/examples/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/examples/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -566,22 +328,260 @@
           }
         } ]
       }, {
-        "name" : "codeql/cpp-examples",
-        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "name" : "legacy-libraries-csharp",
+        "semanticVersion" : "0.0.0+e1786262261474ddd372ad6eb02078d178f3f8e1",
         "locations" : [ {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/examples/",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/csharp/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/examples/qlpack.yml",
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/csharp/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/cpp-tests",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/test/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/test/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/cpp-tests-cwe-190-tainted",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/test/query-tests/Security/CWE/CWE-190/semmle/tainted/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/ql/test/query-tests/Security/CWE/CWE-190/semmle/tainted/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/python-queries",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/src/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
         } ]
       }, {
         "name" : "windows-drivers",
-        "semanticVersion" : "0.9.6+7516962a2014403a9903b09d761ade68d5d16b0b",
+        "semanticVersion" : "0.9.6+5bdde59d9ea81544d433b45306fbc9c4daeb9973",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/windows-drivers/queries/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/windows-drivers/queries/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/java-queries",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/java/ql/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql-csharp-tests",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/test/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/test/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/python-all",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/lib/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/python/ql/lib/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/csharp-all",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/lib/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/lib/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/javascript-all",
+        "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/lib/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/lib/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/ruby-examples",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/examples/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/examples/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/javascript-queries",
+        "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/ql/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/ruby-queries",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/ruby-tests",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/test/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/ruby/ql/test/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "legacy-libraries-java",
+        "semanticVersion" : "0.0.0+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/java/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/misc/legacy-support/java/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/cpp-upgrades",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/upgrades/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/cpp/upgrades/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql/javascript-upgrades",
+        "semanticVersion" : "0.0.3+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/upgrades/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/javascript/upgrades/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "codeql-csharp-examples",
+        "semanticVersion" : "0.0.2+e1786262261474ddd372ad6eb02078d178f3f8e1",
+        "locations" : [ {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/examples/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/CQL/codeql_home/Windows-Driver-Developer-Supplemental-Tools/codeql/codeql-queries/csharp/ql/examples/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "windows-drivers",
+        "semanticVersion" : "0.9.6+1e16158d2af11f0c9a982eed573117e70a585108",
         "locations" : [ {
           "uri" : "file:///D:/new%20branch/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

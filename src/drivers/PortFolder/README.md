@@ -41,6 +41,11 @@ To run CodeQl queries on source files, a query, a CodeQL CLI and a CodeQL CLI ge
 ### Dependencies
 
 * This repository uses CodeQL version 2.6.3.
+* sarif-tools 1.0.0. Install sarif-tools using pip command
+
+```
+pip install sarif-tools
+```
 
 ### Installing
 
