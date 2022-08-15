@@ -34,7 +34,15 @@ predicate returnsStatusPending(FunctionCall call) {
       call.getASuccessor*() = rs
       or
       exists(VariableAccess va1, AssignExpr ae, VariableAccess va2 |
-        call.getASuccessor*() = ae and
+        (
+          //STATUS_PENDING assignment can occur before or after the function call.
+          call.getEnclosingFunction() = ae.getEnclosingFunction() and
+          (
+            call.getAPredecessor*() = ae
+            or
+            call.getASuccessor*() = ae
+          )
+        ) and
         ae.getRValue().(Literal).getValue().toInt() = 259 and
         ae.getLValue() = va1 and
         ae.getASuccessor*() = rs and

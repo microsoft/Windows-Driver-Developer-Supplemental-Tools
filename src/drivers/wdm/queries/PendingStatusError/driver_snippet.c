@@ -22,10 +22,10 @@ DispatchWrite (
     PAGED_CODE();
     NTSTATUS status;
 
-
+    status = STATUS_PENDING;
     //The call below represents a passing case for PendingStatusError.
     IoMarkIrpPending(Irp);
-    status = STATUS_PENDING;
+    
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
     return status;
 }
