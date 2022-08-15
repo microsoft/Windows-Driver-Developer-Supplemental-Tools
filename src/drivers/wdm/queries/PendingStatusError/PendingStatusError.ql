@@ -29,8 +29,19 @@ predicate isIOCompletionRoutine(Function f) {
 predicate returnsStatusPending(FunctionCall call) {
   exists(ReturnStmt rs |
     //259 is the integer representaion for STATUS_PENDING
-    rs.getExpr().(Literal).getValue().toInt() = 259 and
-    call.getASuccessor*() = rs
+    (
+      rs.getExpr().(Literal).getValue().toInt() = 259 and
+      call.getASuccessor*() = rs
+      or
+      exists(VariableAccess va1, AssignExpr ae, VariableAccess va2 |
+        call.getASuccessor*() = ae and
+        ae.getRValue().(Literal).getValue().toInt() = 259 and
+        ae.getLValue() = va1 and
+        ae.getASuccessor*() = rs and
+        va2.getParent() = rs and
+        va2.getTarget().getName() = va1.getTarget().getName()
+      )
+    )
   )
 }
 

@@ -20,11 +20,14 @@ DispatchWrite (
 
     UNREFERENCED_PARAMETER(DeviceObject);
     PAGED_CODE();
+    NTSTATUS status;
+
 
     //The call below represents a passing case for PendingStatusError.
     IoMarkIrpPending(Irp);
+    status = STATUS_PENDING;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
-    return STATUS_PENDING;
+    return status;
 }
 
 //Failing Case
@@ -46,7 +49,7 @@ DispatchSetInformation (
         //The call below represents a failing case for PendingStatusError.
         IoMarkIrpPending(Irp);
     }
-    status = Irp->IoStatus.Status = STATUS_SUCCESS;
+    status = STATUS_SUCCESS;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
     return status;
 }
