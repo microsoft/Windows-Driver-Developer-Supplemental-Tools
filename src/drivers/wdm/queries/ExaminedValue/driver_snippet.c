@@ -35,4 +35,8 @@ void top_level_call(){
     //Fails
     func2();
 
+    //Passes
+    if(NT_SUCCESS(func1())){
+    }
+
 }

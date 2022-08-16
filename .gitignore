@@ -10,3 +10,4 @@ src/drivers/PortFolders/**/driver/Debug/*
 src/drivers/PortFolders/**/driver/x64/*
 src/drivers/PortFolder/TestDB/*
 src/drivers/PortFolder/AnalysisFiles/*
+src/drivers/wdm/queries/WhiteBoard.ql

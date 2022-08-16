@@ -8,6 +8,14 @@ Abstract:
 
     This file contains the driver entry points and callbacks.
 
+    This is a sample driver that contains intentionally placed
+    code defects in order to illustrate how CodeQL finds and reports defects.
+    This driver sample/template is not functional.
+
+    The include directive below for driver_snippet.c is where test snippets 
+    will be loaded from.
+
+
 Environment:
 
     Kernel-mode Driver Framework
