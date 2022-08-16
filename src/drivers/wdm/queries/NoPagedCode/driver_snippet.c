@@ -52,9 +52,8 @@ DispatchShutdown (
 
 
 #pragma code_seg("PAGE")
-//Passes
+//Fails
 NTSTATUS func1(){
-    PAGED_CODE();
     if(TRUE){
 
     }

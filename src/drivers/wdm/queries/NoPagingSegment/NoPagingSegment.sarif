@@ -14,18 +14,21 @@
             "text" : "NoPagingSegment"
           },
           "fullDescription" : {
-            "text" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment"
+            "text" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment. In other words, a function that contains a PAGED_CODE or PAGED_CODE_LOCKED macro has not been placed in paged memory by using #pragma alloc_text or #pragma code_seg. For more information refer to C28172 Code Analysis rule."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "description" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment",
+            "description" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment. In other words, a function that contains a PAGED_CODE or PAGED_CODE_LOCKED macro has not been placed in paged memory by using #pragma alloc_text or #pragma code_seg. For more information refer to C28172 Code Analysis rule.",
+            "feature.area" : "Multiple",
             "id" : "cpp/portedqueries/no-paging-segment",
             "kind" : "problem",
             "name" : "NoPagingSegment",
+            "platform" : "Desktop",
             "problem.severity" : "warning",
+            "repro.text" : "The following code locations have PAGED_CODE() or PAGED_CODE_LOCKED() calls but they were not put in paged segments.",
             "version" : "1.0"
           }
         } ]
@@ -578,7 +581,7 @@
         } ]
       }, {
         "name" : "windows-drivers",
-        "semanticVersion" : "0.9.6+815c3e4423fed0a48c6bb9e3dc01e89854721ddc",
+        "semanticVersion" : "0.9.6+bf549f1c076816ee372fdc364a5394d7f3560f23",
         "locations" : [ {
           "uri" : "file:///D:/new%20branch/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -594,7 +597,7 @@
     },
     "artifacts" : [ {
       "location" : {
-        "uri" : "driver/fail_driver1.c",
+        "uri" : "driver/driver_snippet.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 0
       }
@@ -612,18 +615,46 @@
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
-            "uri" : "driver/fail_driver1.c",
+            "uri" : "driver/driver_snippet.c",
             "uriBaseId" : "%SRCROOT%",
             "index" : 0
           },
           "region" : {
-            "startLine" : 204,
-            "endColumn" : 14
+            "startLine" : 65,
+            "startColumn" : 10,
+            "endColumn" : 15
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "c1185f03cb7c59dd:1",
+        "primaryLocationLineHash" : "98adc396925ec049:1",
+        "primaryLocationStartColumnFingerprint" : "9"
+      }
+    }, {
+      "ruleId" : "cpp/portedqueries/no-paging-segment",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/portedqueries/no-paging-segment",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 41,
+            "endColumn" : 17
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "2b677663d4f4eaae:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     } ],

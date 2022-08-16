@@ -14,18 +14,21 @@
             "text" : "NoPagedCode"
           },
           "fullDescription" : {
-            "text" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found."
+            "text" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found. For more information look at C28170 Code Analysis rule."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "description" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found.",
+            "description" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found. For more information look at C28170 Code Analysis rule.",
+            "feature.area" : "Multiple",
             "id" : "cpp/portedqueries/no-paged-code",
             "kind" : "problem",
             "name" : "NoPagedCode",
+            "platform" : "Desktop",
             "problem.severity" : "warning",
+            "repro.text" : "The following code locations do not call PAGED_CODE() or PAGED_CODE_LOCKED even though they put the function in a paged segment.",
             "version" : "1.0"
           }
         } ]
@@ -578,7 +581,7 @@
         } ]
       }, {
         "name" : "windows-drivers",
-        "semanticVersion" : "0.9.6+1ff384abce6b5d1f82caac84d8f3e693908195c8",
+        "semanticVersion" : "0.9.6+bf549f1c076816ee372fdc364a5394d7f3560f23",
         "locations" : [ {
           "uri" : "file:///D:/new%20branch/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -617,7 +620,7 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 73,
+            "startLine" : 72,
             "startColumn" : 10,
             "endColumn" : 15
           }
@@ -625,6 +628,34 @@
       } ],
       "partialFingerprints" : {
         "primaryLocationLineHash" : "94d36694269ab444:1",
+        "primaryLocationStartColumnFingerprint" : "9"
+      }
+    }, {
+      "ruleId" : "cpp/portedqueries/no-paged-code",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/portedqueries/no-paged-code",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 56,
+            "startColumn" : 10,
+            "endColumn" : 15
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "abeb76d8090a66a7:1",
         "primaryLocationStartColumnFingerprint" : "9"
       }
     }, {
