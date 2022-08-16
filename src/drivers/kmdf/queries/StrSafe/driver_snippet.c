@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 //Macros to enable or disable a code section that may or maynot conflict with this test.
-#define SET_PENDING 0
 #define SET_DISPATCH 1
 
 //Template function. Not used for this test.

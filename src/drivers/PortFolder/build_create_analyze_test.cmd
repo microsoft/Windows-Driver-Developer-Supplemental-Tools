@@ -1,6 +1,8 @@
-call :test PendingStatusError WDMTestingTemplate wdm
-call :test ExaminedValue WDMTestingTemplate wdm
-call :test StrSafe KMDFTestTemplate kmdf
+@REM call :test PendingStatusError WDMTestingTemplate wdm
+@REM call :test ExaminedValue WDMTestingTemplate wdm
+@REM call :test StrSafe KMDFTestTemplate kmdf
+@REM call :test MultiplePagedCode WDMTestingTemplate wdm
+
 
 
 exit /b 0

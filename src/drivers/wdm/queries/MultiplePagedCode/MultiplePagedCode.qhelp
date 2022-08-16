@@ -2,13 +2,13 @@
 <qhelp>
 	<overview>
 		<p>
-			The function has more than one instance of PAGED_CODE or PAGED_CODE_LOCKED. 
+			The function has more than one instance of PAGED_CODE or PAGED_CODE_LOCKED.
 			This warning indicates that there is more than one instance of the PAGED_CODE or PAGED_CODE_LOCKED macro in a function. This error is reported at the second or subsequent instances of the PAGED_CODE or PAGED_CODE_LOCKED macro.
 		</p>
 	</overview>
 	<recommendation>
 		<p>
-			Remove the second PAGED_CODE OR PAGED_CODE_LOCKED macro. 
+			Remove the second PAGED_CODE OR PAGED_CODE_LOCKED macro.
 		</p>
 	</recommendation>
 	<example>

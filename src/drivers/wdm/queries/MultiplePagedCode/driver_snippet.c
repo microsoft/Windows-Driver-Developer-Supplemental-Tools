@@ -1,33 +1,57 @@
-//Both failing and passing tests added to the WDMTestingTemplate
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 
-/** Failing cases:
- * DispatchCreate will raise a warning as it has more than one invocation of PAGED_CODE. Read C28170 and C28171 on MSDN for details. 
- * 
- */
+//Macros to enable or disable a code section that may or maynot conflict with this test.
+#define SET_DISPATCH 1
+#define SET_MULTIPLE_PAGED_CODE 1
 
 
-/** Passing cases:
- * All other dispatch routines should pass  
- * 
- * 
- */
+_Dispatch_type_(IRP_MJ_CLEANUP) 
+DRIVER_DISPATCH DispatchCleanup;
+
+_Dispatch_type_(IRP_MJ_SHUTDOWN)
+DRIVER_DISPATCH DispatchShutdown;
+
+#ifndef __cplusplus
+#pragma alloc_text (PAGE, DispatchCleanup)
+#pragma alloc_text (PAGE, DispatchShutdown)
+#endif
 
 
+//Template
 void top_level_call(){
-    
 }
 
+//Passes
+NTSTATUS
+DispatchCleanup (
+    PDEVICE_OBJECT DriverObject,
+    PIRP Irp
+    )
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
+    
+    return STATUS_SUCCESS;
+}
 
-/**
-The two function declarations below are unrelated to this test. The reason they are here is because including them in the WDMTestingTemplate will interfer with DispatchAnnotationMissing and DispatchMismatch tests.
- */
+//Fails
+NTSTATUS
+DispatchShutdown (
+    PDEVICE_OBJECT DriverObject,
+    PIRP Irp
+    )
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
+    PAGED_CODE();
+    
+    return STATUS_SUCCESS;
+}
 
-_Dispatch_type_(IRP_MJ_PNP)
-DRIVER_DISPATCH DispatchPnp; 
-
-_Dispatch_type_(IRP_MJ_CREATE) 
-DRIVER_DISPATCH DispatchCreate;
 
 
 

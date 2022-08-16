@@ -1,5 +1,8 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+
 //Macros to enable or disable a code section that may or maynot conflict with this test.
-#define SET_PENDING 1
+#define SET_PENDING_STATUS_ERROR 1
 #define SET_DISPATCH 1
 
 //Template. Not called in this test.
