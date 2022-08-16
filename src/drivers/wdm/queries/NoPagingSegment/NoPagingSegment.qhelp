@@ -2,7 +2,7 @@
 <qhelp>
 	<overview>
 		<p>
-			The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment
+			The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment.
 			A function that contains a PAGED_CODE or PAGED_CODE_LOCKED macro has not been placed in paged memory by using #pragma alloc_text or #pragma code_seg.
 		</p>
 	</overview>

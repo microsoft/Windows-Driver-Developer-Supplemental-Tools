@@ -1,38 +1,76 @@
-//Both failing and passing tests cases are added to the WDMTestingTemplate
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 
-/** Failing cases:
- * DispatchPower should show failure as it has PAGED_CODE macro invocation but wasn't placed in a PAGE secion 
- * using pragmas #pragma alloc_text or #pragma code_seg.
- * 
- */
+//Macros to enable or disable a code section that may or maynot conflict with this test.
+#define SET_DISPATCH 1
+#define SET_PAGE_CODE 1
 
 
-/** Passing cases:
- * All other dispatch routines should pass  
- * 
- * 
- */
+_Dispatch_type_(IRP_MJ_CLEANUP) 
+DRIVER_DISPATCH DispatchCleanup;
 
+_Dispatch_type_(IRP_MJ_SHUTDOWN)
+DRIVER_DISPATCH DispatchShutdown;
 
-/**
-The two function declarations below are unrelated to this test. The reason they are here is because including them in the WDMTestingTemplate will interfer with DispatchAnnotationMissing and DispatchMismatch tests.
- */
-
-
-#ifdef __cplusplus
-extern "C" {
-#endif
-#include <wdm.h>
-#ifdef __cplusplus
-}
+#ifndef __cplusplus
+#pragma alloc_text (PAGE, DispatchCleanup)
 #endif
 
-_Dispatch_type_(IRP_MJ_PNP)
-DRIVER_DISPATCH DispatchPnp; 
 
-_Dispatch_type_(IRP_MJ_CREATE) 
-DRIVER_DISPATCH DispatchCreate;
+//Template
 void top_level_call(){
+}
+
+//Passes
+NTSTATUS
+DispatchCleanup (
+    PDEVICE_OBJECT DriverObject,
+    PIRP Irp
+    )
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
     
+    return STATUS_SUCCESS;
+}
+
+//Fails
+NTSTATUS
+DispatchShutdown (
+    PDEVICE_OBJECT DriverObject,
+    PIRP Irp
+    )
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
+    
+    return STATUS_SUCCESS;
+}
+
+
+#pragma code_seg("PAGE")
+//Passes
+NTSTATUS func1(){
+    PAGED_CODE();
+    if(TRUE){
+    }
+    return STATUS_SUCCESS;
+}
+#pragma code_seg()
+
+//Fails
+NTSTATUS func2(){
+    PAGED_CODE();
+    return STATUS_SUCCESS;
+}
+
+#define PAGED_CODE_SEG __declspec(code_seg("PAGE"))
+//Passes
+PAGED_CODE_SEG
+NTSTATUS func3(){
+    PAGED_CODE();
+    return STATUS_SUCCESS;
 }

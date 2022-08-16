@@ -208,8 +208,6 @@ DispatchPower (
 {
     NTSTATUS status = STATUS_PENDING;
     PDRIVER_DEVICE_EXTENSION extension = (PDRIVER_DEVICE_EXTENSION)(DeviceObject->DeviceExtension); 
-    PAGED_CODE();
-    
     
     IoSetCompletionRoutine(Irp, CompletionRoutine, extension, TRUE, TRUE, TRUE);
     
