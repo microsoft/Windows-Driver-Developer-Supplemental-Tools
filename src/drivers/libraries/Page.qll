@@ -34,17 +34,24 @@ class AllocSegPragma extends PreprocessorPragma {
 //Evaluates to true if a PagedFunc was placed in a PAGE section using alloc_text pragma
 predicate isAllocUsedToLocatePagedFunc(Function pf) {
   exists(AllocSegPragma asp |
-    asp.getHead().matches("%" + pf.getName() + "%") and
+    asp.getHead().matches("%" + pf.getName() + ")") and
     asp.getFile() = pf.getFile()
   )
 }
 
+cached
+class PagedSegMacro extends MacroInvocation {
+  cached
+  PagedSegMacro() { this.getMacro().getBody().matches("%code\\_seg(\"PAGE\")%") }
+}
+
 //Evaluates to true if there is Macro Invocation above PagedFunc which expands to code_seg("PAGE")
-predicate isPagedSegSetWithMacroAbove(Function pf) {
+predicate isPagedSegSetWithMacroAbove(Function f) {
   exists(MacroInvocation ma |
     ma.getMacro().getBody().matches("%code\\_seg(\"PAGE\")%") and
-    ma.getLocation().getStartLine() <= pf.getLocation().getStartLine() and
-    pf.getAnAttribute().getName() = "code_seg"
+    ma.getLocation().getStartLine() <= f.getLocation().getStartLine() and
+    f.getAnAttribute().getName() = "code_seg" and
+    ma.getFile() = f.getFile()
   )
 }
 

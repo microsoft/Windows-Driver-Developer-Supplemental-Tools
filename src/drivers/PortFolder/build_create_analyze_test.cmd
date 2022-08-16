@@ -1,7 +1,10 @@
-@REM call :test PendingStatusError WDMTestingTemplate wdm
-@REM call :test ExaminedValue WDMTestingTemplate wdm
-@REM call :test StrSafe KMDFTestTemplate kmdf
-@REM call :test MultiplePagedCode WDMTestingTemplate wdm
+call :test PendingStatusError WDMTestingTemplate wdm
+call :test ExaminedValue WDMTestingTemplate wdm
+call :test StrSafe KMDFTestTemplate kmdf
+call :test MultiplePagedCode WDMTestingTemplate wdm
+call :test NoPagedCode WDMTestingTemplate wdm
+call :test NoPagingSegment WDMTestingTemplate wdm
+
 
 
 

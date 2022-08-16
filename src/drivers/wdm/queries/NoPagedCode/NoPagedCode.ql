@@ -12,6 +12,7 @@ import drivers.libraries.Page
 
 from PagedFunctionDeclaration f
 where
+  f.getEntryPoint() instanceof BlockStmt and
   not f instanceof PagedFunc and
   f.getFile().getExtension() != "tmh"
 select f,
