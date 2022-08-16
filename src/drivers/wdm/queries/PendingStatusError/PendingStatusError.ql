@@ -2,7 +2,7 @@
  * @name PendingStatusError
  * @kind problem
  * @platform Desktop
- * @description A dispatch routine that calls IoMarkIrpPending includes at least one path in which the driver returns a value other than STATUS_PENDING. The IoMarkIrpPending routine marks the specified IRP, indicating that a driver's dispatch routine subsequently returned STATUS_PENDING because further processing is required by other driver routines. For more information please refer https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28143-iomarkirppending-must-return-statuspending. 
+ * @description A dispatch routine that calls IoMarkIrpPending includes at least one path in which the driver returns a value other than STATUS_PENDING. The IoMarkIrpPending routine marks the specified IRP, indicating that a driver's dispatch routine subsequently returned STATUS_PENDING because further processing is required by other driver routines. For more information please refer C28143 Code Analysis rule.
  * @problem.severity error
  * @feature.area Multiple
  * @repro.text The following code locations potentially contain IoMarkIrpPending calls that do not return STATUS_PENDING
