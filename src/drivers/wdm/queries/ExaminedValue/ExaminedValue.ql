@@ -3,7 +3,7 @@
 /**
  * @name ExaminedValue
  * @kind problem
- * @description The returned value is annotated with the _Check_return_ or _Must_inspect_result_ annotation, but the calling function is either not using the value or is overwriting the value without examining it.
+ * @description The returned value is annotated with the _Check_return_ or _Must_inspect_result_ annotation, but the calling function is either not using the value or is overwriting the value without examining it. For more information please refer C28193 Code Analysis rule.
  * @problem.severity warning
  * @id cpp/portedqueries/examined-value
  * @platform Desktop
