@@ -1,6 +1,6 @@
 {
     "all": {
-        "+": 1,
+        "+": 0,
         "-": 0
     },
     "error": {
@@ -9,15 +9,9 @@
         "codes": []
     },
     "warning": {
-        "+": 1,
+        "+": 0,
         "-": 0,
-        "codes": [
-            [
-                "cpp/portedqueries/no-paged-code The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found.",
-                0,
-                1
-            ]
-        ]
+        "codes": []
     },
     "note": {
         "+": 0,

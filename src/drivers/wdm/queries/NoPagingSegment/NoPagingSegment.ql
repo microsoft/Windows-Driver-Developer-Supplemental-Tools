@@ -12,10 +12,11 @@ import drivers.libraries.Page
 
 from PagedFunc pf
 where
-  not isPageCodeSectionSetAbove2(pf) and
+  not isPageCodeSectionSetAbove(pf) and
   not isPagedSegSetWithMacroAbove(pf) and
   not isAllocUsedToLocatePagedFunc(pf) and
-  pf.getFile().getExtension() != "tmh" and
-  pf.getFile().getExtension() != "h"
+  pf.getFile().getExtension() != "tmh" and 
+  //The path below observed while testing. It was Auto-generated file.
+  not pf.getFile().getRelativePath().matches("%x64/Debug%")
 select pf,
   "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment"

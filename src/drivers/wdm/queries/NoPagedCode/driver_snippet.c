@@ -1,31 +1,75 @@
-//Both failing and passing tests added to the WDMTestingTemplate
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 
 
-/** Failing cases:
- * CompletionRoutine and DispatchRead rouines will raise warning as they were put in a PAGED section but 
- * they don't have PAGED_CODE or PAGED_CODE_LOCKED macros
- * 
- */
+//Macros to enable or disable a code section that may or maynot conflict with this test.
+#define SET_DISPATCH 1
+#define SET_PAGE_CODE 1
 
 
-/** Passing cases:
- * All other dispatch routines should pass  
- * 
- * 
- */
+_Dispatch_type_(IRP_MJ_CLEANUP) 
+DRIVER_DISPATCH DispatchCleanup;
+
+_Dispatch_type_(IRP_MJ_SHUTDOWN)
+DRIVER_DISPATCH DispatchShutdown;
+
+#ifndef __cplusplus
+#pragma alloc_text (PAGE, DispatchCleanup)
+#pragma alloc_text (PAGE, DispatchShutdown)
+#endif
 
 
-
-
-/**
-The two function declarations below are unrelated to this test. The reason they are here is because including them in the WDMTestingTemplate will interfer with DispatchAnnotationMissing and DispatchMismatch tests.
- */
-
-_Dispatch_type_(IRP_MJ_PNP)
-DRIVER_DISPATCH DispatchPnp; 
-
-_Dispatch_type_(IRP_MJ_CREATE) 
-DRIVER_DISPATCH DispatchCreate;
+//Template
 void top_level_call(){
+}
+
+//Passes
+NTSTATUS
+DispatchCleanup (
+    PDEVICE_OBJECT DriverObject,
+    PIRP Irp
+    )
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
     
+    return STATUS_SUCCESS;
+}
+
+//Fails
+NTSTATUS
+DispatchShutdown (
+    PDEVICE_OBJECT DriverObject,
+    PIRP Irp
+    )
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(Irp);
+    
+    return STATUS_SUCCESS;
+}
+
+
+#pragma code_seg("PAGE")
+//Passes
+NTSTATUS func1(){
+    PAGED_CODE();
+    if(TRUE){
+
+    }
+    return STATUS_SUCCESS;
+}
+#pragma code_seg()
+
+//Passes
+NTSTATUS func2(){
+    return STATUS_SUCCESS;
+}
+
+#define PAGED_CODE_SEG __declspec(code_seg("PAGE"))
+//Fails
+PAGED_CODE_SEG
+NTSTATUS func3(){
+    return STATUS_SUCCESS;
 }

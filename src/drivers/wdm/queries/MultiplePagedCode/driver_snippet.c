@@ -4,7 +4,7 @@
 
 //Macros to enable or disable a code section that may or maynot conflict with this test.
 #define SET_DISPATCH 1
-#define SET_MULTIPLE_PAGED_CODE 1
+#define SET_PAGE_CODE 1
 
 
 _Dispatch_type_(IRP_MJ_CLEANUP) 

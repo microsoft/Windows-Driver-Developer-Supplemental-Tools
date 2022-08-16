@@ -46,10 +46,6 @@ DRIVER_DISPATCH DispatchCreate;
 #endif
 
 
-
-
-
-
 _Use_decl_annotations_
 NTSTATUS
 DriverEntry(
@@ -70,7 +66,7 @@ DriverEntry(
     DriverObject->MajorFunction[IRP_MJ_SET_INFORMATION]  = (PDRIVER_DISPATCH)DispatchSetInformation;
     #endif
     //The two dispatch routine assignments below are for MultiplePagedCode query only.
-    #if SET_MULTIPLE_PAGED_CODE == 1 
+    #if SET_PAGE_CODE == 1 
     DriverObject->MajorFunction[IRP_MJ_CLEANUP]            = (PDRIVER_DISPATCH)DispatchCleanup;
     DriverObject->MajorFunction[IRP_MJ_SHUTDOWN]           = (PDRIVER_DISPATCH)DispatchShutdown;
     #endif
@@ -190,6 +186,7 @@ DispatchRead (
 
     UNREFERENCED_PARAMETER(DeviceObject);
     UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
 
     KeInitializeSpinLock(&queueLock);
      
@@ -256,6 +253,8 @@ DriverUnload(
     
     return;
 }
+
+#pragma code_seg()
 
 _IRQL_requires_(APC_LEVEL) 
 NTSTATUS TestInner3(){

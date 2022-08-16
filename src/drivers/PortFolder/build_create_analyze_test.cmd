@@ -7,7 +7,6 @@ call :test NoPagingSegment WDMTestingTemplate wdm
 
 
 
-
 exit /b 0
 
 :test
