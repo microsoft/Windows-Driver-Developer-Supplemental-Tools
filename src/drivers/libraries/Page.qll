@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 import cpp
 
 //Represents functions where a function has either PAGED_CODE or PAGED_CODE_LOCKED macro invocations
@@ -38,7 +40,7 @@ class AllocSegPragma extends PreprocessorPragma {
 //Evaluates to true if a PagedFunc was placed in a PAGE section using alloc_text pragma
 predicate isAllocUsedToLocatePagedFunc(Function pf) {
   exists(AllocSegPragma asp |
-    asp.getHead().matches("%" + pf.getName() + ")") and
+    asp.getHead().matches("%" + pf.getName() + [" )", ")"]) and
     asp.getFile() = pf.getFile()
   )
 }
@@ -53,7 +55,7 @@ predicate isPagedSegSetWithMacroAbove(Function f) {
   )
 }
 
-//Represents functions for whom code_seg() is defined
+//Represents functions for whom code_seg() is set
 cached
 class Resett extends Function {
   DefaultCodeSegPragma dcs;
@@ -73,7 +75,7 @@ class Resett extends Function {
   DefaultCodeSegPragma getCodeSeg() { result = dcs }
 }
 
-//Represents functions for whom code_seg("PAGE") is defined
+//Represents functions for whom code_seg("PAGE") is set
 cached
 class Sett extends Function {
   cached
