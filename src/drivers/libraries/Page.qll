@@ -49,10 +49,12 @@ predicate isPagedSegSetWithMacroAbove(Function f) {
   )
 }
 
-cached
-class PageCodeSetFunctions extends Function {
-  cached
-  PageCodeSetFunctions() { codeSegStatus(this) = 1 }
+//Comment:
+predicate isPageCodeSectionSetAbove(Function f) {
+  exists(CodeSegPragma csp |
+    f.getLocation().getStartLine() > csp.getLocation().getStartLine() and
+    f.getFile() = csp.getFile()
+  )
 }
 
 //Identifies if there is a pragma for code_seg("PAGE") or code_seg()
@@ -61,6 +63,7 @@ int codeSegStatus(Function f) {
     exists(CodeSegPragma csp, DefaultCodeSegPragma dcsp |
       f.getLocation().getStartLine() > csp.getLocation().getStartLine() and
       f.getFile() = csp.getFile() and
+      dcsp.getFile() = csp.getFile() and
       dcsp.getFile() = f.getFile() and
       dcsp.getLocation().getStartLine() < f.getLocation().getStartLine()
     )
@@ -75,6 +78,23 @@ int codeSegStatus(Function f) {
     else result = 0 //no code_seg prama for the function
 }
 
+//Evaluates to true if there is a code_seg("PAGE") pragma above the given PagedFunc without a reset
+predicate isPageCodeSectionSetAbove2(Function f) {
+  exists(CodeSegPragma csp |
+    f.getLocation().getStartLine() > csp.getLocation().getStartLine() and
+    f.getFile() = csp.getFile() and
+    not thereIsAPageReset(f, csp)
+  )
+}
+
+//Evaluates to true if there's a change to default code segment, with pragma code_seg().
+predicate thereIsAPageReset(Function f, CodeSegPragma csp) {
+  exists(DefaultCodeSegPragma dcsp |
+    dcsp.getFile() = f.getFile() and
+    dcsp.getLocation().getStartLine() > csp.getLocation().getStartLine()
+  )
+}
+
 //Represents a paged section
 cached
 class PagedFunctionDeclaration extends Function {
@@ -82,7 +102,7 @@ class PagedFunctionDeclaration extends Function {
   PagedFunctionDeclaration() {
     isPagedSegSetWithMacroAbove(this)
     or
-    codeSegStatus(this) = 1
+    isPageCodeSectionSetAbove2(this)
     or
     isAllocUsedToLocatePagedFunc(this)
   }

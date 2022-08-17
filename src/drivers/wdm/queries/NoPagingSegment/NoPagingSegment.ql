@@ -17,7 +17,7 @@ import drivers.libraries.Page
 
 from PagedFunc pf
 where
-  not codeSegStatus(pf) = 1 and
+  not isPageCodeSectionSetAbove(pf) and
   not isPagedSegSetWithMacroAbove(pf) and
   not isAllocUsedToLocatePagedFunc(pf) and
   //The path below observed while testing. It was Auto-generated file.
