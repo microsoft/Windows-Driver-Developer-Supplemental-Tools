@@ -5,6 +5,9 @@
   from: windows-drivers
 - include:
     query path: 
-      - drivers/wdm/queries/StrSafe/StrSafe.ql
+      - drivers/kmdf/queries/StrSafe/StrSafe.ql
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
       - drivers/wdm/queries/ExaminedValue/ExaminedValue.ql
+      - drivers/wdm/queries/NoPagedCode/NoPagedCode.ql
+      - drivers/wdm/queries/NoPagingSegment/NoPagingSegment.ql
+      - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
