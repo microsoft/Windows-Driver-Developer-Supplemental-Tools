@@ -16,7 +16,7 @@ class PagedFunc extends Function {
 
 //Represents code_seg("PAGE") pragma
 class CodeSegPragma extends PreprocessorPragma {
-  CodeSegPragma() { this.getHead().matches("code\\_seg(\"PAGE\")") }
+  CodeSegPragma() { this.getHead().matches("code\\_seg%(%\"PAGE\")") }
 }
 
 //Represents a code_seg() pragma
@@ -57,11 +57,11 @@ predicate isPagedSegSetWithMacroAbove(Function f) {
 
 //Represents functions for whom code_seg() is set
 cached
-class Resett extends Function {
+class FunctionWithPageReset extends Function {
   DefaultCodeSegPragma dcs;
 
   cached
-  Resett() {
+  FunctionWithPageReset() {
     exists(CodeSegPragma csp, DefaultCodeSegPragma dcsp |
       this.getLocation().getStartLine() > csp.getLocation().getStartLine() and
       dcsp.getFile() = csp.getFile() and
@@ -77,13 +77,13 @@ class Resett extends Function {
 
 //Represents functions for whom code_seg("PAGE") is set
 cached
-class Sett extends Function {
+class FunctionWithPageSet extends Function {
   cached
-  Sett() {
+  FunctionWithPageSet() {
     exists(CodeSegPragma csp |
       this.getLocation().getStartLine() > csp.getLocation().getStartLine() and
       this.getFile() = csp.getFile() and
-      not exists(Resett rf |
+      not exists(FunctionWithPageReset rf |
         rf.getFile() = csp.getFile() and
         rf = this and
         rf.getCodeSeg().getLocation().getStartLine() > csp.getLocation().getStartLine()
@@ -99,7 +99,7 @@ class PagedFunctionDeclaration extends Function {
   PagedFunctionDeclaration() {
     isPagedSegSetWithMacroAbove(this)
     or
-    this instanceof Sett
+    this instanceof FunctionWithPageSet
     or
     isAllocUsedToLocatePagedFunc(this)
   }
