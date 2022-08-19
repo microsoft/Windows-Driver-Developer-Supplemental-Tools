@@ -3,6 +3,10 @@ call :test ExaminedValue WDMTestingTemplate wdm
 call :test StrSafe KMDFTestTemplate kmdf
 
 
+call :test OpaqueMdlUse WDMTestingTemplate wdm
+call :test OpaqueMdlWrite WDMTestingTemplate wdm
+
+
 exit /b 0
 
 :test
@@ -27,7 +31,9 @@ codeql database create -l=cpp -c "msbuild /p:Platform=x64 /t:rebuild" "..\..\Tes
 cd ..\..
 echo analysing_database
 mkdir "AnalysisFiles\Test Samples"
+
 codeql database analyze "TestDB\%1" --format=sarifv2.1.0 --output="AnalysisFiles\Test Samples\%1.sarif" "..\%3\queries\%1\%1.ql" 
+
 
 echo comparing analysis result with expected result
 sarif diff -o "test\%1.sarif" "..\%3\queries\%1\%1.sarif" "AnalysisFiles\Test Samples\%1.sarif"
