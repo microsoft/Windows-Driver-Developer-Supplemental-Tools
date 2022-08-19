@@ -1,0 +1,10 @@
+# Query Suite for ported CA checks
+
+- description: Ported CA checks
+- queries: .
+  from: windows-drivers
+- include:
+    query path: 
+      - drivers/wdm/queries/StrSafe/StrSafe.ql
+      - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
+      - drivers/wdm/queries/ExaminedValue/ExaminedValue.ql

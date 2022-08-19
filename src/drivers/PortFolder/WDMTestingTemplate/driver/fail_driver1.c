@@ -9,12 +9,11 @@ Module Name:
 Abstract:
 
     This is a sample driver that contains intentionally placed
-    code defects in order to illustrate how CodeQL finds and reports defects. 
-    works. This driver is not functional and not intended as a 
-    sample for real driver development projects.
+    code defects in order to illustrate how CodeQL finds and reports defects.
+    This driver sample/template is not functional.
 
-    The include directive below for driver_snippet.c will be where test snippets 
-    are be loaded from.
+    The include directive below for driver_snippet.c is where test snippets 
+    will be loaded from.
 
 Environment:
 
@@ -30,6 +29,13 @@ Environment:
 
 #define PAGED_CODE_SEG __declspec(code_seg("PAGE"))
 
+#if SET_DISPATCH == 1
+_Dispatch_type_(IRP_MJ_PNP)
+DRIVER_DISPATCH DispatchPnp; 
+_Dispatch_type_(IRP_MJ_CREATE) 
+DRIVER_DISPATCH DispatchCreate;
+#endif
+
 
 #ifndef __cplusplus
 #pragma alloc_text (INIT, DriverEntry)
@@ -38,6 +44,11 @@ Environment:
 #pragma alloc_text (PAGE, DispatchRead)
 #pragma alloc_text (PAGE, DispatchPnp)
 #endif
+
+
+
+
+
 
 _Use_decl_annotations_
 NTSTATUS
@@ -53,8 +64,10 @@ DriverEntry(
     DriverObject->MajorFunction[IRP_MJ_POWER]            = (PDRIVER_DISPATCH)DispatchPower;
     DriverObject->MajorFunction[IRP_MJ_SYSTEM_CONTROL]   = DispatchSystemControl;
     DriverObject->MajorFunction[IRP_MJ_PNP]              = (PDRIVER_DISPATCH)DispatchPnp;
+    #if SET_PENDING == 1
     DriverObject->MajorFunction[IRP_MJ_WRITE]            = (PDRIVER_DISPATCH)DispatchWrite;
     DriverObject->MajorFunction[IRP_MJ_SET_INFORMATION]  = (PDRIVER_DISPATCH)DispatchSetInformation;
+    #endif
     DriverObject->DriverExtension->AddDevice             = DriverAddDevice;
     DriverObject->DriverUnload                           = DriverUnload;
 
