@@ -4,11 +4,11 @@
 name: Build Windows CodeQL queries
 
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
+  # Triggers the workflow on push or pull request events but only for the main and development branches
   push:
-    branches: [ main ]
+    branches: [ main, development ]
   pull_request:
-    branches: [ main ]
+    branches: [ main, development ]
 
   # Allow manual scheduling
   workflow_dispatch:
