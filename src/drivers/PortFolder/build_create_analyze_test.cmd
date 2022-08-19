@@ -4,8 +4,8 @@ call :test StrSafe KMDFTestTemplate kmdf
 call :test MultiplePagedCode WDMTestingTemplate wdm
 call :test NoPagedCode WDMTestingTemplate wdm
 call :test NoPagingSegment WDMTestingTemplate wdm
-
-
+call :test OpaqueMdlUse WDMTestingTemplate wdm
+call :test OpaqueMdlWrite WDMTestingTemplate wdm
 
 exit /b 0
 

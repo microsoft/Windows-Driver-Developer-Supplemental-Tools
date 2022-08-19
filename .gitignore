@@ -9,7 +9,5 @@ Debug/*
 src/drivers/PortFolders/**/driver/Debug/*
 src/drivers/PortFolders/**/driver/x64/*
 src/drivers/PortFolder/TestDB/*
+src/drivers/PortFolder/out/*
 src/drivers/PortFolder/AnalysisFiles/*
-src/drivers/wdm/queries/WhiteBoard.ql
-# The following line will be removed after the 1st PR for KMDFTestTemplate gets merged
-src/drivers/PortFolder/KMDFTestTemplate/* 
