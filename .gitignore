@@ -9,3 +9,5 @@ Debug/*
 src/drivers/PortFolders/**/driver/Debug/*
 src/drivers/PortFolders/**/driver/x64/*
 src/drivers/PortFolder/TestDB/*
+src/drivers/PortFolder/out/*
+src/drivers/PortFolder/AnalysisFiles/*
