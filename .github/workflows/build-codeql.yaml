@@ -41,10 +41,10 @@ jobs:
       run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\
     - name: Build must-fix driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers\queries\suites\windows_driver_mustfix.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_driver_mustfix.qls
     - name: Build recommended driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers\queries\suites\windows_driver_recommended.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_driver_recommended.qls
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\codeql\windows-drivers
