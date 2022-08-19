@@ -174,6 +174,6 @@ Return Value:
     //
     // Stop WPP Tracing
     //
-    WPP_CLEANUP( WdfDriverWdmGetDriverObject( (WDFDRIVER) DriverObject) );
+    WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)DriverObject));
 
 }
