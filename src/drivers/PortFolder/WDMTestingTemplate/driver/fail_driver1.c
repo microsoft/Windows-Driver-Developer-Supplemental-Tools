@@ -65,7 +65,7 @@ DriverEntry(
     DriverObject->MajorFunction[IRP_MJ_WRITE]            = (PDRIVER_DISPATCH)DispatchWrite;
     DriverObject->MajorFunction[IRP_MJ_SET_INFORMATION]  = (PDRIVER_DISPATCH)DispatchSetInformation;
     #endif
-    //The two dispatch routine assignments below are for MultiplePagedCode query only.
+    //The two dispatch routine assignments below are for Memory allocation queries only.
     #if SET_PAGE_CODE == 1 
     DriverObject->MajorFunction[IRP_MJ_CLEANUP]            = (PDRIVER_DISPATCH)DispatchCleanup;
     DriverObject->MajorFunction[IRP_MJ_SHUTDOWN]           = (PDRIVER_DISPATCH)DispatchShutdown;
