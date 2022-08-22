@@ -1,4 +1,4 @@
-[submodule "codeql/codeql-queries"]
+[submodule "codeql-queries"]
 	path = codeql-queries
 	url = https://github.com/github/codeql.git
 	branch = main

@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Direct access of opaque MDL fields should be avoided, as opaque struct layouts may change without warning.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Instead of accessing MDL fields directly, driver writers should make use of the <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-mmgetmdlvirtualaddress">MmGetMdlVirtualAddress</a>, <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-mmgetmdlbytecount">MmGetMdlByteCount</a>, <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-mmgetmdlbyteoffset">MmGetMdlByteOffset</a>, and <a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-mmgetsystemaddressformdlsafe">MmGetSystemAddressForMdlSafe</a> macros.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/kernel/using-mdls">
+				Using MDLs (MSDN)
+			</a>
+		</li>
+	</references>
+</qhelp>
