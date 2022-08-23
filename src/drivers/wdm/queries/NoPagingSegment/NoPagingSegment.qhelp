@@ -8,7 +8,7 @@
 	</overview>
 	<recommendation>
 		<p>
-			Put a function/routine that calls PAGED_CODE  in a paged section using #pragma alloc_text or #pragma code_seg.
+			Put a function/routine that calls PAGED_CODE in a paged section using #pragma alloc_text or #pragma code_seg.
 		</p>
 	</recommendation>
 	<example>

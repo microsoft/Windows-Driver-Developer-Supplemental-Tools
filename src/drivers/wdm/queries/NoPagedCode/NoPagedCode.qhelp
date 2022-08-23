@@ -17,7 +17,7 @@
 	</example>
 	<references>
 		<li>
-			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28135-first-argument-to-kewaitforsingleobject">
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28170-pageable-code-macro-not-found">
 				C28170
 			</a>
 		</li>
