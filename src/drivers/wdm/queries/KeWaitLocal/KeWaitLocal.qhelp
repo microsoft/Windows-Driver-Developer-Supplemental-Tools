@@ -9,7 +9,7 @@
 	</overview>
 	<recommendation>
 		<p>
-			If the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode
+			If the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode.
 		</p>
 	</recommendation>
 	<example>
@@ -21,6 +21,5 @@
 				C28135
 			</a>
 		</li>
-		
 	</references>
 </qhelp>

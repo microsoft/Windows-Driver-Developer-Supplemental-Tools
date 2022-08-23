@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name DispatchAnnotationMissing
  * @kind problem
@@ -8,8 +10,8 @@
  */
 
 import cpp
-import Windows.wdk.wdm.WdmDrivers
-import Windows.wdk.wdm.SAL
+import drivers.wdm.libraries.WdmDrivers
+import drivers.libraries.SAL
 
 //Represents elements with DRIVER_DISPATCH type.
 class DriverDispatchDRoutineTypedef extends TypedefType {

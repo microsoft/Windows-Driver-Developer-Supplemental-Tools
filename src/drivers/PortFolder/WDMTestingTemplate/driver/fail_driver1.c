@@ -61,7 +61,7 @@ DriverEntry(
     DriverObject->MajorFunction[IRP_MJ_SYSTEM_CONTROL]   = DispatchSystemControl;
     DriverObject->MajorFunction[IRP_MJ_PNP]              = (PDRIVER_DISPATCH)DispatchPnp;
     //The two dispatch routine assignments below are for PendingStatusError query only.
-    #if SET_PENDING_STATUS_ERROR == 1 
+    #if SET_PENDING == 1 
     DriverObject->MajorFunction[IRP_MJ_WRITE]            = (PDRIVER_DISPATCH)DispatchWrite;
     DriverObject->MajorFunction[IRP_MJ_SET_INFORMATION]  = (PDRIVER_DISPATCH)DispatchSetInformation;
     #endif

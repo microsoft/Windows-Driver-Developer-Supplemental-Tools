@@ -1,10 +1,9 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name DispatchMismatch
  * @kind problem
-<<<<<<< HEAD
-=======
  * @platform Desktop
->>>>>>> 9cc8e27942839d6c64e90599f4c96ab8bbfeefd4
  * @description The dispatch function does not have a _Dispatch_type_ annotation matching this dispatch table entry
  * @problem.severity warning
  * @id cpp/portedqueries/dispatch-mismatch
@@ -12,7 +11,7 @@
  */
 
 import cpp
-import Windows.wdk.wdm.WdmDrivers
+import drivers.wdm.libraries.WdmDrivers
 
 //Represents functions whose declaration annotations don't match their expected annotation type
 class MismatchedDispatches extends Function {
@@ -26,11 +25,7 @@ class MismatchedDispatches extends Function {
   }
 }
 
-<<<<<<< HEAD
-//Represents function with missing annotation in their declaration. 
-=======
 //Represents functions with  annotation in their declaration.
->>>>>>> 9cc8e27942839d6c64e90599f4c96ab8bbfeefd4
 class NonAnnotatedDispatchs extends Function {
   NonAnnotatedDispatchs() {
     exists(DispatchTypeDefinition dmi, WdmDispatchRoutine wdr |
@@ -40,21 +35,13 @@ class NonAnnotatedDispatchs extends Function {
   }
 }
 
-<<<<<<< HEAD
-from FunctionAccess fa, WdmDispatchRoutine wdm
-where
-  fa.getTarget() = wdm and not fa.getTarget() instanceof NonAnnotatedDispatchs
-  or
-  fa.getTarget() instanceof MismatchedDispatches
-select fa.getTarget(),
-=======
 //Evaluates to true for functions that are not dispatch routine assignments
 predicate notWdmDispatchAssignment(AssignExpr ae) {
   exists(FunctionAccess fa |
     ae.getRValue() = fa and
     fa.getEnclosingFunction() instanceof WdmDriverEntry and
     not fa.getTarget() instanceof WdmDispatchRoutine and
-    not ae instanceof DispatchRoutineAssignment and
+    not ae instanceof CallbackRoutineAssignment and
     ae.getLValue().(ArrayExpr).getArrayBase().toString() = "MajorFunction"
   )
 }
@@ -71,6 +58,5 @@ where
     notWdmDispatchAssignment(es.getExpr())
   )
 select fa,
->>>>>>> 9cc8e27942839d6c64e90599f4c96ab8bbfeefd4
   fa.getTarget() +
     " : The dispatch function does not have a _Dispatch_type_ annotation matching this dispatch table entry."
