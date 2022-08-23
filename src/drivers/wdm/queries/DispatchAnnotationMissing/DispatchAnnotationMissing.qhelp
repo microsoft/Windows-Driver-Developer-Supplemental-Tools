@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The dispatch function does not have any _Dispatch_type_ annotations
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The right-hand side should be a function of type DRIVER_DISPATCH type with the appropriate _Dispatch_type_ annotations.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28169-dispatch-function-does-not-have-proper-annotation">
+				C28169
+			</a>
+		</li>
+	</references>
+</qhelp>
