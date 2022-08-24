@@ -171,7 +171,6 @@ DispatchCreate (
     return STATUS_SUCCESS;
 }
 
-//This routine represents a failing case for NoPagedCode
 _Use_decl_annotations_
 NTSTATUS
 DispatchRead (
@@ -215,7 +214,6 @@ DispatchPower (
     return status;
 }
 
-//TODO: move the PAGED_CODE_SEG to a simple call
 PAGED_CODE_SEG
 _Use_decl_annotations_
 NTSTATUS
@@ -254,49 +252,7 @@ DriverUnload(
 
 #pragma code_seg()
 
-_IRQL_requires_(APC_LEVEL) 
-NTSTATUS TestInner3(){
-    return STATUS_SUCCESS;
-}
 
-
-NTSTATUS someFunc(){
-    // CHAR *tempStr = NULL;
-    // tempStr = new (std::nothrow) CHAR[256];
-    return TestInner3();
-}
-
-_IRQL_requires_(PASSIVE_LEVEL) 
-NTSTATUS TestInner2(){
-    NTSTATUS notUsed;
-
-    /*
-    The call below, someFunc() represents a failing case for IrqlTooLow function as it is in a call is made in a PASSIVE_LEVEL to a function that requres APC_LEVEL, aka TestInner3()
-    */
-    notUsed = someFunc();
-    return STATUS_SUCCESS;
-}
-
-_Check_return_
-NTSTATUS TestInner1(){
-    return TestInner2();
-}
-
-
-NTSTATUS
-IrqlLowTestFunction(){
-    /*
-    The call below represents a failing case for ExaminedValue check as the return value of the call is not checked.
-    */
-    return TestInner1();
-}
-
-_Must_inspect_result_
-_IRQL_requires_(DISPATCH_LEVEL) 
-NTSTATUS
-IrqlHighTestFunction(){
-    return STATUS_SUCCESS;
-}
 
 
 _Use_decl_annotations_
@@ -337,13 +293,9 @@ CompletionRoutine(
 
     _Analysis_assume_(EventIn != NULL);
     KeRaiseIrql(DISPATCH_LEVEL, &oldIrql);
-
-    /*
-    The call below, IrqlLowTestFunction() represents a failing case for IrqlTooHigh function as it is in a call is made in a DISPATCH_LEVEL to a call that contains two subsequent child calls in it with lower IRQL level. 
-    */
-    IrqlLowTestFunction();
-    KeLowerIrql(oldIrql);
-
+    #if IRQL_CHECK == 1
+    failForIrqlTooHigh(&oldIrql);
+    #endif
     KeSetEvent(Event, extension->Increment, TRUE);
     return STATUS_CONTINUE_COMPLETION;
 }
@@ -378,20 +330,11 @@ DpcForIsrRoutine(
     UNREFERENCED_PARAMETER(Context);
     UNREFERENCED_PARAMETER(Dpc);
     NTSTATUS status;
-    KIRQL oldIrql;
-    /*
-    The call below, IrqlHighTestFunction() represents a passing case for both IrqlTooLow and IrqlTooHigh checks as the function is called at the right IRQL level.
-    */
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIrql);
-    status = IrqlHighTestFunction();
-    KeLowerIrql(oldIrql);
 
-    /*
-    The check below represents a passing test for ExaminedValue check as the result of IrqlHighTestFunction(), which was annotated with _Must_inspect_result_ is checked
-    */
-    if(status != 0){
-        //do something.
-    }
+    #if IRQL_CHECK == 1
+    KIRQL oldIrql;
+    passForIrqlTooHigh(&oldIrql);
+    #endif
 
     top_level_call();
 

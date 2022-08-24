@@ -1,14 +1,19 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name IrqTooHigh
  * @kind problem
  * @description The function is not permitted to be called at the current IRQ level. The current level is too high.
- * @problem.severity warning
+ * @problem.severity error
  * @id cpp/portedqueries/irq-too-high
+ * @platform Desktop
+ * @repor.text The following line(s) potentially contains a function call that is supposed to be called at a higher Irql level.
+ * @feature.area Multiple
  * @version 1.0
  */
 
 import cpp
-import PortedQueries.PortLibrary.Irql
+import drivers.libraries.Irql
 
 //Evaluates to true if KeLowerIrql call is made before a call to IrqlAnnotatedFunction is made
 predicate preceedingKeLowerIrqlCall(CallsToIrqlAnnotatedFunction iafc) {
@@ -28,11 +33,7 @@ predicate irqlAnnotationViolatingCall(CallsToIrqlAnnotatedFunction ciaf) {
     ciaf.getEnclosingFunction() = iaf and
     iaf.getIrqlLevel() = current and
     getActualIrqlFunc(ciaf).getIrqlLevel() = called and
-    current > called and
-    not (
-      iaf.getFuncIrqlName().matches(["%min%", "%max%"]) or
-      getActualIrqlFunc(ciaf).getFuncIrqlName().matches(["%min%", "%max%"])
-    ) //excluding cases where both the destination(which may or maynot be the called function) and the caller BOTH have min and/or max as those cases can result in false positives.
+    current > called
   )
 }
 
@@ -56,6 +57,5 @@ predicate irqlNotLoweredCall(CallsToIrqlAnnotatedFunction fc) {
 from CallsToIrqlAnnotatedFunction ciaf
 where irqlNotLoweredCall(ciaf) or irqlAnnotationViolatingCall(ciaf)
 select ciaf,
-  " Current function " + ciaf.getEnclosingFunction().getName() +
-    " has a higer IRQL level than the called function which requires " +
-    getActualIrqlFunc(ciaf).getIrqlLevel().toString()
+  ciaf.getTarget().getName() +
+    " can not be called at the current Irql level.  The current level is too high"
