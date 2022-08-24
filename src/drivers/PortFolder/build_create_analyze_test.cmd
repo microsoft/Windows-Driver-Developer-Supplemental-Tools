@@ -1,11 +1,14 @@
-call :test PendingStatusError WDMTestingTemplate wdm
-call :test ExaminedValue WDMTestingTemplate wdm
-call :test StrSafe KMDFTestTemplate kmdf
-call :test MultiplePagedCode WDMTestingTemplate wdm
-call :test NoPagedCode WDMTestingTemplate wdm
-call :test NoPagingSegment WDMTestingTemplate wdm
-call :test OpaqueMdlUse WDMTestingTemplate wdm
-call :test OpaqueMdlWrite WDMTestingTemplate wdm
+@REM call :test PendingStatusError WDMTestingTemplate wdm
+@REM call :test ExaminedValue WDMTestingTemplate wdm
+@REM call :test StrSafe KMDFTestTemplate kmdf
+@REM call :test MultiplePagedCode WDMTestingTemplate wdm
+@REM call :test NoPagedCode WDMTestingTemplate wdm
+@REM call :test NoPagingSegment WDMTestingTemplate wdm
+@REM call :test OpaqueMdlUse WDMTestingTemplate wdm
+@REM call :test OpaqueMdlWrite WDMTestingTemplate wdm
+
+call :test KeWaitLocal WDMTestingTemplate wdm
+
 
 exit /b 0
 
