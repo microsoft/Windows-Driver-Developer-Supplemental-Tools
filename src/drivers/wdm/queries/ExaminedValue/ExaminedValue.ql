@@ -29,7 +29,7 @@ class ReturnMustBeCheckedFunctionCall extends FunctionCall {
 
 //Holds if an expression (a call to ReturnMustBeCheckedFunction in this case) is occuring in a void context.
 predicate unUsed(Expr e) {
-  e instanceof ExprInVoidContext 
+  e instanceof ExprInVoidContext
   or
   definition(_, e.getParent()) and
   not definitionUsePair(_, e.getParent(), _)
