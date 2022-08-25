@@ -13,7 +13,7 @@
  */
 
 import cpp
-import drivers.libraries.Irql
+import drivers.libraries.Irql 
 
 //Evaluates to true if KeLowerIrql call is made before a call to IrqlAnnotatedFunction is made
 predicate preceedingKeLowerIrqlCall(CallsToIrqlAnnotatedFunction iafc) {

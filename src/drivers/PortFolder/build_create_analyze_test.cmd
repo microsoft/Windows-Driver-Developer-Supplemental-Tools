@@ -6,8 +6,6 @@ call :test NoPagedCode WDMTestingTemplate wdm
 call :test NoPagingSegment WDMTestingTemplate wdm
 call :test OpaqueMdlUse WDMTestingTemplate wdm
 call :test OpaqueMdlWrite WDMTestingTemplate wdm
-call :test IrqTooLow WDMTestingTemplate wdm
-call :test IrqTooHigh WDMTestingTemplate wdm
 call :test KeWaitLocal WDMTestingTemplate wdm
 
 
