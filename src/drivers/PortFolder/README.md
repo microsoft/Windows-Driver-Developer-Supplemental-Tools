@@ -5,25 +5,46 @@ This repository contains a set of CodeQL queries that are used to perform static
 ## Repo structure
 
 - PortFolder
-    - Analysis Files
-        - Test Samples
-            - PendingStatusError.sarif
     - KMDFTestTemplate
         - KMDFTestTemplate.vcproj
         - ...
     - WDFTestingTemplate
         - driver/fail_driver1.vcproj
         - ...
+    - tests
+        - StrSafe.sarif
+        - ...
 
     - clean.cmd
     - build_create_analyze_test.cmd
     - README.md
 
-#### Analysis Files
+#### tests
 
-* AnalysisFiles folder contains .sarif files. They are outputs of running CodeQL Analysis on test databases. The JSON property we look for in these files is the 'results' property. The value will be array of results of running a query. Each result object willl contain useful key-value pairs like line number and filename where an a result has occured.
-
-
+* This folder contains .sarif files which are outputs of comparing expected result with analysis result. If the analysis result matches expected result, then the output of ```sarif diff``` command will look like this:
+```
+{
+    "all": {
+        "+": 0,
+        "-": 0
+    },
+    "error": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    },
+    "warning": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    },
+    "note": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    }
+}
+```
 #### KMDFTestTemplate and WDFTestingTemplate
 
 * These files are basic KMDF and WDF driver templates used for testing purposes. Each folder has an empty driver_snippet.c file which will be replaced by the appropriate test snippet at build time. 
