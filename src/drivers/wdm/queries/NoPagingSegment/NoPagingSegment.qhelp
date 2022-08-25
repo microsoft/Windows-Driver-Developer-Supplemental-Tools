@@ -1,0 +1,24 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment.
+			A function that contains a PAGED_CODE or PAGED_CODE_LOCKED macro has not been placed in paged memory by using #pragma alloc_text or #pragma code_seg.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Put a function/routine that calls PAGED_CODE in a paged section using #pragma alloc_text or #pragma code_seg.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28172-function-macros-not-in-paged-segment">
+				C28172
+			</a>
+		</li>
+	</references>
+</qhelp>
