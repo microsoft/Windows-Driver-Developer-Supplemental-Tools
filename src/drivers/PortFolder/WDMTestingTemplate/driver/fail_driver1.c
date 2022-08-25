@@ -252,9 +252,6 @@ DriverUnload(
 
 #pragma code_seg()
 
-
-
-
 _Use_decl_annotations_
 NTSTATUS
 DispatchPnp (

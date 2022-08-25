@@ -10,6 +10,7 @@ call :test KeWaitLocal WDMTestingTemplate wdm queries
 call :test IrqTooHigh WDMTestingTemplate wdm experimental
 call :test IrqTooLow WDMTestingTemplate wdm experimental
 
+
 exit /b 0
 
 :test
@@ -35,6 +36,7 @@ cd ..\..
 echo analysing_database
 mkdir "AnalysisFiles\Test Samples"
 codeql database analyze "TestDB\%1" --format=sarifv2.1.0 --output="AnalysisFiles\Test Samples\%1.sarif" "..\%3\%4\%1\%1.ql" 
+
 
 echo comparing analysis result with expected result
 sarif diff -o "test\%1.sarif" "..\%3\%4\%1\%1.sarif" "AnalysisFiles\Test Samples\%1.sarif"
