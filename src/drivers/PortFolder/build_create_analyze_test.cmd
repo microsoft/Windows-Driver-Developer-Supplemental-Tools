@@ -1,11 +1,15 @@
-call :test PendingStatusError WDMTestingTemplate wdm
-call :test ExaminedValue WDMTestingTemplate wdm
-call :test StrSafe KMDFTestTemplate kmdf
-call :test MultiplePagedCode WDMTestingTemplate wdm
-call :test NoPagedCode WDMTestingTemplate wdm
-call :test NoPagingSegment WDMTestingTemplate wdm
-call :test OpaqueMdlUse WDMTestingTemplate wdm
-call :test OpaqueMdlWrite WDMTestingTemplate wdm
+call :test PendingStatusError WDMTestingTemplate wdm queries
+call :test ExaminedValue WDMTestingTemplate wdm queries
+call :test StrSafe KMDFTestTemplate kmdf queries
+call :test MultiplePagedCode WDMTestingTemplate wdm queries
+call :test NoPagedCode WDMTestingTemplate wdm queries
+call :test NoPagingSegment WDMTestingTemplate wdm queries
+call :test OpaqueMdlUse WDMTestingTemplate wdm queries
+call :test OpaqueMdlWrite WDMTestingTemplate wdm queries
+call :test KeWaitLocal WDMTestingTemplate wdm queries
+call :test IrqTooHigh WDMTestingTemplate wdm experimental
+call :test IrqTooLow WDMTestingTemplate wdm experimental
+
 
 exit /b 0
 
@@ -13,7 +17,7 @@ exit /b 0
 echo %0 %1 {
 rd /s /q out\%1 >NUL 2>&1
 robocopy /e %2 out\%1\
-robocopy /e ..\%3\queries\%1\ out\%1\driver\
+robocopy /e ..\%3\%4\%1\ out\%1\driver\
 
 cd out\%1
 
@@ -31,9 +35,10 @@ codeql database create -l=cpp -c "msbuild /p:Platform=x64 /t:rebuild" "..\..\Tes
 cd ..\..
 echo analysing_database
 mkdir "AnalysisFiles\Test Samples"
-codeql database analyze "TestDB\%1" --format=sarifv2.1.0 --output="AnalysisFiles\Test Samples\%1.sarif" "..\%3\queries\%1\%1.ql" 
+codeql database analyze "TestDB\%1" --format=sarifv2.1.0 --output="AnalysisFiles\Test Samples\%1.sarif" "..\%3\%4\%1\%1.ql" 
+
 
 echo comparing analysis result with expected result
-sarif diff -o "test\%1.sarif" "..\%3\queries\%1\%1.sarif" "AnalysisFiles\Test Samples\%1.sarif"
+sarif diff -o "test\%1.sarif" "..\%3\%4\%1\%1.sarif" "AnalysisFiles\Test Samples\%1.sarif"
 
 echo %0 %1 }

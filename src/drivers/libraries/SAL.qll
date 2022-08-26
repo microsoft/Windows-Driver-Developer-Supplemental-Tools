@@ -1,10 +1,10 @@
 /**
  * Provides classes for identifying and reasoning about Microsoft source code
  * annotation language (SAL) macros.
- * 
+ *
  * This version of this file has been updated to include driverspecs.h as a valid SAL header.
  * It will be removed if and when that change is upstreamed to the main CodeQL repo.
- * 
+ *
  * TODO: Create PR to bring into main CodeQL repo or recieve feedback on how to more cleanly
  * extend this module in our own file without copying the existing library.
  */
@@ -17,7 +17,10 @@ import cpp
 class SALMacro extends Macro {
   SALMacro() {
     this.getFile().getBaseName() =
-      ["sal.h", "specstrings_strict.h", "specstrings.h", "w32p.h", "minwindef.h", "driverspecs.h"] and
+      [
+        "sal.h", "specstrings_strict.h", "specstrings.h", "w32p.h", "minwindef.h", "driverspecs.h",
+        "no_sal2.h", "kernelspecs.h"
+      ] and
     (
       // Dialect for Windows 8 and above
       this.getName().matches("\\_%\\_")
