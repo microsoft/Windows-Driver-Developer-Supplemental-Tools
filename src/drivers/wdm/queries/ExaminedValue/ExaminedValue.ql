@@ -48,9 +48,9 @@ predicate callFrequency(ReturnMustBeCheckedFunction f, string message) {
       count(ReturnMustBeCheckedFunctionCall fc |
         fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc)
       ) and
-    // used != total and
+    used != total and
     percentage = used * 100 / total and
-    // percentage >= 90 and
+    percentage >= 75 and
     message =
       percentage.toString() +
         "% of calls to this function have their result checked. Checked return values = " +
