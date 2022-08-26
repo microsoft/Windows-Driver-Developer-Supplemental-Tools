@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 import cpp
 import drivers.libraries.SAL
 
@@ -74,4 +76,3 @@ IrqlAnnotatedFunction getActualIrqlFunc(FunctionCall fc) {
 class CallsToIrqlAnnotatedFunction extends FunctionCall {
   CallsToIrqlAnnotatedFunction() { containsIrqlCall(this) }
 }
-

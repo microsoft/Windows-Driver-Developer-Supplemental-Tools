@@ -7,7 +7,7 @@
  * @problem.severity error
  * @id cpp/portedqueries/irq-too-low
  * @platform Desktop
- * @repor.text The following line(s) potentially contains a function call that is supposed to be called at a lower Irql level.
+ * @repro.text The following line(s) potentially contains a function call that is supposed to be called at a lower Irql level.
  * @feature.area Multiple
  * @version 1.0
  */

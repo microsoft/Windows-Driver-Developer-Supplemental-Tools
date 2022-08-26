@@ -19,6 +19,6 @@ where
   call.getTarget().getName() = "KeWaitForSingleObject" and
   call.getArgument(2).getValue().toInt() != 0 and
   call.getArgument(0).(AddressOfExpr).getOperand() = va and
-  va.getTarget() instanceof LocalVariable
+  va.getTarget() instanceof StackVariable
 select call,
   "KeWaitForSingleObject should have a KernelMode AccessMode when the first argument is local"
