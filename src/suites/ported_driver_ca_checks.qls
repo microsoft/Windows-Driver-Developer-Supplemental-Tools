@@ -11,3 +11,7 @@
       - drivers/wdm/queries/NoPagedCode/NoPagedCode.ql
       - drivers/wdm/queries/NoPagingSegment/NoPagingSegment.ql
       - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
+      - drivers/wdm/queries/KeWaitLocal/KeWaitLocal.ql
+      - drivers/wdm/experimental/IrqTooHigh/IrqTooHigh.ql
+      - drivers/wdm/experimental/IrqTooLow/IrqTooLow.ql
+      
