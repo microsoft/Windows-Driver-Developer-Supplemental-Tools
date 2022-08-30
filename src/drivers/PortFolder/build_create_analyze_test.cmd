@@ -9,6 +9,8 @@ call :test OpaqueMdlWrite WDMTestingTemplate wdm queries
 call :test KeWaitLocal WDMTestingTemplate wdm queries
 call :test IrqTooHigh WDMTestingTemplate wdm experimental
 call :test IrqTooLow WDMTestingTemplate wdm experimental
+call :test WrongDispatchTableAssignment WDMTestingTemplate wdm queries
+
 
 
 exit /b 0
