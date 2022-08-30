@@ -77,7 +77,8 @@ class WrongDispatchFunctionAssignments extends AssignExpr {
     or
     dispatchAnnotationMismatched(this) and
     message =
-      "The dispatch function doesn't not have a dispatch type annotation matching this dispatch table entry."
+      "The dispatch function does not have a dispatch type annotation matching this dispatch table entry."
+
   }
 
   string getMessage() { result = message }
