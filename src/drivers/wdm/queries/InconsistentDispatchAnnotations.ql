@@ -18,7 +18,7 @@ from DispatchTypeDefinition dmi, WdmDispatchRoutine wdr, FunctionDeclarationEntr
 where
   fde = wdr.getADeclarationEntry() and
   dmi.getDeclarationEntry() = fde and
-   wdr.matchesAnnotation(dmi)
+  not wdr.matchesAnnotation(dmi)
 select fde,
   "Function declaration of " + fde.getFunction().getName() +
     " is annotated as a different dispatch type (" + dmi.getDispatchTypeAsName() +
