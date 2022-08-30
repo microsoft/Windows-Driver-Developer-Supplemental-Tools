@@ -6,7 +6,7 @@ The dispatch table assignment satisfies either of these 3 scenarios: 1) The disp
 	</overview>
 	<recommendation>
 		<p>
-			This defect can be corrected either DRIVER_DISPATCH type function or by adding a _Dispatch_type_ annotation to the function or correcting the dispatch table entry being used.
+			This defect can be corrected either using a DRIVER_DISPATCH type function or by adding a _Dispatch_type_ annotation to the function or correcting the dispatch table entry being used.
 		</p>
 	</recommendation>
 	<example>
