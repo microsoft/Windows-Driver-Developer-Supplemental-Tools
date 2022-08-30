@@ -1,12 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name DispatchMismatch
+ * @name WrongDispatchTableAssignment
  * @kind problem
  * @platform Desktop
- * @description The dispatch function does not have a _Dispatch_type_ annotation matching this dispatch table entry
+ * @description The dispatch table assignment doesn't satisfy either of these scenarios: 1) The dispatch table assignment has a function whose type is DRIVER_DISPATCH, or 2) The dispatch table assignment has a DRIVER_DISPATCH function as its right-hand but the function doesn't have a driver dispatch type annotation, or 2) The dispatch function satisfies both of the above conditions but its dispatch type doesn't match the expected dispatch table entry.
  * @problem.severity warning
- * @id cpp/portedqueries/dispatch-mismatch
+ * @feature.area Multiple
+ * @repro.text The following lines of code may potentially contain incorrect assignment to dispatch table entry.
+ * @id cpp/portedqueries/wrong-dispatch-table-assignment
  * @version 1.0
  */
 
