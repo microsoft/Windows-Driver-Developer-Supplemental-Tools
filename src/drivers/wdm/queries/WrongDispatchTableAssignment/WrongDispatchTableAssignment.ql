@@ -73,7 +73,8 @@ class WrongDispatchFunctionAssignments extends AssignExpr {
       "Dispatch table assignment should have a DRIVER_DISPATCH type rouine as its right-hand side value."
     or
     dispatchAnnotationMissing(this) and
-    message = "The dispatch function doesn't not have a dispatch type annotation."
+    message = "The dispatch function does not have a dispatch type annotation."
+
     or
     dispatchAnnotationMismatched(this) and
     message =
