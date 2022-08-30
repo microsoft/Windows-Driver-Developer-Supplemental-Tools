@@ -19,15 +19,10 @@ import drivers.libraries.SAL
 //Evaluates to true for AssignExpr for whom the right hand side evaluates to a FunctionAccess whose target is
 //a WdmDispatchRoutine but its dispatch type annotation doesn't match the dispatch table entry
 predicate dispatchAnnotationMismatched(AssignExpr ae) {
-  exists(
-    DispatchTypeDefinition dmi, WdmDispatchRoutine wdr, FunctionDeclarationEntry fde,
-    FunctionAccess faa
-  |
+  exists(DispatchTypeDefinition dmi, WdmDispatchRoutine wdr, FunctionAccess faa |
     ae.getRValue().(FunctionAccess) = faa and
     faa.getTarget() = wdr and
-    faa.getTarget() = fde.getFunction() and
-    fde = wdr.getADeclarationEntry() and
-    dmi.getDeclarationEntry() = fde and
+    dmi.getDeclarationEntry() = wdr.getADeclarationEntry() and
     not wdr.matchesAnnotation(dmi)
   )
 }
@@ -43,7 +38,7 @@ predicate dispatchRoutineExists(AssignExpr ae) {
   dispatchRoutineExists(ae.getRValue().(AssignExpr))
 }
 
-//Represents dispatch table AssignExpr whose right hand side is not a routine of type DRIVER_DISPATCH
+//Represents dispatch table AssignExpr whose right hand side is not a funtion of type DRIVER_DISPATCH
 class NonDispatchFunction extends AssignExpr {
   NonDispatchFunction() {
     exists(

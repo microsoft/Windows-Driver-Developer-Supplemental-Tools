@@ -2,14 +2,14 @@
 // Licensed under the MIT license.
 
 
-//Fails
+//Fails: missing SAL annotation
 DRIVER_DISPATCH DispatchPnp; 
 
-//Fails
+//Fails: annotation mismatch
 _Dispatch_type_(IRP_MJ_CLOSE) 
 DRIVER_DISPATCH DispatchCreate;
 
-//Fails
+//Fails: since the expected SAL annotation for IRP_% types is _Dispatch_type_
 _Function_class_(IRP_MJ_READ)
 _Function_class_(DRIVER_DISPATCH)
 NTSTATUS
