@@ -177,6 +177,7 @@ DispatchCreate (
     return STATUS_SUCCESS;
 }
 
+
 _Use_decl_annotations_
 NTSTATUS
 DispatchCancel (
@@ -189,6 +190,7 @@ DispatchCancel (
     UNREFERENCED_PARAMETER(Irp);
     return STATUS_SUCCESS;
 }
+
 
 _Use_decl_annotations_
 NTSTATUS
