@@ -35,7 +35,7 @@ DRIVER_DISPATCH DispatchPnp;
 _Dispatch_type_(IRP_MJ_CREATE) 
 DRIVER_DISPATCH DispatchCreate;
 _Dispatch_type_(IRP_MJ_READ) 
-DRIVER_DISPATCH DispatchRead;;
+DRIVER_DISPATCH DispatchRead;
 #endif
 
 

@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 
 
-
 //Fails
 DRIVER_DISPATCH DispatchPnp; 
 
@@ -23,6 +22,5 @@ DispatchRead (
 _Dispatch_type_(IRP_MN_CANCEL_REMOVE_DEVICE) 
 _Dispatch_type_(IRP_MN_CANCEL_STOP_DEVICE) 
 DRIVER_DISPATCH DispatchCancel;
-
 
 void top_level_call(){}
