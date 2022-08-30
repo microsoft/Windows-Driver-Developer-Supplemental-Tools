@@ -13,7 +13,7 @@
 import cpp
 import drivers.wdm.libraries.WdmDrivers
 
-//Represents functions whose declaration annotations don't match their expected annotation type
+//Represents functions whose declaration annotations don't match their expected annotation type in dispatch table
 class MismatchedDispatches extends Function {
   MismatchedDispatches() {
     exists(DispatchTypeDefinition dmi, WdmDispatchRoutine wdr, FunctionDeclarationEntry fde |
@@ -22,6 +22,11 @@ class MismatchedDispatches extends Function {
       dmi.getDeclarationEntry() = fde and
       not wdr.matchesAnnotation(dmi)
     )
+  }
+
+  //for testing
+  int startLine(){
+    result = this.getLocation().getStartLine()
   }
 }
 

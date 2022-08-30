@@ -34,6 +34,8 @@ _Dispatch_type_(IRP_MJ_PNP)
 DRIVER_DISPATCH DispatchPnp; 
 _Dispatch_type_(IRP_MJ_CREATE) 
 DRIVER_DISPATCH DispatchCreate;
+_Dispatch_type_(IRP_MJ_READ) 
+DRIVER_DISPATCH DispatchRead;;
 #endif
 
 
@@ -60,6 +62,10 @@ DriverEntry(
     DriverObject->MajorFunction[IRP_MJ_POWER]            = (PDRIVER_DISPATCH)DispatchPower;
     DriverObject->MajorFunction[IRP_MJ_SYSTEM_CONTROL]   = DispatchSystemControl;
     DriverObject->MajorFunction[IRP_MJ_PNP]              = (PDRIVER_DISPATCH)DispatchPnp;
+    #if SET_DISPATCH == 0
+    DriverObject->MajorFunction[IRP_MN_CANCEL_REMOVE_DEVICE]              = 
+    DriverObject->MajorFunction[IRP_MN_CANCEL_STOP_DEVICE]                = (PDRIVER_DISPATCH)DispatchCancel;
+    #endif
     //The two dispatch routine assignments below are for PendingStatusError query only.
     #if SET_PENDING == 1 
     DriverObject->MajorFunction[IRP_MJ_WRITE]            = (PDRIVER_DISPATCH)DispatchWrite;
@@ -168,6 +174,19 @@ DispatchCreate (
 	NTSTATUS status;
     status = Irp->IoStatus.Status = STATUS_SUCCESS;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
+    return STATUS_SUCCESS;
+}
+
+_Use_decl_annotations_
+NTSTATUS
+DispatchCancel (
+    PDEVICE_OBJECT DeviceObject,
+    PIRP Irp
+    )
+{  
+    //Doesn't do anything
+    UNREFERENCED_PARAMETER(DeviceObject);
+    UNREFERENCED_PARAMETER(Irp);
     return STATUS_SUCCESS;
 }
 
