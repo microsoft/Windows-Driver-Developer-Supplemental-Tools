@@ -17,10 +17,7 @@
 import cpp
 
 class ExtendedDeprecatedApiCall extends FunctionCall {
-
-  ExtendedDeprecatedApiCall() {
-    this.getTarget() instanceof ExtendedDeprecatedApi
-  }
+  ExtendedDeprecatedApiCall() { this.getTarget() instanceof ExtendedDeprecatedApi }
 }
 
 class ExtendedDeprecatedApi extends Function {
@@ -51,38 +48,50 @@ class ExtendedDeprecatedApi extends Function {
 }
 
 class ExtendedDeprecatedMacro extends Macro {
-   string name;
+  string name;
 
-   ExtendedDeprecatedMacro() {
+  ExtendedDeprecatedMacro() {
     this.getName()
-    .matches([
-        "_fstrcat", "_fstrcpy", "_fstrncat", "_fstrncpy", "_ftccat", "_ftccpy", "_ftcscat",
-        "_ftcscpy", "_getts", "_gettws", "_getws", "_mbccat", "_makepath", "_mbscat",
-        "_snprintf", "_sntprintf", "_sntscanf", "_snwprintf", "_splitpath", "_stprintf",
-        "_stscanf", "_tccat", "_tccpy", "_tcscat", "_tcscpy", "_tcsncat", "_tcsncpy",
-        "_tmakepath", "_tscanf", "_tsplitpath", "_vsnprintf", "_vsntprintf", "_vsnwprintf",
-        "_vstprintf", "_wmakepath", "_wsplitpath", "OemToCharW", "StrCat", "StrCatA",
-        "StrCatBuff", "StrCatBuffA", "StrCatBuffW", "StrCatChainW", "StrCatN", "StrCatNA",
-        "StrCatNW", "StrCatW", "StrCpy", "StrCpyA", "StrCpyN", "StrCpyNA", "StrCpyNW",
-        "strcpyW", "StrCpyW", "StrNCat", "StrNCatA", "StrNCatW", "StrNCpy", "StrNCpyA",
-        "StrNCpyW", "gets", "lstrcat", "lstrcatA", "lstrcatn", "lstrcatnA", "lstrcatnW",
-        "lstrcatW", "lstrcpy", "lstrcpyA", "lstrcpyn", "lstrcpynA", "lstrcpynW", "lstrcpyW",
-        "snscanf", "snwscanf", "sprintf", "sprintfA", "sprintfW", "lstrncat", "makepath",
-        "nsprintf", "strcat", "strcatA", "strcatW", "strcpy", "strcpyA", "strncat", "strncpy",
-        "swprintf", "ualstrcpyW", "vsnprintf", "vsprintf", "vswprintf", "wcscat", "wcscpy",
-        "wcsncat", "wcsncpy", "wnsprintf", "wnsprintfA", "wsprintf", "wsprintfA", "wsprintfW",
-        "wvnsprintf", "wvnsprintfA", "wvnsprintfW", "wvsprintf", "wvsprintfA", "wvsprintfW"
-      ]) and
-   name = this.getName()
-   }
+        .matches([
+            "_fstrcat", "_fstrcpy", "_fstrncat", "_fstrncpy", "_ftccat", "_ftccpy", "_ftcscat",
+            "_ftcscpy", "_getts", "_gettws", "_getws", "_mbccat", "_makepath", "_mbscat",
+            "_snprintf", "_sntprintf", "_sntscanf", "_snwprintf", "_splitpath", "_stprintf",
+            "_stscanf", "_tccat", "_tccpy", "_tcscat", "_tcscpy", "_tcsncat", "_tcsncpy",
+            "_tmakepath", "_tscanf", "_tsplitpath", "_vsnprintf", "_vsntprintf", "_vsnwprintf",
+            "_vstprintf", "_wmakepath", "_wsplitpath", "OemToCharW", "StrCat", "StrCatA",
+            "StrCatBuff", "StrCatBuffA", "StrCatBuffW", "StrCatChainW", "StrCatN", "StrCatNA",
+            "StrCatNW", "StrCatW", "StrCpy", "StrCpyA", "StrCpyN", "StrCpyNA", "StrCpyNW",
+            "strcpyW", "StrCpyW", "StrNCat", "StrNCatA", "StrNCatW", "StrNCpy", "StrNCpyA",
+            "StrNCpyW", "gets", "lstrcat", "lstrcatA", "lstrcatn", "lstrcatnA", "lstrcatnW",
+            "lstrcatW", "lstrcpy", "lstrcpyA", "lstrcpyn", "lstrcpynA", "lstrcpynW", "lstrcpyW",
+            "snscanf", "snwscanf", "sprintf", "sprintfA", "sprintfW", "lstrncat", "makepath",
+            "nsprintf", "strcat", "strcatA", "strcatW", "strcpy", "strcpyA", "strncat", "strncpy",
+            "swprintf", "ualstrcpyW", "vsnprintf", "vsprintf", "vswprintf", "wcscat", "wcscpy",
+            "wcsncat", "wcsncpy", "wnsprintf", "wnsprintfA", "wsprintf", "wsprintfA", "wsprintfW",
+            "wvnsprintf", "wvnsprintfA", "wvnsprintfW", "wvsprintf", "wvsprintfA", "wvsprintfW"
+          ]) and
+    name = this.getName()
+  }
 }
 
 class ExtendedDeprecatedMacroInvocation extends MacroInvocation {
-   ExtendedDeprecatedMacroInvocation() {
-      this.getMacro() instanceof ExtendedDeprecatedMacro
-   }
+  ExtendedDeprecatedMacroInvocation() { this.getMacro() instanceof ExtendedDeprecatedMacro }
 }
 
-from ExtendedDeprecatedApiCall deprecatedCall
+class ExtendedDeprecatedCall extends Element {
+  string name;
+
+  ExtendedDeprecatedCall() {
+    name = this.(ExtendedDeprecatedMacroInvocation).getMacroName()
+    or
+    name = this.(ExtendedDeprecatedApiCall).getTarget().getName()
+  }
+
+  string getMessage() {
+    result = "TODO: Display appropriate replacement guidance"
+  }
+}
+
+from ExtendedDeprecatedCall deprecatedCall
 where not deprecatedCall.getLocation().getFile().toString().matches("%ex_x.h")
 select deprecatedCall, deprecatedCall.getFile().getBaseName()
