@@ -1,17 +1,19 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Use of deprecated WDK API
- * @description Use of deprecated WDK API detected.
+ * @name Use of unsafe function or macro
+ * @description Use of unsafe, deprecated function or macro detected
  * @platform Desktop
  * @security.severity Low
  * @impact Attack Surface Reduction
  * @feature.area Multiple
- * @repro.text The following code locations contain calls to a deprecated WDK API
+ * @repro.text The following code locations contain calls to an unsafe, deprecated function or macro.
  * @kind problem
- * @id cpp/windows/wdk/deprecated-api
+ * @id cpp/windows/drivers/queries/extended-deprecated-apis
  * @problem.severity warning
- * @query-version 1.2
+ * @precision high
+ * @tags correctness
+ * @query-version v1
  */
 
 import cpp
