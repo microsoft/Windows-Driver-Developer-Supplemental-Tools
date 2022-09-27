@@ -10,7 +10,7 @@ call :test KeWaitLocal WDMTestingTemplate wdm queries
 call :test IrqTooHigh WDMTestingTemplate wdm experimental
 call :test IrqTooLow WDMTestingTemplate wdm experimental
 call :test WrongDispatchTableAssignment WDMTestingTemplate wdm queries
-
+call :test ExtendedDeprecatedApis WDMTestingTemplate general queries
 
 
 exit /b 0
