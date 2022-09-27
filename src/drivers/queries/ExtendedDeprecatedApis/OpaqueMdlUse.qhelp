@@ -1,0 +1,33 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Deprecated, insecure APIs should not be used.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Instead of using deprecated APIs, driver developers should refer to the output of the rule and replace any calls to deprecated APIs with the recommended replacements.  These recommendations are based on the MSDN articles for Code Analysis rules C28719, C28726, and C28750, as linked in the references section below.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28719-banned-api-usage-use-updated-function-replacement">
+				C28719 warning - Windows Drivers
+			</a>
+		</li>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28726-banned-api-usage-use-updated-function-replacement">
+				C28726 warning - Windows Drivers
+			</a>
+		</li>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28750-banned-istrlen-usage">
+				C28750 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

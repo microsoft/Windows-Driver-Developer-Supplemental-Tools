@@ -1,8 +1,8 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Use of unsafe function or macro
- * @description Use of unsafe, deprecated function or macro detected
+ * @name Use of deprecated function or macro (C28719, C28726, C28750)
+ * @description Unsafe, deprectated APIs should not be used.  This is a port of Code Analysis checks C28719, C28726, and C28750.
  * @platform Desktop
  * @security.severity Low
  * @impact Attack Surface Reduction
@@ -439,5 +439,5 @@ class ExtendedDeprecatedCall extends Element {
 }
 
 from ExtendedDeprecatedCall deprecatedCall
-where not deprecatedCall.getLocation().getFile().toString().matches("%ex_x.h")
+where not deprecatedCall.getLocation().getFile().toString().matches("%Windows Kits%include%.h")
 select deprecatedCall, deprecatedCall.getMessage()

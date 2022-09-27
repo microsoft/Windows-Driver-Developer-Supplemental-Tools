@@ -37,5 +37,5 @@ class WdkDeprecatedApiFunctionCall extends FunctionCall {
 }
 
 from WdkDeprecatedApiFunctionCall deprecatedCall
-where not deprecatedCall.getLocation().getFile().toString().matches("%ex_x.h")
+where not deprecatedCall.getLocation().getFile().toString().matches("%Windows Kits%include%.h")
 select deprecatedCall, deprecatedCall.message()
