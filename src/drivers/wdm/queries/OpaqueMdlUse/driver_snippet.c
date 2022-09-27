@@ -4,35 +4,10 @@
 // driver_snippet.c
 //
 
+#define SET_DISPATCH 1
+
 // Template. Not called in this test.
 void top_level_call() {}
-
-// Template. Not called in this test.
-_Use_decl_annotations_
-    NTSTATUS
-    DispatchWrite(
-        PDEVICE_OBJECT DeviceObject,
-        PIRP Irp)
-{
-    UNREFERENCED_PARAMETER(DeviceObject);
-    UNREFERENCED_PARAMETER(Irp);
-    return STATUS_SUCCESS;
-}
-
-_Dispatch_type_(IRP_MJ_SET_INFORMATION)
-    DRIVER_DISPATCH DispatchSetInformation;
-
-// Template. Not called in this test.
-_Use_decl_annotations_
-    NTSTATUS
-    DispatchSetInformation(
-        PDEVICE_OBJECT DeviceObject,
-        PIRP Irp)
-{
-    UNREFERENCED_PARAMETER(DeviceObject);
-    UNREFERENCED_PARAMETER(Irp);
-    return STATUS_SUCCESS;
-}
 
 // Passing case: only the Next and MdlFlags fields are accessed
 VOID OpaqueMdlUse_Pass1(PMDL Mdl)

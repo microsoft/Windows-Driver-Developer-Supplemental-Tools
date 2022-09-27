@@ -6,6 +6,7 @@
 - include:
     query path: 
       - drivers/kmdf/queries/StrSafe/StrSafe.ql
+      - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
       - drivers/wdm/queries/ExaminedValue/ExaminedValue.ql
       - drivers/wdm/queries/NoPagedCode/NoPagedCode.ql
@@ -13,6 +14,8 @@
       - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
       - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
       - drivers/wdm/queries/KeWaitLocal/KeWaitLocal.ql
+      - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlUse.ql
+      - drivers/wdm/queries/OpaqueMdlWrite/OpaqueMdlWrite.ql
       - drivers/wdm/experimental/IrqTooHigh/IrqTooHigh.ql
       - drivers/wdm/experimental/IrqTooLow/IrqTooLow.ql
       
