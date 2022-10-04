@@ -7,7 +7,7 @@
 	</overview>
 	<recommendation>
 		<p>
-			Instead of using deprecated APIs, driver developers should refer to the output of the rule and replace any calls to deprecated APIs with the recommended replacements.  These recommendations are based on the MSDN articles for Code Analysis rules C28719, C28726, and C28750, as linked in the references section below.
+			Instead of using deprecated APIs, driver developers should refer to the output of the rule and replace any calls to deprecated APIs with the recommended replacements.  These recommendations are based on the MSDN articles for Code Analysis rules C28719, C28726, and C28750, as linked in the references section below.  If no recommended replacement is provided, developers should investigate alternate code or APIs for attaining the same functionality.
 		</p>
 	</recommendation>
 	<example>
