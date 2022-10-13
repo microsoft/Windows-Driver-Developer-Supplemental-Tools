@@ -11,7 +11,8 @@
  * @precision high
  * @tags security
  *       external/cwe/cwe-704
- */
+ * @query-version 1.0
+*/
 
 import cpp
 
