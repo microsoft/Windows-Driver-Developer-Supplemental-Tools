@@ -30,4 +30,4 @@
       - Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
       - Likely Bugs/UninitializedPtrField.ql
       - Security/Crytpography/HardcodedIVCNG.ql
-      - Security/CWE/CWE-704/WcharCharConversionLimited.ql
+      - Security/CWE/CWE-704/WcharCharConversion.ql
