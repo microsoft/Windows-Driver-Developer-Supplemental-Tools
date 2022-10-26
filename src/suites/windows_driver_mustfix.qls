@@ -11,9 +11,9 @@
       - Likely Bugs/Underspecified Functions/TooFewArguments.ql
       - Security/CWE/CWE-190/ComparisonWithWiderType.ql
       - Security/CWE/CWE-253/HResultBooleanConversion.ql
-      - Security/CWE/CWE-704/WcharCharConversion.ql
 - queries: .
   from: windows-drivers
 - include:
     query path: 
       - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
+      - microsoft/Security/CWE/CWE-704/WcharCharConversionLimited.ql
