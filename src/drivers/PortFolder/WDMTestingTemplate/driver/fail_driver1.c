@@ -38,6 +38,7 @@ _Dispatch_type_(IRP_MJ_READ)
 DRIVER_DISPATCH DispatchRead;
 #endif
 
+const ULONG myTag = '_gaT';
 
 #ifndef __cplusplus
 #pragma alloc_text (INIT, DriverEntry)
