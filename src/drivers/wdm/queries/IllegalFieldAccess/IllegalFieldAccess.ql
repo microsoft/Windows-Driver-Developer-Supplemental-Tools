@@ -16,6 +16,7 @@
  */
 
 import cpp
+import drivers.wdm.libraries.WdmDrivers
 
 // So.  It appears that what this check does on paper != what it does in practice.
 // In theory, it should check that you aren't (for example) assigning CancelRoutines directly.
@@ -26,5 +27,31 @@ import cpp
 //Irp->CancelRoutine = DispatchCancel; // SHOULD be caught by C28128 but isn't
 //DeviceObject->Dpc.DeferredRoutine = DpcForIsrRoutine; // IS caught by C28128
 
-from Function f
-select f
+class IrpCancelRoutineAccess extends FieldAccess, IllegalFieldUsage {
+    IrpCancelRoutineAccess() {
+        this.getTarget().getParentScope() instanceof Irp
+        and this.getTarget().getName().matches("CancelRoutine")
+    }
+}
+
+class DpcFieldAccess extends FieldAccess, IllegalFieldUsage {
+
+    DpcFieldAccess() {
+        this.getTarget().getParentScope() instanceof Dpc
+    }
+}
+
+class DpcAccess extends FieldAccess, IllegalFieldUsage {
+
+    DpcAccess() {
+        this.getTarget().getType() instanceof Dpc
+    }
+}
+
+abstract class IllegalFieldUsage extends Element {
+
+}
+
+from AssignExpr ae
+where ae.getLValue() instanceof IllegalFieldUsage
+select ae
