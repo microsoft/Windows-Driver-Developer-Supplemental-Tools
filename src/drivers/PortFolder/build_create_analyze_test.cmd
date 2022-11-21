@@ -12,6 +12,7 @@ call :test IrqTooLow WDMTestingTemplate wdm experimental
 call :test WrongDispatchTableAssignment WDMTestingTemplate wdm queries
 call :test ExtendedDeprecatedApis WDMTestingTemplate general queries
 call :test PoolTagIntegral WDMTestingTemplate general queries
+call :test IllegalFieldAccess WDMTestingTemplate wdm queries
 
 
 exit /b 0

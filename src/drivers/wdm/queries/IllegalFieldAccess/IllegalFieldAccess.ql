@@ -2,13 +2,13 @@
 // Licensed under the MIT license.
 /**
  * @name Incorrect access to protected field (C28128)
- * @description The driver directly accessed a structure member that should be accessed only by using specialized functions.
+ * @description The driver assigned a value to a structure member that should be accessed only by using specialized functions.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
- * @repro.text The driver directly accessed a structure member that should be accessed only by using specialized functions.
+ * @repro.text The driver assigned a value to a structure member that should be accessed only by using specialized functions.
  * @kind problem
- * @id cpp/windows/drivers/queries/pool-tag-integral
+ * @id cpp/windows/drivers/queries/illegal-field-access
  * @problem.severity warning
  * @precision high
  * @tags correctness
@@ -23,35 +23,35 @@ import drivers.wdm.libraries.WdmDrivers
 // In practice, it only looks for accesses to the DPC object fields.
 // Example: DeviceObject->Dpc.DeferredRoutine = DpcForIsrRoutine;
 // Let's implement both.
-
 //Irp->CancelRoutine = DispatchCancel; // SHOULD be caught by C28128 but isn't
 //DeviceObject->Dpc.DeferredRoutine = DpcForIsrRoutine; // IS caught by C28128
-
 class IrpCancelRoutineAccess extends FieldAccess, IllegalFieldUsage {
-    IrpCancelRoutineAccess() {
-        this.getTarget().getParentScope() instanceof Irp
-        and this.getTarget().getName().matches("CancelRoutine")
-    }
+  IrpCancelRoutineAccess() {
+    this.getTarget().getParentScope() instanceof Irp and
+    this.getTarget().getName().matches("CancelRoutine")
+  }
 }
 
 class DpcFieldAccess extends FieldAccess, IllegalFieldUsage {
-
-    DpcFieldAccess() {
-        this.getTarget().getParentScope() instanceof Dpc
-    }
+  DpcFieldAccess() { this.getTarget().getParentScope() instanceof Dpc }
 }
 
 class DpcAccess extends FieldAccess, IllegalFieldUsage {
-
-    DpcAccess() {
-        this.getTarget().getType() instanceof Dpc
-    }
+  DpcAccess() { this.getTarget().getUnderlyingType() instanceof Dpc }
 }
 
 abstract class IllegalFieldUsage extends Element {
-
+  string getErrorMessage() {
+    if this instanceof DpcAccess or this instanceof DpcFieldAccess
+    then
+      result =
+        "An assignment to an IO DPC or one of its fields has been made directly. It should be made by IoInitializeDpcRequest."
+    else
+      result =
+        "An assignment to an IRP CancelRoutine field was made directly. It should be made by IoSetCancelRoutine."
+  }
 }
 
-from AssignExpr ae
-where ae.getLValue() instanceof IllegalFieldUsage
-select ae
+from AssignExpr ae, IllegalFieldUsage ifu
+where ae.getLValue() = ifu
+select ae, ifu.getErrorMessage()
