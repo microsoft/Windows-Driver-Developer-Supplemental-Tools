@@ -18,13 +18,7 @@
 import cpp
 import drivers.wdm.libraries.WdmDrivers
 
-// So.  It appears that what this check does on paper != what it does in practice.
-// In theory, it should check that you aren't (for example) assigning CancelRoutines directly.
-// In practice, it only looks for accesses to the DPC object fields.
-// Example: DeviceObject->Dpc.DeferredRoutine = DpcForIsrRoutine;
-// Let's implement both.
-//Irp->CancelRoutine = DispatchCancel; // SHOULD be caught by C28128 but isn't
-//DeviceObject->Dpc.DeferredRoutine = DpcForIsrRoutine; // IS caught by C28128
+/** Represents an access to a CancelRoutine field of an IRP. */
 class IrpCancelRoutineAccess extends FieldAccess, IllegalFieldUsage {
   IrpCancelRoutineAccess() {
     this.getTarget().getParentScope() instanceof Irp and
@@ -32,14 +26,22 @@ class IrpCancelRoutineAccess extends FieldAccess, IllegalFieldUsage {
   }
 }
 
+/** Represents an access to a field of a DPC. */
 class DpcFieldAccess extends FieldAccess, IllegalFieldUsage {
   DpcFieldAccess() { this.getTarget().getParentScope() instanceof Dpc }
 }
 
+/** Represents an access to a DPC. */
 class DpcAccess extends FieldAccess, IllegalFieldUsage {
   DpcAccess() { this.getTarget().getUnderlyingType() instanceof Dpc }
 }
 
+/**
+ * Represents the illegal accesses we look for in this query, namely:
+ * - Accesses to a DeviceObject's DPC field
+ * - Accesses to a DPC's field
+ * - Accesses to an IRP's CancelRoutine field
+ */
 abstract class IllegalFieldUsage extends Element {
   string getErrorMessage() {
     if this instanceof DpcAccess or this instanceof DpcFieldAccess
