@@ -45,6 +45,9 @@ jobs:
     - name: Build recommended driver suite
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only windows_driver_recommended.qls
+    - name: Build CA ported queries
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
