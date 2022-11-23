@@ -13,6 +13,7 @@ call :test WrongDispatchTableAssignment WDMTestingTemplate wdm queries
 call :test ExtendedDeprecatedApis WDMTestingTemplate general queries
 call :test WdkDeprecatedApis WDMTestingTemplate general queries
 call :test IllegalFieldAccess WDMTestingTemplate wdm queries
+call :test PoolTagIntegral WDMTestingTemplate wdm queries
 call :test ObReferenceMode WDMTestingTemplate wdm queries
 
 exit /b 0
