@@ -62,7 +62,8 @@ To run CodeQl queries on source files, a query, a CodeQL CLI and a CodeQL CLI ge
 ### Dependencies
 
 * This repository uses CodeQL version 2.6.3.
-* sarif-tools 1.0.0. Install sarif-tools using pip command
+* Python 3.
+* sarif-tools 1.0.0. Install sarif-tools using pip command.  If you see errors related to the installation of "lxml", install a version of lxml for Windows matching your Python environment from here: https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
 
 ```
 pip install sarif-tools

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Use of deprecated function or macro (C28719, C28726, C28750)
+ * @name Use of deprecated function or macro (C28719, C28726, C28735, C28750)
  * @description Unsafe, deprecated APIs should not be used.  This is a port of Code Analysis checks C28719, C28726, and C28750.
  * @platform Desktop
  * @security.severity Low
@@ -52,6 +52,15 @@ predicate matchesBannedApi(string input) {
           "_mbsncpy", "_mbstok", "_snscanf", "_snwscanf", "_ui64toa", "_ui64tow", "_ultoa",
           "CharToOemA", "CharToOemBuffA", "CharToOemBuffW", "CharToOemW", "OemToCharA",
           "OemToCharBuffA", "OemToCharBuffW", "scanf", "sscanf", "wmemcpy", "wnsprintfW", "wscanf"
+        ]
+    )
+  or
+  // Functions marked deprecated in C28735
+  input =
+    any([
+          "EtwRegisterTraceGuidsA", "EtwRegisterTraceGuidsW", "EtwUnregisterTraceGuids",
+          "RegisterTraceGuidsA", "RegisterTraceGuidsW", "RegisterEventSourceA",
+          "RegisterEventSourceW", "UnregisterTraceGuids"
         ]
     )
   or
@@ -413,6 +422,15 @@ class ExtendedDeprecatedCall extends Element {
         name.matches("wscanf") and replacement = "wscanf_s"
       )
       or
+      // Functions marked deprecated in C28735
+      name.matches(any([
+              "EtwRegisterTraceGuidsA", "EtwRegisterTraceGuidsW", "EtwUnregisterTraceGuids",
+              "RegisterTraceGuidsA", "RegisterTraceGuidsW", "RegisterEventSourceA",
+              "RegisterEventSourceW", "UnregisterTraceGuids"
+            ]
+        )) and
+      replacement = "__ETWReplacement"
+      or
       // Functions marked deprecated in C28750
       (
         name.matches("lstrlen") and replacement = "_tcslen"
@@ -431,13 +449,19 @@ class ExtendedDeprecatedCall extends Element {
         name +
           " is insecure and has been marked deprecated.  Please investigate a safe replacement."
     else
-      result =
-        name +
-          " is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: "
-          + replacement + "."
+      if replacement.matches("__ETWReplacement")
+      then
+        result =
+          name +
+            " has been marked deprecated as it is a legacy tracing API.  Please migrate to modern Event Tracing for Windows APIs."
+      else
+        result =
+          name +
+            " is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: "
+            + replacement + "."
   }
 }
 
 from ExtendedDeprecatedCall deprecatedCall
-where not deprecatedCall.getLocation().getFile().toString().matches("%Windows Kits%Include%.h")
+where not deprecatedCall.getLocation().getFile().toString().matches("%Windows Kits%include%.h")
 select deprecatedCall, deprecatedCall.getMessage()

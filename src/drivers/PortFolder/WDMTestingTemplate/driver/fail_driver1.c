@@ -38,11 +38,14 @@ _Dispatch_type_(IRP_MJ_READ)
 DRIVER_DISPATCH DispatchRead;
 #endif
 
+const ULONG myTag = '_gaT';
 
 #ifndef __cplusplus
 #pragma alloc_text (INIT, DriverEntry)
 #pragma alloc_text (PAGE, DriverAddDevice)
+#ifndef SET_CUSTOM_CREATE
 #pragma alloc_text (PAGE, DispatchCreate)
+#endif
 #pragma alloc_text (PAGE, DispatchRead)
 #pragma alloc_text (PAGE, DispatchPnp)
 #endif
@@ -134,6 +137,7 @@ DriverAddDevice(
    return status;
 }
 
+#ifndef SET_CUSTOM_CREATE
 _Use_decl_annotations_
 NTSTATUS
 DispatchCreate (
@@ -176,6 +180,7 @@ DispatchCreate (
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
     return STATUS_SUCCESS;
 }
+#endif
 
 
 _Use_decl_annotations_
