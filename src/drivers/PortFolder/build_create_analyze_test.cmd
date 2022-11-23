@@ -11,7 +11,7 @@ call :test IrqTooHigh WDMTestingTemplate wdm experimental
 call :test IrqTooLow WDMTestingTemplate wdm experimental
 call :test WrongDispatchTableAssignment WDMTestingTemplate wdm queries
 call :test ExtendedDeprecatedApis WDMTestingTemplate general queries
-call :test PoolTagIntegral WDMTestingTemplate general queries
+call :test WdkDeprecatedApis WDMTestingTemplate general queries
 call :test IllegalFieldAccess WDMTestingTemplate wdm queries
 
 
@@ -39,7 +39,7 @@ codeql database create -l=cpp -c "msbuild /p:Platform=x64 /t:rebuild" "..\..\Tes
 cd ..\..
 echo analysing_database
 mkdir "AnalysisFiles\Test Samples"
-codeql database analyze "TestDB\%1" --format=sarifv2.1.0 --output="AnalysisFiles\Test Samples\%1.sarif" "..\%3\%4\%1\%1.ql" 
+codeql database analyze "TestDB\%1" --format=sarifv2.1.0 --output="AnalysisFiles\Test Samples\%1.sarif" "..\%3\%4\%1\*.ql" 
 
 
 echo comparing analysis result with expected result
