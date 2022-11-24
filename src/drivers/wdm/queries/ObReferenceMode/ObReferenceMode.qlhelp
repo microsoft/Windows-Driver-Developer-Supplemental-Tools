@@ -1,0 +1,26 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			In a dispatch routine call to ObReferenceObjectByHandle or ObReferenceObjectByPointer, the driver is passing UserMode or KernelMode for the AccessMode parameter, instead of using Irp->RequestorMode.
+		</p>
+		<p>
+			This check applies only to the top driver in the stack.  It can be ignored or suppressed otherwise.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The top-level driver in the driver stack should use Irp->RequestorMode, rather than specifying UserMode or KernelMode. This allows the senders of kernel-mode IRP to supply kernel-mode handles safely. 
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28126-accessmode-param-incorrect">
+				C28126 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

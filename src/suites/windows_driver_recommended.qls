@@ -1,0 +1,33 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+- description: Recommended and required queries for Windows Drivers.
+- import: suites/windows_driver_mustfix.qls
+- queries: . 
+  from: codeql/cpp-queries
+- include:
+    query path: 
+      - Best Practices/Likely Errors/OffsetUseBeforeRangeCheck.ql
+      - Likely Bugs/Arithmetic/IntMultToLong.ql
+      - Likely Bugs/Arithmetic/SignedOverflowCheck.ql
+      - Likely Bugs/Conversion/CastArrayPointerArithmetic.ql
+      - Likely Bugs/Likely Typos/IncorrectNotOperatorUsage.ql
+      - Likely Bugs/Memory Management/SuspiciousSizeof.ql
+      - Likely Bugs/Memory Management/UninitializedLocal.ql
+      - Security/CWE/CWE-121/UnterminatedVarargsCall.ql
+      - Security/CWE/CWE-457/ConditionallyUninitializedVariable.ql
+      - Security/CWE/CWE-468/IncorrectPointerScaling.ql
+      - Security/CWE/CWE-468/IncorrectPointerScalingVoid.ql
+      - Security/CWE/CWE-468/SuspiciousAddWithSizeof.ql
+      - Security/CWE/CWE-676/PotentiallyDangerousFunction.ql
+      - Security/CWE/CWE-704/WcharCharConversion.ql
+- queries: .
+  from: windows-drivers
+- include:
+    query path: 
+      - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
+      - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
+      - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
+      - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - microsoft/Likely Bugs/UninitializedPtrField.ql
+      - microsoft/Security/Crytpography/HardcodedIVCNG.ql
