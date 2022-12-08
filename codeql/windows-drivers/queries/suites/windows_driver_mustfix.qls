@@ -13,7 +13,7 @@
       - Security/CWE/CWE-253/HResultBooleanConversion.ql
       - Security/CWE/CWE-704/WcharCharConversion.ql
 - queries: .
-  from: windows-drivers
+  from: microsoft/windows-drivers
 - include:
     query path: 
       - Windows/wdk/wdk-deprecated-api.ql
