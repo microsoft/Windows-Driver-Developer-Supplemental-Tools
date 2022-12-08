@@ -1,0 +1,25 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The dispatch table assignment satisfies either of these 3 scenarios: 1) The dispatch table assignment has a function whose type is not DRIVER_DISPATCH, or 2) The dispatch table assignment has a DRIVER_DISPATCH function at its right-hand side but the function doesn't have a driver dispatch type annotation, or 3) The dispatch function satisfies both of the above conditions but its dispatch type doesn't match the expected type for the dispatch table entry.	</p>
+	</overview>
+	<recommendation>
+		<p>
+			This defect can be corrected either using a DRIVER_DISPATCH type function or by adding a _Dispatch_type_ annotation to the function or correcting the dispatch table entry being used.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28168-dispatch-function-dispatch-annotation">
+				C28168
+			</a>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28169-dispatch-function-does-not-have-proper-annotation">
+				C28169
+			</a>
+		</li>
+	</references>
+</qhelp>

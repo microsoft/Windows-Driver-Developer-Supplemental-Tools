@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The type of a pool tag should be integral, not a string or string pointer.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Instead of using strings or string pointers, pool tags should be four-character integrals.  For example, '_gaT'.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28134-pool-tag-type-should-be-integral">
+				C28134 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

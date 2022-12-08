@@ -1,0 +1,12 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+name: windows-drivers
+version: 0.9.6
+libraryPathDependencies: 
+    - codeql/cpp-queries
+    - codeql/cpp-all
+dependencies:
+    codeql/cpp-queries: "*"
+suites: suites
+extractor: cpp
