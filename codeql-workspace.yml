@@ -1,2 +1,2 @@
 provide:
-  - codeql/windows-drivers/queries/qlpack.yml
+  - src/qlpack.yml
