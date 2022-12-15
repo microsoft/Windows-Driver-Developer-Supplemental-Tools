@@ -7,8 +7,8 @@ call :test NoPagingSegment WDMTestingTemplate wdm queries
 call :test OpaqueMdlUse WDMTestingTemplate wdm queries
 call :test OpaqueMdlWrite WDMTestingTemplate wdm queries
 call :test KeWaitLocal WDMTestingTemplate wdm queries
-call :test IrqTooHigh WDMTestingTemplate wdm experimental
-call :test IrqTooLow WDMTestingTemplate wdm experimental
+call :test IrqTooHigh WDMTestingTemplate wdm queries\experimental
+call :test IrqTooLow WDMTestingTemplate wdm queries\experimental
 call :test WrongDispatchTableAssignment WDMTestingTemplate wdm queries
 call :test ExtendedDeprecatedApis WDMTestingTemplate general queries
 call :test WdkDeprecatedApis WDMTestingTemplate general queries
