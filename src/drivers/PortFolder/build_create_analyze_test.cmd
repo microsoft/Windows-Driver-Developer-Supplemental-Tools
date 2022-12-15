@@ -15,6 +15,8 @@ call :test WdkDeprecatedApis WDMTestingTemplate general queries
 call :test IllegalFieldAccess WDMTestingTemplate wdm queries
 call :test PoolTagIntegral WDMTestingTemplate general queries
 call :test ObReferenceMode WDMTestingTemplate wdm queries
+call :test DefaultPoolTag WDMTestingTemplate general queries
+call :test DefaultPoolTagExtended WDMTestingTemplate general experimental
 
 exit /b 0
 
