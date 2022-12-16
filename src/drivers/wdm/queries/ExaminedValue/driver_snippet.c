@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 
-//Macros to enable or disable a code section that may or maynot conflict with this test.
+// Macro to enable or disable a code section that may or may not conflict with this test.
 #define SET_DISPATCH 1
 
 _Check_return_
@@ -31,6 +31,40 @@ void top_level_call(){
 
     if(!NT_SUCCESS(status2)){
     } 
+
+    // We now artificially run func2 a bunch and check its result to get over the 
+    // reporting threshold for the query.
+
+    //Passes
+    status2 = func2();
+    if(!NT_SUCCESS(status2)){
+    } 
+
+    //Passes
+    status2 = func2();
+    if(!NT_SUCCESS(status2)){
+    } 
+
+    //Passes
+    status2 = func2();
+    if(!NT_SUCCESS(status2)){
+    } 
+
+    //Passes
+    status2 = func2();
+    if(!NT_SUCCESS(status2)){
+    } 
+
+    //Passes
+    status2 = func2();
+    if(!NT_SUCCESS(status2)){
+    } 
+
+    //Passes
+    status2 = func2();
+    if(!NT_SUCCESS(status2)){
+    } 
+
     //Fails
     func2();
 
