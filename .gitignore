@@ -6,8 +6,8 @@
 **/.vs/*
 Debug/*
 
-src/drivers/PortFolders/**/driver/Debug/*
-src/drivers/PortFolders/**/driver/x64/*
-src/drivers/PortFolder/TestDB/*
-src/drivers/PortFolder/out/*
-src/drivers/PortFolder/AnalysisFiles/*
+src/drivers/test/**/driver/Debug/*
+src/drivers/test/**/driver/x64/*
+src/drivers/test/TestDB/*
+src/drivers/test/out/*
+src/drivers/test/AnalysisFiles/*
