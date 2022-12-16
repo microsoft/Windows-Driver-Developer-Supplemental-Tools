@@ -61,6 +61,10 @@ Return Value:
 
     status = WdfDeviceCreate(&DeviceInit, &deviceAttributes, &device);
 
+    #ifdef __TEST_DEVICE_INIT_API
+    #include "__test_device_init_api.c"
+    #endif
+
     if (NT_SUCCESS(status)) {
         //
         // Get a pointer to the device context structure that we just associated

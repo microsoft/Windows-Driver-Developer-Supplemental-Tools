@@ -1,6 +1,6 @@
 call :test PendingStatusError WDMTestingTemplate wdm queries
 call :test ExaminedValue WDMTestingTemplate wdm queries
-call :test StrSafe KMDFTestTemplate kmdf queries
+call :test StrSafe KMDFTestingTemplate kmdf queries
 call :test MultiplePagedCode WDMTestingTemplate wdm queries
 call :test NoPagedCode WDMTestingTemplate wdm queries
 call :test NoPagingSegment WDMTestingTemplate wdm queries
@@ -15,6 +15,7 @@ call :test WdkDeprecatedApis WDMTestingTemplate general queries
 call :test IllegalFieldAccess WDMTestingTemplate wdm queries
 call :test PoolTagIntegral WDMTestingTemplate general queries
 call :test ObReferenceMode WDMTestingTemplate wdm queries
+call :test DeviceInitApi KMDFTestingTemplate kmdf queries\experimental
 
 exit /b 0
 
