@@ -20,11 +20,11 @@ exit /b 0
 
 :test
 echo %0 %1 {
-rd /s /q out\%1 >NUL 2>&1
-robocopy /e %2 out\%1\
-robocopy /e ..\%3\%4\%1\ out\%1\driver\
+rd /s /q working\%1 >NUL 2>&1
+robocopy /e %2 working\%1\
+robocopy /e ..\%3\%4\%1\ working\%1\driver\
 
-cd out\%1
+cd working\%1
 
 echo building
 msbuild /t:rebuild /p:platform=x64
@@ -44,6 +44,6 @@ codeql database analyze "TestDB\%1" --format=sarifv2.1.0 --output="AnalysisFiles
 
 
 echo comparing analysis result with expected result
-sarif diff -o "test\%1.sarif" "..\%3\%4\%1\%1.sarif" "AnalysisFiles\Test Samples\%1.sarif"
+sarif diff -o "diff\%1.sarif" "..\%3\%4\%1\%1.sarif" "AnalysisFiles\Test Samples\%1.sarif"
 
 echo %0 %1 }

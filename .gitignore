@@ -9,5 +9,5 @@ Debug/*
 src/drivers/test/**/driver/Debug/*
 src/drivers/test/**/driver/x64/*
 src/drivers/test/TestDB/*
-src/drivers/test/out/*
+src/drivers/test/working/*
 src/drivers/test/AnalysisFiles/*
