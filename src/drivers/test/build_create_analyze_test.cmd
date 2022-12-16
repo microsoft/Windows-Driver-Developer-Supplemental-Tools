@@ -1,21 +1,21 @@
-call :test PendingStatusError WDMTestingTemplate wdm queries
-call :test ExaminedValue WDMTestingTemplate wdm queries
-call :test StrSafe KMDFTestingTemplate kmdf queries
-call :test MultiplePagedCode WDMTestingTemplate wdm queries
-call :test NoPagedCode WDMTestingTemplate wdm queries
-call :test NoPagingSegment WDMTestingTemplate wdm queries
-call :test OpaqueMdlUse WDMTestingTemplate wdm queries
-call :test OpaqueMdlWrite WDMTestingTemplate wdm queries
-call :test KeWaitLocal WDMTestingTemplate wdm queries
-call :test IrqTooHigh WDMTestingTemplate wdm queries\experimental
-call :test IrqTooLow WDMTestingTemplate wdm queries\experimental
-call :test WrongDispatchTableAssignment WDMTestingTemplate wdm queries
-call :test ExtendedDeprecatedApis WDMTestingTemplate general queries
-call :test WdkDeprecatedApis WDMTestingTemplate general queries
-call :test IllegalFieldAccess WDMTestingTemplate wdm queries
-call :test PoolTagIntegral WDMTestingTemplate general queries
-call :test ObReferenceMode WDMTestingTemplate wdm queries
-call :test DeviceInitApi KMDFTestingTemplate kmdf queries\experimental
+call :test PendingStatusError WDMTestTemplate wdm queries
+call :test ExaminedValue WDMTestTemplate wdm queries
+call :test StrSafe KMDFTestTemplate kmdf queries
+call :test MultiplePagedCode WDMTestTemplate wdm queries
+call :test NoPagedCode WDMTestTemplate wdm queries
+call :test NoPagingSegment WDMTestTemplate wdm queries
+call :test OpaqueMdlUse WDMTestTemplate wdm queries
+call :test OpaqueMdlWrite WDMTestTemplate wdm queries
+call :test KeWaitLocal WDMTestTemplate wdm queries
+call :test IrqTooHigh WDMTestTemplate wdm queries\experimental
+call :test IrqTooLow WDMTestTemplate wdm queries\experimental
+call :test WrongDispatchTableAssignment WDMTestTemplate wdm queries
+call :test ExtendedDeprecatedApis WDMTestTemplate general queries
+call :test WdkDeprecatedApis WDMTestTemplate general queries
+call :test IllegalFieldAccess WDMTestTemplate wdm queries
+call :test PoolTagIntegral WDMTestTemplate general queries
+call :test ObReferenceMode WDMTestTemplate wdm queries
+call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
 
 exit /b 0
 
