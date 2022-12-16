@@ -8,32 +8,27 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.6.3",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/pool-tag-integral",
-          "name" : "cpp/windows/drivers/queries/pool-tag-integral",
+          "id" : "cpp/windows/wdk/kmdf/DeviceInitApi",
+          "name" : "cpp/windows/wdk/kmdf/DeviceInitApi",
           "shortDescription" : {
-            "text" : "Use of string in pool tag instead of integral (C28134)"
+            "text" : "Calling WDF object initialization API after WdfDeviceCreate"
           },
           "fullDescription" : {
-            "text" : "The type of a pool tag should be integral, not a string or string pointer."
+            "text" : "Calling a WDF init API on a WDFDEVICE_INIT structure after calling WdfDeviceCreate can cause system instability, as the framework takes ownership of the structure. Partially ported from the Static Driver Verifier (SDV) rule DeviceInitAPI; see https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/kmdf-deviceinitapi for details."
           },
           "defaultConfiguration" : {
             "enabled" : true,
-            "level" : "warning"
+            "level" : "error"
           },
           "properties" : {
             "tags" : [ "correctness" ],
-            "description" : "The type of a pool tag should be integral, not a string or string pointer.",
-            "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/pool-tag-integral",
-            "impact" : "Attack Surface Reduction",
-            "kind" : "problem",
-            "name" : "Use of string in pool tag instead of integral (C28134)",
-            "platform" : "Desktop",
-            "precision" : "high",
-            "problem.severity" : "warning",
-            "query-version" : "v1",
-            "repro.text" : "The following code locations call a pool allocation function with a tag that is not an integral type.",
-            "security.severity" : "Low"
+            "description" : "Calling a WDF init API on a WDFDEVICE_INIT structure after calling WdfDeviceCreate can cause system instability, as the framework takes ownership of the structure.\n Partially ported from the Static Driver Verifier (SDV) rule DeviceInitAPI; see https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/kmdf-deviceinitapi for details.",
+            "id" : "cpp/windows/wdk/kmdf/DeviceInitApi",
+            "kind" : "path-problem",
+            "name" : "Calling WDF object initialization API after WdfDeviceCreate",
+            "precision" : "medium",
+            "problem.severity" : "error",
+            "query-version" : "v1"
           }
         } ]
       },
@@ -81,7 +76,7 @@
         } ]
       }, {
         "name" : "windows-drivers",
-        "semanticVersion" : "0.9.6+5b9be344714dcda4897487272a1d52dcbe9da923",
+        "semanticVersion" : "0.9.6+b07584bad21381c9be211051a241f6e10c122853",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -585,126 +580,7 @@
         } ]
       } ]
     },
-    "artifacts" : [ {
-      "location" : {
-        "uri" : "driver/driver_snippet.c",
-        "uriBaseId" : "%SRCROOT%",
-        "index" : 0
-      }
-    } ],
-    "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/pool-tag-integral",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/windows/drivers/queries/pool-tag-integral",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: char *)"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 26,
-            "startColumn" : 5,
-            "endColumn" : 20
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "8ad0ec3c47c85fd3:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    }, {
-      "ruleId" : "cpp/windows/drivers/queries/pool-tag-integral",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/windows/drivers/queries/pool-tag-integral",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: const ULONG *)"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 27,
-            "startColumn" : 5,
-            "endColumn" : 20
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "e7715c6d25a17fc3:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    }, {
-      "ruleId" : "cpp/windows/drivers/queries/pool-tag-integral",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/windows/drivers/queries/pool-tag-integral",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: ULONG *)"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 28,
-            "startColumn" : 5,
-            "endColumn" : 20
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "b4607ca2bc71911e:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    }, {
-      "ruleId" : "cpp/windows/drivers/queries/pool-tag-integral",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/windows/drivers/queries/pool-tag-integral",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: char\\[5\\])"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 29,
-            "startColumn" : 5,
-            "endColumn" : 20
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "5a936be5671d65bf:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    } ],
+    "results" : [ ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {
       "semmle.formatSpecifier" : "sarifv2.1.0"
