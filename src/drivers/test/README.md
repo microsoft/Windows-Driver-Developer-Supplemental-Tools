@@ -5,7 +5,7 @@ This repository contains a set of CodeQL queries that are used to perform static
 ## Repo structure
 
 - PortFolder
-    - KMDFTestTemplate
+    - KMDFTestingTemplate
         - KMDFTestTemplate.vcproj
         - ...
     - WDFTestingTemplate
@@ -45,7 +45,7 @@ This repository contains a set of CodeQL queries that are used to perform static
     }
 }
 ```
-#### KMDFTestTemplate and WDFTestingTemplate
+#### KMDFTestingTemplate and WDFTestingTemplate
 
 * These files are basic KMDF and WDF driver templates used for testing purposes. Each folder has an empty driver_snippet.c file which will be replaced by the appropriate test snippet at build time. 
 
