@@ -2,7 +2,7 @@
 
 - description: Ported CA checks
 - queries: .
-  from: windows-drivers
+  from: microsoft/windows-drivers
 - include:
     query path: 
       - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
