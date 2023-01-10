@@ -71,7 +71,7 @@ For general use, use the `main` branch along with [version 2.6.3 of the CodeQL C
 
     **Note**: Be sure to check the path to the suite or query you want to run, not every branch has the same file structure.
 
-1. ***For WHCP Users Only*** Prepare to Create a Driver Verification Log (DVL)
+1. ***For WHCP Users Only***: Prepare to Create a Driver Verification Log (DVL):
 
     Before you can create a DVL, you must copy your SARIF log file to the parent directory of your driver project. You can also modify your output location in the `codeql database analyze` step in order to skip this additional step. Once you have finished this step, please refer to the continued instructions at [CodeQL and the Static Tools Logo Test, Driver Verification Log DVL Consumption of SARIF Output](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/static-tools-and-codeql#driver-verification-log-dvl-consumption-of-sarif-output).
     ```
