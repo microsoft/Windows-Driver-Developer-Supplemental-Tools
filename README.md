@@ -1,8 +1,8 @@
 # Windows Driver Developer Supplemental Tools
 
-This repository contains open-source components for supplemental use in developing device drivers for Windows, as well as driver specific [CodeQL](https://codeql.github.com/) query suites used for the [Windows Hardware Compatability Program](https://learn.microsoft.com/en-us/windows-hardware/design/compatibility/). The quickstart below will get you set up to build your database and analyze your driver using CodeQL. For the full documentation, troubleshooting, and more details about the Static Tools Logo test within the WHCP Program, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql).
+This repository contains open-source components for supplemental use in developing device drivers for Windows, as well as driver specific [CodeQL](https://codeql.github.com/) query suites used for the [Windows Hardware Compatibility Program](https://learn.microsoft.com/en-us/windows-hardware/design/compatibility/). The quickstart below will get you set up to build your database and analyze your driver using CodeQL. For the full documentation, troubleshooting, and more details about the Static Tools Logo test within the WHCP Program, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql).
 
-### Windows Hardware Compatability Program Release Version Matrix
+### Windows Hardware Compatibility Program Release Version Matrix
 | Release                  | Branch to use | CodeQL CLI version |
 |--------------------------|---------------|--------------------|
 | Windows Server 2022      | WHCP_21H2     | 2.4.6              |
@@ -71,9 +71,9 @@ For general use, use the `main` branch along with [version 2.6.3 of the CodeQL C
 
     **Note**: Be sure to check the path to the suite or query you want to run, not every branch has the same file structure.
 
-1. ***For WHCP Users Only***
+1. ***For WHCP Users Only*** Prepare to Create a Driver Verification Log (DVL)
 
-    Copy the SARIF log file to the parent directory of your driver file in order to convert it to DVL format. You can also modify your output location in the `codeql database analyze` step in order to skip this additional step. Continued instructions at [CodeQL and the Static Tools Logo Test, Driver Verification Log DVL Consumption of SARIF Output](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/static-tools-and-codeql#driver-verification-log-dvl-consumption-of-sarif-output).
+    Before you can create a DVL, you must copy your SARIF log file to the parent directory of your driver project. You can also modify your output location in the `codeql database analyze` step in order to skip this additional step. Once you have finished this step, please refer to the continued instructions at [CodeQL and the Static Tools Logo Test, Driver Verification Log DVL Consumption of SARIF Output](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/static-tools-and-codeql#driver-verification-log-dvl-consumption-of-sarif-output).
     ```
     D:\codeql-home\codeql>copy <path to SARIF output file> <path to driver directory>
     ```
@@ -92,12 +92,11 @@ This project welcomes contributions, feedback, and suggestions!
 
 We are in the process of setting up pull request checks, but to ensure our requirements are met, please ensure the following are complete with your pull request:
 1. Pull request description contains a concise summary of what changes are being introduced.
-2. Only one query or query group are introduced per pull request.
-3. If there are changes to an existing query, increase the tracked version of that query.
-4. Write at least one positive and one negative unit test for any new queries or changed queries.
-5. Run all unit tests.
-6. Run `codeql database create` and `codeql database analyze` successfully on a valid driver before merging.
-7. Update the help menu associated with any new queries.
+1. Only one query or query group are introduced per pull request.
+1. If there are changes to an existing query, increase its version (found in the comments at the top of the query file '@version').
+1. Run all unit tests.
+1. Run `codeql database create` and `codeql database analyze` successfully on a valid driver before merging.
+1. Add a .qhelp file for any new queries or update the existing one if there is new functionality for the end user.
 
 Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
