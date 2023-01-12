@@ -16,6 +16,8 @@ call :test IllegalFieldAccess WDMTestTemplate wdm queries
 call :test PoolTagIntegral WDMTestTemplate general queries
 call :test ObReferenceMode WDMTestTemplate wdm queries
 call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
+call :test DefaultPoolTag WDMTestingTemplate general queries
+call :test DefaultPoolTagExtended WDMTestingTemplate general experimental
 
 exit /b 0
 
