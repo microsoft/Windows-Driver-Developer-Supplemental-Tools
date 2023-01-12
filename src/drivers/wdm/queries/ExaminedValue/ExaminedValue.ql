@@ -13,7 +13,6 @@
  */
 
 import cpp
-import drivers.wdm.libraries.WdmDrivers
 import drivers.libraries.SAL
 
 //Represents functions that are annotated with either _Check_return_ or _Must_inspect_result_

@@ -1,2 +1,0 @@
-{ "provide": [ "codeql-queries/.codeqlmanifest.json",
-               "src/qlpack.yml"] }
