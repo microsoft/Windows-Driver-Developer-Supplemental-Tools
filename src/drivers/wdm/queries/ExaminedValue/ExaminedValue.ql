@@ -15,7 +15,7 @@
 import cpp
 import drivers.libraries.SAL
 
-//Represents functions that are annotated with either _Check_return_ or _Must_inspect_result_
+// Represents functions that are annotated with either _Check_return_ or _Must_inspect_result_
 class ReturnMustBeCheckedFunction extends Function {
   SALCheckReturn scr;
 
@@ -26,12 +26,13 @@ class ReturnMustBeCheckedFunctionCall extends FunctionCall {
   ReturnMustBeCheckedFunctionCall() { this.getTarget() instanceof ReturnMustBeCheckedFunction }
 }
 
-//Holds if an expression (a call to ReturnMustBeCheckedFunction in this case) is occuring in a void context.
+// Holds if an expression (a call to ReturnMustBeCheckedFunction in this case) is occuring in a void context.
 predicate unUsed(Expr e) {
   e instanceof ExprInVoidContext
   or
-  definition(_, e.getParent()) and
-  not definitionUsePair(_, e.getParent(), _)
+  exists (SemanticStackVariable v | definition(v, e.getParent()) and
+  not definitionUsePair(v, e.getParent(), _) and
+  not v instanceof Parameter) // If we assign to a parameter, we are probably passing info out that way
 }
 
 /**
