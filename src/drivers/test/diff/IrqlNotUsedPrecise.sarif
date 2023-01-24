@@ -1,6 +1,6 @@
 {
     "all": {
-        "+": 1,
+        "+": 0,
         "-": 0
     },
     "error": {
@@ -9,15 +9,9 @@
         "codes": []
     },
     "warning": {
-        "+": 1,
+        "+": 0,
         "-": 0,
-        "codes": [
-            [
-                "cpp/windows/drivers/queries/irql-not-used This function has annotated the parameter [inIrql](1) with \"_IRQL_restores_\", but at least one path exists where it does not use it to restore the IRQL.",
-                0,
-                1
-            ]
-        ]
+        "codes": []
     },
     "note": {
         "+": 0,
