@@ -12,7 +12,7 @@
       - Security/CWE/CWE-190/ComparisonWithWiderType.ql
       - Security/CWE/CWE-253/HResultBooleanConversion.ql
 - queries: .
-  from: windows-drivers
+  from: microsoft/windows-drivers
 - include:
     query path: 
       - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
