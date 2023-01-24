@@ -23,6 +23,27 @@ class IrqlTypeDefinition extends SALAnnotation {
   string getIrqlMacroName() { result = irqlAnnotationName }
 }
 
+/**
+ * Represents a SAL annotation indicating that the parameter in
+ * question is an IRQL that will be restored byt the function.
+ */
+class IrqlParameterAnnotation extends SALAnnotation {
+  string irqlAnnotationName;
+
+  IrqlParameterAnnotation() {
+    this.getMacroName().matches(["_IRQL_restores_"]) and
+    irqlAnnotationName = this.getMacroName() and
+    exists(MacroInvocation mi | mi.getParentInvocation() = this)
+  }
+
+  string getIrqlMacroName() { result = irqlAnnotationName }
+}
+
+/** Represents a parameter that is annotated with "_IRQL_restores_". */
+class IrqlRestoreParameter extends Parameter {
+  IrqlRestoreParameter() { exists(IrqlParameterAnnotation ipa | ipa.getDeclaration() = this) }
+}
+
 //Represents Irql annotationed functions.
 class IrqlAnnotatedFunction extends Function {
   string funcIrqlLevel;

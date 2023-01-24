@@ -1,0 +1,28 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			A parameter annotated _IRQL_restores_ must be read and used to restore the IRQL value.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Make sure that any parameter annotated "_IRQL_restores_" is always used to restore the IRQL via calling an OS function.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<semmleNotes>
+		<p>
+			This version of the query uses the "must-flow" library to ensure all paths correctly restore the IRQL.  It will be upstreamed once we update our target version of CodeQL.
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28157-function-irql-never-restored">
+				C28157 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>
