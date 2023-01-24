@@ -21,10 +21,12 @@ jobs:
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
+    
     - name: Clone self (windows-driver-developer-supplemental-tools)
       uses: actions/checkout@v2
       with:
         path: .
+    
     - name: Download CodeQL CLI
       uses: i3h/download-release-asset@v1.2.0
       with:
@@ -32,8 +34,10 @@ jobs:
         repo: "codeql-cli-binaries"
         tag: "v2.11.5"
         file: "codeql-win64.zip"
+    
     - name: Unzip CodeQL CLI
       run: Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force
+    
     - name: Move CodeQL CLI folder to correct location
       shell: cmd
       continue-on-error: true # Required because robocopy returns 1 on success
@@ -42,17 +46,20 @@ jobs:
     - name: Install CodeQL Packages
       shell: cmd
       continue-on-error: true
-      run: .\codeql-cli\codeql.cmd package install .\
+      run: .\codeql-cli\codeql.cmd pack install .\windows-driver-developer-supplemental-tools\src
 
     - name: Build must-fix driver suite
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only windows_driver_mustfix.qls
+    
     - name: Build recommended driver suite
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only windows_driver_recommended.qls
+    
     - name: Build CA ported queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
+    
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
