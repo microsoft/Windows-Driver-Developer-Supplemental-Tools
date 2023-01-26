@@ -1,17 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
+ * @id cpp/windows/drivers/queries/irql-not-used
  * @name IRQL not restored
- * @description A parameter annotated _IRQL_restores_ must be read and used to restore the IRQL value.
+ * @description  A parameter annotated \_IRQL\_restores\_ must be read and used to restore the IRQL value.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
- * @repro.text This function does not have a path where its parameter annotated _IRQL_restores_ is actually used to set the system IRQL.
+ * @impact Insecure Coding Practice
+ * @repro.text This function does not have a path where a parameter annotated \_IRQL\_restores\_ is actually used to set the system IRQL.
+ * @owner.email sdat@microsoft.com
  * @kind problem
- * @id cpp/windows/drivers/queries/irql-not-used
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       wddst
  * @query-version v1
  */
 
@@ -20,7 +23,7 @@ import drivers.libraries.Irql
 import semmle.code.cpp.dataflow.DataFlow
 
 /**
- * Represents a function that has at least one parameter annotated with "_irql_restore_".
+ * Represents a function that has at least one parameter annotated with "\_IRQL\_restores\_".
  */
 class IrqlRestoreFunction extends Function {
   Parameter p;

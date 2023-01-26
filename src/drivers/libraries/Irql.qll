@@ -59,12 +59,12 @@ class IrqlSaveAnnotation extends IrqlParameterAnnotation {
   }
 }
 
-/** Represents a parameter that is annotated with "_IRQL_restores_". */
+/** Represents a parameter that is annotated with "\_IRQL\_restores\_". */
 class IrqlRestoreParameter extends Parameter {
   IrqlRestoreParameter() { exists(IrqlRestoreAnnotation ira | ira.getDeclaration() = this) }
 }
 
-/** Represents a parameter that is annotated with "_IRQL_saves_". */
+/** Represents a parameter that is annotated with "\_IRQL\_saves\_". */
 class IrqlSaveParameter extends Parameter {
   IrqlSaveParameter() { exists(IrqlSaveAnnotation isa | isa.getDeclaration() = this) }
 }

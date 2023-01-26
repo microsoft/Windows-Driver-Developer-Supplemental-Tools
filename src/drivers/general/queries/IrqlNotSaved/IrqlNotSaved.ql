@@ -1,17 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
+ * @id cpp/windows/drivers/queries/irql-not-saved
  * @name IRQL not saved (C28158)
  * @description A variable annotated \_IRQL\_saves\_ must have the IRQL saved into it.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text This function does not have a path where its parameter annotated \_IRQL\_saves\_ has the IRQL saved to it.
+ * @owner.email sdat@microsoft.com
  * @kind problem
- * @id cpp/windows/drivers/queries/irql-not-saved
  * @problem.severity warning
  * @precision medium
  * @tags correctness
+ *       wddst
  * @query-version v1
  */
 
