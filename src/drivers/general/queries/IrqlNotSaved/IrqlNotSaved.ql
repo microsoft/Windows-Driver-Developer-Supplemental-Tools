@@ -141,7 +141,7 @@ class IrqlSaveVariableFlowedTo extends Variable {
 from IrqlSaveParameter isp
 where
   // Case one: does the IrqlSaveParameter (or an alias of it) have the IRQL assigned to it
-  // directly by colling, for example, KeRaiseIrql?
+  // directly by calling, for example, KeRaiseIrql?
   not exists(DataFlow::Node node, IrqlSaveVariableFlowedTo isvft, IrqlAssignmentFlowConfiguration difc |
     isvft.getSaveParameter() = isp and
     (

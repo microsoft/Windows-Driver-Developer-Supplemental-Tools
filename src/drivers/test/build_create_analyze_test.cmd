@@ -18,6 +18,7 @@ call :test ObReferenceMode WDMTestTemplate wdm queries
 call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
 call :test IrqlNotUsed WDMTestTemplate general queries
 call :test IrqlNotUsedPrecise WDMTestTemplate general queries\experimental
+call :test IrqlNotSaved WDMTestTemplate general queries
 
 exit /b 0
 
