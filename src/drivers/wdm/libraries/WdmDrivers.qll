@@ -32,13 +32,15 @@ class WdmCallbackRoutineTypedef extends TypedefType {
       this.getName().matches("KSERVICE_ROUTINE")
       or
       this.getName().matches("IO_DPC_ROUTINE")
+      or
+      this.getName().matches("DRIVER_ADD_DEVICE")
     ) and
     this.getFile().getBaseName().matches("wdm.h")
   }
 }
 
-/*
- * A function implementing a WDM callback routine.
+/**
+ * Represents a function implementing a WDM callback routine.
  * Defines a function to be a callback routine iff it has a typedef
  * in its definition which matches the WDM callback typedefs, and it
  * is in a WDM driver (includes wdm.h.)
@@ -56,9 +58,14 @@ class WdmCallbackRoutine extends Function {
   }
 }
 
+/** A WDM AddDevice callback routine. */
+class WdmAddDevice extends WdmCallbackRoutine {
+  WdmAddDevice() { callbackType.getName().matches("DRIVER_ADD_DEVICE") }
+}
+
 /** A WDM DriverUnload callback routine. */
 class WdmDriverUnload extends WdmCallbackRoutine {
-  WdmDriverUnload() { this.getName().matches("DRIVER_UNLOAD") }
+  WdmDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
 }
 
 /** A WDM DriverEntry callback routine. */
