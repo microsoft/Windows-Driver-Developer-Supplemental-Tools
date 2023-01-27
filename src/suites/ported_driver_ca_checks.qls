@@ -5,6 +5,8 @@
   from: microsoft/windows-drivers
 - include:
     query path: 
+      - drivers/general/experimental/DefaultPoolTagExtended/DefaultPoolTagExtended.ql
+      - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
       - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
       - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
