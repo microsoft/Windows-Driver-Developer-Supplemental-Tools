@@ -18,6 +18,7 @@ call :test ObReferenceMode WDMTestTemplate wdm queries
 call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
 call :test DefaultPoolTag WDMTestingTemplate general queries
 call :test DefaultPoolTagExtended WDMTestingTemplate general experimental
+call :test InitNotCleared WDMTestTemplate wdm queries
 
 exit /b 0
 

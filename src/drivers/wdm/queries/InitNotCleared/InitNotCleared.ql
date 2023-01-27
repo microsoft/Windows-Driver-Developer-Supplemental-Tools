@@ -1,17 +1,20 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-/**
+ /**
+ * @id cpp/windows/drivers/queries/init-not-cleared
  * @name Failure to clear DO_DEVICE_INITIALIZING (C28152)
- * @description The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the DeviceObject.
+ * @description The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
- * @repro.text The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the DeviceObject.
+ * @impact Insecure Coding Practice
+ * @repro.text The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.
+ * @owner.email sdat@microsoft.com
  * @kind problem
- * @id cpp/windows/drivers/queries/init-not-cleared
  * @problem.severity warning
- * @precision high
+ * @precision medium
  * @tags correctness
+ *       wddst
  * @query-version v1
  */
 
@@ -20,6 +23,9 @@ import drivers.wdm.libraries.WdmDrivers
 import semmle.code.cpp.dataflow.DataFlow
 import semmle.code.cpp.dataflow.DataFlow2
 
+/**
+ * Represents a call to IoCreateDevice.
+ */
 class IoCreateFunction extends Function {
   IoCreateFunction() {
     this.getName().matches("IoCreateDevice") and
@@ -29,11 +35,8 @@ class IoCreateFunction extends Function {
 
 /**
  * Represents a data-flow path from a FDO created via a call to
- * IoDeviceCreate to a use in an AssignAnd expression.
- *
- * I think we'll also need an auxilliary flow to handle
- * interprocedural cases where the AddDevice passes the device object
- * into another function that then creates the FDO.
+ * IoDeviceCreate to a use in an AssignAnd expression that clears
+ * the DO_DEVICE_INITIALIZING flag.
  */
 class FdoFlow extends DataFlow::Configuration {
   FdoFlow() { this = "FdoFlow" }
@@ -51,11 +54,15 @@ class FdoFlow extends DataFlow::Configuration {
     exists(AssignAndExpr aae |
       node.asExpr() = aae.getLValue().getAChild*() and
       aae.getLValue().getAChild*().(PointerFieldAccess).getTarget().getName().matches("Flags") and
-      aae.getRValue().getAChild*().(ComplementExpr).getOperand().(Literal).getValue().matches("128")
+      aae.getRValue().getAChild*().(ComplementExpr).getOperand().(Literal).getValue().matches("128") // Literal value of the flag
     )
   }
 }
 
+/**
+ * Represents a data-flow path from the DriverObject parameter of
+ * a WDM AddDevice function.
+ */
 class AddDeviceFlow extends DataFlow2::Configuration {
   AddDeviceFlow() { this = "AddDeviceFlow" }
 
@@ -67,41 +74,17 @@ class AddDeviceFlow extends DataFlow2::Configuration {
 }
 
 /*
- * warning C28152: The return from an AddDevice-like function unexpectedly DO_DEVICE_INITIALIZING
- *
- * The driver has returned from its AddDevice routine, or a similar utility routine, but the DO_DEVICE_INITIALIZING bit of the Flags word (DeviceObject->Flags) in the DeviceObject routine is not cleared.
- *
- * The AddDevice routine must contain code similar to the following to clear the DO_DEVICE_INITIALIZING flag.
- *
- * FunctionalDeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;
+ * We look for any AddDevice routine that does not have a corresponding
+ * call to IoCreateDevice where the resulting FDO later has its DO_DEVICE_INITIALIZING
+ * flag cleared.
  */
-
-// So.  First find a call to IoCreateDevice within a AddDevice function.
-// Then check flow from (one of the arguments) to some clearing function... usually an AssignAndExpr
-// LValue is a PointerFieldAccess (flags) to a VariableAccess (device)
-// RValue is a ComplementExpr to a Literal (128)
-from
-  DataFlow::Node deviceObjectTarget, DataFlow::Node targetDefinition, DataFlow::Node future,
-  FdoFlow fdo
+from FdoFlow fdo, WdmAddDevice wad, AddDeviceFlow adf
 where
-  deviceObjectTarget.asExpr().(VariableAccess) =
-    targetDefinition.asDefiningArgument().(AddressOfExpr).getOperand().(VariableAccess) and
-  fdo.hasFlow(targetDefinition, future)
-select deviceObjectTarget, targetDefinition, future
-/*
- * from WdmAddDevice wad
- * where
- *  not exists(
- *    DataFlow::Node deviceObject, DataFlow::Node deviceObjectTarget, DataFlow::Node targetDefinition,
- *    FdoFlow fdo, AddDeviceFlow adf
- *  |
- *    deviceObject.asParameter() = wad.getParameter(0) and
- *    adf.hasFlow(deviceObject, deviceObjectTarget) and
- *    deviceObjectTarget.asExpr().(VariableAccess) =
- *      targetDefinition.asDefiningArgument().(AddressOfExpr).getOperand().(VariableAccess) and
- *    fdo.hasFlow(targetDefinition, _)
- *  )
- * select wad,
- *  "The AddDevice routine $@ does not clear the DO_DEVICE_INITIALIZING flags in the FDO before returning."
- */
-
+  not exists(FunctionCall fc |
+    fc.getTarget() instanceof IoCreateFunction and
+    adf.hasFlow(DataFlow::parameterNode(wad.getParameter(0)), DataFlow::exprNode(fc.getArgument(0))) and
+    fdo.hasFlow(DataFlow::definitionByReferenceNodeFromArgument(fc.getArgument(6)), _)
+  )
+select wad,
+  "The AddDevice routine $@ does not clear the DO_DEVICE_INITIALIZING flag from the FDO it creates.",
+  wad, wad.toString()
