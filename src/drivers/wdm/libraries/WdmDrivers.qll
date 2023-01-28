@@ -5,15 +5,29 @@ import drivers.libraries.SAL
 
 class Irp extends Struct {
   Irp() {
-    this.getName().matches("_IRP")
-    and this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
+    this.getName().matches("_IRP") and
+    this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
   }
 }
 
 class Dpc extends Struct {
   Dpc() {
-    this.getName().matches("_KDPC")
-    and this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
+    this.getName().matches("_KDPC") and
+    this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
+  }
+}
+
+class DeviceObject extends Struct {
+  DeviceObject() {
+    this.getName().matches("_DEVICE_OBJECT") and
+    this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
+  }
+}
+
+class DriverObject extends Struct {
+  DriverObject() {
+    this.getName().matches("_DRIVER_OBJECT") and
+    this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
   }
 }
 
@@ -45,7 +59,6 @@ class WdmCallbackRoutineTypedef extends TypedefType {
  * in its definition which matches the WDM callback typedefs, and it
  * is in a WDM driver (includes wdm.h.)
  */
-
 class WdmCallbackRoutine extends Function {
   /** The callback routine type, i.e. DRIVER_UNLOAD. */
   WdmCallbackRoutineTypedef callbackType;
