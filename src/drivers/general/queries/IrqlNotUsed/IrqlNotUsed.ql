@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/windows/drivers/queries/irql-not-used
+ * @id cpp/drivers/irql-not-used
  * @name IRQL not restored
- * @description  A parameter annotated \_IRQL\_restores\_ must be read and used to restore the IRQL value.
+ * @description Any parameter annotated \_IRQL\_restores\_ must be read and used to restore the IRQL value.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
  * @impact Insecure Coding Practice
- * @repro.text This function does not have a path where a parameter annotated \_IRQL\_restores\_ is actually used to set the system IRQL.
+ * @repro.text This function has a parameter annotated \_IRQL\_restores\_, but does not have a code path where this parameter is read and used to restore the IRQL.
  * @owner.email sdat@microsoft.com
  * @kind problem
  * @problem.severity warning
- * @precision high
+ * @precision medium
  * @tags correctness
  *       wddst
  * @query-version v1

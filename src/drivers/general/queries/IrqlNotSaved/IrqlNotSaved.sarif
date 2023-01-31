@@ -8,8 +8,8 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.6",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/irql-not-saved",
-          "name" : "cpp/windows/drivers/queries/irql-not-saved",
+          "id" : "cpp/drivers/irql-not-saved",
+          "name" : "cpp/drivers/irql-not-saved",
           "shortDescription" : {
             "text" : "IRQL not saved (C28158)"
           },
@@ -21,24 +21,26 @@
             "level" : "warning"
           },
           "properties" : {
-            "tags" : [ "correctness" ],
+            "tags" : [ "correctness", "wddst" ],
             "description" : "A variable annotated \\_IRQL\\_saves\\_ must have the IRQL saved into it.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/irql-not-saved",
+            "id" : "cpp/drivers/irql-not-saved",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "IRQL not saved (C28158)",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "This function does not have a path where its parameter annotated \\_IRQL\\_saves\\_ has the IRQL saved to it.",
+            "repro.text" : "This function has a parameter annotated \\_IRQL\\_saves\\_, but does not have the system IRQL saved to it.",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+b100ca1a271bffa7a823915fd6fdca14de5003d3",
+        "semanticVersion" : "0.1.0+c51108725c279e5ecdd3fea8e4543a98d4dc7fa9",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -74,10 +76,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/irql-not-saved",
+      "ruleId" : "cpp/drivers/irql-not-saved",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/irql-not-saved",
+        "id" : "cpp/drivers/irql-not-saved",
         "index" : 0
       },
       "message" : {
@@ -98,7 +100,7 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "d4ff848f37e6d99f:1",
+        "primaryLocationLineHash" : "6276e1ac4864af21:1",
         "primaryLocationStartColumnFingerprint" : "43"
       },
       "relatedLocations" : [ {

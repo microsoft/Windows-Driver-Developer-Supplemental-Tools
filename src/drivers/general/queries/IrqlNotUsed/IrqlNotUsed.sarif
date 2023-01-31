@@ -8,37 +8,39 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.6",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/irql-not-used",
-          "name" : "cpp/windows/drivers/queries/irql-not-used",
+          "id" : "cpp/drivers/irql-not-used",
+          "name" : "cpp/drivers/irql-not-used",
           "shortDescription" : {
             "text" : "IRQL not restored"
           },
           "fullDescription" : {
-            "text" : "A parameter annotated _IRQL_restores_ must be read and used to restore the IRQL value."
+            "text" : "Any parameter annotated \\_IRQL\\_restores\\_ must be read and used to restore the IRQL value."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "tags" : [ "correctness" ],
-            "description" : "A parameter annotated _IRQL_restores_ must be read and used to restore the IRQL value.",
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "Any parameter annotated \\_IRQL\\_restores\\_ must be read and used to restore the IRQL value.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/irql-not-used",
+            "id" : "cpp/drivers/irql-not-used",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "IRQL not restored",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "This function does not have a path where its parameter annotated _IRQL_restores_ is actually used to set the system IRQL.",
+            "repro.text" : "This function has a parameter annotated \\_IRQL\\_restores\\_, but does not have a code path where this parameter is read and used to restore the IRQL.",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+ab7925778c5d071e87b57f7ba7024cbbdde666a8",
+        "semanticVersion" : "0.1.0+c51108725c279e5ecdd3fea8e4543a98d4dc7fa9",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -74,10 +76,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/irql-not-used",
+      "ruleId" : "cpp/drivers/irql-not-used",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/irql-not-used",
+        "id" : "cpp/drivers/irql-not-used",
         "index" : 0
       },
       "message" : {
@@ -91,7 +93,7 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 38,
+            "startLine" : 43,
             "startColumn" : 6,
             "endColumn" : 23
           }
@@ -110,7 +112,7 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 38,
+            "startLine" : 43,
             "startColumn" : 46,
             "endColumn" : 52
           }

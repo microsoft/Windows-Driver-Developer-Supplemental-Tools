@@ -1,18 +1,18 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/windows/drivers/queries/irql-not-saved
+ * @id cpp/drivers/irql-not-saved
  * @name IRQL not saved (C28158)
  * @description A variable annotated \_IRQL\_saves\_ must have the IRQL saved into it.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
  * @impact Insecure Coding Practice
- * @repro.text This function does not have a path where its parameter annotated \_IRQL\_saves\_ has the IRQL saved to it.
+ * @repro.text This function has a parameter annotated \_IRQL\_saves\_, but does not have the system IRQL saved to it.
  * @owner.email sdat@microsoft.com
  * @kind problem
  * @problem.severity warning
- * @precision medium
+ * @precision high
  * @tags correctness
  *       wddst
  * @query-version v1
@@ -101,14 +101,14 @@ class IrqlAssignmentFlowConfiguration extends DataFlow::Configuration {
         .getTarget()
         .getName()
         .matches([
-            "KeRaiseIrqlToDpcLevel", "KfRaiseIrql", "KfAcquireSpinlock",
-            "KeAcquireSpinLockAtDpcLevel"
+            "KeRaiseIrqlToDpcLevel", "KfRaiseIrql", "KfAcquireSpinLock",
+            "KeAcquireSpinLockAtDpcLevel", "KeAcquireSpinLock", "KeAcquireSpinLockRaiseToDpc"
           ])
   }
 
   override predicate isSink(DataFlow::Node sink) {
     // Either we're sinking to a direct reference of a parameter, or...
-    sink.asExpr().(VariableAccess).getTarget() instanceof IrqlSaveParameter 
+    sink.asExpr().(VariableAccess).getTarget() instanceof IrqlSaveParameter
     or
     // We a dereferenced pointer to the variable.
     sink.asPartialDefinition()
@@ -129,7 +129,9 @@ class IrqlSaveVariableFlowedTo extends Variable {
   IrqlSaveParameter isp;
 
   IrqlSaveVariableFlowedTo() {
-    exists(IrqlSaveParameterFlowConfiguration difca, DataFlow::Node parameter, DataFlow::Node access |
+    exists(
+      IrqlSaveParameterFlowConfiguration difca, DataFlow::Node parameter, DataFlow::Node access
+    |
       access.asExpr().(VariableAccess).getTarget() = this and
       parameter.asParameter() = isp and
       difca.hasFlow(parameter, access)
@@ -143,9 +145,16 @@ class IrqlSaveVariableFlowedTo extends Variable {
 
 from IrqlSaveParameter isp
 where
-  // Case one: does the IrqlSaveParameter (or an alias of it) have the IRQL assigned to it
-  // directly by calling, for example, KeRaiseIrql?
-  not exists(DataFlow::Node node, IrqlSaveVariableFlowedTo isvft, IrqlAssignmentFlowConfiguration difc |
+  // Exclude OS functions
+  not isp.getFunction() instanceof FundamentalIrqlSaveFunction and
+  
+  /*
+   * Case one: does the IrqlSaveParameter (or an alias of it) have the IRQL assigned to it
+   * directly by calling, for example, KeRaiseIrql?
+   */
+  not exists(
+    DataFlow::Node node, IrqlSaveVariableFlowedTo isvft, IrqlAssignmentFlowConfiguration difc
+  |
     isvft.getSaveParameter() = isp and
     (
       node.asExpr().(VariableAccess).getTarget() = isvft
