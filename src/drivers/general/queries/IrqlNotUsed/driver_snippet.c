@@ -24,17 +24,25 @@ VOID IrqlNotUsed_passAux(KIRQL inIrql, PKSPIN_LOCK myLock) {
 
 /* Passing case one.
    Function directly calls a function that restores IRQL. */
-VOID IrqlNotUsed_pass(PTestLock myLock) {
+VOID IrqlNotUsed_pass(_IRQL_restores_ KIRQL inIrql, PKSPIN_LOCK myLock) {
 
-    KeReleaseSpinLock(&(myLock)->spinLock,(myLock)->inIrql);
+    KeReleaseSpinLock(myLock, inIrql);
 
 }
 
 /* Passing case two.
-   Function indirectly calls a function that restores IRQL. */
+   Function indirectly calls a function that restores IRQL. */ 
 VOID IrqlNotUsed_pass2(_IRQL_restores_ KIRQL inIrql, PKSPIN_LOCK myLock) {
 
     IrqlNotUsed_passAux(inIrql, myLock);
+
+}
+
+/* Passing case three.
+   Annotation is applied to a struct which is used to restore the IRQL. */
+VOID IrqlNotUsed_pass3(_IRQL_restores_ PTestLock myLock) {
+
+    KeReleaseSpinLock(&(myLock)->spinLock,(myLock)->inIrql);
 
 }
 

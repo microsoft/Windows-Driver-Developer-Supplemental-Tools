@@ -40,7 +40,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+c51108725c279e5ecdd3fea8e4543a98d4dc7fa9",
+        "semanticVersion" : "0.1.0+72e2acc449707a64f4eb84cd54d350f98798c842",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -93,7 +93,7 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 38,
+            "startLine" : 51,
             "startColumn" : 44,
             "endColumn" : 51
           }
@@ -112,13 +112,59 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 38,
+            "startLine" : 51,
             "startColumn" : 44,
             "endColumn" : 51
           }
         },
         "message" : {
           "text" : "outIrql"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/irql-not-saved",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/irql-not-saved",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The parameter [myLock](1) is annotated \"_IRQL_saves_\" but never has the IRQL saved to it."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 43,
+            "startColumn" : 48,
+            "endColumn" : 54
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "342705500599b584:1",
+        "primaryLocationStartColumnFingerprint" : "47"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 43,
+            "startColumn" : 48,
+            "endColumn" : 54
+          }
+        },
+        "message" : {
+          "text" : "myLock"
         }
       } ]
     } ],

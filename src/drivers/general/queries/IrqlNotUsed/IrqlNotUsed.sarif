@@ -30,7 +30,7 @@
             "name" : "IRQL not restored",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
-            "precision" : "high",
+            "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "This function has a parameter annotated \\_IRQL\\_restores\\_, but does not have a code path where this parameter is read and used to restore the IRQL.",
@@ -40,7 +40,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+c51108725c279e5ecdd3fea8e4543a98d4dc7fa9",
+        "semanticVersion" : "0.1.0+72e2acc449707a64f4eb84cd54d350f98798c842",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -93,6 +93,52 @@
             "index" : 0
           },
           "region" : {
+            "startLine" : 51,
+            "startColumn" : 6,
+            "endColumn" : 23
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "f06af79f118bcf42:1",
+        "primaryLocationStartColumnFingerprint" : "5"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 51,
+            "startColumn" : 46,
+            "endColumn" : 52
+          }
+        },
+        "message" : {
+          "text" : "inIrql"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/irql-not-used",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/irql-not-used",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "This function has annotated the parameter [myLock](1) with \"_IRQL_restores_\" but does not use it to restore the IRQL."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
             "startLine" : 43,
             "startColumn" : 6,
             "endColumn" : 23
@@ -100,7 +146,7 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "b53e3a4b4188689f:1",
+        "primaryLocationLineHash" : "41c0a3dc1c9cab79:1",
         "primaryLocationStartColumnFingerprint" : "5"
       },
       "relatedLocations" : [ {
@@ -113,12 +159,12 @@
           },
           "region" : {
             "startLine" : 43,
-            "startColumn" : 46,
-            "endColumn" : 52
+            "startColumn" : 50,
+            "endColumn" : 56
           }
         },
         "message" : {
-          "text" : "inIrql"
+          "text" : "myLock"
         }
       } ]
     } ],

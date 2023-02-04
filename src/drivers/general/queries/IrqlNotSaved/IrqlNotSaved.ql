@@ -12,7 +12,7 @@
  * @owner.email sdat@microsoft.com
  * @kind problem
  * @problem.severity warning
- * @precision high
+ * @precision medium
  * @tags correctness
  *       wddst
  * @query-version v1

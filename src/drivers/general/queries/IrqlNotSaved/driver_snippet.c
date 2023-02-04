@@ -6,6 +6,11 @@
 
 #define SET_DISPATCH 1
 
+typedef struct _TestLock {
+    KIRQL inIrql;
+    KSPIN_LOCK spinLock;
+} TestLock, * PTestLock;
+
 // Template. Not called in this test.
 void top_level_call() {}
 
@@ -30,6 +35,14 @@ VOID IrqlNotSaved_pass(_IRQL_saves_ KIRQL outIrql, PKSPIN_LOCK myLock) {
 VOID IrqlNotSaved_pass2(_IRQL_saves_ KIRQL outIrql, PKSPIN_LOCK myLock) {
 
     IrqlNotSaved_passAux(outIrql);
+
+}
+
+/* Passing case three.
+   Annotation is applied to a struct which is used to restore the IRQL. */
+VOID IrqlNotSaved_pass3(_IRQL_saves_ PTestLock myLock) {
+
+    KeAcquireSpinLock(&(myLock)->spinLock,&(myLock)->inIrql);
 
 }
 
