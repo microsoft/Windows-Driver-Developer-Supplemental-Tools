@@ -5,7 +5,6 @@
   from: microsoft/windows-drivers
 - include:
     query path: 
-      - drivers/general/experimental/IrqlNotUsedPrecise/IrqlNotUsedPrecise.ql
       - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
       - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
