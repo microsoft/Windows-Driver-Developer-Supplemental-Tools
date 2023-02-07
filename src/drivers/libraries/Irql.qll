@@ -23,6 +23,52 @@ class IrqlTypeDefinition extends SALAnnotation {
   string getIrqlMacroName() { result = irqlAnnotationName }
 }
 
+/**
+ * Represents a SAL annotation indicating that the parameter in
+ * question is used as part of adjusting the IRQL.
+ */
+class IrqlParameterAnnotation extends SALAnnotation {
+  string irqlAnnotationName;
+
+  IrqlParameterAnnotation() {
+    this.getMacroName().matches(["_IRQL_restores_", "_IRQL_saves_"]) and
+    irqlAnnotationName = this.getMacroName() and
+    exists(MacroInvocation mi | mi.getParentInvocation() = this)
+  }
+
+  string getIrqlMacroName() { result = irqlAnnotationName }
+}
+
+/**
+ * Represents a SAL annotation indicating that the parameter in
+ * question contains an IRQL value that the system will be set to.
+ */
+class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
+  IrqlRestoreAnnotation() {
+    this.getMacroName().matches(["_IRQL_restores_"])
+  }
+}
+
+/**
+ * Represents a SAL annotation indicating that the parameter in
+ * question will have the current IRQL saved to it.
+ */
+class IrqlSaveAnnotation extends IrqlParameterAnnotation {
+  IrqlSaveAnnotation() {
+    this.getMacroName().matches(["_IRQL_saves_"])
+  }
+}
+
+/** Represents a parameter that is annotated with "\_IRQL\_restores\_". */
+class IrqlRestoreParameter extends Parameter {
+  IrqlRestoreParameter() { exists(IrqlRestoreAnnotation ira | ira.getDeclaration() = this) }
+}
+
+/** Represents a parameter that is annotated with "\_IRQL\_saves\_". */
+class IrqlSaveParameter extends Parameter {
+  IrqlSaveParameter() { exists(IrqlSaveAnnotation isa | isa.getDeclaration() = this) }
+}
+
 //Represents Irql annotationed functions.
 class IrqlAnnotatedFunction extends Function {
   string funcIrqlLevel;

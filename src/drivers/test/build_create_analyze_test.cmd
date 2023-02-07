@@ -19,6 +19,8 @@ call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
 call :test DefaultPoolTag WDMTestingTemplate general queries
 call :test DefaultPoolTagExtended WDMTestingTemplate general experimental
 call :test InitNotCleared WDMTestTemplate wdm queries
+call :test IrqlNotUsed WDMTestTemplate general queries
+call :test IrqlNotSaved WDMTestTemplate general queries
 
 exit /b 0
 

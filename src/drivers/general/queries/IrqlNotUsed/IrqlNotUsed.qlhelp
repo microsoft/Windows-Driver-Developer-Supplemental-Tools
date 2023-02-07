@@ -1,0 +1,28 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			A parameter annotated _IRQL_restores_ must be read and used to restore the IRQL value.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Make sure that any parameter annotated "_IRQL_restores_" has a code path where the IRQL is restored by calling an OS function.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<semmleNotes>
+		<p>
+			This version of the query only checks for functions that have no path where the IRQL is restored at all.  In a future update, we will use the must-flow library to check for functions where there are _any_ paths where the IRQL is not restored.
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28157-function-irql-never-restored">
+				C28157 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>
