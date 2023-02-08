@@ -3,6 +3,20 @@
 import cpp
 import drivers.libraries.SAL
 
+class Irp extends Struct {
+  Irp() {
+    this.getName().matches("_IRP")
+    and this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
+  }
+}
+
+class Dpc extends Struct {
+  Dpc() {
+    this.getName().matches("_KDPC")
+    and this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
+  }
+}
+
 /** A typedef for the standard WDM callback routines. */
 class WdmCallbackRoutineTypedef extends TypedefType {
   WdmCallbackRoutineTypedef() {
