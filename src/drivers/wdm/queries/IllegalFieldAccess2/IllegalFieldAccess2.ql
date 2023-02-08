@@ -8,7 +8,7 @@
  * @feature.area Multiple
  * @repro.text The driver read a structure field that should not be accessed outside of certain contexts.
  * @kind problem
- * @id cpp/windows/drivers/queries/illegal-field-access
+ * @id cpp/windows/drivers/queries/illegal-field-access-2
  * @problem.severity warning
  * @precision high
  * @tags correctness
@@ -18,15 +18,42 @@
 import cpp
 import drivers.wdm.libraries.WdmDrivers
 
-/** Represents an access to a field of a DPC. */
-class IllegalDeviceObjectFieldAccess extends FieldAccess, IllegalFieldAccess {
+/**
+ * Represents the illegal accesses we look for in this query.
+ *
+ * Because some field accesses are legal in the correct context, you should always check the
+ * isIllegalAccess() predicate when looking for illegal accesses.
+ */
+abstract class PotentiallyIllegalFieldAccess extends Element {
+  /** Provides a message describing the illegal access.  Use only if isIllegalAccess() is true. */
+  abstract string getErrorMessage();
+
+  /** Determines if this access is actually illegal in context. */
+  abstract predicate isIllegalAccess();
+}
+
+/**
+ * Represents a potentially illegal access to a field of a DeviceObject, namely:
+ * - Accesses to a DeviceObject's NextDevice field (outside of DriverEntry and DriverUnload)
+ * - Accesses to generally unavailable DeviceObject fields
+ */
+class IllegalDeviceObjectFieldAccess extends FieldAccess, PotentiallyIllegalFieldAccess {
   IllegalDeviceObjectFieldAccess() {
     this.getTarget().getParentScope() instanceof DeviceObject and
+    /*
+     * The below cases are not handled by this rule or are generally read-accessible.
+     *
+     *      TODO: Vpb and SecurityDescriptor are valid in filesystem drivers, but the
+     *      macros to indicate this were never implemented, and so they are always suppressed
+     *      in filesystem drivers ATM.  We need to either implement suppression or filesystem
+     *      driver detection.
+     */
+
     not this.getTarget()
         .getName()
         .matches([
             "DeviceExtension", "Flags", "Characteristics", "CurrentIrp", "DeviceType", "StackSize",
-            "AlignmentRequirement"
+            "AlignmentRequirement", "DriverObject", "Vpb", "SecurityDescriptor"
           ]) and
     not this.getFile().getBaseName().matches("wdm.h")
   }
@@ -37,43 +64,74 @@ class IllegalDeviceObjectFieldAccess extends FieldAccess, IllegalFieldAccess {
     else result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
   }
 
-  /**
-   * Evaluates if this access is actually illegal, given context.
-   * Note: Some behavior, namely that "Vpb" and "SecurityDescriptor" are readable in storage drivers,
-   * is not currently implemented.
-   */
   override predicate isIllegalAccess() {
+    not this.getTarget().getName().matches("NextDevice")
+    or
+    this.getTarget().getName().matches("NextDevice") and
     not (
-      this.getTarget().getName().matches("NextDevice") and
-      not (
-        this.getParentScope() instanceof WdmDriverEntry or
-        this.getParentScope() instanceof WdmDriverUnload
-      )
+      this.getControlFlowScope() instanceof WdmDriverEntry or
+      this.getControlFlowScope() instanceof WdmDriverUnload
     )
   }
 }
 
 /**
- * Represents the illegal accesses we look for in this query, namely:
- * - Accesses to a DeviceObject's NextDevice field (outside of DriverEntry and DriverUnload)
- *                 // "Flags" is special cased in drivers-dfa.
- *                if (   lstrcmpW(memberName, L"DeviceExtension") == 0
- *                    || lstrcmpW(memberName, L"Flags") == 0
- *                    || lstrcmpW(memberName, L"Characteristics") == 0
- *                    || lstrcmpW(memberName, L"CurrentIrp") == 0
- *                    || lstrcmpW(memberName, L"DeviceType") == 0
- *                    || lstrcmpW(memberName, L"StackSize") == 0
- *                    || lstrcmpW(memberName, L"AlignmentRequirement") == 0)
- * - Accesses to a DPC's field
- * - Accesses to an IRP's CancelRoutine field
+ * Represents potentially illegal accesses to a DriverObject field, namely:
+ * - Accesses to a DriverObject's DriverStartIo, DriverUnload, MajorFunction, and DriverExtension fields outside DriverEntry
+ * - Accesses to generally unavailable DriverObject fields
  */
-abstract class IllegalFieldAccess extends Element {
-  abstract string getErrorMessage();
-  abstract predicate isIllegalAccess();
+class IllegalDriverObjectFieldAccess extends FieldAccess, PotentiallyIllegalFieldAccess {
+  IllegalDriverObjectFieldAccess() {
+    this.getTarget().getParentScope() instanceof DriverObject and
+    // The below cases are not handled by this rule or are generally read-accessible.
+    not this.getTarget()
+        .getName()
+        .matches(["FastIoDispatch", "Size", "DeviceObject", "HardwareDatabase", "DriverInit"]) and
+    not this.getFile().getBaseName().matches("wdm.h")
+  }
+
+  override string getErrorMessage() {
+    if
+      this.getTarget()
+          .getName()
+          .matches(["DriverStartIo", "DriverUnload", "MajorFunction", "DriverExtension"])
+    then
+      result =
+        "The '" + this.getTarget().getName() +
+          "' field can only be accessed in a DriverEntry routine."
+    else result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
+  }
+
+  override predicate isIllegalAccess() {
+    // Below fields are illegal iff we're not in a DriverEntry function
+    this.getTarget()
+        .getName()
+        .matches(["DriverStartIo", "DriverUnload", "MajorFunction", "DriverExtension"]) and
+    not this.getControlFlowScope() instanceof WdmDriverEntry
+    or
+    not this.getTarget()
+        .getName()
+        .matches(["DriverStartIo", "DriverUnload", "MajorFunction", "DriverExtension"])
+  }
 }
 
-// "Vpb" and "SecurityDescriptor" readable if MacroValue "_DRIVER_TYPE_FILESYSTEM", "_DRIVER_TYPE_FILESYSTEM_FILTER", or "_DRIVER_TYPE_STORAGE"
-// "NextDevice" readable in DriverEntry and DriverUnload
-from IllegalFieldAccess ifa
+/** Represents illegal accesses to DriverExtension fields. */
+class IllegalDriverExtensionFieldAccess extends FieldAccess, PotentiallyIllegalFieldAccess {
+  IllegalDriverExtensionFieldAccess() {
+    this.getTarget().getParentScope() instanceof DriverExtension and
+    not this.getTarget().getName().matches("AddDevice")
+  }
+
+  override string getErrorMessage() {
+    result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
+  }
+
+  override predicate isIllegalAccess() {
+    // This is always true for this class, as we filtered out on AddDevice in the characteristic predicate.
+    this instanceof IllegalDriverExtensionFieldAccess
+  }
+}
+
+from PotentiallyIllegalFieldAccess ifa
 where ifa.isIllegalAccess()
 select ifa, ifa.getErrorMessage()

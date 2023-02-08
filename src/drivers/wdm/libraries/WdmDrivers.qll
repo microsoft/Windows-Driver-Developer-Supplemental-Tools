@@ -31,6 +31,13 @@ class DriverObject extends Struct {
   }
 }
 
+class DriverExtension extends Struct {
+  DriverExtension() {
+    this.getName().matches("_DRIVER_EXTENSION") and
+    this.getDefinitionLocation().getFile().getBaseName().matches("%wdm.h")
+  }
+}
+
 /** A typedef for the standard WDM callback routines. */
 class WdmCallbackRoutineTypedef extends TypedefType {
   WdmCallbackRoutineTypedef() {
