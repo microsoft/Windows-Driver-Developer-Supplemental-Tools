@@ -45,7 +45,6 @@ jobs:
     
     - name: Install CodeQL Packages
       shell: cmd
-      continue-on-error: true
       run: .\codeql-cli\codeql.cmd pack install .\windows-driver-developer-supplemental-tools\src
 
     - name: Build must-fix driver suite
