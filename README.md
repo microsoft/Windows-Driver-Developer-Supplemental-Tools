@@ -10,6 +10,7 @@ This repository contains open-source components for supplemental use in developi
 
 ### For Windows Hardware Compatibility Program Use
 
+### Windows Hardware Compatibility Program Release Version Matrix
 | Release                  | Branch to use | CodeQL CLI version |
 |--------------------------|---------------|--------------------|
 | Windows Server 2022      | WHCP_21H2     | 2.4.6              |
