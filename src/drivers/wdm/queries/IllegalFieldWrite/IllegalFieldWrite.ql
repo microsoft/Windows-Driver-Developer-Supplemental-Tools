@@ -1,12 +1,12 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Illegal access to a protected field (C28175)
- * @description The driver wrote a structure field that should not be modified outside of certain contexts.
+ * @name Illegal access to a protected field (C28176)
+ * @description The driver wrote to a structure field that should not be modified outside of certain contexts.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
- * @repro.text The driver wrote a structure field that should not be modified outside of certain contexts.
+ * @repro.text The driver wrote to a structure field that should not be modified outside of certain contexts.
  * @kind problem
  * @id cpp/windows/drivers/queries/illegal-field-write
  * @problem.severity warning
@@ -25,11 +25,8 @@ import drivers.wdm.libraries.WdmDrivers
  * isIllegalAccess() predicate when looking for illegal accesses.
  */
 abstract class PotentiallyIllegalFieldAccess extends Element {
-  /** Provides a message describing the illegal access.  Use only if isIllegalAccess() is true. */
+  /** Provides a message describing the illegal access. */
   abstract string getErrorMessage();
-
-  /** Determines if this access is actually illegal in context. */
-  abstract predicate isIllegalAccess();
 }
 
 /**
@@ -49,29 +46,16 @@ class IllegalDeviceObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
      *      driver detection.
      */
 
-    not this.getTarget()
+    this.getTarget()
         .getName()
         .matches([
-            "DeviceExtension", "Flags", "Characteristics", "CurrentIrp", "DeviceType", "StackSize",
-            "AlignmentRequirement", "DriverObject", "Vpb", "SecurityDescriptor"
+            "NextDevice", "DriverObject", "SecurityDescriptor"
           ]) and
     not this.getFile().getBaseName().matches("wdm.h")
   }
 
   override string getErrorMessage() {
-    if this.getTarget().getName().matches("NextDevice")
-    then result = "The 'NextDevice' field can only be accessed in DriverEntry or DriverUnload."
-    else result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
-  }
-
-  override predicate isIllegalAccess() {
-    not this.getTarget().getName().matches("NextDevice")
-    or
-    this.getTarget().getName().matches("NextDevice") and
-    not (
-      this.getControlFlowScope() instanceof WdmDriverEntry or
-      this.getControlFlowScope() instanceof WdmDriverUnload
-    )
+    result = "The '" + this.getTarget().getName() + "' field is read-only."
   }
 }
 
@@ -84,54 +68,19 @@ class IllegalDriverObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
   IllegalDriverObjectFieldAccess() {
     this.getTarget().getParentScope() instanceof DriverObject and
     // The below cases are not handled by this rule or are generally read-accessible.
-    not this.getTarget()
+    this.getTarget()
         .getName()
-        .matches(["FastIoDispatch", "Size", "DeviceObject", "HardwareDatabase", "DriverInit"]) and
+        .matches(["DeviceObject", "HardwareDatabase", "DriverInit", "Size"]) and
     not this.getFile().getBaseName().matches("wdm.h")
   }
 
   override string getErrorMessage() {
-    if
-      this.getTarget()
-          .getName()
-          .matches(["DriverStartIo", "DriverUnload", "MajorFunction", "DriverExtension"])
-    then
-      result =
-        "The '" + this.getTarget().getName() +
-          "' field can only be accessed in a DriverEntry routine."
-    else result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
-  }
-
-  override predicate isIllegalAccess() {
-    // Below fields are illegal iff we're not in a DriverEntry function
-    this.getTarget()
-        .getName()
-        .matches(["DriverStartIo", "DriverUnload", "MajorFunction", "DriverExtension"]) and
-    not this.getControlFlowScope() instanceof WdmDriverEntry
-    or
-    not this.getTarget()
-        .getName()
-        .matches(["DriverStartIo", "DriverUnload", "MajorFunction", "DriverExtension"])
+    result = "The '" + this.getTarget().getName() + "' field is read-only."
   }
 }
 
-/** Represents illegal accesses to DriverExtension fields. */
-class IllegalDriverExtensionFieldAccess extends FieldAccess, PotentiallyIllegalFieldAccess {
-  IllegalDriverExtensionFieldAccess() {
-    this.getTarget().getParentScope() instanceof DriverExtension and
-    not this.getTarget().getName().matches("AddDevice")
-  }
+// TODO: catch _both_ illegal writes in the "DriverObject->DeviceObject->NextDevice = NULL;" case?
 
-  override string getErrorMessage() {
-    result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
-  }
-
-  override predicate isIllegalAccess() {
-    // This is always true for this class, as we filtered out on AddDevice in the characteristic predicate.
-    this instanceof IllegalDriverExtensionFieldAccess
-  }
-}
-
-from PotentiallyIllegalFieldAccess ifa
-where ifa.isIllegalAccess()
+from AssignExpr ae, PotentiallyIllegalFieldAccess ifa
+where ae.getLValue() = ifa
 select ifa, ifa.getErrorMessage()

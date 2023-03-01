@@ -262,6 +262,7 @@ DispatchSystemControl (
     return STATUS_SUCCESS;
 }
 
+#ifndef SET_CUSTOM_UNLOAD
 #pragma code_seg("PAGE")
 _Use_decl_annotations_
 VOID
@@ -275,6 +276,7 @@ DriverUnload(
     
     return;
 }
+#endif
 
 #pragma code_seg()
 

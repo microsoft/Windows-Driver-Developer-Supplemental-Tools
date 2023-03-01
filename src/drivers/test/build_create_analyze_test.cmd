@@ -21,6 +21,7 @@ call :test DefaultPoolTagExtended WDMTestingTemplate general experimental
 call :test InitNotCleared WDMTestTemplate wdm queries
 call :test IrqlNotUsed WDMTestTemplate general queries
 call :test IrqlNotSaved WDMTestTemplate general queries
+call :test IllegalFieldWrite WDMTestTemplate wdm queries
 
 exit /b 0
 

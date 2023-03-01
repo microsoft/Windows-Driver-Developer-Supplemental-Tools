@@ -1,0 +1,166 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.11.6",
+        "rules" : [ {
+          "id" : "cpp/windows/drivers/queries/illegal-field-write",
+          "name" : "cpp/windows/drivers/queries/illegal-field-write",
+          "shortDescription" : {
+            "text" : "Illegal access to a protected field (C28176)"
+          },
+          "fullDescription" : {
+            "text" : "The driver wrote to a structure field that should not be modified outside of certain contexts."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "correctness" ],
+            "description" : "The driver wrote to a structure field that should not be modified outside of certain contexts.",
+            "feature.area" : "Multiple",
+            "id" : "cpp/windows/drivers/queries/illegal-field-write",
+            "kind" : "problem",
+            "name" : "Illegal access to a protected field (C28176)",
+            "platform" : "Desktop",
+            "precision" : "high",
+            "problem.severity" : "warning",
+            "query-version" : "v1",
+            "repro.text" : "The driver wrote to a structure field that should not be modified outside of certain contexts.",
+            "security.severity" : "Low"
+          }
+        } ]
+      },
+      "extensions" : [ {
+        "name" : "microsoft/windows-drivers",
+        "semanticVersion" : "0.1.0+6de988a3a2417cc6e54095b4a902d3186b66bb19",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "legacy-upgrades",
+        "semanticVersion" : "0.0.0",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      } ]
+    },
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    } ],
+    "results" : [ {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'NextDevice' field is read-only."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 30,
+            "startColumn" : 33,
+            "endColumn" : 43
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "a0ed526c83135dd6:1",
+        "primaryLocationStartColumnFingerprint" : "28"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'SecurityDescriptor' field is read-only."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 19,
+            "startColumn" : 19,
+            "endColumn" : 37
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "7e127d7c4d22887:1",
+        "primaryLocationStartColumnFingerprint" : "14"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'DriverObject' field is read-only."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 20,
+            "startColumn" : 19,
+            "endColumn" : 31
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "bbfba5531de85daa:1",
+        "primaryLocationStartColumnFingerprint" : "14"
+      }
+    } ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}

@@ -5,6 +5,7 @@
 //
 
 #define SET_DISPATCH 1
+#define SET_CUSTOM_UNLOAD 1
 
 // Template. Not called in this test.
 void top_level_call() {}
@@ -15,9 +16,17 @@ IllegalFieldAccess (
     PIRP Irp
     )
 {
-    Irp->CancelRoutine = top_level_call; // ERROR; SHOULD be caught by C28128 but ISN'T
-    DeviceObject->Dpc.DeferredRoutine = DpcForIsrRoutine; // ERROR; IS caught by C28128
-    DeviceObject->Dpc = *((PKDPC)DpcForIsrRoutine); // ERROR; IS caught by C28128
-    IoSetCancelRoutine(Irp, top_level_call); // GOOD
+    DeviceObject->SecurityDescriptor = NULL; // ERROR; SHOULD be caught by C28176 but ISN'T (BY DESIGN)
+    DeviceObject->DriverObject = NULL; // ERROR; IS caught by C28176
+    DeviceObject->Flags &= 0x100000; // GOOD
     IoInitializeDpcRequest(DeviceObject, DpcForIsrRoutine); // GOOD
+}
+
+VOID
+DriverUnload (
+    PDRIVER_OBJECT DriverObject
+)
+{
+    DriverObject->DeviceObject->NextDevice = NULL; // TWO ERRORS; IS caught by C28176
+    return;
 }
