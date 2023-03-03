@@ -115,7 +115,7 @@ class IllegalDriverObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
   }
 }
 
-/** Represents illegal accesses to DriverExtension fields. */
+/** Represents illegal accesses to DriverExtension fields, i.e. anything that isn't the "AddDevice" field. */
 class IllegalDriverExtensionFieldAccess extends FieldAccess, PotentiallyIllegalFieldAccess {
   IllegalDriverExtensionFieldAccess() {
     this.getTarget().getParentScope() instanceof DriverExtension and
