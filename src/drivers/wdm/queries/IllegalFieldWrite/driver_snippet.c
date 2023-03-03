@@ -16,8 +16,9 @@ IllegalFieldAccess (
     PIRP Irp
     )
 {
-    DeviceObject->SecurityDescriptor = NULL; // ERROR; SHOULD be caught by C28176 but ISN'T (BY DESIGN)
+    DeviceObject->SecurityDescriptor = NULL; // ERROR; IS NOT caught by 28176 (BY DESIGN)
     DeviceObject->DriverObject = NULL; // ERROR; IS caught by C28176
+    DeviceObject->DriverObject++; // ERROR; IS NOT caught by C28176
     DeviceObject->Flags &= 0x100000; // GOOD
     IoInitializeDpcRequest(DeviceObject, DpcForIsrRoutine); // GOOD
 }
@@ -28,5 +29,6 @@ DriverUnload (
 )
 {
     DriverObject->DeviceObject->NextDevice = NULL; // TWO ERRORS; IS caught by C28176
+    DriverObject->DeviceObject->Flags &= 0x100000; // ERROR; IS caught by C28176
     return;
 }

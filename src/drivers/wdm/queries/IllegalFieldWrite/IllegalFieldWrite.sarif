@@ -38,7 +38,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6de988a3a2417cc6e54095b4a902d3186b66bb19",
+        "semanticVersion" : "0.1.0+a1eaac1762ee26f2d5091d5efd730f88db88fb87",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -81,7 +81,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "The 'NextDevice' field is read-only."
+        "text" : "The 'DeviceObject' field of the DriverObject struct is read-only."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -91,14 +91,42 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 30,
+            "startLine" : 31,
+            "startColumn" : 19,
+            "endColumn" : 31
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "a894fa421089cbf4:1",
+        "primaryLocationStartColumnFingerprint" : "14"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'NextDevice' field of the DeviceObject struct is read-only."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 31,
             "startColumn" : 33,
             "endColumn" : 43
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "a0ed526c83135dd6:1",
+        "primaryLocationLineHash" : "a894fa421089cbf4:1",
         "primaryLocationStartColumnFingerprint" : "28"
       }
     }, {
@@ -109,7 +137,35 @@
         "index" : 0
       },
       "message" : {
-        "text" : "The 'SecurityDescriptor' field is read-only."
+        "text" : "The 'DeviceObject' field of the DriverObject struct is read-only."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 32,
+            "startColumn" : 19,
+            "endColumn" : 31
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "f2626880e69626d8:1",
+        "primaryLocationStartColumnFingerprint" : "14"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'SecurityDescriptor' field of the DeviceObject struct is read-only."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -126,7 +182,7 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "7e127d7c4d22887:1",
+        "primaryLocationLineHash" : "4d0f053a4e800670:1",
         "primaryLocationStartColumnFingerprint" : "14"
       }
     }, {
@@ -137,7 +193,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "The 'DriverObject' field is read-only."
+        "text" : "The 'DriverObject' field of the DeviceObject struct is read-only."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -154,7 +210,35 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "bbfba5531de85daa:1",
+        "primaryLocationLineHash" : "1141f9ea37b2d87c:1",
+        "primaryLocationStartColumnFingerprint" : "14"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'DriverObject' field of the DeviceObject struct is read-only."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 21,
+            "startColumn" : 19,
+            "endColumn" : 31
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "7fe578f0416d91b1:1",
         "primaryLocationStartColumnFingerprint" : "14"
       }
     } ],

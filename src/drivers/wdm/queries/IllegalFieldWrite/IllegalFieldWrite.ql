@@ -20,67 +20,50 @@ import drivers.wdm.libraries.WdmDrivers
 
 /**
  * Represents the illegal accesses we look for in this query.
- *
- * Because some field accesses are legal in the correct context, you should always check the
- * isIllegalAccess() predicate when looking for illegal accesses.
  */
-abstract class PotentiallyIllegalFieldAccess extends Element {
+abstract class PotentiallyIllegalFieldAccess extends FieldAccess {
   /** Provides a message describing the illegal access. */
-  abstract string getErrorMessage();
+  string getErrorMessage() {
+    result =
+      "The '" + this.getTarget() + "' field of the " + this.getQualifier() + " struct is read-only."
+  }
 }
 
 /**
- * Represents a potentially illegal access to a field of a DeviceObject, namely:
- * - Accesses to a DeviceObject's NextDevice field (outside of DriverEntry and DriverUnload)
- * - Accesses to generally unavailable DeviceObject fields
+ * Represents a potentially illegal access to a field of a DeviceObject when used in a write,
+ * namely the NextDevice, DriverObject, and SecurityDescriptor fields.
  */
-class IllegalDeviceObjectFieldAccess extends FieldAccess, PotentiallyIllegalFieldAccess {
+class IllegalDeviceObjectFieldAccess extends PotentiallyIllegalFieldAccess {
   IllegalDeviceObjectFieldAccess() {
     this.getTarget().getParentScope() instanceof DeviceObject and
-    /*
-     * The below cases are not handled by this rule or are generally read-accessible.
-     *
-     *      TODO: Vpb and SecurityDescriptor are valid in filesystem drivers, but the
-     *      macros to indicate this were never implemented, and so they are always suppressed
-     *      in filesystem drivers ATM.  We need to either implement suppression or filesystem
-     *      driver detection.
-     */
-
-    this.getTarget()
-        .getName()
-        .matches([
-            "NextDevice", "DriverObject", "SecurityDescriptor"
-          ]) and
+    this.getTarget().getName().matches(["NextDevice", "DriverObject", "SecurityDescriptor"]) and
     not this.getFile().getBaseName().matches("wdm.h")
-  }
-
-  override string getErrorMessage() {
-    result = "The '" + this.getTarget().getName() + "' field is read-only."
   }
 }
 
 /**
- * Represents potentially illegal accesses to a DriverObject field, namely:
- * - Accesses to a DriverObject's DriverStartIo, DriverUnload, MajorFunction, and DriverExtension fields outside DriverEntry
- * - Accesses to generally unavailable DriverObject fields
+ * Represents potentially illegal accesses to a DriverObject field when used in a write, namely the
+ * DeviceObject, HardwareDatabase, DriverInit, and Size fields.
  */
-class IllegalDriverObjectFieldAccess extends FieldAccess, PotentiallyIllegalFieldAccess {
+class IllegalDriverObjectFieldAccess extends PotentiallyIllegalFieldAccess {
   IllegalDriverObjectFieldAccess() {
     this.getTarget().getParentScope() instanceof DriverObject and
-    // The below cases are not handled by this rule or are generally read-accessible.
-    this.getTarget()
-        .getName()
-        .matches(["DeviceObject", "HardwareDatabase", "DriverInit", "Size"]) and
+    this.getTarget().getName().matches(["DeviceObject", "HardwareDatabase", "DriverInit", "Size"]) and
     not this.getFile().getBaseName().matches("wdm.h")
-  }
-
-  override string getErrorMessage() {
-    result = "The '" + this.getTarget().getName() + "' field is read-only."
   }
 }
 
-// TODO: catch _both_ illegal writes in the "DriverObject->DeviceObject->NextDevice = NULL;" case?
-
-from AssignExpr ae, PotentiallyIllegalFieldAccess ifa
-where ae.getLValue() = ifa
+// Look for any assignments to an illegal field, or any direct increment/decrements of it.
+from PotentiallyIllegalFieldAccess ifa
+where
+  exists(Assignment ae |
+    ifa = ae.getLValue()
+    or
+    exists(FieldAccess fa |
+      fa.getQualifier*() = ifa and
+      ae.getLValue() = fa
+    )
+  )
+  or
+  exists(CrementOperation co | co.getOperand() = ifa)
 select ifa, ifa.getErrorMessage()
