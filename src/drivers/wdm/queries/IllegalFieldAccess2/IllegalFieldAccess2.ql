@@ -60,8 +60,8 @@ class IllegalDeviceObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
 
   override string getErrorMessage() {
     if this.getTarget().getName().matches("NextDevice")
-    then result = "The 'NextDevice' field can only be accessed in DriverEntry or DriverUnload."
-    else result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
+    then result = "The 'NextDevice' field of the " + this.getQualifier() + " struct can only be accessed in DriverEntry or DriverUnload."
+    else result = "The '" + this.getTarget().getName() + "' field of the " + this.getQualifier() + " struct cannot be accessed by a driver."
   }
 
   override predicate isIllegalAccess() {
@@ -98,8 +98,8 @@ class IllegalDriverObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
     then
       result =
         "The '" + this.getTarget().getName() +
-          "' field can only be accessed in a DriverEntry routine."
-    else result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
+          "' field of the " + this.getQualifier() + " struct can only be accessed in a DriverEntry routine."
+    else result = "The '" + this.getTarget().getName() + "' field of the " + this.getQualifier() + " struct cannot be accessed by a driver."
   }
 
   override predicate isIllegalAccess() {
@@ -123,7 +123,7 @@ class IllegalDriverExtensionFieldAccess extends FieldAccess, PotentiallyIllegalF
   }
 
   override string getErrorMessage() {
-    result = "The '" + this.getTarget().getName() + "' field cannot be accessed by a driver."
+    result = "The '" + this.getTarget().getName() + "' field of the " + this.getQualifier() + " struct cannot be accessed by a driver."
   }
 
   override predicate isIllegalAccess() {

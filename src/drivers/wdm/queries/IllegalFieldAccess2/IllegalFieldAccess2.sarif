@@ -1,0 +1,222 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.11.6",
+        "rules" : [ {
+          "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+          "name" : "cpp/windows/drivers/queries/illegal-field-access-2",
+          "shortDescription" : {
+            "text" : "Illegal access to a protected field (C28175)"
+          },
+          "fullDescription" : {
+            "text" : "The driver read a structure field that should not be accessed outside of certain contexts."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "correctness" ],
+            "description" : "The driver read a structure field that should not be accessed outside of certain contexts.",
+            "feature.area" : "Multiple",
+            "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+            "kind" : "problem",
+            "name" : "Illegal access to a protected field (C28175)",
+            "platform" : "Desktop",
+            "precision" : "high",
+            "problem.severity" : "warning",
+            "query-version" : "v1",
+            "repro.text" : "The driver read a structure field that should not be accessed outside of certain contexts.",
+            "security.severity" : "Low"
+          }
+        } ]
+      },
+      "extensions" : [ {
+        "name" : "microsoft/windows-drivers",
+        "semanticVersion" : "0.1.0+bcce4d40c0554212a1998137ba182b3981b8391c",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "legacy-upgrades",
+        "semanticVersion" : "0.0.0",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      } ]
+    },
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    } ],
+    "results" : [ {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'Flags' field of the DriverObject struct cannot be accessed by a driver."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 31,
+            "startColumn" : 19,
+            "endColumn" : 24
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "218e42c5f824618d:1",
+        "primaryLocationStartColumnFingerprint" : "14"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'NextDevice' field of the DeviceObject struct can only be accessed in DriverEntry or DriverUnload."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 19,
+            "startColumn" : 23,
+            "endColumn" : 33
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "40c8d136de1dbbd7:1",
+        "primaryLocationStartColumnFingerprint" : "18"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'Dpc' field of the DeviceObject struct cannot be accessed by a driver."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 20,
+            "startColumn" : 23,
+            "endColumn" : 26
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "2f5e69bc3def7ea8:1",
+        "primaryLocationStartColumnFingerprint" : "18"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'Flags' field of the DriverObject struct cannot be accessed by a driver."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 21,
+            "startColumn" : 37,
+            "endColumn" : 42
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "f7ed25a20d82c7ec:1",
+        "primaryLocationStartColumnFingerprint" : "32"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The 'DriverExtension' field of the DriverObject struct can only be accessed in a DriverEntry routine."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 22,
+            "startColumn" : 37,
+            "endColumn" : 52
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "dea582d930bb9b30:1",
+        "primaryLocationStartColumnFingerprint" : "32"
+      }
+    } ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}

@@ -16,8 +16,8 @@ IllegalFieldAccess2 (
     PIRP Irp
     )
 {
-    DeviceObject->NextDevice = DeviceObject; // ERROR; IS caught by C28175
-    DeviceObject->Dpc = *((PKDPC)DpcForIsrRoutine); // ERROR; IS caught by C28175
+    if (DeviceObject->NextDevice) {}  // ERROR; IS caught by C28175
+    if (DeviceObject->Dpc.Number) {} // ERROR; IS NOT caught by C28175 (masked by C28128)
     if (DeviceObject->DriverObject->Flags && 0x0001) {} // ERROR; IS caught by C28175
     if (DeviceObject->DriverObject->DriverExtension) {} // ERROR; IS caught by C28175
 }
@@ -27,7 +27,7 @@ DriverUnload (
     PDRIVER_OBJECT DriverObject
 )
 {
-    DriverObject->DeviceObject->NextDevice = NULL; // GOOD
-    DriverObject->DeviceObject->Flags &= 0x100000; // ERROR; IS caught by C28175
+    DriverObject->DeviceObject->NextDevice = NULL; // GOOD (for C28175)
+    DriverObject->Flags &= 0x100000; // ERROR; IS caught by C28175
     return;
 }
