@@ -1,0 +1,26 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The driver is writing to a read-only field of a driver struct.
+		</p>
+		<p>
+			Note that this check only reports violations when the field is explicitly read-only, and not completely inaccessible.  For finding reads of inaccessible fields, use IllegalFieldAccess and IllegalFieldAccess2.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Driver writers should not make changes to these fields.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28176-struct-member-should-not-be-modified-by-driver">
+				C28176 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>
