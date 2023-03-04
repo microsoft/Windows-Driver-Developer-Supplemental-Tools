@@ -16,8 +16,13 @@ call :test IllegalFieldAccess WDMTestTemplate wdm queries
 call :test PoolTagIntegral WDMTestTemplate general queries
 call :test ObReferenceMode WDMTestTemplate wdm queries
 call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
+call :test DefaultPoolTag WDMTestingTemplate general queries
+call :test DefaultPoolTagExtended WDMTestTemplate general queries\experimental
+call :test InitNotCleared WDMTestTemplate wdm queries
 call :test IrqlNotUsed WDMTestTemplate general queries
 call :test IrqlNotSaved WDMTestTemplate general queries
+call :test IllegalFieldWrite WDMTestTemplate wdm queries
+call :test IllegalFieldAccess2 WDMTestTemplate wdm queries
 
 exit /b 0
 
