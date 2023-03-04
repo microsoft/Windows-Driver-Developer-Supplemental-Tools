@@ -17,6 +17,8 @@
       - drivers/wdm/experimental/IrqTooLow/IrqTooLow.ql
       - drivers/wdm/queries/ExaminedValue/ExaminedValue.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
+      - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
+      - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
       - drivers/wdm/queries/InitNotCleared/InitNotCleared.ql
       - drivers/wdm/queries/KeWaitLocal/KeWaitLocal.ql
       - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
