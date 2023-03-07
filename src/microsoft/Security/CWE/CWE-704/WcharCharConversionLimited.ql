@@ -5,7 +5,7 @@
  *              This can lead to undefined behavior, including buffer overruns.
  *              This query is a specilized version of `cpp/incorrect-string-type-conversion` that ignores casting to `PUCHAR`
  * @kind problem
- * @id cpp/incorrect-string-type-conversion-isgnore-puchar-casts
+ * @id cpp/incorrect-string-type-conversion-ignore-puchar-casts
  * @problem.severity error
  * @security-severity 8.8
  * @precision high
