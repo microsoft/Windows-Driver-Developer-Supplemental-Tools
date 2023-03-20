@@ -1,0 +1,172 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.11.6",
+        "rules" : [ {
+          "id" : "cpp/windows/drivers/queries/init-not-cleared",
+          "name" : "cpp/windows/drivers/queries/init-not-cleared",
+          "shortDescription" : {
+            "text" : "Failure to clear DO_DEVICE_INITIALIZING (C28152)"
+          },
+          "fullDescription" : {
+            "text" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.",
+            "feature.area" : "Multiple",
+            "id" : "cpp/windows/drivers/queries/init-not-cleared",
+            "impact" : "Insecure Coding Practice",
+            "kind" : "problem",
+            "name" : "Failure to clear DO_DEVICE_INITIALIZING (C28152)",
+            "owner.email" : "sdat@microsoft.com",
+            "platform" : "Desktop",
+            "precision" : "medium",
+            "problem.severity" : "warning",
+            "query-version" : "v1",
+            "repro.text" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.",
+            "security.severity" : "Low"
+          }
+        } ]
+      },
+      "extensions" : [ {
+        "name" : "microsoft/windows-drivers",
+        "semanticVersion" : "0.1.0+71ba680b6e5f964dc8fb3089b463d866e91d57d5",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "legacy-upgrades",
+        "semanticVersion" : "0.0.0",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      } ]
+    },
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    } ],
+    "results" : [ {
+      "ruleId" : "cpp/windows/drivers/queries/init-not-cleared",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/init-not-cleared",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The AddDevice routine [AddDevice_Fail2](1) does not clear the DO_DEVICE_INITIALIZING flag from the FDO it creates."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 95,
+            "endColumn" : 16
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "18edb445adef0a0e:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 95,
+            "endColumn" : 16
+          }
+        },
+        "message" : {
+          "text" : "AddDevice_Fail2"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/init-not-cleared",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/init-not-cleared",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "The AddDevice routine [AddDevice_Fail1](1) does not clear the DO_DEVICE_INITIALIZING flag from the FDO it creates."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 69,
+            "endColumn" : 16
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "ec8faa72edf45f79:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 69,
+            "endColumn" : 16
+          }
+        },
+        "message" : {
+          "text" : "AddDevice_Fail1"
+        }
+      } ]
+    } ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}

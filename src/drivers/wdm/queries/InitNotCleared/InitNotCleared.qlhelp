@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			A WDM AddDevice routine must clear the DO_DEVICE_INITIALIZING flag of the filter device object or functional device object it creates.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Clear the DO_DEVICE_INITIALIZING flag of the FDO with code like "FunctionalDeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;"
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28152-do-device-initializing-flag-not-cleared">
+				C28152 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>
