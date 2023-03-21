@@ -7,10 +7,11 @@ class IrqlTypeDefinition extends SALAnnotation {
   string irqlLevel;
   string irqlAnnotationName;
 
-  //IRQL Annotation Types
+  /** Represents standard IRQL annotations which refer to explicit IRQL levels. */
   IrqlTypeDefinition() {
     //Needs to include other function and parameter annotations too
-    this.getMacroName().matches(["_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_"]) and
+    this.getMacroName()
+        .matches(["_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_", "_IRQL_raises_"]) and
     irqlAnnotationName = this.getMacroName() and
     exists(MacroInvocation mi |
       mi.getParentInvocation() = this and
@@ -23,8 +24,26 @@ class IrqlTypeDefinition extends SALAnnotation {
   string getIrqlMacroName() { result = irqlAnnotationName }
 }
 
+class IrqlSameAnnotation extends SALAnnotation {
+  string irqlAnnotationName;
+
+  /** Represents standard IRQL annotations which refer to explicit IRQL levels. */
+  IrqlSameAnnotation() {
+    //Needs to include other function and parameter annotations too
+    this.getMacroName()
+        .matches(["_IRQL_requires_same_"]) and
+    irqlAnnotationName = this.getMacroName()
+  }
+
+  string getIrqlMacroName() { result = irqlAnnotationName }
+}
+
 class IrqlMaxAnnotation extends IrqlTypeDefinition {
   IrqlMaxAnnotation() { this.getMacroName().matches("_IRQL_requires_max_") }
+}
+
+class IrqlRaisesAnnotation extends IrqlTypeDefinition {
+  IrqlRaisesAnnotation() { this.getMacroName().matches("_IRQL_raises_") }
 }
 
 class IrqlMinAnnotation extends IrqlTypeDefinition {
@@ -90,7 +109,7 @@ class IrqlAnnotatedFunction extends Function {
 
   private string getLevel() { result = irqlAnnotation.getIrqlLevelFull() }
 
-  string getFuncIrqlName() { result = irqlAnnotation.getIrqlMacroName() }
+  string getFuncIrqlAnnotation() { result = irqlAnnotation.getIrqlMacroName() }
 
   /**
    * Needs to include other levels too. From MSDN doc: Very few functions have both an upper bound other than DISPATCH_LEVEL and a lower bound other than PASSIVE_LEVEL.
@@ -113,6 +132,21 @@ class IrqlAnnotatedFunction extends Function {
   }
 }
 
+/** Represents a function that changes the IRQL. */
+abstract class IrqlChangesFunction extends IrqlAnnotatedFunction { }
+
+/** Represents a function that is explicitly annotated to not change the IRQL. */
+class IrqlRequiresSameAnnotatedFunction extends Function {
+  IrqlSameAnnotation irqlAnnotation;
+
+  IrqlRequiresSameAnnotatedFunction() {
+    exists(FunctionDeclarationEntry fde |
+      fde = this.getADeclarationEntry() and
+      irqlAnnotation.getDeclarationEntry() = fde
+    )
+  }
+}
+
 class IrqlRequiresAnnotatedFunction extends IrqlAnnotatedFunction {
   IrqlRequiresAnnotatedFunction() { irqlAnnotation instanceof IrqlRequiresAnnotation }
 }
@@ -123,6 +157,10 @@ class IrqlMaxAnnotatedFunction extends IrqlAnnotatedFunction {
 
 class IrqlMinAnnotatedFunction extends IrqlAnnotatedFunction {
   IrqlMinAnnotatedFunction() { irqlAnnotation instanceof IrqlMinAnnotation }
+}
+
+class IrqlRaisesAnnotatedFunction extends IrqlAnnotatedFunction, IrqlChangesFunction  {
+  IrqlRaisesAnnotatedFunction() { irqlAnnotation instanceof IrqlRaisesAnnotation }
 }
 
 //Evaluates to true if a FunctionCall at some points calls Irql annotated Function in its call hierarchy
