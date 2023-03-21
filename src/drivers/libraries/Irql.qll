@@ -10,7 +10,7 @@ class IrqlTypeDefinition extends SALAnnotation {
   //IRQL Annotation Types
   IrqlTypeDefinition() {
     //Needs to include other function and parameter annotations too
-    this.getMacroName().matches(["_IRQL_requires_"]) and
+    this.getMacroName().matches(["_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_"]) and
     irqlAnnotationName = this.getMacroName() and
     exists(MacroInvocation mi |
       mi.getParentInvocation() = this and
@@ -21,6 +21,18 @@ class IrqlTypeDefinition extends SALAnnotation {
   string getIrqlLevelFull() { result = irqlLevel }
 
   string getIrqlMacroName() { result = irqlAnnotationName }
+}
+
+class IrqlMaxAnnotation extends IrqlTypeDefinition {
+  IrqlMaxAnnotation() { this.getMacroName().matches("_IRQL_requires_max_") }
+}
+
+class IrqlMinAnnotation extends IrqlTypeDefinition {
+  IrqlMinAnnotation() { this.getMacroName().matches("_IRQL_requires_min_") }
+}
+
+class IrqlRequiresAnnotation extends IrqlTypeDefinition {
+  IrqlRequiresAnnotation() { this.getMacroName().matches("_IRQL_requires_") }
 }
 
 /**
@@ -44,9 +56,7 @@ class IrqlParameterAnnotation extends SALAnnotation {
  * question contains an IRQL value that the system will be set to.
  */
 class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
-  IrqlRestoreAnnotation() {
-    this.getMacroName().matches(["_IRQL_restores_"])
-  }
+  IrqlRestoreAnnotation() { this.getMacroName().matches(["_IRQL_restores_"]) }
 }
 
 /**
@@ -54,9 +64,7 @@ class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
  * question will have the current IRQL saved to it.
  */
 class IrqlSaveAnnotation extends IrqlParameterAnnotation {
-  IrqlSaveAnnotation() {
-    this.getMacroName().matches(["_IRQL_saves_"])
-  }
+  IrqlSaveAnnotation() { this.getMacroName().matches(["_IRQL_saves_"]) }
 }
 
 /** Represents a parameter that is annotated with "\_IRQL\_restores\_". */
@@ -69,23 +77,20 @@ class IrqlSaveParameter extends Parameter {
   IrqlSaveParameter() { exists(IrqlSaveAnnotation isa | isa.getDeclaration() = this) }
 }
 
-//Represents Irql annotationed functions.
+/** Represents a function that is annotated with "\_IRQL_requires_\", etc. */
 class IrqlAnnotatedFunction extends Function {
-  string funcIrqlLevel;
-  string funcIrqlAnnotationName;
+  IrqlTypeDefinition irqlAnnotation;
 
   IrqlAnnotatedFunction() {
-    exists(IrqlTypeDefinition itd, FunctionDeclarationEntry fde |
+    exists(FunctionDeclarationEntry fde |
       fde = this.getADeclarationEntry() and
-      itd.getDeclarationEntry() = fde and
-      funcIrqlLevel = itd.getIrqlLevelFull() and
-      funcIrqlAnnotationName = itd.getIrqlMacroName()
+      irqlAnnotation.getDeclarationEntry() = fde
     )
   }
 
-  private string getLevel() { result = funcIrqlLevel }
+  private string getLevel() { result = irqlAnnotation.getIrqlLevelFull() }
 
-  string getFuncIrqlName() { result = funcIrqlAnnotationName }
+  string getFuncIrqlName() { result = irqlAnnotation.getIrqlMacroName() }
 
   /**
    * Needs to include other levels too. From MSDN doc: Very few functions have both an upper bound other than DISPATCH_LEVEL and a lower bound other than PASSIVE_LEVEL.
@@ -98,8 +103,26 @@ class IrqlAnnotatedFunction extends Function {
     else
       if getLevel().matches("%APC_LEVEL%")
       then result = 1
-      else result = 2
+      else
+        if getLevel().matches("%DISPATCH_LEVEL%")
+        then result = 2
+        else
+          if getLevel().matches("%HIGH_LEVEL%")
+          then result = 15
+          else result = 3
   }
+}
+
+class IrqlRequiresAnnotatedFunction extends IrqlAnnotatedFunction {
+  IrqlRequiresAnnotatedFunction() { irqlAnnotation instanceof IrqlRequiresAnnotation }
+}
+
+class IrqlMaxAnnotatedFunction extends IrqlAnnotatedFunction {
+  IrqlMaxAnnotatedFunction() { irqlAnnotation instanceof IrqlMaxAnnotation }
+}
+
+class IrqlMinAnnotatedFunction extends IrqlAnnotatedFunction {
+  IrqlMinAnnotatedFunction() { irqlAnnotation instanceof IrqlMinAnnotation }
 }
 
 //Evaluates to true if a FunctionCall at some points calls Irql annotated Function in its call hierarchy
