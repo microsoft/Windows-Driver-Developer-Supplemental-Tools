@@ -13,14 +13,28 @@
  */
 
 import cpp
-import drivers.libraries.Page
+
+cached
+class PagedCodeMacro extends Macro {
+  cached
+  PagedCodeMacro() { this.getName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"] }
+}
+
+class PagedCodeMacroInvocationGeneral extends MacroInvocation {
+  cached
+  PagedCodeMacroInvocationGeneral() { this.getMacro() instanceof PagedCodeMacro }
+}
+
+class PagedCodeMacroInvocation extends PagedCodeMacroInvocationGeneral {
+  cached
+  PagedCodeMacroInvocation() { not exists(this.getParentInvocation()) }
+}
 
 //Selects routines with two at least two PAGE_CODE invocations inside one function
-from MacroInvocation mi, MacroInvocation mi2
+from PagedCodeMacroInvocation mi, PagedCodeMacroInvocation mi2, Function f
 where
   mi.getEnclosingFunction() = mi2.getEnclosingFunction() and
-  mi.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"] and
-  mi2.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"] and
   mi.getLocation().getStartLine() < mi2.getLocation().getStartLine()
 select mi2,
-  "Functions in a paged section must have exactly one instance of the PAGED_CODE or PAGED_CODE_LOCKED macro"
+  "Functions in a paged section must have exactly one instance of the PAGED_CODE or PAGED_CODE_LOCKED macro.  First instance: $@, second instance: $@",
+  mi, mi.getMacroName(), mi2, mi2.getMacroName()

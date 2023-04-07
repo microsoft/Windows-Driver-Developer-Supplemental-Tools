@@ -18,6 +18,11 @@ DRIVER_DISPATCH DispatchShutdown;
 #pragma alloc_text (PAGE, DispatchShutdown)
 #endif
 
+#define HIDDEN_PAGED_CALL() PAGED_CODE()
+
+#define HIDDEN_PAGED_INNER() PAGED_CODE()
+
+#define HIDDEN_PAGED_OUTER() HIDDEN_PAGED_INNER()
 
 //Template
 void top_level_call(){
@@ -51,6 +56,41 @@ DispatchShutdown (
     
     return STATUS_SUCCESS;
 }
+
+
+//Fails 2
+NTSTATUS
+FailCase2(
+    PDEVICE_OBJECT DriverObject,
+    PIRP Irp
+    )
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
+    HIDDEN_PAGED_CALL();
+    
+    return STATUS_SUCCESS;
+}
+
+
+
+//Fails 3?
+NTSTATUS
+FailCase3(
+    PDEVICE_OBJECT DriverObject,
+    PIRP Irp
+    )
+{
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(Irp);
+    PAGED_CODE();
+    HIDDEN_PAGED_OUTER();
+    
+    return STATUS_SUCCESS;
+}
+
+
 
 
 
