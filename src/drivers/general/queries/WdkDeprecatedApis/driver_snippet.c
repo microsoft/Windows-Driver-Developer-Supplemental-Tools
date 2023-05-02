@@ -20,3 +20,12 @@ VOID WdkDeprecatedApi_Fail()
 {
     ExAllocatePool(POOL_FLAG_NON_PAGED, sizeof(int));
 }
+
+// Failing case: call a macro invocation of an obsolete API
+VOID WdkDeprecatedApi_Fail2()
+{
+#ifndef ExAllocatePoolWithTag(a, b, c)
+#define ExAllocatePoolWithTag(a, b, c) ExAllocatePool(a, b)
+#endif
+    ExAllocatePoolWithTag(POOL_FLAG_NON_PAGED, sizeof(int), '_gaT');
+}
