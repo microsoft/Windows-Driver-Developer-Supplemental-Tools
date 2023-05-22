@@ -8,36 +8,39 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.6",
         "rules" : [ {
-          "id" : "cpp/windows/wdk/deprecated-api",
-          "name" : "cpp/windows/wdk/deprecated-api",
+          "id" : "cpp/windows/drivers/queries/init-not-cleared",
+          "name" : "cpp/windows/drivers/queries/init-not-cleared",
           "shortDescription" : {
-            "text" : "Use of deprecated WDK API"
+            "text" : "Failure to clear DO_DEVICE_INITIALIZING (C28152)"
           },
           "fullDescription" : {
-            "text" : "Use of deprecated WDK API detected."
+            "text" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "description" : "Use of deprecated WDK API detected.",
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/wdk/deprecated-api",
-            "impact" : "Attack Surface Reduction",
+            "id" : "cpp/windows/drivers/queries/init-not-cleared",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "Use of deprecated WDK API",
+            "name" : "Failure to clear DO_DEVICE_INITIALIZING (C28152)",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
+            "precision" : "medium",
             "problem.severity" : "warning",
-            "query-version" : "1.3",
-            "repro.text" : "The following code locations contain calls to a deprecated WDK API",
+            "query-version" : "v1",
+            "repro.text" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+60d1aca7624cfa2ad3b9c3a3e79096f21d59d977",
+        "semanticVersion" : "0.1.0+71ba680b6e5f964dc8fb3089b463d866e91d57d5",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -73,14 +76,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/wdk/deprecated-api",
+      "ruleId" : "cpp/windows/drivers/queries/init-not-cleared",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/wdk/deprecated-api",
+        "id" : "cpp/windows/drivers/queries/init-not-cleared",
         "index" : 0
       },
       "message" : {
-        "text" : "Using deprecated API 'ExAllocatePoolWithTag'. Replacement function: ExAllocatePool2. For downlevel code, use ExAllocatePoolZero or ExAllocatePoolUninitialized. Do not use `POOL_FLAG_UNINITIALIZED` flag when fixing. For details, please visit https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2\nUsing deprecated API 'ExAllocatePool'. Replacement function: ExAllocatePool2. For downlevel code, use ExAllocatePoolZero or ExAllocatePoolUninitialized. Do not use `POOL_FLAG_UNINITIALIZED` flag when fixing. For details, please visit https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2"
+        "text" : "The AddDevice routine [AddDevice_Fail2](1) does not clear the DO_DEVICE_INITIALIZING flag from the FDO it creates."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -90,25 +93,41 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 30,
-            "startColumn" : 5,
-            "endColumn" : 68
+            "startLine" : 95,
+            "endColumn" : 16
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "7fe183293afd1fdc:1",
+        "primaryLocationLineHash" : "18edb445adef0a0e:1",
         "primaryLocationStartColumnFingerprint" : "0"
-      }
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 95,
+            "endColumn" : 16
+          }
+        },
+        "message" : {
+          "text" : "AddDevice_Fail2"
+        }
+      } ]
     }, {
-      "ruleId" : "cpp/windows/wdk/deprecated-api",
+      "ruleId" : "cpp/windows/drivers/queries/init-not-cleared",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/wdk/deprecated-api",
+        "id" : "cpp/windows/drivers/queries/init-not-cleared",
         "index" : 0
       },
       "message" : {
-        "text" : "Using deprecated API 'ExAllocatePool'. Replacement function: ExAllocatePool2. For downlevel code, use ExAllocatePoolZero or ExAllocatePoolUninitialized. Do not use `POOL_FLAG_UNINITIALIZED` flag when fixing. For details, please visit https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2"
+        "text" : "The AddDevice routine [AddDevice_Fail1](1) does not clear the DO_DEVICE_INITIALIZING flag from the FDO it creates."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -118,16 +137,32 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 21,
-            "startColumn" : 5,
-            "endColumn" : 19
+            "startLine" : 69,
+            "endColumn" : 16
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "550333300fe9fc29:1",
+        "primaryLocationLineHash" : "ec8faa72edf45f79:1",
         "primaryLocationStartColumnFingerprint" : "0"
-      }
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 69,
+            "endColumn" : 16
+          }
+        },
+        "message" : {
+          "text" : "AddDevice_Fail1"
+        }
+      } ]
     } ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {

@@ -5,6 +5,8 @@
   from: microsoft/windows-drivers
 - include:
     query path: 
+      - drivers/general/experimental/DefaultPoolTagExtended/DefaultPoolTagExtended.ql
+      - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
       - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
       - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
@@ -15,6 +17,9 @@
       - drivers/wdm/experimental/IrqTooLow/IrqTooLow.ql
       - drivers/wdm/queries/ExaminedValue/ExaminedValue.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
+      - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
+      - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
+      - drivers/wdm/queries/InitNotCleared/InitNotCleared.ql
       - drivers/wdm/queries/KeWaitLocal/KeWaitLocal.ql
       - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
       - drivers/wdm/queries/NoPagedCode/NoPagedCode.ql
