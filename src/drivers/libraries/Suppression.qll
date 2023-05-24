@@ -1,32 +1,74 @@
 import cpp
 
 // Reference: https://learn.microsoft.com/en-us/cpp/preprocessor/warning?view=msvc-170
-
 //TODO: Support pragmas that combine disable, suppress, etc. in a single line
 //TODO: Support LGTM-style comment suppression?
 //TODO: Improve performance
+abstract class CASuppression extends PreprocessorPragma {
 
-class SuppressPragma extends PreprocessorPragma {
+  abstract predicate matchesRuleName(string name);
+
+  abstract string getRuleName();
+
+  abstract predicate appliesToLocation(Location l);
+
+  CASuppressionScope getScope() { result = this }
+
+  string makeLgtmName() {
+    if this.getRuleName() = any(["__WARNING_BANNED_API_USAGE", "28736"])
+    then result = "lgtm[cpp/windows/drivers/queries/extended-deprecated-apis]"
+    else result = "lgtm" + this.getRuleName()
+  }
+}
+
+class CASuppressionScope extends ElementBase instanceof CASuppression {
+  predicate hasLocationInfo(
+    string filepath, int startline, int startcolumn, int endline, int endcolumn
+  ) {
+    exists(Location l |
+      l.getFile().getAbsolutePath() = filepath and
+      l.getStartLine() = startline and
+      l.getStartColumn() = startcolumn and
+      l.getEndLine() = endline and
+      l.getEndColumn() = endcolumn and
+      super.appliesToLocation(l)
+    )
+  }
+}
+
+class SuppressPragma extends CASuppression {
   string suppressedRule;
 
   //TODO: Support #pragma warning(suppress:28104 28161 6001 6101) - i.e. multiple suppresses in one line
+  // Would an any() construct work here? Like any (string s, int i | .regexcapture(i))
   SuppressPragma() {
     suppressedRule =
-      this.getHead()
-          .regexpCapture("prefast\\(\\s*suppress\\s*:\\s*([\\d\\w]+)[\\s\\d\\w\\W]*\\)", 1) or
-    suppressedRule =
-      this.getHead()
-          .regexpCapture("warning\\(\\s*suppress\\s*:\\s*([\\d\\w]+)[\\s\\d\\w\\W]*\\)", 1)
+      any(string s |
+        exists(int n |
+          s =
+            this.getHead()
+                .regexpCapture("prefast\\(\\s*suppress\\s*:\\s*([\\d\\w]+)[\\s\\d\\w\\W]*\\)", n)
+          or
+          suppressedRule =
+            this.getHead()
+                .regexpCapture("warning\\(\\s*suppress\\s*:\\s*([\\d\\w]+)[\\s\\d\\w\\W]*\\)", n)
+        )
+      )
   }
 
   pragma[inline]
-  predicate matchesRuleName(string name) { name = suppressedRule }
+  override predicate matchesRuleName(string name) { name = suppressedRule }
 
   pragma[inline]
-  string getRuleName() { result = suppressedRule }
+  override string getRuleName() { result = suppressedRule }
+
+  override predicate appliesToLocation(Location l) {
+    this.getFile() = l.getFile() and
+    this.getLocation().getEndLine() + 1 = l.getStartLine()
+  }
 }
 
-class DisablePragma extends PreprocessorPragma {
+class DisablePragma extends CASuppression {
   string disabledRule;
 
   DisablePragma() {
@@ -37,13 +79,13 @@ class DisablePragma extends PreprocessorPragma {
   }
 
   pragma[inline]
-  predicate matchesRuleName(string name) { name = disabledRule }
+  override predicate matchesRuleName(string name) { name = disabledRule }
 
   pragma[inline]
-  string getRuleName() { result = disabledRule }
+  override string getRuleName() { result = disabledRule }
 
   pragma[inline]
-  predicate appliesToLocation(Location l) {
+  override predicate appliesToLocation(Location l) {
     this.getFile() = l.getFile() and
     this.getLocation().getEndLine() >= l.getStartLine() and
     exists(SuppressionPushPopSegment spps |
