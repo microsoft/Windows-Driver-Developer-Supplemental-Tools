@@ -5,7 +5,6 @@ import cpp
 //TODO: Support LGTM-style comment suppression?
 //TODO: Improve performance
 abstract class CASuppression extends PreprocessorPragma {
-
   abstract predicate matchesRuleName(string name);
 
   abstract string getRuleName();
@@ -15,9 +14,70 @@ abstract class CASuppression extends PreprocessorPragma {
   CASuppressionScope getScope() { result = this }
 
   string makeLgtmName() {
-    if this.getRuleName() = any(["__WARNING_BANNED_API_USAGE", "28736"])
-    then result = "lgtm[cpp/windows/drivers/queries/extended-deprecated-apis]"
-    else result = "lgtm" + this.getRuleName()
+    this.getRuleName() = any(["__WARNING_BANNED_API_USAGE", "28736"]) and
+    result = "lgtm[cpp/windows/drivers/queries/extended-deprecated-apis]"
+    or
+    this.getRuleName() = any(["__WARNING_UNHELPFUL_TAG", "28147"]) and
+    result = any(["lgtm[cpp/windows/drivers/queries/default-pool-tag]", "lgtm[cpp/windows/drivers/queries/default-pool-tag-extended]"])
+    or
+    this.getRuleName() = any(["__WARNING_IRQL_NOT_SET", "28158"]) and
+    result = "lgtm[cpp/drivers/irql-not-saved]"
+    or
+    this.getRuleName() = any(["__WARNING_IRQL_NOT_USED", "28157"]) and
+    result = "lgtm[cpp/drivers/irql-not-used]"
+    or
+    this.getRuleName() = any(["__WARNING_POOL_TAG", "28134"]) and
+    result = "lgtm[cpp/windows/drivers/queries/pool-tag-integral]"
+    or
+    this.getRuleName() = any(["__WARNING_STRSAFE_H", "28146"]) and
+    result = "lgtm[cpp/portedqueries/str-safe]"
+    or
+    this.getRuleName() = any(["__WARNING_MUST_USE", "28193"]) and
+    result = "lgtm[cpp/portedqueries/examined-value]"
+    or
+    this.getRuleName() = any(["__WARNING_IRQ_TOO_LOW", "28120"]) and
+    result = "lgtm[cpp/portedqueries/irq-too-low]"
+    or
+    this.getRuleName() = any(["__WARNING_IRQ_TOO_HIGH", "28121"]) and
+    result = "lgtm[cpp/portedqueries/irq-too-high]"
+    or
+    this.getRuleName() = any(["__WARNING_FUNCTION_ASSIGNMENT", "28128"]) and
+    result = "lgtm[cpp/windows/drivers/queries/illegal-field-access]"
+    or
+    this.getRuleName() = any(["__WARNING_INACCESSIBLE_MEMBER", "28175"]) and
+    result = "lgtm[cpp/windows/drivers/queries/illegal-field-access-2]"
+    or
+    this.getRuleName() = any(["__WARNING_READ_ONLY_MEMBER", "28176"]) and
+    result = "lgtm[cpp/windows/drivers/queries/illegal-field-write]"
+    or
+    this.getRuleName() = any(["__WARNING_INIT_NOT_CLEARED", "28152"]) and
+    result = "lgtm[cpp/windows/drivers/queries/init-not-cleared]"
+    or
+    this.getRuleName() = any(["__WARNING_KE_WAIT_LOCAL", "28135"]) and
+    result = "lgtm[cpp/drivers/kewaitlocal-requires-kernel-mode]"
+    or
+    this.getRuleName() = any(["__WARNING_MULTIPLE_PAGED_CODE", "28171"]) and
+    result = "lgtm[cpp/portedqueries/multiple-paged-code]"
+    or
+    this.getRuleName() = any(["__WARNING_NO_PAGED_CODE", "28170"]) and
+    result = "lgtm[cpp/portedqueries/no-paged-code]"
+    or
+    this.getRuleName() = any(["__WARNING_NO_PAGING_SEGMENT", "28172"]) and
+    result = "lgtm[cpp/portedqueries/no-paging-segment]"
+    or
+    this.getRuleName() = any(["__WARNING_OBJ_REFERENCE_MODE", "28126"]) and
+    result = "lgtm[cpp/windows/drivers/queries/ob-reference-mode]"
+    or
+    this.getRuleName() = any(["__WARNING_MODIFYING_MDL", "28145"]) and
+    result = "lgtm[cpp/windows/drivers/queries/opaquemdlwrite]"
+    or
+    this.getRuleName() = any(["__WARNING_PENDING_STATUS_ERROR", "28143"]) and
+    result = "lgtm[cpp/portedqueries/pending-status-error]"
+    or
+    this.getRuleName() = any(["__WARNING_DISPATCH_MISMATCH", "28168", "__WARNING_DISPATCH_MISSING", "28169"]) and
+    result = "lgtm[cpp/portedqueries/wrong-dispatch-table-assignment]"
+    or
+    result = "lgtm[" + this.getRuleName() + "]"
   }
 }
 
