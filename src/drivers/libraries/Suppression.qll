@@ -14,11 +14,23 @@ abstract class CASuppression extends PreprocessorPragma {
   CASuppressionScope getScope() { result = this }
 
   string makeLgtmName() {
-    this.getRuleName() = any(["__WARNING_BANNED_API_USAGE", "28736"]) and
+    this.getRuleName() =
+      any([
+            "__WARNING_BANNED_API_USAGE", "28719",
+            "__WARNING_BANNED_LEGACY_INSTRUMENTATION_API_USAGE",
+            "__WARNING_BANNED_CRIMSON_API_USAGE", "28735", "__WARNING_BANNED_API_USAGEL2", "28726",
+            "__WARNING_BANNED_API_USAGE_LSTRLEN", "28750"
+          ]
+      ) and
     result = "lgtm[cpp/windows/drivers/queries/extended-deprecated-apis]"
     or
     this.getRuleName() = any(["__WARNING_UNHELPFUL_TAG", "28147"]) and
-    result = any(["lgtm[cpp/windows/drivers/queries/default-pool-tag]", "lgtm[cpp/windows/drivers/queries/default-pool-tag-extended]"])
+    result =
+      any([
+            "lgtm[cpp/windows/drivers/queries/default-pool-tag]",
+            "lgtm[cpp/windows/drivers/queries/default-pool-tag-extended]"
+          ]
+      )
     or
     this.getRuleName() = any(["__WARNING_IRQL_NOT_SET", "28158"]) and
     result = "lgtm[cpp/drivers/irql-not-saved]"
@@ -74,7 +86,8 @@ abstract class CASuppression extends PreprocessorPragma {
     this.getRuleName() = any(["__WARNING_PENDING_STATUS_ERROR", "28143"]) and
     result = "lgtm[cpp/portedqueries/pending-status-error]"
     or
-    this.getRuleName() = any(["__WARNING_DISPATCH_MISMATCH", "28168", "__WARNING_DISPATCH_MISSING", "28169"]) and
+    this.getRuleName() =
+      any(["__WARNING_DISPATCH_MISMATCH", "28168", "__WARNING_DISPATCH_MISSING", "28169"]) and
     result = "lgtm[cpp/portedqueries/wrong-dispatch-table-assignment]"
     or
     result = "lgtm[" + this.getRuleName() + "]"
@@ -92,6 +105,8 @@ class CASuppressionScope extends ElementBase instanceof CASuppression {
       l.getEndLine() = endline and
       l.getEndColumn() = endcolumn and
       super.appliesToLocation(l)
+      // Gotta handle the case where multiple suppressions are stacked.
+      // There's something here with an n-1, recursion situation I feel...
     )
   }
 }
