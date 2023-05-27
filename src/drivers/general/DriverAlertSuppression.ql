@@ -1,12 +1,11 @@
 /**
- * @name Alert suppression
- * @description Generates information about alert suppressions.
+ * @name Driver alert suppression
+ * @description Suppresses alerts in Windows Drivers based on Code Analysis syntax.
  * @kind alert-suppression
- * @id cpp/alert-suppression
+ * @id cpp/windows/drivers/driver-alert-suppression
  */
 
 private import drivers.libraries.Suppression
-private import semmle.code.cpp.Element
 
 from CASuppression cas, string text, string annotation, CASuppressionScope cass
 where

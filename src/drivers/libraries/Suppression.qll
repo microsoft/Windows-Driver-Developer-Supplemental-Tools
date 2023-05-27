@@ -3,16 +3,20 @@ import cpp
 // Reference: https://learn.microsoft.com/en-us/cpp/preprocessor/warning?view=msvc-170
 //TODO: Support pragmas that combine disable, suppress, etc. in a single line
 //TODO: Support LGTM-style comment suppression?
-//TODO: Improve performance
+/** Represents a Code Analysis-style suppression using #pragma commands. */
 abstract class CASuppression extends PreprocessorPragma {
   abstract predicate matchesRuleName(string name);
 
+  /** Returns the rule name that was provided in the suppression. */
   abstract string getRuleName();
 
+  /** Evaluates if the given location is suppressed by this suppression. */
   abstract predicate appliesToLocation(Location l);
 
+  /** Returns the scope covered by this suppression. */
   CASuppressionScope getScope() { result = this }
 
+  /** Given the CA rule ID or warning from a suppression or disable pragma, creates an LGTM-style suppression. */
   string makeLgtmName() {
     this.getRuleName() =
       any([
@@ -94,6 +98,7 @@ abstract class CASuppression extends PreprocessorPragma {
   }
 }
 
+/** Represents the scope covered by a given CA supression. */
 class CASuppressionScope extends ElementBase instanceof CASuppression {
   predicate hasLocationInfo(
     string filepath, int startline, int startcolumn, int endline, int endcolumn
@@ -105,17 +110,18 @@ class CASuppressionScope extends ElementBase instanceof CASuppression {
       l.getEndLine() = endline and
       l.getEndColumn() = endcolumn and
       super.appliesToLocation(l)
-      // Gotta handle the case where multiple suppressions are stacked.
-      // There's something here with an n-1, recursion situation I feel...
     )
   }
 }
 
+/**
+ * Represents a #pragma warning(suppress:) statement, which suppresses a given warning on the following
+ * line of actual code.
+ */
 class SuppressPragma extends CASuppression {
   string suppressedRule;
 
-  //TODO: Support #pragma warning(suppress:28104 28161 6001 6101) - i.e. multiple suppresses in one line
-  // Would an any() construct work here? Like any (string s, int i | .regexcapture(i))
+  // TODO: Support #pragma warning(suppress:28104 28161 6001 6101) - i.e. multiple suppresses in one line
   SuppressPragma() {
     suppressedRule =
       any(string s |
@@ -140,12 +146,18 @@ class SuppressPragma extends CASuppression {
   override predicate appliesToLocation(Location l) {
     this.getFile() = l.getFile() and
     this.getLocation().getEndLine() + 1 = l.getStartLine()
+    // TODO: Support case where multiple suppressions are stacked on consecutive lines
   }
 }
 
+/**
+ * Represents a #pragma warning(disable:) statement, which suppresses the given warning indefinitely
+ * until the pragma state is pushed or popped, or until an enable statement is used (enable not yet implemented).
+ */
 class DisablePragma extends CASuppression {
   string disabledRule;
 
+  // TODO: Support #pragma warning(disable:28104 28161 6001 6101) - i.e. multiple rules disabled in one line
   DisablePragma() {
     disabledRule =
       this.getHead().regexpCapture("warning\\s*\\(\\s*disable\\s*:\\s*([\\d\\w]+)\\s*\\)", 1) or
@@ -162,23 +174,43 @@ class DisablePragma extends CASuppression {
   pragma[inline]
   override predicate appliesToLocation(Location l) {
     this.getFile() = l.getFile() and
-    this.getLocation().getEndLine() >= l.getStartLine() and
+    this.getLocation().getEndLine() <= l.getStartLine() and
+    // If we're in a pragma push/pop, ensure the disable is too
     exists(SuppressionPushPopSegment spps |
       spps.getADisablePragma() = this and
       spps.isInPushPopSegment(l)
     )
+    // TODO: Handle case where the disable is outside push/pop
   }
 }
 
-//TODO: Support prefast(push) and prefast(pop) (and distinguish between warning/prefast?)
+/** Represents a pragma push statement. */
 class SuppressionPushPragma extends PreprocessorPragma {
-  SuppressionPushPragma() { this.getHead().matches("warning(push)") }
+  boolean isWarning;
+
+  SuppressionPushPragma() {
+    this.getHead().matches("warning(push)") and isWarning = true
+    or
+    this.getHead().matches("prefast(push)") and isWarning = false
+  }
+
+  boolean getIsWarning() { result = isWarning }
 }
 
+/** Represents a pragma pop statement. */
 class SuppressionPopPragma extends PreprocessorPragma {
-  SuppressionPopPragma() { this.getHead().matches("warning(pop)") }
+  boolean isWarning;
+
+  SuppressionPopPragma() {
+    this.getHead().matches("warning(pop)") and isWarning = true
+    or
+    this.getHead().matches("prefast(pop)") and isWarning = false
+  }
+
+  boolean getIsWarning() { result = isWarning }
 }
 
+/** Represents an area surrounded by pragma push/pops. */
 class SuppressionPushPopSegment extends Location {
   SuppressionPushPragma push;
   SuppressionPopPragma pop;
@@ -191,13 +223,16 @@ class SuppressionPushPopSegment extends Location {
     pop.getLocation() = end and
     pop.getFile() = push.getFile() and
     pop.getLocation().getStartLine() >= push.getLocation().getEndLine() and
+    pop.getIsWarning() = push.getIsWarning() and
     not exists(SuppressionPopPragma closerPop |
       closerPop.getFile() = push.getFile() and
       closerPop.getLocation().getStartLine() >= push.getLocation().getEndLine() and
-      closerPop.getLocation().getEndLine() < pop.getLocation().getStartLine()
+      closerPop.getLocation().getEndLine() < pop.getLocation().getStartLine() and
+      closerPop.getIsWarning() = push.getIsWarning()
     )
   }
 
+  /** Determines if a given location is in this push/pop segment. */
   pragma[inline]
   predicate isInPushPopSegment(Location l) {
     l.getFile() = this.getFile() and
@@ -205,40 +240,9 @@ class SuppressionPushPopSegment extends Location {
     l.getEndLine() <= end.getStartLine()
   }
 
+  /** Returns a disable pragma within this push/pop segment. */
   cached
   DisablePragma getADisablePragma() {
     result = any(DisablePragma p | this.isInPushPopSegment(p.getLocation()))
   }
-}
-
-predicate fastHasSpecificSuppressionPragma(Location l, string rule) {
-  // Is the rule suppressed by a one-line suppression?
-  exists(SuppressPragma p |
-    p.getFile() = l.getFile() and
-    p.matchesRuleName(rule) and
-    p.getLocation().getEndLine() + 1 = l.getStartLine()
-  )
-  or
-  // Is the rule suppressed by a disable statement?
-  fastHasSpecificSuppressionPragma_aux(any(DisablePragma p |
-      l.getFile() = p.getFile() and p.matchesRuleName(rule)
-    ), l)
-}
-
-predicate fastHasSpecificSuppressionPragma_aux(DisablePragma p, Location l) {
-  p.getLocation().getEndLine() <= l.getStartLine() and
-  (
-    exists(SuppressionPushPopSegment spps |
-      spps.getFile() = p.getFile() and
-      spps.isInPushPopSegment(l) and
-      spps.getADisablePragma() = p
-    )
-    or
-    noContainingPushPopSegment(p)
-  )
-}
-
-pragma[noinline]
-predicate noContainingPushPopSegment(DisablePragma p) {
-  not any(SuppressionPushPopSegment spps | spps.getFile() = p.getFile()).getADisablePragma() = p
 }

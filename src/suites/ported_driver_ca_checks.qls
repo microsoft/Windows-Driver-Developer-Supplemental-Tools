@@ -5,7 +5,6 @@
   from: microsoft/windows-drivers
 - include:
     query path: 
-      - drivers/general/AlertSuppression.ql
       - drivers/general/experimental/DefaultPoolTagExtended/DefaultPoolTagExtended.ql
       - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
       - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
