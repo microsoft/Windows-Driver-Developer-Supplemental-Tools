@@ -7,9 +7,9 @@
 
 private import drivers.libraries.Suppression
 
-from CASuppression cas, string text, string annotation, CASuppressionScope cass
+from CASuppression cas, string text, string annotation, CASuppressionScope scope
 where
   text = cas.toString() and // text of suppression comment (excluding delimiters)
   annotation = cas.makeLgtmName() // text of suppression annotation
-  and cas.getScope() = cass // scope of suppression
-select cas, text, annotation, cass
+  and cas.getScope() = scope // scope of suppression
+select cas, text, annotation, scope

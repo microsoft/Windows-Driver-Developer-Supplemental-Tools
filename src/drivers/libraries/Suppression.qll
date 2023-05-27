@@ -189,9 +189,9 @@ class SuppressionPushPragma extends PreprocessorPragma {
   boolean isWarning;
 
   SuppressionPushPragma() {
-    this.getHead().matches("warning(push)") and isWarning = true
+    this.getHead().regexpMatch("warning\\s*\\(\\s*push\\s*\\)") and isWarning = true
     or
-    this.getHead().matches("prefast(push)") and isWarning = false
+    this.getHead().regexpMatch("prefast\\s*\\(\\s*push\\s*\\)") and isWarning = false
   }
 
   boolean getIsWarning() { result = isWarning }
@@ -202,9 +202,9 @@ class SuppressionPopPragma extends PreprocessorPragma {
   boolean isWarning;
 
   SuppressionPopPragma() {
-    this.getHead().matches("warning(pop)") and isWarning = true
+    this.getHead().regexpMatch("warning\\s*\\(\\s*pop\\s*\\)") and isWarning = true
     or
-    this.getHead().matches("prefast(pop)") and isWarning = false
+    this.getHead().regexpMatch("prefast\\s*\\(\\s*pop\\s*\\)") and isWarning = false
   }
 
   boolean getIsWarning() { result = isWarning }
