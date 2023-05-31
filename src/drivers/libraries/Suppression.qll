@@ -142,13 +142,15 @@ class SuppressPragma extends CASuppression {
   pragma[inline]
   override string getRuleName() { result = suppressedRule }
 
+  pragma[nomagic]
   override predicate appliesToLocation(Location l) {
     this.getFile() = l.getFile() and
     this.getLocation().getEndLine() + this.getMinimumLocationOffset() = l.getStartLine()
   }
 
   /** Finds the offset (in line count) to the closest non-pragma element after this suppression. */
-  int getMinimumLocationOffset() {
+  pragma[nomagic]
+  cached int getMinimumLocationOffset() {
     result =
       min(int i |
         i > 0 and
