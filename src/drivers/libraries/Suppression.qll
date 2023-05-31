@@ -121,20 +121,19 @@ class CASuppressionScope extends ElementBase instanceof CASuppression {
 class SuppressPragma extends CASuppression {
   string suppressedRule;
 
-  // TODO: Support #pragma warning(suppress:28104 28161 6001 6101) - i.e. multiple suppresses in one line
   SuppressPragma() {
     suppressedRule =
       any(string s |
-        exists(int n |
           s =
             this.getHead()
-                .regexpCapture("prefast\\(\\s*suppress\\s*:\\s*([\\d\\w]+)[\\s\\d\\w\\W]*\\)", n)
+                .regexpCapture("prefast\\(\\s*suppress\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+                .splitAt(" ")
           or
-          suppressedRule =
+          s =
             this.getHead()
-                .regexpCapture("warning\\(\\s*suppress\\s*:\\s*([\\d\\w]+)[\\s\\d\\w\\W]*\\)", n)
+                .regexpCapture("warning\\(\\s*suppress\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+                .splitAt(" ")
         )
-      )
   }
 
   pragma[inline]
@@ -172,10 +171,17 @@ class DisablePragma extends CASuppression {
 
   // TODO: Support #pragma warning(disable:28104 28161 6001 6101) - i.e. multiple rules disabled in one line
   DisablePragma() {
-    disabledRule =
-      this.getHead().regexpCapture("warning\\s*\\(\\s*disable\\s*:\\s*([\\d\\w]+)\\s*\\)", 1) or
-    disabledRule =
-      this.getHead().regexpCapture("prefast\\s*\\(\\s*disable\\s*:\\s*([\\d\\w]+)\\s*\\)", 1)
+    disabledRule = any(string s |
+      s =
+        this.getHead()
+            .regexpCapture("prefast\\(\\s*disable\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+            .splitAt(" ")
+      or
+      s =
+        this.getHead()
+            .regexpCapture("warning\\(\\s*disable\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+            .splitAt(" ")
+    )
   }
 
   pragma[inline]
