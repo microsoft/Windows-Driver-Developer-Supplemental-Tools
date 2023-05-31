@@ -124,16 +124,16 @@ class SuppressPragma extends CASuppression {
   SuppressPragma() {
     suppressedRule =
       any(string s |
-          s =
-            this.getHead()
-                .regexpCapture("prefast\\(\\s*suppress\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
-                .splitAt(" ")
-          or
-          s =
-            this.getHead()
-                .regexpCapture("warning\\(\\s*suppress\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
-                .splitAt(" ")
-        )
+        s =
+          this.getHead()
+              .regexpCapture("prefast\\(\\s*suppress\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+              .splitAt(" ")
+        or
+        s =
+          this.getHead()
+              .regexpCapture("warning\\(\\s*suppress\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+              .splitAt(" ")
+      )
   }
 
   pragma[inline]
@@ -150,7 +150,8 @@ class SuppressPragma extends CASuppression {
 
   /** Finds the offset (in line count) to the closest non-pragma element after this suppression. */
   pragma[nomagic]
-  cached int getMinimumLocationOffset() {
+  cached
+  int getMinimumLocationOffset() {
     result =
       min(int i |
         i > 0 and
@@ -173,17 +174,18 @@ class DisablePragma extends CASuppression {
 
   // TODO: Support #pragma warning(disable:28104 28161 6001 6101) - i.e. multiple rules disabled in one line
   DisablePragma() {
-    disabledRule = any(string s |
-      s =
-        this.getHead()
-            .regexpCapture("prefast\\(\\s*disable\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
-            .splitAt(" ")
-      or
-      s =
-        this.getHead()
-            .regexpCapture("warning\\(\\s*disable\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
-            .splitAt(" ")
-    )
+    disabledRule =
+      any(string s |
+        s =
+          this.getHead()
+              .regexpCapture("prefast\\(\\s*disable\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+              .splitAt(" ")
+        or
+        s =
+          this.getHead()
+              .regexpCapture("warning\\(\\s*disable\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+              .splitAt(" ")
+      )
   }
 
   pragma[inline]
@@ -192,16 +194,20 @@ class DisablePragma extends CASuppression {
   pragma[inline]
   override string getRuleName() { result = disabledRule }
 
-  pragma[inline]
+  pragma[nomagic]
   override predicate appliesToLocation(Location l) {
     this.getFile() = l.getFile() and
     this.getLocation().getEndLine() <= l.getStartLine() and
     // If we're in a pragma push/pop, ensure the disable is too
-    exists(SuppressionPushPopSegment spps |
-      spps.getADisablePragma() = this and
-      spps.isInPushPopSegment(l)
+    (
+      exists(SuppressionPushPopSegment spps |
+        spps.getADisablePragma() = this and
+        spps.isInPushPopSegment(l)
+      )
+      or
+      not exists(SuppressionPushPopSegment spps | spps.getADisablePragma() = this) and
+      not exists(SuppressionPushPopSegment spps | spps.isInPushPopSegment(l))
     )
-    // TODO: Handle case where the disable is outside push/pop
   }
 }
 
