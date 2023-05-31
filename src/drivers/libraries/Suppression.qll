@@ -145,8 +145,21 @@ class SuppressPragma extends CASuppression {
 
   override predicate appliesToLocation(Location l) {
     this.getFile() = l.getFile() and
-    this.getLocation().getEndLine() + 1 = l.getStartLine()
-    // TODO: Support case where multiple suppressions are stacked on consecutive lines
+    this.getLocation().getEndLine() + this.getMinimumLocationOffset() = l.getStartLine()
+  }
+
+  /** Finds the offset (in line count) to the closest non-pragma element after this suppression. */
+  int getMinimumLocationOffset() {
+    result =
+      min(int i |
+        i > 0 and
+        exists(Locatable l |
+          l.getFile() = this.getFile() and
+          l.getLocation().getStartLine() > this.getLocation().getEndLine() and
+          not l instanceof CASuppression and
+          this.getLocation().getEndLine() + i = l.getLocation().getStartLine()
+        )
+      )
   }
 }
 

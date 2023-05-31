@@ -46,7 +46,7 @@ VOID AlertSuppressionTesting()
     strcpy(dst, src);
 #pragma prefast(suppress : 28719)
 #pragma prefast(suppress : 28720)
-    strcpy(dst, src); // BUG: Should be suppressed, isn't
+    strcpy(dst, src);
 #pragma prefast(suppress : 28720 28719)
     strcpy(dst, src); // BUG: Should be suppressed, isn't
 #pragma prefast(disable : 28719)
@@ -58,4 +58,8 @@ VOID AlertSuppressionTesting()
     strcpy(dst, src);
 #pragma prefast(pop)
     strcpy(dst, src); // BUG: Should be suppressed, isn't
+    
+#pragma prefast(suppress : 28719)
+
+    strcpy(dst, src);
 }
