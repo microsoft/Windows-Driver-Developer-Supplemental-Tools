@@ -34,32 +34,40 @@ VOID AlertSuppressionTesting()
     PSTR src = "Testing suppression";
     char dst[100];
 
-    strcpy(dst, src); // Unsuppressed
-
-#pragma prefast(suppress : 28719)
-    strcpy(dst, src);
-#pragma prefast(suppress : 28719, "Suppression with comment")
-    strcpy(dst, src); 
-#pragma prefast(suppress : __WARNING_BANNED_API_USAGE, "Suppression with name and comment")
-    strcpy(dst, src); 
-#pragma prefast(suppress : cpp/windows/drivers/queries/extended-deprecated-apis)
-    strcpy(dst, src);
-#pragma prefast(suppress : 28719)
-#pragma prefast(suppress : 28720)
-    strcpy(dst, src);
-#pragma prefast(suppress : 28720 28719)
-    strcpy(dst, src);
-#pragma prefast(disable : 28719)
-    strcpy(dst, src); 
-#pragma prefast(push)
     strcpy(dst, src); // Intentionally unsuppressed
 
-#pragma prefast(disable : 28719)
+#pragma prefast(suppress : 28719) // Suppress a single rule
     strcpy(dst, src);
-#pragma prefast(pop)
+
+#pragma prefast(suppress : 28719, "Suppression with comment") // Suppress a rule with rationale provided
     strcpy(dst, src); 
+
+#pragma prefast(suppress : __WARNING_BANNED_API_USAGE, "Suppression with name and comment") // Suppress a rule via legacy CA name
+    strcpy(dst, src); 
+
+#pragma prefast(suppress : cpp/windows/drivers/queries/extended-deprecated-apis) // Suppress a rule via CodeQL name
+    strcpy(dst, src);
     
-#pragma prefast(suppress : 28719)
+#pragma prefast(suppress : 28719) // Suppress a rule when there is whitespace between the pragma and the result
 
     strcpy(dst, src);
+
+#pragma prefast(suppress : 28719) // Suppress a rule when there is an additional suppression between the suppress pragma and the violating code
+#pragma prefast(suppress : 28720) 
+    strcpy(dst, src);
+
+#pragma prefast(suppress : 28720 28719) // Suppress multiple rules in a single command
+    strcpy(dst, src);
+
+#pragma prefast(disable : 28719) // Suppress a rule indefinitely until the stack is pushed
+    strcpy(dst, src); 
+
+#pragma prefast(push) // Push the pragma state onto the stack, nullifying the disable command
+    strcpy(dst, src); // Intentionally unsuppressed
+
+#pragma prefast(disable : 28719) // Apply a new disable command in this stack frame
+    strcpy(dst, src);
+
+#pragma prefast(pop) // Pop the pragma stack, re-applying the original disable pragma
+    strcpy(dst, src); 
 }
