@@ -7,8 +7,8 @@
  * This query is a suppression query designed to identify existing PREFast-style suppressions
  * in Windows driver code and honor them through LGTM's suppression system.  It cannot be run
  * on its own.  Instead, it should be run alongside other queries; when the code has a valid
- * suppression for a given result, the output of the run will indicate that the result was 
- * suppressed in the SARIF file.
+ * suppression for a given result, the SARIF file output by the run will
+ * indicate that the result was suppressed in the code.
  * 
  * Note that at this time, these suppressions are *not* taken into consideration during
  * WHCP certification by the Static Tools Logo test.
