@@ -121,17 +121,22 @@ class CASuppressionScope extends ElementBase instanceof CASuppression {
 class SuppressPragma extends CASuppression {
   string suppressedRule;
 
+  /** The characteristic predicate for a SuppressPragma relies on a regex that matches comments of the form:
+   * [prefast/warning](suppress:[rule IDs]{, "comment"}) where the {} contents are fully optional.
+   * Note that rule IDs can be in the form of raw numbers, or strings that may connect with dashes or underscores,
+   * and multiple rule IDs may be specified in a single suppression.
+   */
   SuppressPragma() {
     suppressedRule =
       any(string s |
         s =
           this.getHead()
-              .regexpCapture("prefast\\(\\s*suppress\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+              .regexpCapture("prefast\\(\\s*suppress\\s*:\\s*([\\d\\w\\s\\\\\\p{Pd}\\p{Pc}/]+)+(,?([\\s\\w\\d\\W\\p{P}]))*\\)", 1)
               .splitAt(" ")
         or
         s =
           this.getHead()
-              .regexpCapture("warning\\(\\s*suppress\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+              .regexpCapture("warning\\(\\s*suppress\\s*:\\s*([\\d\\w\\s\\\\\\p{Pd}\\p{Pc}/]+)+(,?([\\s\\w\\d\\W\\p{P}]))*\\)", 1)
               .splitAt(" ")
       )
   }
@@ -172,18 +177,17 @@ class SuppressPragma extends CASuppression {
 class DisablePragma extends CASuppression {
   string disabledRule;
 
-  // TODO: Support #pragma warning(disable:28104 28161 6001 6101) - i.e. multiple rules disabled in one line
   DisablePragma() {
     disabledRule =
       any(string s |
         s =
           this.getHead()
-              .regexpCapture("prefast\\(\\s*disable\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+              .regexpCapture("prefast\\(\\s*disable\\s*:\\s*([\\d\\w\\s\\\\\\p{Pd}\\p{Pc}/]+)+(,?([\\s\\w\\d\\W\\p{P}]))*\\)", 1)
               .splitAt(" ")
         or
         s =
           this.getHead()
-              .regexpCapture("warning\\(\\s*disable\\s*:\\s*([\\d\\w\\s]+)+\\)", 1)
+              .regexpCapture("warning\\(\\s*disable\\s*:\\s*([\\d\\w\\s\\\\\\p{Pd}\\p{Pc}/]+)+(,?([\\s\\w\\d\\W\\p{P}]))*\\)", 1)
               .splitAt(" ")
       )
   }

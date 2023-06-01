@@ -39,9 +39,9 @@ VOID AlertSuppressionTesting()
 #pragma prefast(suppress : 28719)
     strcpy(dst, src);
 #pragma prefast(suppress : 28719, "Suppression with comment")
-    strcpy(dst, src); // BUG: REGRESSION: Lost comment support in recent changes
+    strcpy(dst, src); 
 #pragma prefast(suppress : __WARNING_BANNED_API_USAGE, "Suppression with name and comment")
-    strcpy(dst, src); // BUG: REGRESSION: Lost word-based suppression in recent changes
+    strcpy(dst, src); 
 #pragma prefast(suppress : cpp/windows/drivers/queries/extended-deprecated-apis)
     strcpy(dst, src);
 #pragma prefast(suppress : 28719)
