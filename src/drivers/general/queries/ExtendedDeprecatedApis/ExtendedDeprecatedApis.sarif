@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.5",
+        "semanticVersion" : "2.11.6",
         "rules" : [ {
           "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
           "name" : "cpp/windows/drivers/queries/extended-deprecated-apis",
@@ -39,7 +39,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+10ae08b29e203859dc319a0a1eee2d7d87cd3f88",
+        "semanticVersion" : "0.1.0+94e5e84388d98059e0209f9933621a76c0dee7f1",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -99,7 +99,7 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "2ebae78f14622650:1",
+        "primaryLocationLineHash" : "82e29691df499d5d:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -127,7 +127,7 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "e3b86354faff5cc5:1",
+        "primaryLocationLineHash" : "a0f4009610bac07b:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -148,42 +148,14 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 42,
+            "startLine" : 43,
             "startColumn" : 5,
             "endColumn" : 11
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "ef6512d2da0af59c:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "strcpy is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: strcpy_s, StringCbCopy, StringCbCopyEx, StringCchCopy, StringCchCopyEx, strlcpy."
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 44,
-            "startColumn" : 5,
-            "endColumn" : 11
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "edb7b00d5c78b908:1",
+        "primaryLocationLineHash" : "969c85f34783b0c9:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -211,7 +183,7 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "9df002ac3942a1c8:1",
+        "primaryLocationLineHash" : "35b38347e72e53ee:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -239,35 +211,7 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "3c680a64917ef518:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "strcpy is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: strcpy_s, StringCbCopy, StringCbCopyEx, StringCchCopy, StringCchCopyEx, strlcpy."
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 51,
-            "startColumn" : 5,
-            "endColumn" : 11
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "9a9b276cd87e28c6:1",
+        "primaryLocationLineHash" : "457c58a531c32719:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -295,7 +239,7 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "bbc0c7cbc3a8c61b:1",
+        "primaryLocationLineHash" : "c48f69dbca4d1e2:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -316,42 +260,14 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 55,
+            "startLine" : 57,
             "startColumn" : 5,
             "endColumn" : 11
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "5774da00ce2ad9ba:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "strcpy is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: strcpy_s, StringCbCopy, StringCbCopyEx, StringCchCopy, StringCchCopyEx, strlcpy."
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 58,
-            "startColumn" : 5,
-            "endColumn" : 11
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "5cf377904556a621:1",
+        "primaryLocationLineHash" : "b8199b93e64f724c:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -379,7 +295,119 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "bb482f4293b46bf5:1",
+        "primaryLocationLineHash" : "67adf17cf52f9cb0:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "strcpy is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: strcpy_s, StringCbCopy, StringCbCopyEx, StringCchCopy, StringCchCopyEx, strlcpy."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 63,
+            "startColumn" : 5,
+            "endColumn" : 11
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "37878d516b970fae:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "strcpy is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: strcpy_s, StringCbCopy, StringCbCopyEx, StringCchCopy, StringCchCopyEx, strlcpy."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 66,
+            "startColumn" : 5,
+            "endColumn" : 11
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "d24a502aa610bd2e:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "strcpy is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: strcpy_s, StringCbCopy, StringCbCopyEx, StringCchCopy, StringCchCopyEx, strlcpy."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 69,
+            "startColumn" : 5,
+            "endColumn" : 11
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "6a27d42186f1df7d:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "strcpy is insecure and has been marked deprecated.  Replace it with one of the following safe replacements: strcpy_s, StringCbCopy, StringCbCopyEx, StringCchCopy, StringCchCopyEx, strlcpy."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 72,
+            "startColumn" : 5,
+            "endColumn" : 11
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "af4c1b7ec005cdbe:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
