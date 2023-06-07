@@ -8,38 +8,41 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.6",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
-          "name" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+          "id" : "cpp/drivers/extended-deprecated-apis",
+          "name" : "cpp/drivers/extended-deprecated-apis",
           "shortDescription" : {
             "text" : "Use of deprecated function or macro (C28719, C28726, C28735, C28750)"
           },
           "fullDescription" : {
-            "text" : "Unsafe, deprecated APIs should not be used. This is a port of Code Analysis checks C28719, C28726, and C28750."
+            "text" : "Use of deprecated APIs causes correctness or safety issues. This is a port of Code Analysis checks C28719, C28726, and C28750."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "tags" : [ "correctness" ],
-            "description" : "Unsafe, deprecated APIs should not be used.  This is a port of Code Analysis checks C28719, C28726, and C28750.",
+            "tags" : [ "correctness", "security" ],
+            "description" : "Use of deprecated APIs causes correctness or safety issues.  This is a port of Code Analysis checks C28719, C28726, and C28750.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+            "id" : "cpp/drivers/extended-deprecated-apis",
             "impact" : "Attack Surface Reduction",
             "kind" : "problem",
             "name" : "Use of deprecated function or macro (C28719, C28726, C28735, C28750)",
+            "opaqueid" : "C28719",
+            "owner.email:" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The following code locations contain calls to an unsafe, deprecated function or macro.",
+            "scope" : "generic",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+94e5e84388d98059e0209f9933621a76c0dee7f1",
+        "semanticVersion" : "0.1.0+702ca3a3b8f9fc9915312d7604587badbf9214f4",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -75,10 +78,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -103,10 +106,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -131,10 +134,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -159,10 +162,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -187,10 +190,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -215,10 +218,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -239,14 +242,14 @@
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "c48f69dbca4d1e2:1",
+        "primaryLocationLineHash" : "23936499fc6ec6db:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -271,10 +274,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -299,10 +302,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -327,10 +330,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -355,10 +358,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -383,10 +386,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
@@ -411,10 +414,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+      "ruleId" : "cpp/drivers/extended-deprecated-apis",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/extended-deprecated-apis",
+        "id" : "cpp/drivers/extended-deprecated-apis",
         "index" : 0
       },
       "message" : {
