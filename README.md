@@ -111,7 +111,7 @@ We are in the process of setting up pull request checks, but to ensure our requi
 1. Add a .qhelp file for any new queries or update the existing one if there is new functionality for the end user.
 
 #### Note
-All "Must-Fix" suite queries must have been run on the Windows Drivers Samples & bugs opened prior to being merged in the to suite.
+All "Must-Fix" suite queries must have been run on the Windows Drivers Samples, and any bugs found as a result must be filed prior to being merged into the suite.
 
 Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
