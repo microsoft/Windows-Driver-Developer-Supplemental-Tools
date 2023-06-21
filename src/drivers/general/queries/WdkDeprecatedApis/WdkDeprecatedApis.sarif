@@ -8,36 +8,41 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.6",
         "rules" : [ {
-          "id" : "cpp/windows/wdk/deprecated-api",
-          "name" : "cpp/windows/wdk/deprecated-api",
+          "id" : "cpp/drivers/wdk-deprecated-api",
+          "name" : "cpp/drivers/wdk-deprecated-api",
           "shortDescription" : {
             "text" : "Use of deprecated WDK API"
           },
           "fullDescription" : {
-            "text" : "Use of deprecated WDK API detected."
+            "text" : "Use of deprecated allocation APIs can result in non-zeroed memory being provided to the caller."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "description" : "Use of deprecated WDK API detected.",
+            "tags" : [ "security", "wddst" ],
+            "description" : "Use of deprecated allocation APIs can result in non-zeroed memory being provided to the caller.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/wdk/deprecated-api",
+            "id" : "cpp/drivers/wdk-deprecated-api",
             "impact" : "Attack Surface Reduction",
             "kind" : "problem",
             "name" : "Use of deprecated WDK API",
+            "opaqueid" : "CQLD0001",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
+            "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "1.3",
-            "repro.text" : "The following code locations contain calls to a deprecated WDK API",
-            "security.severity" : "Low"
+            "repro.text" : "The following code locations contain calls to a deprecated WDK allocation API.",
+            "scope" : "domainspecific",
+            "security.severity" : "Medium"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+60d1aca7624cfa2ad3b9c3a3e79096f21d59d977",
+        "semanticVersion" : "0.1.0+92d85037df3cb9885cdb443046c034abeba5a5aa",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -73,14 +78,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/wdk/deprecated-api",
+      "ruleId" : "cpp/drivers/wdk-deprecated-api",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/wdk/deprecated-api",
+        "id" : "cpp/drivers/wdk-deprecated-api",
         "index" : 0
       },
       "message" : {
-        "text" : "Using deprecated API 'ExAllocatePoolWithTag'. Replacement function: ExAllocatePool2. For downlevel code, use ExAllocatePoolZero or ExAllocatePoolUninitialized. Do not use `POOL_FLAG_UNINITIALIZED` flag when fixing. For details, please visit https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2\nUsing deprecated API 'ExAllocatePool'. Replacement function: ExAllocatePool2. For downlevel code, use ExAllocatePoolZero or ExAllocatePoolUninitialized. Do not use `POOL_FLAG_UNINITIALIZED` flag when fixing. For details, please visit https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2"
+        "text" : "Using deprecated API 'ExAllocatePoolWithTag'. Replacement function: ExAllocatePool2. For downlevel code, use ExAllocatePoolZero or ExAllocatePoolUninitialized. Do not use `POOL_FLAG_UNINITIALIZED` flag when fixing. For details, please visit https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -101,10 +106,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/windows/wdk/deprecated-api",
+      "ruleId" : "cpp/drivers/wdk-deprecated-api",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/wdk/deprecated-api",
+        "id" : "cpp/drivers/wdk-deprecated-api",
         "index" : 0
       },
       "message" : {

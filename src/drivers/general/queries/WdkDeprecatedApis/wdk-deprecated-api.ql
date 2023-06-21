@@ -1,28 +1,34 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
+ * @id cpp/drivers/wdk-deprecated-api
+ * @kind problem
  * @name Use of deprecated WDK API
- * @description Use of deprecated WDK API detected.
+ * @description Use of deprecated allocation APIs can result in non-zeroed memory being provided to the caller.
  * @platform Desktop
- * @security.severity Low
+ * @security.severity Medium
  * @impact Attack Surface Reduction
  * @feature.area Multiple
- * @repro.text The following code locations contain calls to a deprecated WDK API
- * @kind problem
- * @id cpp/windows/wdk/deprecated-api
+ * @repro.text The following code locations contain calls to a deprecated WDK allocation API.
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD0001
  * @problem.severity warning
+ * @precision high
+ * @tags security
+ *       wddst
+ * @scope domainspecific
  * @query-version 1.3
  */
 
 import cpp
 
-/** Represents either a macro invocation of a deprecated allocation API, or a direct function call to a deprecated allocation API. */
+/** Either a macro invocation of a deprecated allocation API, or a direct function call to a deprecated allocation API. */
 abstract class WdkDeprecatedApiCall extends Element {
   /** Returns a message suggesting replacement APIs when calling a deprecated API. */
   abstract string getMessage();
 }
 
-/** Represents a function call to a now-deprecated memory allocation API. */
+/** A function call to a now-deprecated memory allocation API. */
 class WdkDeprecatedApiFunctionCall extends FunctionCall, WdkDeprecatedApiCall {
   WdkDeprecatedApiFunctionCall() {
     getTarget().hasGlobalName("ExAllocatePoolWithTag") or
@@ -66,7 +72,7 @@ class WdkDeprecatedApiFunctionCall extends FunctionCall, WdkDeprecatedApiCall {
   }
 }
 
-/** Represents a macro version of the deprecated allocation APIs. */
+/** A macro version of the deprecated allocation APIs. */
 class WdkDeprecatedMacro extends Macro {
   WdkDeprecatedMacro() {
     this.getName()
@@ -76,7 +82,7 @@ class WdkDeprecatedMacro extends Macro {
           ])
   }
 
-  /** Returns a message suggesting replacement APIs when calling a deprecated API. */
+  /** A message suggesting replacement APIs when calling a deprecated API. */
   string message() {
     if this.getName().matches("ExAllocatePoolWithTag")
     then
@@ -111,7 +117,7 @@ class WdkDeprecatedMacro extends Macro {
   }
 }
 
-/** Represents a macro invocation of a deprecated allocation API. */
+/** A macro invocation of a deprecated allocation API. */
 class WdkDeprecatedApiMacroInvocation extends MacroInvocation, WdkDeprecatedApiCall {
   WdkDeprecatedApiMacroInvocation() { this.getMacro() instanceof WdkDeprecatedMacro }
 
