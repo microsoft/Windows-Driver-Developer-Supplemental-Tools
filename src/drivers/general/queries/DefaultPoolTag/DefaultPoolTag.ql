@@ -1,21 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Use of string in pool tag instead of integral (C28147)
- * @description Driver should not allocate memory with the default tags of ' mdW' or ' kdD'.
+ * @id cpp/drivers/default-pool-tag
+ * @kind problem
+ * @name Use of default pool tag in memory allocation (C28147)
+ * @description Tagging memory with the default tags of ' mdW' or ' kdD' can make it difficult to debug allocations.
  * @platform Desktop
  * @feature.area Multiple
  * @repro.text The following code locations call a pool allocation function with one of the default tags (' mdW' or ' kdD').
- * @kind problem
- * @id cpp/windows/drivers/queries/default-pool-tag
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ * @scope domainspecific
  * @query-version v1
  */
 
 import cpp
-import semmle.code.cpp.dataflow.DataFlow
 
 /** Represents a pool allocation function (has a ULONG "Tag" field, a "Flags" field, and a size parameter.) */
 class PoolTypeFunction extends Function {
