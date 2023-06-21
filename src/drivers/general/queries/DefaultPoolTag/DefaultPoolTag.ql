@@ -17,7 +17,7 @@
 
 import cpp
 
-/** Represents a pool allocation function (has a ULONG "Tag" field, a "Flags" field, and a size parameter.) */
+/** A pool allocation function (has a ULONG "Tag" field, a "Flags" field, and a size parameter.) */
 class PoolTypeFunction extends Function {
   PoolTypeFunction() {
     exists(Parameter p |
@@ -30,7 +30,7 @@ class PoolTypeFunction extends Function {
   }
 }
 
-/** Represents a default pool tag (' mdw' or ' kdD'.) */
+/** A default pool tag (' mdw' or ' kdD'.) */
 class DefaultPoolTag extends Literal {
   DefaultPoolTag() {
     this.(CharLiteral).getValueText() = "' mdW'" or
