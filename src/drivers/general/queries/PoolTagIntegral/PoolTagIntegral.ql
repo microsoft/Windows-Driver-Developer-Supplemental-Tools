@@ -1,23 +1,28 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
+ * @id cpp/drivers/pool-tag-integral
+ * @kind problem
  * @name Use of string in pool tag instead of integral (C28134)
- * @description The type of a pool tag should be integral, not a string or string pointer.
+ * @description Using a string or string pointer for a pool tag rather than a character integral will result in garbage in the tag.
  * @platform Desktop
  * @security.severity Low
- * @impact Attack Surface Reduction
  * @feature.area Multiple
+ * @impact Attack Surface Reduction
  * @repro.text The following code locations call a pool allocation function with a tag that is not an integral type.
- * @kind problem
- * @id cpp/windows/drivers/queries/pool-tag-integral
+ * @owner.email sdat@microsoft.com
+ * @opaqueid C28134
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
 import cpp
 
+/** A pool allocation function. */
 class PoolTypeFunction extends Function {
   PoolTypeFunction() {
     exists(Parameter p |
@@ -29,6 +34,7 @@ class PoolTypeFunction extends Function {
   }
 }
 
+/** A valid pool tag (an integral value). */
 class ValidPoolTag extends Expr {
   ValidPoolTag() {
     this.getUnderlyingType().getName().matches(["unsigned long", "unsigned int", "long", "int"])
