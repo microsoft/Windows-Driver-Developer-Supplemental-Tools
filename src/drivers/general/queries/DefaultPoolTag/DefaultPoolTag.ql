@@ -8,6 +8,8 @@
  * @platform Desktop
  * @feature.area Multiple
  * @repro.text The following code locations call a pool allocation function with one of the default tags (' mdW' or ' kdD').
+ * @owner.email: sdat@microsoft.com
+ * @opaqueid C28147
  * @problem.severity warning
  * @precision high
  * @tags correctness

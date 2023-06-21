@@ -8,6 +8,8 @@
  * @platform Desktop
  * @feature.area Multiple
  * @repro.text The following code locations directly write to an opaque MDL field.
+ * @owner.email: sdat@microsoft.com
+ * @opaqueid C28145
  * @problem.severity error
  * @precision high
  * @tags correctness
