@@ -2,16 +2,20 @@
 // Licensed under the MIT license.
 /**
  * @name Illegal access to a protected field (C28175)
+ * @id cpp/drivers/illegal-field-access-2
+ * @kind problem
  * @description The driver read a structure field that should not be accessed outside of certain contexts.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
  * @repro.text The driver read a structure field that should not be accessed outside of certain contexts.
- * @kind problem
- * @id cpp/windows/drivers/queries/illegal-field-access-2
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28175
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
@@ -19,7 +23,7 @@ import cpp
 import drivers.wdm.libraries.WdmDrivers
 
 /**
- * Represents the illegal accesses we look for in this query.
+ * The illegal accesses we look for in this query.
  *
  * Because some field accesses are legal in the correct context, you should always check the
  * isIllegalAccess() predicate when looking for illegal accesses.
@@ -33,7 +37,7 @@ abstract class PotentiallyIllegalFieldAccess extends Element {
 }
 
 /**
- * Represents a potentially illegal access to a field of a DeviceObject, namely:
+ * A potentially illegal access to a field of a DeviceObject, namely:
  * - Accesses to a DeviceObject's NextDevice field (outside of DriverEntry and DriverUnload)
  * - Accesses to generally unavailable DeviceObject fields
  */
@@ -82,7 +86,7 @@ class IllegalDeviceObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
 }
 
 /**
- * Represents potentially illegal accesses to a DriverObject field, namely:
+ * A potentially illegal access to a DriverObject field, namely:
  * - Accesses to a DriverObject's DriverStartIo, DriverUnload, MajorFunction, and DriverExtension fields outside DriverEntry
  * - Accesses to generally unavailable DriverObject fields
  */
@@ -129,7 +133,7 @@ class IllegalDriverObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
   }
 }
 
-/** Represents illegal accesses to DriverExtension fields, i.e. anything that isn't the "AddDevice" field. */
+/** An illegal access to DriverExtension fields, i.e. anything that isn't the "AddDevice" field. */
 class IllegalDriverExtensionFieldAccess extends FieldAccess, PotentiallyIllegalFieldAccess {
   IllegalDriverExtensionFieldAccess() {
     this.getTarget().getParentScope() instanceof DriverExtension and
