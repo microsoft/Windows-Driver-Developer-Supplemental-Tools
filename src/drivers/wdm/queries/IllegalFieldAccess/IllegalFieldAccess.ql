@@ -2,23 +2,27 @@
 // Licensed under the MIT license.
 /**
  * @name Incorrect access to protected field (C28128)
+ * @id cpp/drivers/illegal-field-access
+ * @kind problem
  * @description The driver assigned a value to a structure member that should be accessed only by using specialized functions.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
  * @repro.text The driver assigned a value to a structure member that should be accessed only by using specialized functions.
- * @kind problem
- * @id cpp/windows/drivers/queries/illegal-field-access
- * @problem.severity warning
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28128
+ * @problem.severity error
  * @precision high
  * @tags correctness
+ *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
 import cpp
 import drivers.wdm.libraries.WdmDrivers
 
-/** Represents an access to a CancelRoutine field of an IRP. */
+/** An access to a CancelRoutine field of an IRP. */
 class IrpCancelRoutineAccess extends FieldAccess, IllegalFieldUsage {
   IrpCancelRoutineAccess() {
     this.getTarget().getParentScope() instanceof Irp and
@@ -26,18 +30,18 @@ class IrpCancelRoutineAccess extends FieldAccess, IllegalFieldUsage {
   }
 }
 
-/** Represents an access to a field of a DPC. */
+/** An access to a field of a DPC. */
 class DpcFieldAccess extends FieldAccess, IllegalFieldUsage {
   DpcFieldAccess() { this.getTarget().getParentScope() instanceof Dpc }
 }
 
-/** Represents an access to a DPC. */
+/** An access to a DPC. */
 class DpcAccess extends FieldAccess, IllegalFieldUsage {
   DpcAccess() { this.getTarget().getUnderlyingType() instanceof Dpc }
 }
 
 /**
- * Represents the illegal accesses we look for in this query, namely:
+ * The illegal accesses we look for in this query, namely:
  * - Accesses to a DeviceObject's DPC field
  * - Accesses to a DPC's field
  * - Accesses to an IRP's CancelRoutine field
