@@ -8,10 +8,10 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.6",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/illegal-field-write",
-          "name" : "cpp/windows/drivers/queries/illegal-field-write",
+          "id" : "cpp/drivers/illegal-field-write",
+          "name" : "cpp/drivers/illegal-field-write",
           "shortDescription" : {
-            "text" : "Illegal access to a protected field (C28176)"
+            "text" : "Illegal write to a protected field (C28176)"
           },
           "fullDescription" : {
             "text" : "The driver wrote to a structure field that should not be modified outside of certain contexts."
@@ -21,24 +21,27 @@
             "level" : "warning"
           },
           "properties" : {
-            "tags" : [ "correctness" ],
+            "tags" : [ "correctness", "wddst" ],
             "description" : "The driver wrote to a structure field that should not be modified outside of certain contexts.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/illegal-field-write",
+            "id" : "cpp/drivers/illegal-field-write",
             "kind" : "problem",
-            "name" : "Illegal access to a protected field (C28176)",
+            "name" : "Illegal write to a protected field (C28176)",
+            "opaqueid" : "CQLD-C28176",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The driver wrote to a structure field that should not be modified outside of certain contexts.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+a1eaac1762ee26f2d5091d5efd730f88db88fb87",
+        "semanticVersion" : "0.1.0+fe66e4987ce58d7ba234cddd8be702e2412a37f0",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -74,10 +77,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleId" : "cpp/drivers/illegal-field-write",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "id" : "cpp/drivers/illegal-field-write",
         "index" : 0
       },
       "message" : {
@@ -102,10 +105,10 @@
         "primaryLocationStartColumnFingerprint" : "14"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleId" : "cpp/drivers/illegal-field-write",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "id" : "cpp/drivers/illegal-field-write",
         "index" : 0
       },
       "message" : {
@@ -130,10 +133,10 @@
         "primaryLocationStartColumnFingerprint" : "28"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleId" : "cpp/drivers/illegal-field-write",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "id" : "cpp/drivers/illegal-field-write",
         "index" : 0
       },
       "message" : {
@@ -158,10 +161,10 @@
         "primaryLocationStartColumnFingerprint" : "14"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleId" : "cpp/drivers/illegal-field-write",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "id" : "cpp/drivers/illegal-field-write",
         "index" : 0
       },
       "message" : {
@@ -186,10 +189,10 @@
         "primaryLocationStartColumnFingerprint" : "14"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleId" : "cpp/drivers/illegal-field-write",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "id" : "cpp/drivers/illegal-field-write",
         "index" : 0
       },
       "message" : {
@@ -214,10 +217,10 @@
         "primaryLocationStartColumnFingerprint" : "14"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-write",
+      "ruleId" : "cpp/drivers/illegal-field-write",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-write",
+        "id" : "cpp/drivers/illegal-field-write",
         "index" : 0
       },
       "message" : {
