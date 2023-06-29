@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
- /**
- * @id cpp/windows/drivers/queries/init-not-cleared
+/**
+ * @id cpp/drivers/init-not-cleared
  * @name Failure to clear DO_DEVICE_INITIALIZING (C28152)
  * @description The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.
  * @platform Desktop
@@ -78,6 +78,7 @@ class AddDeviceFlow extends DataFlow2::Configuration {
  * call to IoCreateDevice where the resulting FDO later has its DO_DEVICE_INITIALIZING
  * flag cleared.
  */
+
 from FdoFlow fdo, WdmAddDevice wad, AddDeviceFlow adf
 where
   not exists(FunctionCall fc |
