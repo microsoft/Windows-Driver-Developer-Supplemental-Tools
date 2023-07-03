@@ -34,9 +34,18 @@ For general use, use the `main` branch along with [version 2.11.5 of the CodeQL 
     
 
 1. Clone and install the Windows Driver Developer Supplemental Tools repository which contains the CodeQL queries specific for drivers:
+
+   For WHCP BRANCHES use:
+   ```
+    D:\codeql-home\>git clone https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools.git --recurse-submodules
     ```
+   
+   For MAIN BRANCH use:
+   
+   ```
     D:\codeql-home\>git clone https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools.git
     ```
+   
     Now you should have:
     ```
         D:/codeql-home
@@ -56,7 +65,12 @@ For general use, use the `main` branch along with [version 2.11.5 of the CodeQL 
     ```
 
 1. Install CodeQL Packages using `codeql pack install`
-    ```
+
+   For WHCP BRANCHES: Skip this step.
+
+   For MAIN BRANCH use:
+
+   ```
     D:\codeql-home\codeql>codeql pack install D:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src
     ```
 
