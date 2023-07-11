@@ -14,6 +14,9 @@
  * @query-version 1.0
  * @precision high
  * @platform Desktop
+ * @tags correctness
+ *       wddst
+ * @query-version v2
  */
 
 import cpp
