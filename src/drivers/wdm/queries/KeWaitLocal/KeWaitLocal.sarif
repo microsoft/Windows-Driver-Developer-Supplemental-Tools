@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.5",
+        "semanticVersion" : "2.11.6",
         "rules" : [ {
           "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
           "name" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
@@ -39,7 +39,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+49dac27a0f5a5406cdaad6c6b32b20e47aef0459",
+        "semanticVersion" : "0.1.0+944b9daee85c76d0eebad37772e8b5bc35647a87",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -82,7 +82,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "KeWaitForSingleObject should have a KernelMode AccessMode when the first argument is local"
+        "text" : "[good_use](1): KeWaitForSingleObject should have a KernelMode AccessMode when the [first argument](2) is local"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -101,7 +101,42 @@
       "partialFingerprints" : {
         "primaryLocationLineHash" : "61bc3c7079348327:1",
         "primaryLocationStartColumnFingerprint" : "0"
-      }
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 7,
+            "startColumn" : 6,
+            "endColumn" : 14
+          }
+        },
+        "message" : {
+          "text" : "good_use"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 9,
+            "startColumn" : 12,
+            "endColumn" : 19
+          }
+        },
+        "message" : {
+          "text" : "first argument"
+        }
+      } ]
     } ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {
