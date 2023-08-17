@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.6",
+        "semanticVersion" : "2.11.5",
         "rules" : [ {
           "id" : "cpp/drivers/illegal-field-access",
           "name" : "cpp/drivers/illegal-field-access",
@@ -41,7 +41,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+d89d871fa1bff5ba7d2c90cb3727dc90b84b451d",
+        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

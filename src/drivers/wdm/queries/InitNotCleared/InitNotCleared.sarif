@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.6",
+        "semanticVersion" : "2.11.5",
         "rules" : [ {
           "id" : "cpp/drivers/init-not-cleared",
           "name" : "cpp/drivers/init-not-cleared",
@@ -40,7 +40,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+394e3e940ad953b7ea980037def15aa781c911b7",
+        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

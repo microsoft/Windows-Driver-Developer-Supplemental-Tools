@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.6",
+        "semanticVersion" : "2.11.5",
         "rules" : [ {
           "id" : "cpp/drivers/pool-tag-integral",
           "name" : "cpp/drivers/pool-tag-integral",
@@ -42,7 +42,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+93aa238c95b103f5150038b97b0a3825980e3c87",
+        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

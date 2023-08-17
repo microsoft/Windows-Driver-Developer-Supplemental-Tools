@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.6",
+        "semanticVersion" : "2.11.5",
         "rules" : [ {
           "id" : "cpp/drivers/default-pool-tag-extended",
           "name" : "cpp/drivers/default-pool-tag-extended",
@@ -27,6 +27,8 @@
             "id" : "cpp/drivers/default-pool-tag-extended",
             "kind" : "problem",
             "name" : "Use of default pool tag in memory allocation (C28147)",
+            "opaqueid" : "C28147",
+            "owner.email:" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
@@ -38,7 +40,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+e4e6d8adc20450517640bf0064408c8c20658505",
+        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
