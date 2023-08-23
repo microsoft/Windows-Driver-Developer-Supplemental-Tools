@@ -8,34 +8,40 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/portedqueries/no-paged-code",
-          "name" : "cpp/portedqueries/no-paged-code",
+          "id" : "cpp/drivers/no-paged-code",
+          "name" : "cpp/drivers/no-paged-code",
           "shortDescription" : {
-            "text" : "NoPagedCode"
+            "text" : "No PAGED_CODE invocation"
           },
           "fullDescription" : {
-            "text" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found. For more information look at C28170 Code Analysis rule."
+            "text" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found. This can cause issues when debugging, using Code Analysis, or running on checked builds."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "description" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found. For more information look at C28170 Code Analysis rule.",
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found. This can cause issues when debugging, using Code Analysis, or running on checked builds.",
             "feature.area" : "Multiple",
-            "id" : "cpp/portedqueries/no-paged-code",
+            "id" : "cpp/drivers/no-paged-code",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "NoPagedCode",
+            "name" : "No PAGED_CODE invocation",
+            "opaqueid" : "CQLD-C28170",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
+            "precision" : "low",
             "problem.severity" : "warning",
-            "repro.text" : "The following code locations do not call PAGED_CODE() or PAGED_CODE_LOCKED even though they put the function in a paged segment.",
-            "version" : "1.0"
+            "query-version" : "v1",
+            "repro.text" : "The following code locations are duplicate PAGED_CODE() calls within a function.",
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+7048e8864fd8531352be5c7f75768b15c765eaf1",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -71,10 +77,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/portedqueries/no-paged-code",
+      "ruleId" : "cpp/drivers/no-paged-code",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/no-paged-code",
+        "id" : "cpp/drivers/no-paged-code",
         "index" : 0
       },
       "message" : {
@@ -99,10 +105,10 @@
         "primaryLocationStartColumnFingerprint" : "9"
       }
     }, {
-      "ruleId" : "cpp/portedqueries/no-paged-code",
+      "ruleId" : "cpp/drivers/no-paged-code",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/no-paged-code",
+        "id" : "cpp/drivers/no-paged-code",
         "index" : 0
       },
       "message" : {
@@ -127,10 +133,10 @@
         "primaryLocationStartColumnFingerprint" : "9"
       }
     }, {
-      "ruleId" : "cpp/portedqueries/no-paged-code",
+      "ruleId" : "cpp/drivers/no-paged-code",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/no-paged-code",
+        "id" : "cpp/drivers/no-paged-code",
         "index" : 0
       },
       "message" : {
