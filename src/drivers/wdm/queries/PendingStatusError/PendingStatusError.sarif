@@ -8,34 +8,41 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/portedqueries/pending-status-error",
-          "name" : "cpp/portedqueries/pending-status-error",
+          "id" : "cpp/drivers/pending-status-error",
+          "name" : "cpp/drivers/pending-status-error",
           "shortDescription" : {
-            "text" : "PendingStatusError"
+            "text" : "Did not return STATUS_PENDING after IoMarkIrpPending call"
           },
           "fullDescription" : {
             "text" : "A dispatch routine that calls IoMarkIrpPending includes at least one path in which the driver returns a value other than STATUS_PENDING. The IoMarkIrpPending routine marks the specified IRP, indicating that a driver's dispatch routine subsequently returned STATUS_PENDING because further processing is required by other driver routines. For more information please refer C28143 Code Analysis rule."
           },
           "defaultConfiguration" : {
             "enabled" : true,
-            "level" : "error"
+            "level" : "warning"
           },
           "properties" : {
+            "tags" : [ "correctness", "wddst" ],
             "description" : "A dispatch routine that calls IoMarkIrpPending includes at least one path in which the driver returns a value other than STATUS_PENDING. The IoMarkIrpPending routine marks the specified IRP, indicating that a driver's dispatch routine subsequently returned STATUS_PENDING because further processing is required by other driver routines. For more information please refer C28143 Code Analysis rule.",
             "feature.area" : "Multiple",
-            "id" : "cpp/portedqueries/pending-status-error",
+            "id" : "cpp/drivers/pending-status-error",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "PendingStatusError",
+            "name" : "Did not return STATUS_PENDING after IoMarkIrpPending call",
+            "opaqueid" : "CQL-C28143",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
-            "problem.severity" : "error",
+            "precision" : "Low",
+            "problem.severity" : "warning",
+            "query-version" : "v1",
             "repro.text" : "The following code locations potentially contain IoMarkIrpPending calls that do not return STATUS_PENDING",
-            "version" : "1.0"
+            "scope" : "domainspecific",
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+6e56873e73ecb32443caada8c3a8b30565d9f7bc",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -71,10 +78,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/portedqueries/pending-status-error",
+      "ruleId" : "cpp/drivers/pending-status-error",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/pending-status-error",
+        "id" : "cpp/drivers/pending-status-error",
         "index" : 0
       },
       "message" : {
