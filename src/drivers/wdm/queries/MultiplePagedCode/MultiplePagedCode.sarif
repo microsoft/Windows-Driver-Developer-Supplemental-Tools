@@ -8,34 +8,39 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/portedqueries/multiple-paged-code",
-          "name" : "cpp/portedqueries/multiple-paged-code",
+          "id" : "cpp/drivers/multiple-paged-code",
+          "name" : "cpp/drivers/multiple-paged-code",
           "shortDescription" : {
-            "text" : "MultiplePagedCode"
+            "text" : "Multiple instances of PAGED_CODE or PAGED_CODE_LOCKED"
           },
           "fullDescription" : {
-            "text" : "The function has more than one instance of PAGED_CODE or PAGED_CODE_LOCKED."
+            "text" : "The function has more than one instance of PAGED_CODE or PAGED_CODE_LOCKED. This can cause issues when debugging, using Code Analysis, or running on checked builds."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "description" : "The function has more than one instance of PAGED_CODE or PAGED_CODE_LOCKED.",
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "The function has more than one instance of PAGED_CODE or PAGED_CODE_LOCKED.  This can cause issues when debugging, using Code Analysis, or running on checked builds.",
             "feature.area" : "Multiple",
-            "id" : "cpp/portedqueries/multiple-paged-code",
+            "id" : "cpp/drivers/multiple-paged-code",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "MultiplePagedCode",
+            "name" : "Multiple instances of PAGED_CODE or PAGED_CODE_LOCKED",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
+            "precision" : "high",
             "problem.severity" : "warning",
-            "repro.text" : "The following code locations potentially contain dupulicate PAGED_CODE() calls.",
-            "version" : "1.0"
+            "query-version" : "v1",
+            "repro.text" : "The following code locations are duplicate PAGED_CODE() calls within a function.",
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+64dd419a8bed7f9b59e4d67c8503e97440dad2da",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -71,10 +76,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/portedqueries/multiple-paged-code",
+      "ruleId" : "cpp/drivers/multiple-paged-code",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/multiple-paged-code",
+        "id" : "cpp/drivers/multiple-paged-code",
         "index" : 0
       },
       "message" : {
