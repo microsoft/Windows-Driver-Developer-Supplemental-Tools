@@ -61,7 +61,7 @@ class IrqlFlowConfiguration extends DataFlow::Configuration {
 }
 
 /**
- * A "fundamental" function that restores IRQL, i.e. one defined
+ * A function that we know will restore the IRQL, i.e. one defined
  * by the Windows OS itself.  This is in general in a Windows Kits header.  For
  * extra clarity and internal use, we also list the exact header files.
  */
