@@ -11,10 +11,12 @@
  * @repro.text The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.
  * @owner.email sdat@microsoft.com
  * @kind problem
+ * @opaqueid CQLD-C28152
  * @problem.severity warning
  * @precision medium
  * @tags correctness
  *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
