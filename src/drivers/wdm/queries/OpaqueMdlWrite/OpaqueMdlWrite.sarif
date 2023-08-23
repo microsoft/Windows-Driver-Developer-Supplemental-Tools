@@ -8,8 +8,8 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/drivers/opaquemdlwrite",
-          "name" : "cpp/drivers/opaquemdlwrite",
+          "id" : "cpp/drivers/opaque-mdl-write",
+          "name" : "cpp/drivers/opaque-mdl-write",
           "shortDescription" : {
             "text" : "Write to opaque MDL field (C28145)"
           },
@@ -18,29 +18,31 @@
           },
           "defaultConfiguration" : {
             "enabled" : true,
-            "level" : "error"
+            "level" : "warning"
           },
           "properties" : {
-            "tags" : [ "correctness" ],
+            "tags" : [ "correctness", "wddst" ],
             "description" : "Writing to opaque MDL fields can cause erroneous behavior.  This is a port of Code Analysis check C28145.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/opaquemdlwrite",
+            "id" : "cpp/drivers/opaque-mdl-write",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Write to opaque MDL field (C28145)",
-            "opaqueid" : "C28145",
-            "owner.email:" : "sdat@microsoft.com",
+            "opaqueid" : "CQL-C28145",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
-            "problem.severity" : "error",
+            "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The following code locations directly write to an opaque MDL field.",
-            "scope" : "domainspecific"
+            "scope" : "domainspecific",
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+f97a6fdbfa1835c7ef931c0ac3c3e6d3165b06a6",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -76,10 +78,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/opaquemdlwrite",
+      "ruleId" : "cpp/drivers/opaque-mdl-write",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/opaquemdlwrite",
+        "id" : "cpp/drivers/opaque-mdl-write",
         "index" : 0
       },
       "message" : {

@@ -1,18 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/opaquemdlwrite
- * @kind problem
+ * @id cpp/drivers/opaque-mdl-write
  * @name Write to opaque MDL field (C28145)
  * @description Writing to opaque MDL fields can cause erroneous behavior.  This is a port of Code Analysis check C28145.
  * @platform Desktop
+ * @security.severity Low
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The following code locations directly write to an opaque MDL field.
- * @owner.email: sdat@microsoft.com
- * @opaqueid C28145
- * @problem.severity error
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQL-C28145
+ * @kind problem
+ * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       wddst
  * @scope domainspecific
  * @query-version v1
  */
