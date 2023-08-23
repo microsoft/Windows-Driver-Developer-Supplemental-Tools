@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.6",
+        "semanticVersion" : "2.11.5",
         "rules" : [ {
           "id" : "cpp/drivers/irql-not-saved",
           "name" : "cpp/drivers/irql-not-saved",
@@ -28,19 +28,21 @@
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "IRQL not saved (C28158)",
+            "opaqueid" : "CQLD-C28158",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "This function has a parameter annotated \\_IRQL\\_saves\\_, but does not have the system IRQL saved to it.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+72e2acc449707a64f4eb84cd54d350f98798c842",
+        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

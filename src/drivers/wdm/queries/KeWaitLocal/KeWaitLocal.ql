@@ -2,18 +2,22 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/kewaitlocal-requires-kernel-mode
- * @name KeWaitLocal
+ * @name Use of local variable and UserMode in call to KeWaitSingleObject
  * @description When the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode.
- * @security.severity: Low
- * @impact: Exploitable Design
- * @feature.area Multiple
- * @repro.text The following code locations contain a call to KeWaitForSingleObject while waiting for a local kernel-mode object, but the Mode parameter has not been set to KernelMode.
- * @owner.email: sdat@microsoft.com
- * @kind problem
- * @problem.severity error
- * @query-version 1.0
- * @precision high
  * @platform Desktop
+ * @security.severity Low
+ * @feature.area Multiple
+ * @impact Exploitable Design
+ * @repro.text The following code locations contain a call to KeWaitForSingleObject while waiting for a local kernel-mode object, but the Mode parameter has not been set to KernelMode.
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28135
+ * @kind problem
+ * @problem.severity warning
+ * @precision high
+ * @tags correctness
+ *       wddst
+ * @scope domainspecific
+ * @query-version v1
  */
 
 import cpp

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/irql-not-saved
+ * @kind problem
  * @name IRQL not saved (C28158)
  * @description A variable annotated \_IRQL\_saves\_ must have the IRQL saved into it.
  * @platform Desktop
@@ -10,11 +11,12 @@
  * @impact Insecure Coding Practice
  * @repro.text This function has a parameter annotated \_IRQL\_saves\_, but does not have the system IRQL saved to it.
  * @owner.email sdat@microsoft.com
- * @kind problem
+ * @opaqueid CQLD-C28158
  * @problem.severity warning
  * @precision medium
  * @tags correctness
  *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
@@ -24,7 +26,7 @@ import semmle.code.cpp.dataflow.DataFlow
 import semmle.code.cpp.dataflow.DataFlow2
 
 /**
- * Represents a function that has at least one parameter annotated with "\_IRQL\_save\_".
+ * A function that has at least one parameter annotated with "\_IRQL\_save\_".
  */
 class IrqlSaveFunction extends Function {
   Parameter p;
@@ -39,7 +41,7 @@ class IrqlSaveFunction extends Function {
 }
 
 /**
- * Represents a data-flow configuration describing flow from an
+ * A data-flow configuration describing flow from an
  * \_IRQL\_saves\_-annotated parameter to an OS function that restores
  * the IRQL.
  */
@@ -59,7 +61,7 @@ class IrqlFlowConfiguration extends DataFlow::Configuration {
 }
 
 /**
- * Represents a "fundamental" function that restores IRQL, i.e. one defined
+ * A function that we know will restore the IRQL, i.e. one defined
  * by the Windows OS itself.  This is in general in a Windows Kits header.  For
  * extra clarity and internal use, we also list the exact header files.
  */
@@ -73,7 +75,7 @@ class FundamentalIrqlSaveFunction extends IrqlSaveFunction {
 }
 
 /**
- * Represents a simple data flow from any IrqlSaveParameter to another variable.
+ * A simple data flow from any IrqlSaveParameter to another variable.
  */
 class IrqlSaveParameterFlowConfiguration extends DataFlow2::Configuration {
   IrqlSaveParameterFlowConfiguration() { this = "IrqlSaveParameterFlowConfiguration" }
@@ -86,7 +88,7 @@ class IrqlSaveParameterFlowConfiguration extends DataFlow2::Configuration {
 }
 
 /**
- * Represents a data-flow configuration representing flow from an
+ * A data-flow configuration representing flow from an
  * OS function that returns an IRQL to be saved to a parameter marked
  * \_IRQL\_saves\_ (or a variable aliasing that parameter.)
  */
@@ -122,7 +124,7 @@ class IrqlAssignmentFlowConfiguration extends DataFlow::Configuration {
 }
 
 /**
- * Represents a variable that is either a parameter annotated \_IRQL\_saves\_
+ * A variable that is either a parameter annotated \_IRQL\_saves\_
  * or a variable which contains the value from a parameter annotated as such.
  */
 class IrqlSaveVariableFlowedTo extends Variable {
@@ -147,11 +149,11 @@ from IrqlSaveParameter isp
 where
   // Exclude OS functions
   not isp.getFunction() instanceof FundamentalIrqlSaveFunction and
-  
   /*
    * Case one: does the IrqlSaveParameter (or an alias of it) have the IRQL assigned to it
    * directly by calling, for example, KeRaiseIrql?
    */
+
   not exists(
     DataFlow::Node node, IrqlSaveVariableFlowedTo isvft, IrqlAssignmentFlowConfiguration difc
   |

@@ -6,10 +6,10 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.6",
+        "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/init-not-cleared",
-          "name" : "cpp/windows/drivers/queries/init-not-cleared",
+          "id" : "cpp/drivers/init-not-cleared",
+          "name" : "cpp/drivers/init-not-cleared",
           "shortDescription" : {
             "text" : "Failure to clear DO_DEVICE_INITIALIZING (C28152)"
           },
@@ -24,23 +24,25 @@
             "tags" : [ "correctness", "wddst" ],
             "description" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/init-not-cleared",
+            "id" : "cpp/drivers/init-not-cleared",
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Failure to clear DO_DEVICE_INITIALIZING (C28152)",
+            "opaqueid" : "CQLD-C28152",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+71ba680b6e5f964dc8fb3089b463d866e91d57d5",
+        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -76,10 +78,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/init-not-cleared",
+      "ruleId" : "cpp/drivers/init-not-cleared",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/init-not-cleared",
+        "id" : "cpp/drivers/init-not-cleared",
         "index" : 0
       },
       "message" : {
@@ -120,10 +122,10 @@
         }
       } ]
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/init-not-cleared",
+      "ruleId" : "cpp/drivers/init-not-cleared",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/init-not-cleared",
+        "id" : "cpp/drivers/init-not-cleared",
         "index" : 0
       },
       "message" : {

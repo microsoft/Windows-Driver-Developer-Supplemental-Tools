@@ -1,15 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name NoPagingSegment
- * @kind problem
- * @description The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment. In other words, a function that contains a PAGED_CODE or PAGED_CODE_LOCKED macro has not been placed in paged memory by using #pragma alloc_text or #pragma code_seg. For more information refer to C28172 Code Analysis rule.
- * @problem.severity warning
- * @feature.area Multiple
+ * @id cpp/drivers/no-paged-code
+ * @name No paging segment for PAGED_CODE macro invocation
+ * @description The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment. This can cause issues when debugging, using Code Analysis, or running on checked builds.
  * @platform Desktop
+ * @security.severity Low
+ * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The following code locations have PAGED_CODE() or PAGED_CODE_LOCKED() calls but they were not put in paged segments.
- * @id cpp/portedqueries/no-paging-segment
- * @version 1.0
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28172
+ * @kind problem
+ * @problem.severity warning
+ * @precision low
+ * @tags correctness
+ *       wddst
+ * @scope domainspecific
+ * @query-version v1
  */
 
 import cpp
