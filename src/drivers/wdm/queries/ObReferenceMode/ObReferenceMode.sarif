@@ -8,8 +8,8 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/drivers/no-paged-code",
-          "name" : "cpp/drivers/no-paged-code",
+          "id" : "cpp/drivers/ob-reference-mode",
+          "name" : "cpp/drivers/ob-reference-mode",
           "shortDescription" : {
             "text" : "The AccessMode parameter to ObReferenceObject* should be IRP->RequestorMode (C28126)"
           },
@@ -24,8 +24,8 @@
             "tags" : [ "correctness", "wddst" ],
             "description" : "In a dispatch routine call to ObReferenceObjectByHandle or ObReferenceObjectByPointer, the driver is passing UserMode or KernelMode for the AccessMode parameter, instead of using Irp->RequestorMode.  This warning can be ignored or suppressed for drivers that are not the top-level driver.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/no-paged-code",
-            "impact" : "Insecure Coding Practice",
+            "id" : "cpp/drivers/ob-reference-mode",
+            "impact" : "Exploitable Design",
             "kind" : "problem",
             "name" : "The AccessMode parameter to ObReferenceObject* should be IRP->RequestorMode (C28126)",
             "opaqueid" : "CQLD-C28126",
@@ -41,7 +41,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+2334e103689c85560079d969599a6734e20f6935",
+        "semanticVersion" : "0.1.0+ae2d160845533ee6b587fd5debf11def63ba55ec",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -77,10 +77,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/no-paged-code",
+      "ruleId" : "cpp/drivers/ob-reference-mode",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/no-paged-code",
+        "id" : "cpp/drivers/ob-reference-mode",
         "index" : 0
       },
       "message" : {

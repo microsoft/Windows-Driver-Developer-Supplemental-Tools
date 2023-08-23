@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/no-paged-code
+ * @id cpp/drivers/ob-reference-mode
  * @name The AccessMode parameter to ObReferenceObject* should be IRP->RequestorMode (C28126)
  * @description In a dispatch routine call to ObReferenceObjectByHandle or ObReferenceObjectByPointer, the driver is passing UserMode or KernelMode for the AccessMode parameter, instead of using Irp->RequestorMode.  This warning can be ignored or suppressed for drivers that are not the top-level driver.
  * @platform Desktop
