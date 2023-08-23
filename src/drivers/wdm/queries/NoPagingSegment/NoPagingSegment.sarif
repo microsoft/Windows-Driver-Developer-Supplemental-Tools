@@ -8,34 +8,40 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/portedqueries/no-paging-segment",
-          "name" : "cpp/portedqueries/no-paging-segment",
+          "id" : "cpp/drivers/no-paged-code",
+          "name" : "cpp/drivers/no-paged-code",
           "shortDescription" : {
-            "text" : "NoPagingSegment"
+            "text" : "No paging segment for PAGED_CODE macro invocation"
           },
           "fullDescription" : {
-            "text" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment. In other words, a function that contains a PAGED_CODE or PAGED_CODE_LOCKED macro has not been placed in paged memory by using #pragma alloc_text or #pragma code_seg. For more information refer to C28172 Code Analysis rule."
+            "text" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment. This can cause issues when debugging, using Code Analysis, or running on checked builds."
           },
           "defaultConfiguration" : {
             "enabled" : true,
             "level" : "warning"
           },
           "properties" : {
-            "description" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment. In other words, a function that contains a PAGED_CODE or PAGED_CODE_LOCKED macro has not been placed in paged memory by using #pragma alloc_text or #pragma code_seg. For more information refer to C28172 Code Analysis rule.",
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment. This can cause issues when debugging, using Code Analysis, or running on checked builds.",
             "feature.area" : "Multiple",
-            "id" : "cpp/portedqueries/no-paging-segment",
+            "id" : "cpp/drivers/no-paged-code",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "NoPagingSegment",
+            "name" : "No paging segment for PAGED_CODE macro invocation",
+            "opaqueid" : "CQLD-C28172",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
+            "precision" : "low",
             "problem.severity" : "warning",
+            "query-version" : "v1",
             "repro.text" : "The following code locations have PAGED_CODE() or PAGED_CODE_LOCKED() calls but they were not put in paged segments.",
-            "version" : "1.0"
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+9ab5e43ca979bbf5762e22d186fa6e349df3dc38",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -71,10 +77,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/portedqueries/no-paging-segment",
+      "ruleId" : "cpp/drivers/no-paged-code",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/no-paging-segment",
+        "id" : "cpp/drivers/no-paged-code",
         "index" : 0
       },
       "message" : {
@@ -99,10 +105,10 @@
         "primaryLocationStartColumnFingerprint" : "9"
       }
     }, {
-      "ruleId" : "cpp/portedqueries/no-paging-segment",
+      "ruleId" : "cpp/drivers/no-paged-code",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/no-paging-segment",
+        "id" : "cpp/drivers/no-paged-code",
         "index" : 0
       },
       "message" : {
