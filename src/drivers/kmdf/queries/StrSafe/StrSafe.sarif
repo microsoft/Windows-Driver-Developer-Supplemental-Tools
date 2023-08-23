@@ -8,34 +8,41 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/portedqueries/str-safe",
-          "name" : "cpp/portedqueries/str-safe",
+          "id" : "cpp/drivers/str-safe",
+          "name" : "cpp/drivers/str-safe",
           "shortDescription" : {
-            "text" : "StrSafe"
+            "text" : "Unsafe string header"
           },
           "fullDescription" : {
             "text" : "Kernel Mode drivers should use ntstrsafe.h, not strsafe.h. The header ntstrsafe.h contains versions of the functions found in strsafe.h that are suitable for use in kernel mode code. For more information please refer C28146 Code Analysis rule."
           },
           "defaultConfiguration" : {
             "enabled" : true,
-            "level" : "warning"
+            "level" : "error"
           },
           "properties" : {
+            "tags" : [ "security", "wddst" ],
             "description" : "Kernel Mode drivers should use ntstrsafe.h, not strsafe.h. The header ntstrsafe.h contains versions of the functions found in strsafe.h that are suitable for use in kernel mode code. For more information please refer C28146 Code Analysis rule.",
             "feature.area" : "Multiple",
-            "id" : "cpp/portedqueries/str-safe",
+            "id" : "cpp/drivers/str-safe",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "StrSafe",
+            "name" : "Unsafe string header",
+            "opaqueid" : "CQLD-C8146",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
-            "problem.severity" : "warning",
+            "precision" : "high",
+            "problem.severity" : "error",
+            "query-version" : "v1",
             "repro.text" : "The following include directive is unsafe for Kernel Mode drivers.",
-            "version" : "1.0"
+            "scope" : "domainspecific",
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
+        "semanticVersion" : "0.1.0+a48c9c8aba60ee1822ccc971a2abd532ffd26056",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -71,10 +78,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/portedqueries/str-safe",
+      "ruleId" : "cpp/drivers/str-safe",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/str-safe",
+        "id" : "cpp/drivers/str-safe",
         "index" : 0
       },
       "message" : {

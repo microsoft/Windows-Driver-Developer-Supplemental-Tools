@@ -2,15 +2,23 @@
 // Licensed under the MIT license.
 
 /**
- * @name StrSafe
+ * @name Unsafe string header
+ * @id cpp/drivers/str-safe
  * @kind problem
  * @description Kernel Mode drivers should use ntstrsafe.h, not strsafe.h. The header ntstrsafe.h contains versions of the functions found in strsafe.h that are suitable for use in kernel mode code. For more information please refer C28146 Code Analysis rule.
- * @problem.severity warning
  * @platform Desktop
- * @repro.text The following include directive is unsafe for Kernel Mode drivers.
+ * @security.severity Low
  * @feature.area Multiple
- * @id cpp/portedqueries/str-safe
- * @version 1.0
+ * @impact Insecure Coding Practice
+ * @repro.text The following include directive is unsafe for Kernel Mode drivers.
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C8146
+ * @problem.severity error
+ * @precision high
+ * @tags security
+ *       wddst
+ * @scope domainspecific
+ * @query-version v1
  */
 
 import cpp
