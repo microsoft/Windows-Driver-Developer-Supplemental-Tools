@@ -8,8 +8,8 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/opaquemdluse",
-          "name" : "cpp/windows/drivers/queries/opaquemdluse",
+          "id" : "cpp/drivers/opaque-mdl-use",
+          "name" : "cpp/drivers/opaque-mdl-use",
           "shortDescription" : {
             "text" : "Direct access of opaque MDL field"
           },
@@ -21,23 +21,27 @@
             "level" : "warning"
           },
           "properties" : {
-            "tags" : [ "correctness" ],
+            "tags" : [ "correctness", "wddst" ],
             "description" : "Direct access of opaque MDL fields should be avoided, as opaque struct layouts may change without warning.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/opaquemdluse",
+            "id" : "cpp/drivers/opaque-mdl-use",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Direct access of opaque MDL field",
+            "opaqueid" : "CQL-D0002",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "The following code locations directly access an opaque MDL field."
+            "repro.text" : "The following code locations directly access an opaque MDL field.",
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+049ecce3c1459fe4cf91c4cb8be39dd78144bf46",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -73,10 +77,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/opaquemdluse",
+      "ruleId" : "cpp/drivers/opaque-mdl-use",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/opaquemdluse",
+        "id" : "cpp/drivers/opaque-mdl-use",
         "index" : 0
       },
       "message" : {

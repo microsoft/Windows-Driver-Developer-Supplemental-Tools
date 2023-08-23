@@ -1,16 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
+ * @id cpp/drivers/opaque-mdl-use
  * @name Direct access of opaque MDL field
  * @description Direct access of opaque MDL fields should be avoided, as opaque struct layouts may change without warning.
  * @platform Desktop
+ * @security.severity Low
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The following code locations directly access an opaque MDL field.
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQL-D0002
  * @kind problem
- * @id cpp/windows/drivers/queries/opaquemdluse
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       wddst
  * @query-version v1
  */
 
