@@ -8,8 +8,8 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/ob-reference-mode",
-          "name" : "cpp/windows/drivers/queries/ob-reference-mode",
+          "id" : "cpp/drivers/no-paged-code",
+          "name" : "cpp/drivers/no-paged-code",
           "shortDescription" : {
             "text" : "The AccessMode parameter to ObReferenceObject* should be IRP->RequestorMode (C28126)"
           },
@@ -21,24 +21,27 @@
             "level" : "warning"
           },
           "properties" : {
-            "tags" : [ "correctness" ],
+            "tags" : [ "correctness", "wddst" ],
             "description" : "In a dispatch routine call to ObReferenceObjectByHandle or ObReferenceObjectByPointer, the driver is passing UserMode or KernelMode for the AccessMode parameter, instead of using Irp->RequestorMode.  This warning can be ignored or suppressed for drivers that are not the top-level driver.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/ob-reference-mode",
+            "id" : "cpp/drivers/no-paged-code",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "The AccessMode parameter to ObReferenceObject* should be IRP->RequestorMode (C28126)",
+            "opaqueid" : "CQLD-C28126",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "The driver did not pass Irp->RequestorMode to a call to ObReferenceObjectByHandle or ObReferenceObjectByPointer.",
+            "repro.text" : "The driver did not pass Irp->RequestorMode to a call to ObReferenceObjectByHandle or ObReferenceObjectByPointer.  This warning can be ignored or suppressed for drivers that are not the top-level driver.",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+2334e103689c85560079d969599a6734e20f6935",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -74,10 +77,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/ob-reference-mode",
+      "ruleId" : "cpp/drivers/no-paged-code",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/ob-reference-mode",
+        "id" : "cpp/drivers/no-paged-code",
         "index" : 0
       },
       "message" : {
