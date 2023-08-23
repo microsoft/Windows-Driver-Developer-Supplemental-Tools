@@ -10,7 +10,7 @@
  * @feature.area Multiple
  * @repro.text The driver assigned a value to a structure member that should be accessed only by using specialized functions.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQLD-C28128
+ * @opaqueid CQL-C28128
  * @problem.severity error
  * @precision high
  * @tags correctness

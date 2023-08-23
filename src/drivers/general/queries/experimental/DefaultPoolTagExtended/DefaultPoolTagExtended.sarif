@@ -27,7 +27,7 @@
             "id" : "cpp/drivers/default-pool-tag-extended",
             "kind" : "problem",
             "name" : "Use of default pool tag in memory allocation (C28147)",
-            "opaqueid" : "C28147",
+            "opaqueid" : "CQL-C28147e",
             "owner.email:" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
@@ -40,7 +40,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

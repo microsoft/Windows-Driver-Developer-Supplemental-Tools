@@ -16,6 +16,7 @@
  * @precision high
  * @tags correctness
  *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 

@@ -28,19 +28,21 @@
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Failure to clear DO_DEVICE_INITIALIZING (C28152)",
+            "opaqueid" : "CQL-C28152",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The driver exited its AddDevice routine without clearing the DO_DEVICE_INITIALIZING flag of the new FDO.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

@@ -28,20 +28,21 @@
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Direct access of opaque MDL field",
-            "opaqueid" : "CQL-D0002",
+            "opaqueid" : "CQLD-D0002",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The following code locations directly access an opaque MDL field.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+049ecce3c1459fe4cf91c4cb8be39dd78144bf46",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

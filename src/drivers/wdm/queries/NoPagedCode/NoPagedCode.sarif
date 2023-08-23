@@ -35,13 +35,14 @@
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The following code locations are duplicate PAGED_CODE() calls within a function.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+7048e8864fd8531352be5c7f75768b15c765eaf1",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

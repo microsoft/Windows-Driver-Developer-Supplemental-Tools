@@ -10,7 +10,7 @@
  * @impact Insecure Coding Practice
  * @repro.text The following code locations directly write to an opaque MDL field.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQL-C28145
+ * @opaqueid CQLD-C28145
  * @kind problem
  * @problem.severity warning
  * @precision high

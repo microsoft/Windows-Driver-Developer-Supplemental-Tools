@@ -28,7 +28,7 @@
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Write to opaque MDL field (C28145)",
-            "opaqueid" : "CQL-C28145",
+            "opaqueid" : "CQLD-C28145",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
@@ -42,7 +42,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+f97a6fdbfa1835c7ef931c0ac3c3e6d3165b06a6",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

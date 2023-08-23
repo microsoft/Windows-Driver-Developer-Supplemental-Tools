@@ -35,13 +35,14 @@
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The following code locations have PAGED_CODE() or PAGED_CODE_LOCKED() calls but they were not put in paged segments.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+9ab5e43ca979bbf5762e22d186fa6e349df3dc38",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

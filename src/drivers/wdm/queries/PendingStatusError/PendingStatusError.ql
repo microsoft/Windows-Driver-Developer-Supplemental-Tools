@@ -10,7 +10,7 @@
  * @impact Insecure Coding Practice
  * @repro.text The following code locations potentially contain IoMarkIrpPending calls that do not return STATUS_PENDING
  * @owner.email sdat@microsoft.com
- * @opaqueid CQL-C28143
+ * @opaqueid CQLD-C28143
  * @kind problem
  * @problem.severity warning
  * @precision Low

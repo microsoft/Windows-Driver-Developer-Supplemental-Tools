@@ -28,19 +28,21 @@
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Multiple instances of PAGED_CODE or PAGED_CODE_LOCKED",
+            "opaqueid" : "CQLD-C28171",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The following code locations are duplicate PAGED_CODE() calls within a function.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+64dd419a8bed7f9b59e4d67c8503e97440dad2da",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

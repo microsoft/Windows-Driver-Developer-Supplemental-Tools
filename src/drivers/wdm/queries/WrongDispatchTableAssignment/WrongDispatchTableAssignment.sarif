@@ -28,7 +28,7 @@
             "impact" : "Exploitable design",
             "kind" : "problem",
             "name" : "Incorrect dispatch table assignment",
-            "opaqueid" : "CQL-D0003",
+            "opaqueid" : "CQLD-D0003",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "Low",
@@ -42,7 +42,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+214d31382b87368271fa4134ae5373d0a7c8c25d",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

@@ -10,12 +10,13 @@
  * @impact Insecure Coding Practice
  * @repro.text The following code locations directly access an opaque MDL field.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQL-D0002
+ * @opaqueid CQLD-D0002
  * @kind problem
  * @problem.severity warning
  * @precision high
  * @tags correctness
  *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 

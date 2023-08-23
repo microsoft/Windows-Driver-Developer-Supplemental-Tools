@@ -28,19 +28,21 @@
             "impact" : "Exploitable Design",
             "kind" : "problem",
             "name" : "Use of local variable and UserMode in call to KeWaitSingleObject",
+            "opaqueid" : "CQL-C28135",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The following code locations contain a call to KeWaitForSingleObject while waiting for a local kernel-mode object, but the Mode parameter has not been set to KernelMode.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

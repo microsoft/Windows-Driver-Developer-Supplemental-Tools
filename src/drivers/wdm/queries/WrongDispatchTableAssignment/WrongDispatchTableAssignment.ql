@@ -10,7 +10,7 @@
  * @impact Exploitable design
  * @repro.text The following lines of code may potentially contain incorrect assignment to dispatch table entry.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQL-D0003
+ * @opaqueid CQLD-D0003
  * @kind problem
  * @problem.severity warning
  * @precision Low

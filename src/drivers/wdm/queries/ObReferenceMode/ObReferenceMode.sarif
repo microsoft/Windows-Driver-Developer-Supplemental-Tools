@@ -35,13 +35,14 @@
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The driver did not pass Irp->RequestorMode to a call to ObReferenceObjectByHandle or ObReferenceObjectByPointer.  This warning can be ignored or suppressed for drivers that are not the top-level driver.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+ae2d160845533ee6b587fd5debf11def63ba55ec",
+        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

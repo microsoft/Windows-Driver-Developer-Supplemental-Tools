@@ -10,12 +10,13 @@
  * @impact Exploitable Design
  * @repro.text The following code locations contain a call to KeWaitForSingleObject while waiting for a local kernel-mode object, but the Mode parameter has not been set to KernelMode.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQLD-C28135
+ * @opaqueid CQL-C28135
  * @kind problem
  * @problem.severity warning
  * @precision high
  * @tags correctness
  *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
