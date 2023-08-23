@@ -8,10 +8,10 @@
         "organization" : "GitHub",
         "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/portedqueries/wrong-dispatch-table-assignment",
-          "name" : "cpp/portedqueries/wrong-dispatch-table-assignment",
+          "id" : "cpp/drivers/wrong-dispatch-table-assignment",
+          "name" : "cpp/drivers/wrong-dispatch-table-assignment",
           "shortDescription" : {
-            "text" : "WrongDispatchTableAssignment"
+            "text" : "Incorrect dispatch table assignment"
           },
           "fullDescription" : {
             "text" : "The dispatch table assignment satisfies either of these 3 scenarios: 1) The dispatch table assignment has a function whose type is not DRIVER_DISPATCH, or 2) The dispatch table assignment has a DRIVER_DISPATCH function at its right-hand side but the function doesn't have a driver dispatch type annotation, or 3) The dispatch function satisfies both of the above conditions but its dispatch type doesn't match the expected type for the dispatch table entry."
@@ -21,21 +21,28 @@
             "level" : "warning"
           },
           "properties" : {
+            "tags" : [ "correctness", "wddst" ],
             "description" : "The dispatch table assignment satisfies either of these 3 scenarios: 1) The dispatch table assignment has a function whose type is not DRIVER_DISPATCH, or 2) The dispatch table assignment has a DRIVER_DISPATCH function at its right-hand side but the function doesn't have a driver dispatch type annotation, or 3) The dispatch function satisfies both of the above conditions but its dispatch type doesn't match the expected type for the dispatch table entry.",
             "feature.area" : "Multiple",
-            "id" : "cpp/portedqueries/wrong-dispatch-table-assignment",
+            "id" : "cpp/drivers/wrong-dispatch-table-assignment",
+            "impact" : "Exploitable design",
             "kind" : "problem",
-            "name" : "WrongDispatchTableAssignment",
+            "name" : "Incorrect dispatch table assignment",
+            "opaqueid" : "CQL-D0003",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
+            "precision" : "Low",
             "problem.severity" : "warning",
+            "query-version" : "v1",
             "repro.text" : "The following lines of code may potentially contain incorrect assignment to dispatch table entry.",
-            "version" : "1.0"
+            "scope" : "domainspecific",
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+6a14e59810fe14708a885b859a87353d22b908c8",
+        "semanticVersion" : "0.1.0+214d31382b87368271fa4134ae5373d0a7c8c25d",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -71,10 +78,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/portedqueries/wrong-dispatch-table-assignment",
+      "ruleId" : "cpp/drivers/wrong-dispatch-table-assignment",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/wrong-dispatch-table-assignment",
+        "id" : "cpp/drivers/wrong-dispatch-table-assignment",
         "index" : 0
       },
       "message" : {
@@ -99,10 +106,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/portedqueries/wrong-dispatch-table-assignment",
+      "ruleId" : "cpp/drivers/wrong-dispatch-table-assignment",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/wrong-dispatch-table-assignment",
+        "id" : "cpp/drivers/wrong-dispatch-table-assignment",
         "index" : 0
       },
       "message" : {
@@ -127,10 +134,10 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/portedqueries/wrong-dispatch-table-assignment",
+      "ruleId" : "cpp/drivers/wrong-dispatch-table-assignment",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/portedqueries/wrong-dispatch-table-assignment",
+        "id" : "cpp/drivers/wrong-dispatch-table-assignment",
         "index" : 0
       },
       "message" : {

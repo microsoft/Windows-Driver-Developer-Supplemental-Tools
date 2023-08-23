@@ -1,15 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name WrongDispatchTableAssignment
- * @kind problem
- * @platform Desktop
+ * @id cpp/drivers/wrong-dispatch-table-assignment
+ * @name Incorrect dispatch table assignment
  * @description The dispatch table assignment satisfies either of these 3 scenarios: 1) The dispatch table assignment has a function whose type is not DRIVER_DISPATCH, or 2) The dispatch table assignment has a DRIVER_DISPATCH function at its right-hand side but the function doesn't have a driver dispatch type annotation, or 3) The dispatch function satisfies both of the above conditions but its dispatch type doesn't match the expected type for the dispatch table entry.
- * @problem.severity warning
+ * @platform Desktop
+ * @security.severity Low
  * @feature.area Multiple
+ * @impact Exploitable design
  * @repro.text The following lines of code may potentially contain incorrect assignment to dispatch table entry.
- * @id cpp/portedqueries/wrong-dispatch-table-assignment
- * @version 1.0
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQL-D0003
+ * @kind problem
+ * @problem.severity warning
+ * @precision Low
+ * @tags correctness
+ *       wddst
+ * @scope domainspecific
+ * @query-version v1
  */
 
 import cpp
