@@ -8,9 +8,10 @@
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The driver assigned a value to a structure member that should be accessed only by using specialized functions.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQL-C28128
+ * @opaqueid CQLD-C28128
  * @problem.severity error
  * @precision high
  * @tags correctness

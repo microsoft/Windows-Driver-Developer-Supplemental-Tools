@@ -8,9 +8,10 @@
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The driver read a structure field that should not be accessed outside of certain contexts.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQL-C28175
+ * @opaqueid CQLD-C28175
  * @problem.severity warning
  * @precision high
  * @tags correctness

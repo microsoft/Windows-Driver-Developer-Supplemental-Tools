@@ -9,9 +9,10 @@
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The driver wrote to a structure field that should not be modified outside of certain contexts.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQL-C28176
+ * @opaqueid CQLD-C28176
  * @problem.severity warning
  * @precision high
  * @tags correctness

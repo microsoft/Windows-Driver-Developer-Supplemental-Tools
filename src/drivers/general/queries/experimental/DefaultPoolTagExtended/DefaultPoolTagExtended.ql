@@ -7,9 +7,10 @@
  * @description Tagging memory with the default tags of ' mdW' or ' kdD' can make it difficult to debug allocations.
  * @platform Desktop
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The following code locations call a pool allocation function with one of the default tags (' mdW' or ' kdD').
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQL-C28147e
+ * @opaqueid CQLD-C28147e
  * @problem.severity warning
  * @precision medium
  * @tags correctness

@@ -25,9 +25,10 @@
             "description" : "The driver wrote to a structure field that should not be modified outside of certain contexts.",
             "feature.area" : "Multiple",
             "id" : "cpp/drivers/illegal-field-write",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Illegal write to a protected field (C28176)",
-            "opaqueid" : "CQL-C28176",
+            "opaqueid" : "CQLD-C28176",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
@@ -41,7 +42,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
+        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

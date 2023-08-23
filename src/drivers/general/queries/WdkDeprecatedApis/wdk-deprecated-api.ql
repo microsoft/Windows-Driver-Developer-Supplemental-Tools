@@ -11,7 +11,7 @@
  * @feature.area Multiple
  * @repro.text The following code locations contain calls to a deprecated WDK allocation API.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQLD0001
+ * @opaqueid CQLD-D0001
  * @problem.severity warning
  * @precision high
  * @tags security

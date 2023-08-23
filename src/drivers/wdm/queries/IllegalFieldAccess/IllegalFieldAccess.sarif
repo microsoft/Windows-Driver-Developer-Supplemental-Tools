@@ -25,9 +25,10 @@
             "description" : "The driver assigned a value to a structure member that should be accessed only by using specialized functions.",
             "feature.area" : "Multiple",
             "id" : "cpp/drivers/illegal-field-access",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Incorrect access to protected field (C28128)",
-            "opaqueid" : "CQL-C28128",
+            "opaqueid" : "CQLD-C28128",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
@@ -41,7 +42,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
+        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

@@ -11,7 +11,7 @@
  * @impact Insecure Coding Practice
  * @repro.text This function has a parameter annotated \_IRQL\_saves\_, but does not have the system IRQL saved to it.
  * @owner.email sdat@microsoft.com
- * @opaqueid C28158
+ * @opaqueid CQLD-C28158
  * @problem.severity warning
  * @precision medium
  * @tags correctness

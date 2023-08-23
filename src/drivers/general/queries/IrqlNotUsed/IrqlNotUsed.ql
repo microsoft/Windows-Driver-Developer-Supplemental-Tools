@@ -11,7 +11,7 @@
  * @impact Insecure Coding Practice
  * @repro.text This function has a parameter annotated \_IRQL\_restores\_, but does not have a code path where this parameter is read and used to restore the IRQL.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQL-C28157
+ * @opaqueid CQLD-C28157
  * @problem.severity warning
  * @precision medium
  * @tags correctness

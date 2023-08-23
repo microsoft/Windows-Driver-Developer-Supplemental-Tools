@@ -25,9 +25,10 @@
             "description" : "Tagging memory with the default tags of ' mdW' or ' kdD' can make it difficult to debug allocations.",
             "feature.area" : "Multiple",
             "id" : "cpp/drivers/default-pool-tag-extended",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Use of default pool tag in memory allocation (C28147)",
-            "opaqueid" : "CQL-C28147e",
+            "opaqueid" : "CQLD-C28147e",
             "owner.email:" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
@@ -40,7 +41,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+9a039af27053dadc63aab8e19e7bac1f72f758db",
+        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

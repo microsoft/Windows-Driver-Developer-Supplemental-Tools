@@ -11,7 +11,7 @@
  * @feature.area Multiple
  * @repro.text The following code locations contain calls to an unsafe, deprecated function or macro.
  * @owner.email: sdat@microsoft.com
- * @opaqueid C28719
+ * @opaqueid CQLD-C28719
  * @problem.severity warning
  * @precision high
  * @tags correctness

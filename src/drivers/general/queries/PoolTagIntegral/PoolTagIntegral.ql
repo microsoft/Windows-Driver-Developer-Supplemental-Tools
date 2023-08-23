@@ -11,7 +11,7 @@
  * @impact Attack Surface Reduction
  * @repro.text The following code locations call a pool allocation function with a tag that is not an integral type.
  * @owner.email sdat@microsoft.com
- * @opaqueid C28134
+ * @opaqueid CQLD-C28134
  * @problem.severity warning
  * @precision high
  * @tags correctness
