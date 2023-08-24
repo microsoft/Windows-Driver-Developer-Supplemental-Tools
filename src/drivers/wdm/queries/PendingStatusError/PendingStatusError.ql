@@ -1,15 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name PendingStatusError
- * @kind problem
- * @platform Desktop
+ * @id cpp/drivers/pending-status-error
+ * @name Did not return STATUS_PENDING after IoMarkIrpPending call
  * @description A dispatch routine that calls IoMarkIrpPending includes at least one path in which the driver returns a value other than STATUS_PENDING. The IoMarkIrpPending routine marks the specified IRP, indicating that a driver's dispatch routine subsequently returned STATUS_PENDING because further processing is required by other driver routines. For more information please refer C28143 Code Analysis rule.
- * @problem.severity error
+ * @platform Desktop
+ * @security.severity Low
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The following code locations potentially contain IoMarkIrpPending calls that do not return STATUS_PENDING
- * @id cpp/portedqueries/pending-status-error
- * @version 1.0
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28143
+ * @kind problem
+ * @problem.severity warning
+ * @precision Low
+ * @tags correctness
+ *       wddst
+ * @scope domainspecific
+ * @query-version v1
  */
 
 import cpp

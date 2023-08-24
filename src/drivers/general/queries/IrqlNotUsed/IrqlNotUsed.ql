@@ -2,7 +2,8 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/irql-not-used
- * @name IRQL not restored
+ * @kind problem
+ * @name IRQL not restored (C28157)
  * @description Any parameter annotated \_IRQL\_restores\_ must be read and used to restore the IRQL value.
  * @platform Desktop
  * @security.severity Low
@@ -10,11 +11,12 @@
  * @impact Insecure Coding Practice
  * @repro.text This function has a parameter annotated \_IRQL\_restores\_, but does not have a code path where this parameter is read and used to restore the IRQL.
  * @owner.email sdat@microsoft.com
- * @kind problem
+ * @opaqueid CQLD-C28157
  * @problem.severity warning
  * @precision medium
  * @tags correctness
  *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
@@ -23,7 +25,7 @@ import drivers.libraries.Irql
 import semmle.code.cpp.dataflow.DataFlow
 
 /**
- * Represents a function that has at least one parameter annotated with "\_IRQL\_restores\_".
+ * A function that has at least one parameter annotated with "\_IRQL\_restores\_".
  */
 class IrqlRestoreFunction extends Function {
   Parameter p;
@@ -40,7 +42,7 @@ class IrqlRestoreFunction extends Function {
 }
 
 /**
- * Represents a "fundamental" function that restores IRQL, i.e. one defined
+ * A "fundamental" function that restores IRQL, i.e. one defined
  * by the Windows OS itself.  This is in general in a Windows Kits header.  For
  * extra clarity and internal use, we also list the exact header files.
  */
@@ -54,7 +56,7 @@ class FundamentalIrqlRestoreFunction extends IrqlRestoreFunction {
 }
 
 /**
- * Represents a data-flow configuration describing flow from an
+ * A data-flow configuration describing flow from an
  * _IRQL_restores_-annotated parameter to an OS function that restores
  * the IRQL.
  */

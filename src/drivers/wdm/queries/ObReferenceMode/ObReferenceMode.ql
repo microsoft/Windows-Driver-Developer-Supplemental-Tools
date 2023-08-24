@@ -1,17 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
+ * @id cpp/drivers/ob-reference-mode
  * @name The AccessMode parameter to ObReferenceObject* should be IRP->RequestorMode (C28126)
  * @description In a dispatch routine call to ObReferenceObjectByHandle or ObReferenceObjectByPointer, the driver is passing UserMode or KernelMode for the AccessMode parameter, instead of using Irp->RequestorMode.  This warning can be ignored or suppressed for drivers that are not the top-level driver.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
- * @repro.text The driver did not pass Irp->RequestorMode to a call to ObReferenceObjectByHandle or ObReferenceObjectByPointer.
+ * @impact Exploitable Design
+ * @repro.text The driver did not pass Irp->RequestorMode to a call to ObReferenceObjectByHandle or ObReferenceObjectByPointer.  This warning can be ignored or suppressed for drivers that are not the top-level driver.
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28126
  * @kind problem
- * @id cpp/windows/drivers/queries/ob-reference-mode
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
