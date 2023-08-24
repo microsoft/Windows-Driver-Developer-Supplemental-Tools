@@ -1,16 +1,22 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
+ * @id cpp/drivers/opaque-mdl-write
  * @name Write to opaque MDL field (C28145)
- * @description Opaque MDL fields should not be written to.  This is a port of Code Analysis check C28145.
+ * @description Writing to opaque MDL fields can cause erroneous behavior.  This is a port of Code Analysis check C28145.
  * @platform Desktop
+ * @security.severity Low
  * @feature.area Multiple
- * @repro.text The following code locations directly write to an opaque MDL filed.
+ * @impact Insecure Coding Practice
+ * @repro.text The following code locations directly write to an opaque MDL field.
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28145
  * @kind problem
- * @id cpp/windows/drivers/queries/opaquemdlwrite
- * @problem.severity error
+ * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
@@ -18,9 +24,9 @@ import cpp
 import drivers.wdm.libraries.Mdl
 
 /**
- * A class representing a write to a field in an MDL which is not:
- * - The "Next" field (valid to update manually)
- * - Part of the WDM header files
+ * A class representing a write to a field in an MDL which is not any of:
+ * - Writing to the "Next" field (valid to update manually)
+ * - Taking place in the WDM header file
  * - The result of expanding a safe macro to adjust a field
  */
 class IncorrectMdlWrite extends Assignment {

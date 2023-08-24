@@ -1,32 +1,41 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name ExaminedValue
+ * @name Return value not examined (C28193)
+ * @id cpp/drivers/examined-value
  * @kind problem
- * @description The returned value is annotated with the _Check_return_ or _Must_inspect_result_ annotation, but the calling function is either not using the value or is overwriting the value without examining it. For more information please refer C28193 Code Analysis rule.
- * @problem.severity warning
- * @id cpp/portedqueries/examined-value
+ * @description The returned value is annotated with the _Check_return_ or _Must_inspect_result_ annotation, but the calling function is either not using the value or is overwriting the value without examining it.
  * @platform Desktop
+ * @security.severity Low
  * @feature.area Multiple
- * @repro.text The following code locations potentially contain function calls whose return values are not checked.
- * @version 1.0
+ * @impact Attack Surface Reduction
+ * @repro.text The following code location calls a function annotated with _Check_return_ or _Must_inspect_result_ but does not check the returned value.
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28134
+ * @problem.severity warning
+ * @precision high
+ * @tags correctness
+ *       wddst
+ * @scope general
+ * @query-version v1
  */
 
 import cpp
 import drivers.libraries.SAL
 
-//Represents functions that are annotated with either _Check_return_ or _Must_inspect_result_
+/** A function that is annotated with either _Check_return_ or _Must_inspect_result_. */
 class ReturnMustBeCheckedFunction extends Function {
   SALCheckReturn scr;
 
   ReturnMustBeCheckedFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
 }
 
+/** A function call to a function annotated with either _Check_return_ or _Must_inspect_result_. */
 class ReturnMustBeCheckedFunctionCall extends FunctionCall {
   ReturnMustBeCheckedFunctionCall() { this.getTarget() instanceof ReturnMustBeCheckedFunction }
 }
 
-//Holds if an expression (a call to ReturnMustBeCheckedFunction in this case) is occuring in a void context.
+/** Holds if an expression (a call to ReturnMustBeCheckedFunction in this case) is occuring in a void context. */
 predicate unUsed(Expr e) {
   e instanceof ExprInVoidContext
   or
@@ -35,7 +44,7 @@ predicate unUsed(Expr e) {
 }
 
 /**
- * In the general case this predicate is used to calculate the number of checked & total calls to a ReturnMustBeCheckedFunction. In the other case (if the two lines below are uncommented), it evaluates to true for ReturnMustBeCheckedFunctionCall's whose return values have been used in at aleast "X" % of the total number of calls.
+ * Returns true if a ReturnMustBeCheckedFunction has its return value checked more than 75% of the time.
  */
 predicate callFrequency(ReturnMustBeCheckedFunction f, string message) {
   exists(Options opts, int used, int total, int percentage |

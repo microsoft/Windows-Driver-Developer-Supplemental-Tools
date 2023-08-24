@@ -1,17 +1,23 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+
 /**
- * @name Illegal access to a protected field (C28176)
+ * @name Illegal write to a protected field (C28176)
+ * @id cpp/drivers/illegal-field-write
+ * @kind problem
  * @description The driver wrote to a structure field that should not be modified outside of certain contexts.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The driver wrote to a structure field that should not be modified outside of certain contexts.
- * @kind problem
- * @id cpp/windows/drivers/queries/illegal-field-write
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28176
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       wddst
+ * @scope domainspecific
  * @query-version v1
  */
 
@@ -19,7 +25,7 @@ import cpp
 import drivers.wdm.libraries.WdmDrivers
 
 /**
- * Represents the illegal accesses we look for in this query.
+ * An illegal access we look for in this query.
  */
 abstract class PotentiallyIllegalFieldAccess extends FieldAccess {
   /** Provides a message describing the illegal access. */
@@ -30,7 +36,7 @@ abstract class PotentiallyIllegalFieldAccess extends FieldAccess {
 }
 
 /**
- * Represents a potentially illegal access to a field of a DeviceObject when used in a write,
+ * A potentially illegal access to a field of a DeviceObject when used in a write,
  * namely the NextDevice, DriverObject, and SecurityDescriptor fields.
  */
 class IllegalDeviceObjectFieldAccess extends PotentiallyIllegalFieldAccess {
@@ -42,7 +48,7 @@ class IllegalDeviceObjectFieldAccess extends PotentiallyIllegalFieldAccess {
 }
 
 /**
- * Represents potentially illegal accesses to a DriverObject field when used in a write, namely the
+ * A potentially illegal access to a DriverObject field when used in a write, namely the
  * DeviceObject, HardwareDatabase, DriverInit, and Size fields.
  */
 class IllegalDriverObjectFieldAccess extends PotentiallyIllegalFieldAccess {

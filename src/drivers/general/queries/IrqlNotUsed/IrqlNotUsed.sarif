@@ -6,12 +6,12 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.6",
+        "semanticVersion" : "2.11.5",
         "rules" : [ {
           "id" : "cpp/drivers/irql-not-used",
           "name" : "cpp/drivers/irql-not-used",
           "shortDescription" : {
-            "text" : "IRQL not restored"
+            "text" : "IRQL not restored (C28157)"
           },
           "fullDescription" : {
             "text" : "Any parameter annotated \\_IRQL\\_restores\\_ must be read and used to restore the IRQL value."
@@ -27,20 +27,22 @@
             "id" : "cpp/drivers/irql-not-used",
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "IRQL not restored",
+            "name" : "IRQL not restored (C28157)",
+            "opaqueid" : "CQLD-C28157",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "This function has a parameter annotated \\_IRQL\\_restores\\_, but does not have a code path where this parameter is read and used to restore the IRQL.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+72e2acc449707a64f4eb84cd54d350f98798c842",
+        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
