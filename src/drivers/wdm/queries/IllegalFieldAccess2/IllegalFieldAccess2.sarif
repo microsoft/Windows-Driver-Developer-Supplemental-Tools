@@ -6,10 +6,10 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.6",
+        "semanticVersion" : "2.11.5",
         "rules" : [ {
-          "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
-          "name" : "cpp/windows/drivers/queries/illegal-field-access-2",
+          "id" : "cpp/drivers/illegal-field-access-2",
+          "name" : "cpp/drivers/illegal-field-access-2",
           "shortDescription" : {
             "text" : "Illegal access to a protected field (C28175)"
           },
@@ -21,24 +21,28 @@
             "level" : "warning"
           },
           "properties" : {
-            "tags" : [ "correctness" ],
+            "tags" : [ "correctness", "wddst" ],
             "description" : "The driver read a structure field that should not be accessed outside of certain contexts.",
             "feature.area" : "Multiple",
-            "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+            "id" : "cpp/drivers/illegal-field-access-2",
+            "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Illegal access to a protected field (C28175)",
+            "opaqueid" : "CQLD-C28175",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
             "repro.text" : "The driver read a structure field that should not be accessed outside of certain contexts.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+bcce4d40c0554212a1998137ba182b3981b8391c",
+        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -74,10 +78,10 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleId" : "cpp/drivers/illegal-field-access-2",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "id" : "cpp/drivers/illegal-field-access-2",
         "index" : 0
       },
       "message" : {
@@ -102,10 +106,10 @@
         "primaryLocationStartColumnFingerprint" : "14"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleId" : "cpp/drivers/illegal-field-access-2",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "id" : "cpp/drivers/illegal-field-access-2",
         "index" : 0
       },
       "message" : {
@@ -130,10 +134,10 @@
         "primaryLocationStartColumnFingerprint" : "18"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleId" : "cpp/drivers/illegal-field-access-2",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "id" : "cpp/drivers/illegal-field-access-2",
         "index" : 0
       },
       "message" : {
@@ -158,10 +162,10 @@
         "primaryLocationStartColumnFingerprint" : "18"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleId" : "cpp/drivers/illegal-field-access-2",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "id" : "cpp/drivers/illegal-field-access-2",
         "index" : 0
       },
       "message" : {
@@ -186,10 +190,10 @@
         "primaryLocationStartColumnFingerprint" : "32"
       }
     }, {
-      "ruleId" : "cpp/windows/drivers/queries/illegal-field-access-2",
+      "ruleId" : "cpp/drivers/illegal-field-access-2",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/windows/drivers/queries/illegal-field-access-2",
+        "id" : "cpp/drivers/illegal-field-access-2",
         "index" : 0
       },
       "message" : {

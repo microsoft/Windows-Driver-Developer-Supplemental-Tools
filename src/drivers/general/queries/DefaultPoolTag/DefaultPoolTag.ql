@@ -1,23 +1,26 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Use of string in pool tag instead of integral (C28147)
- * @description Driver should not allocate memory with the default tags of ' mdW' or ' kdD'.
+ * @id cpp/drivers/default-pool-tag
+ * @kind problem
+ * @name Use of default pool tag in memory allocation (C28147)
+ * @description Tagging memory with the default tags of ' mdW' or ' kdD' can make it difficult to debug allocations.
  * @platform Desktop
  * @feature.area Multiple
+ * @impact Insecure Coding Practice
  * @repro.text The following code locations call a pool allocation function with one of the default tags (' mdW' or ' kdD').
- * @kind problem
- * @id cpp/windows/drivers/queries/default-pool-tag
+ * @owner.email: sdat@microsoft.com
+ * @opaqueid CQLD-C28147
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ * @scope domainspecific
  * @query-version v1
  */
 
 import cpp
-import semmle.code.cpp.dataflow.DataFlow
 
-/** Represents a pool allocation function (has a ULONG "Tag" field, a "Flags" field, and a size parameter.) */
+/** A pool allocation function (has a ULONG "Tag" field, a "Flags" field, and a size parameter.) */
 class PoolTypeFunction extends Function {
   PoolTypeFunction() {
     exists(Parameter p |
@@ -30,7 +33,7 @@ class PoolTypeFunction extends Function {
   }
 }
 
-/** Represents a default pool tag (' mdw' or ' kdD'.) */
+/** A default pool tag (' mdw' or ' kdD'.) */
 class DefaultPoolTag extends Literal {
   DefaultPoolTag() {
     this.(CharLiteral).getValueText() = "' mdW'" or

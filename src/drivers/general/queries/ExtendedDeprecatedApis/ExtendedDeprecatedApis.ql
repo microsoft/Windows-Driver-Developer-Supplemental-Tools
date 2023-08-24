@@ -1,27 +1,33 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
+ * @id cpp/drivers/extended-deprecated-apis
+ * @kind problem
  * @name Use of deprecated function or macro (C28719, C28726, C28735, C28750)
- * @description Unsafe, deprecated APIs should not be used.  This is a port of Code Analysis checks C28719, C28726, and C28750.
+ * @description Use of deprecated APIs causes correctness or safety issues.  This is a port of Code Analysis checks C28719, C28726, and C28750.
  * @platform Desktop
  * @security.severity Low
  * @impact Attack Surface Reduction
  * @feature.area Multiple
  * @repro.text The following code locations contain calls to an unsafe, deprecated function or macro.
- * @kind problem
- * @id cpp/windows/drivers/queries/extended-deprecated-apis
+ * @owner.email: sdat@microsoft.com
+ * @opaqueid CQLD-C28719
  * @problem.severity warning
  * @precision high
  * @tags correctness
+ *       security
+ * @scope generic
  * @query-version v1
  */
 
 import cpp
 
+/** A function call targeting a deprecated API. */
 class ExtendedDeprecatedApiCall extends FunctionCall {
   ExtendedDeprecatedApiCall() { this.getTarget() instanceof ExtendedDeprecatedApi }
 }
 
+/** Holds if the given string matches the name of a deprecated function or macro. */
 predicate matchesBannedApi(string input) {
   // Functions marked deprecated in C28719
   input =
@@ -68,6 +74,7 @@ predicate matchesBannedApi(string input) {
   input = any(["lstrlen", "lstrlenA", "lstrlenW"])
 }
 
+/** A deprecated API. */
 class ExtendedDeprecatedApi extends Function {
   string name;
 
@@ -77,6 +84,7 @@ class ExtendedDeprecatedApi extends Function {
   }
 }
 
+/** A deprecated macro. */
 class ExtendedDeprecatedMacro extends Macro {
   string name;
 
@@ -86,10 +94,12 @@ class ExtendedDeprecatedMacro extends Macro {
   }
 }
 
+/** An invocation of a deprecated macro. */
 class ExtendedDeprecatedMacroInvocation extends MacroInvocation {
   ExtendedDeprecatedMacroInvocation() { this.getMacro() instanceof ExtendedDeprecatedMacro }
 }
 
+/** A function call or macro invocation to a deprecated API. */
 class ExtendedDeprecatedCall extends Element {
   string name;
   string replacement;
@@ -442,6 +452,7 @@ class ExtendedDeprecatedCall extends Element {
     )
   }
 
+  /** Gets an error message describing the deprecated API and the standard replacement, if any. */
   string getMessage() {
     if replacement.matches("None")
     then

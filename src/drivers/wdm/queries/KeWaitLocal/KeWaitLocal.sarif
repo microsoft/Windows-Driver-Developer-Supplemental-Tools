@@ -11,35 +11,38 @@
           "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
           "name" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
           "shortDescription" : {
-            "text" : "KeWaitLocal"
+            "text" : "Use of local variable and UserMode in call to KeWaitSingleObject"
           },
           "fullDescription" : {
             "text" : "When the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode."
           },
           "defaultConfiguration" : {
             "enabled" : true,
-            "level" : "error"
+            "level" : "warning"
           },
           "properties" : {
+            "tags" : [ "correctness", "wddst" ],
             "description" : "When the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode.",
             "feature.area" : "Multiple",
             "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
-            "impact:" : "Exploitable Design",
+            "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "KeWaitLocal",
-            "owner.email:" : "sdat@microsoft.com",
+            "name" : "Use of local variable and UserMode in call to KeWaitSingleObject",
+            "opaqueid" : "CQLD-C28135",
+            "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
-            "problem.severity" : "error",
-            "query-version" : "1.0",
+            "problem.severity" : "warning",
+            "query-version" : "v2",
             "repro.text" : "The following code locations contain a call to KeWaitForSingleObject while waiting for a local kernel-mode object, but the Mode parameter has not been set to KernelMode.",
-            "security.severity:" : "Low"
+            "scope" : "domainspecific",
+            "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+49dac27a0f5a5406cdaad6c6b32b20e47aef0459",
+        "semanticVersion" : "0.1.0+c5706b97bc9d314a2dabbf2421005784dd3c1303",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
