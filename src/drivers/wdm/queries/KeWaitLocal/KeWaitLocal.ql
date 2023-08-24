@@ -17,7 +17,7 @@
  * @tags correctness
  *       wddst
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -28,5 +28,4 @@ where
   call.getArgument(2).getValue().toInt() != 0 and
   call.getArgument(0).(AddressOfExpr).getOperand() = va and
   va.getTarget() instanceof StackVariable
-select call,
-  "KeWaitForSingleObject should have a KernelMode AccessMode when the first argument is local"
+select call, "$@: KeWaitForSingleObject should have a KernelMode AccessMode when the $@ is local", call.getControlFlowScope(), call.getControlFlowScope().getQualifiedName(), va.getTarget(), "first argument"
