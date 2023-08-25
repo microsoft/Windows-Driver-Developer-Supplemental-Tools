@@ -33,8 +33,9 @@ class IrqlRestrainedCall extends FunctionCall {
 }
 
 /**
- * Attempt to find the range of valid IRQL values when exiting a given function.
+ * Attempt to find the range of valid IRQL values when **exiting** a given function.
  * TODO: Make a version of this focused on calls that we can recursively call to track the IRQL.
+ * TODO: Cases where annotated min and max
  * BUG: Returning 15 unexpectedly in places.
  */
 int getPotentialIrql(IrqlAnnotatedFunction irqlFunc) {
@@ -46,14 +47,24 @@ int getPotentialIrql(IrqlAnnotatedFunction irqlFunc) {
       irqlFunc instanceof IrqlRequiresSameAnnotatedFunction
     then result = irqlFunc.getIrqlLevel()
     else
-      if irqlFunc instanceof IrqlMaxAnnotatedFunction
-      then result = any([0 .. irqlFunc.getIrqlLevel()])
+      if
+        irqlFunc instanceof IrqlMaxAnnotatedFunction and
+        irqlFunc instanceof IrqlMinAnnotatedFunction
+      then
+        result =
+          any([irqlFunc.(IrqlMinAnnotatedFunction).getIrqlLevel() .. irqlFunc
+                    .(IrqlMaxAnnotatedFunction)
+                    .getIrqlLevel()]
+          )
       else
-        if irqlFunc instanceof IrqlMinAnnotatedFunction
-        then result = any([irqlFunc.getIrqlLevel() .. 15])
+        if irqlFunc instanceof IrqlMaxAnnotatedFunction
+        then result = any([0 .. irqlFunc.getIrqlLevel()])
         else
-          // Below is never reached, and is invalid if it is
-          result = -1
+          if irqlFunc instanceof IrqlMinAnnotatedFunction
+          then result = any([irqlFunc.getIrqlLevel() .. 15])
+          else
+            // Below is never reached, and is invalid if it is
+            result = -1
 }
 
 /** Given a IrqlRestrainedCall, gets the most recent prior call in the block. */
@@ -144,5 +155,5 @@ where
   previousLevel = min(int i | i = getAMostRecentIrql(irc)) and
   irc.getTarget().(IrqlMaxAnnotatedFunction).getIrqlLevel() < previousLevel
 select irc,
-  "IRQL is potentially too high at call $@ - max " + irc.getIrqlLevel() + ", found " + previousLevel,
+  "IRQL is too high at call $@ - max " + irc.getIrqlLevel() + ", found " + previousLevel,
   irc, irc.toString()
