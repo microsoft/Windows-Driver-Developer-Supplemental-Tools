@@ -49,7 +49,8 @@ int getPotentialIrql(IrqlAnnotatedFunction irqlFunc) {
     else
       if
         irqlFunc instanceof IrqlMaxAnnotatedFunction and
-        irqlFunc instanceof IrqlMinAnnotatedFunction
+        irqlFunc instanceof IrqlMinAnnotatedFunction and
+        irqlFunc instanceof IrqlRequiresSameAnnotatedFunction
       then
         result =
           any([irqlFunc.(IrqlMinAnnotatedFunction).getIrqlLevel() .. irqlFunc
@@ -57,14 +58,28 @@ int getPotentialIrql(IrqlAnnotatedFunction irqlFunc) {
                     .getIrqlLevel()]
           )
       else
-        if irqlFunc instanceof IrqlMaxAnnotatedFunction
+        if
+          irqlFunc instanceof IrqlMaxAnnotatedFunction and
+          irqlFunc instanceof IrqlRequiresSameAnnotatedFunction
         then result = any([0 .. irqlFunc.getIrqlLevel()])
         else
-          if irqlFunc instanceof IrqlMinAnnotatedFunction
+          if
+            irqlFunc instanceof IrqlMinAnnotatedFunction and
+            irqlFunc instanceof IrqlRequiresSameAnnotatedFunction
           then result = any([irqlFunc.getIrqlLevel() .. 15])
           else
-            // Below is never reached, and is invalid if it is
+            // Below indicates we cannot determine the correct IRQL
             result = -1
+}
+
+cached
+int getIrqlAtThisStatement(Expr e) {
+  if e instanceof KeRaiseIrqlCall
+  then result = e.(KeRaiseIrqlCall).getIrqlLevel()
+  else
+    if not exists(ControlFlowNode cfn | cfn = e.getAPredecessor())
+    then result = 0
+    else result = any(getIrqlAtThisStatement(e.getAPredecessor()))
 }
 
 /** Given a IrqlRestrainedCall, gets the most recent prior call in the block. */
@@ -154,6 +169,5 @@ where
   previousLevel != -1 and
   previousLevel = min(int i | i = getAMostRecentIrql(irc)) and
   irc.getTarget().(IrqlMaxAnnotatedFunction).getIrqlLevel() < previousLevel
-select irc,
-  "IRQL is too high at call $@ - max " + irc.getIrqlLevel() + ", found " + previousLevel,
+select irc, "IRQL is too high at call $@ - max " + irc.getIrqlLevel() + ", found " + previousLevel,
   irc, irc.toString()
