@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/irql-too-high
- * @name IRQL too low
+ * @name IRQL too low (C28120)
  * @description A function annotated with IRQL requirements was called at an IRQL too high for the requirements.
  * @platform Desktop
  * @security.severity Low
@@ -21,13 +21,16 @@
 import cpp
 import drivers.libraries.Irql
 
-// Take it from the top...
-from FunctionCall fc
+from FunctionCall fc, IrqlRestrictsFunction imaf, ControlFlowNode e, int irqlRequirement
 where
-  fc.getTarget() instanceof IrqlMaxAnnotatedFunction and
-  fc.getTarget().(IrqlMaxAnnotatedFunction).getIrqlLevel() <
-    min(getPotentialExitIrqlAtCfn(any(fc.getAPredecessor())))
+  fc.getTarget() = imaf and
+  e = fc.getAPredecessor() and
+  (
+    imaf.(IrqlMaxAnnotatedFunction).getIrqlLevel() = irqlRequirement
+    or
+    imaf.(IrqlRequiresAnnotatedFunction).getIrqlLevel() = irqlRequirement
+  ) and
+  irqlRequirement < min(getPotentialExitIrqlAtCfn(e))
 select fc,
-  "IRQL potentially too low high this call ($@).  Maximum irql level of this call: $@, Irql level at preceding node: $@",
-  fc, fc.getTarget().toString(), fc, "" + fc.getTarget().(IrqlMaxAnnotatedFunction).getIrqlLevel(),
-  fc, "" + getPotentialExitIrqlAtCfn(any(fc.getAPredecessor()))
+  "IRQL potentially too high at this call ($@).  Maximum irql level of this call: $@, Irql level at preceding node: $@",
+  fc, fc.getTarget().toString(), fc, "" + irqlRequirement, e, "" + min(getPotentialExitIrqlAtCfn(e))
