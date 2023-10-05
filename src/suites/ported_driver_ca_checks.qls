@@ -13,8 +13,8 @@
       - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
       - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
       - drivers/kmdf/queries/StrSafe/StrSafe.ql
-      - drivers/wdm/experimental/IrqTooHigh/IrqTooHigh.ql
-      - drivers/wdm/experimental/IrqTooLow/IrqTooLow.ql
+      - drivers/general/queries/experimental/IrqlTooHigh/IrqlTooHigh.ql
+      - drivers/general/queries/experimental/IrqlTooLow/IrqlTooLow.ql
       - drivers/wdm/queries/ExaminedValue/ExaminedValue.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
