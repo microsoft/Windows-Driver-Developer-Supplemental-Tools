@@ -38,7 +38,7 @@ class IrqlMacro extends Macro {
   }
 }
 
-/** Represents an _IRQL_saves_global_(parameter, kind) annotation. */
+/** An \_IRQL\_saves\_global\_(parameter, kind) annotation. */
 class IrqlSavesGlobalAnnotation extends SALAnnotation {
   MacroInvocation irqlMacroInvocation;
 
@@ -49,7 +49,7 @@ class IrqlSavesGlobalAnnotation extends SALAnnotation {
   }
 }
 
-/** Represents an _IRQL_restores_global_(parameter, kind) annotation. */
+/** An \_IRQL\_restores\_global\_(parameter, kind) annotation. */
 class IrqlRestoresGlobalAnnotation extends SALAnnotation {
   MacroInvocation irqlMacroInvocation;
 
@@ -60,14 +60,13 @@ class IrqlRestoresGlobalAnnotation extends SALAnnotation {
   }
 }
 
-/** Represents standard IRQL annotations which refer to explicit IRQL levels. */
-class IrqlAnnotation extends SALAnnotation {
+/** Standard IRQL annotations which apply to entire functions and manipulate or constrain the IRQL. */
+class IrqlFunctionAnnotation extends SALAnnotation {
   string irqlLevel;
   string irqlAnnotationName;
   MacroInvocation irqlMacroInvocation;
 
-  IrqlAnnotation() {
-    // Needs to include other function and parameter annotations too
+  IrqlFunctionAnnotation() {
     this.getMacroName()
         .matches([
             "_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_", "_IRQL_raises_",
@@ -79,32 +78,31 @@ class IrqlAnnotation extends SALAnnotation {
   }
 
   /** Returns the raw text of the IRQL value used in this annotation. */
-  string getIrqlLevelFull() { result = irqlLevel }
+  string getIrqlLevelString() { result = irqlLevel }
 
-  /** Returns the text of this annotation (i.e. _IRQL_requires_, etc.) */
+  /** Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.) */
   string getIrqlMacroName() { result = irqlAnnotationName }
 
   /** Evaluate the IRQL specified in this annotation, if possible. */
   int getIrqlLevel() {
-    if exists(IrqlMacro im | im.getHead().matches(this.getIrqlLevelFull()))
+    if exists(IrqlMacro im | im.getHead().matches(this.getIrqlLevelString()))
     then
       result =
         any(int i |
           exists(IrqlMacro im |
             im.getIrqlLevel() = i and
-            im.getHead().matches(this.getIrqlLevelFull())
+            im.getHead().matches(this.getIrqlLevelString())
           )
         )
     else result = -1
   }
 }
 
-/** Represents an "_IRQL_requires_same" annotation. */
+/** Represents an "\_IRQL\_requires\_same\_" annotation. */
 class IrqlSameAnnotation extends SALAnnotation {
   string irqlAnnotationName;
 
   IrqlSameAnnotation() {
-    //Needs to include other function and parameter annotations too
     this.getMacroName().matches(["_IRQL_requires_same_"]) and
     irqlAnnotationName = this.getMacroName()
   }
@@ -112,29 +110,29 @@ class IrqlSameAnnotation extends SALAnnotation {
   string getIrqlMacroName() { result = irqlAnnotationName }
 }
 
-/** An "_IRQL_requires_max" annotation. */
-class IrqlMaxAnnotation extends IrqlAnnotation {
+/** An "\_IRQL\_requires\_max\_" annotation. */
+class IrqlMaxAnnotation extends IrqlFunctionAnnotation {
   IrqlMaxAnnotation() { this.getMacroName().matches("_IRQL_requires_max_") }
 }
 
-/** An "_IRQL_raises_" annotation. */
-class IrqlRaisesAnnotation extends IrqlAnnotation {
+/** An "\_IRQL\_raises\_" annotation. */
+class IrqlRaisesAnnotation extends IrqlFunctionAnnotation {
   IrqlRaisesAnnotation() { this.getMacroName().matches("_IRQL_raises_") }
 }
 
-/** An "IRQL_requires_min" annotation. */
-class IrqlMinAnnotation extends IrqlAnnotation {
+/** An "\_IRQL\_requires\_min\_" annotation. */
+class IrqlMinAnnotation extends IrqlFunctionAnnotation {
   IrqlMinAnnotation() { this.getMacroName().matches("_IRQL_requires_min_") }
 }
 
-/** An "_IRQL_requires_" annotation. */
-class IrqlRequiresAnnotation extends IrqlAnnotation {
+/** An "\_IRQL\_requires\_" annotation. */
+class IrqlRequiresAnnotation extends IrqlFunctionAnnotation {
   IrqlRequiresAnnotation() { this.getMacroName().matches("_IRQL_requires_") }
 }
 
 /**
  * A SAL annotation indicating that the parameter in
- * question is used as part of adjusting the IRQL.
+ * question is used to store or restore the IRQL.
  */
 class IrqlParameterAnnotation extends SALAnnotation {
   string irqlAnnotationName;
@@ -145,6 +143,7 @@ class IrqlParameterAnnotation extends SALAnnotation {
     exists(MacroInvocation mi | mi.getParentInvocation() = this)
   }
 
+  /** Get the text of the annotation. */
   string getIrqlMacroName() { result = irqlAnnotationName }
 }
 
@@ -158,10 +157,10 @@ class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
 
 /**
  * A SAL annotation indicating that can be used in two ways:
- * - If applied to a function, the function returns the previous IRQL.
+ * - If applied to a function, the function returns the previous IRQL or otherwise saves the IRQL.
  * - If applied to a parameter, the function saves the IRQL to the parameter.
  */
-class IrqlSaveAnnotation extends IrqlAnnotation {
+class IrqlSaveAnnotation extends IrqlFunctionAnnotation {
   IrqlSaveAnnotation() { this.getMacroName().matches(["_IRQL_saves_"]) }
 }
 
@@ -177,11 +176,11 @@ class IrqlSaveParameter extends Parameter {
 
 /** A typedef that has IRQL annotations applied to it. */
 class IrqlAnnotatedTypedef extends TypedefType {
-  IrqlAnnotation irqlAnnotation;
+  IrqlFunctionAnnotation irqlAnnotation;
 
   IrqlAnnotatedTypedef() { irqlAnnotation.getTypedefDeclarations() = this }
 
-  IrqlAnnotation getIrqlAnnotation() { result = irqlAnnotation }
+  IrqlFunctionAnnotation getIrqlAnnotation() { result = irqlAnnotation }
 }
 
 /**
@@ -191,7 +190,7 @@ class IrqlAnnotatedTypedef extends TypedefType {
  */
 cached
 class IrqlRestrictsFunction extends Function {
-  IrqlAnnotation irqlAnnotation;
+  IrqlFunctionAnnotation irqlAnnotation;
 
   cached
   IrqlRestrictsFunction() {
@@ -213,7 +212,7 @@ class IrqlRestrictsFunction extends Function {
 /** A function that changes the IRQL. */
 abstract class IrqlChangesFunction extends Function { }
 
-/** A function that is explicitly annotated to not change the IRQL. */
+/** A function that is explicitly annotated to enter and exit at the same IRQL. */
 class IrqlRequiresSameAnnotatedFunction extends Function {
   IrqlSameAnnotation irqlAnnotation;
 
@@ -293,9 +292,13 @@ class IrqlRestoresGlobalAnnotatedFunction extends IrqlChangesFunction {
   int getIrqlParameterSlot() { result = irqlParamIndex }
 }
 
+/**
+ * An abstract class for functions that use the \_IRQL\_saves\_ annotation,
+ * either on the function definition or on a specific parameter.
+ */
 abstract class IrqlSavesFunction extends Function { }
 
-/** A function that has a parameter annotated _IRQL_saves_. */
+/** A function that has a parameter annotated \_IRQL\_saves\_. */
 class IrqlSavesToParameterFunction extends IrqlSavesFunction {
   IrqlSaveParameter saveParameter;
   int irqlParamIndex;
@@ -317,7 +320,7 @@ class IrqlSavesViaReturnFunction extends IrqlSavesFunction {
   }
 }
 
-/** A function that has a parameter annotated _IRQL_restores_. */
+/** A function that has a parameter annotated \_IRQL\_restores\_. */
 class IrqlRestoreAnnotatedFunction extends Function {
   IrqlRestoreParameter restoreParameter;
   int irqlParamIndex;
@@ -327,7 +330,7 @@ class IrqlRestoreAnnotatedFunction extends Function {
   int getIrqlParameterSlot() { result = irqlParamIndex }
 }
 
-/** A call to a function that has a parameter annotated _IRQL_restores_. */
+/** A call to a function that has a parameter annotated \_IRQL\_restores\_. */
 class IrqlRestoreCall extends FunctionCall {
   IrqlRestoreCall() { this.getTarget() instanceof IrqlRestoreAnnotatedFunction }
 
@@ -352,7 +355,7 @@ class IrqlRestoreCall extends FunctionCall {
   }
 
   /**
-   * Holds if a given call to an _IRQL_saves_global_ annotated function is using the same IRQL location as this.
+   * Holds if a given call to an \_IRQL\_saves\_global\_ annotated function is using the same IRQL location as this.
    */
   private predicate matchingSaveCall(IrqlSaveCall sgic) {
     // Attempting to match all expr children leads to an explosion in runtime, so for now just compare
@@ -372,7 +375,7 @@ class IrqlRestoreCall extends FunctionCall {
   }
 }
 
-/** A call to a function that has a parameter annotated _IRQL_saves_. */
+/** A call to a function that has is annotated \_IRQL\_saves\_. */
 class IrqlSaveCall extends FunctionCall {
   IrqlSaveCall() { this.getTarget() instanceof IrqlSavesFunction }
 
@@ -420,8 +423,6 @@ class KeLowerIrqlCall extends FunctionCall {
 
   /**
    * Get the most recent call before this call that explicitly raised the IRQL.
-   *
-   * TODO: Should be updated to account for functions that are annotated _IRQL_raises_.
    */
   KeRaiseIrqlCall getMostRecentRaise() {
     result =
@@ -504,14 +505,13 @@ private predicate exprsMatchText(Expr e1, Expr e2) {
  * - If calling a function annotated to restore the IRQL from a previously saved spot, then the result is the IRQL before that save call.
  * - If calling a function annotated to raise the IRQL, then it returns the annotated value (the target IRQL).
  * - If calling a function annotated to maintain the same IRQL, then the result is the IRQL at the previous CFN.
- * - If this node immediately precedes a call to a call annotated _Irql_Requires_, then the result is the annotated value for that call.
  * - If this node is calling a function with no annotations, the result is the IRQL that function exits at.
  * - If there is a prior CFN in the CFG, the result is the result for that prior CFN.
  * - If there is no prior CFN, then the result is whatever the IRQL was at a statement prior to a function call to this function.
  * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations.
  * - If there is nothing else, then IRQL is 0.
- * TODO:     _IRQL_limited_to_(DISPATCH_LEVEL);
- * TODO: Functions not explicitly annotated at the function level, but which have _IRQL_saves_ or _IRQL_restores_ parameter annotations.
+ *
+ * Not implemented: _IRQL_limited_to_
  */
 cached
 int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
@@ -544,44 +544,27 @@ int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
                               .getTarget()))
                   )
               else
-/*                if
-                  exists(ControlFlowNode cfn2 |
-                    cfn2 = cfn.getASuccessor() and
-                    cfn2.(FunctionCall).getTarget() instanceof IrqlRequiresAnnotatedFunction
-                  )
-                then
-                  result =
-                    any(cfn.getASuccessor()
-                            .(FunctionCall)
-                            .getTarget()
-                            .(IrqlRequiresAnnotatedFunction)
-                            .getIrqlLevel()
+                if exists(ControlFlowNode cfn2 | cfn2 = cfn.getAPredecessor())
+                then result = any(getPotentialExitIrqlAtCfn(cfn.getAPredecessor()))
+                else
+                  if
+                    exists(FunctionCall fc, ControlFlowNode cfn2 |
+                      fc.getTarget() = cfn.getControlFlowScope() and
+                      cfn2.getASuccessor() = fc
                     )
-                else*/
-                  if exists(ControlFlowNode cfn2 | cfn2 = cfn.getAPredecessor())
-                  then result = any(getPotentialExitIrqlAtCfn(cfn.getAPredecessor()))
+                  then
+                    result =
+                      any(getPotentialExitIrqlAtCfn(any(ControlFlowNode cfn2 |
+                              cfn2.getASuccessor().(FunctionCall).getTarget() =
+                                cfn.getControlFlowScope()
+                            ))
+                      )
                   else
                     if
-                      exists(FunctionCall fc, ControlFlowNode cfn2 |
-                        fc.getTarget() = cfn.getControlFlowScope() and
-                        cfn2.getASuccessor() = fc
-                      )
-                    then
-                      result =
-                        any(getPotentialExitIrqlAtCfn(any(ControlFlowNode cfn2 |
-                                cfn2.getASuccessor().(FunctionCall).getTarget() =
-                                  cfn.getControlFlowScope()
-                              ))
-                        )
-                    else
-                      if
-                        cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
-                        getAllowableIrqlLevel(cfn.getControlFlowScope()) != -1
-                      then result = getAllowableIrqlLevel(cfn.getControlFlowScope())
-                      else result = 0
-  // TODO: How to handle cases where the function is annotated _IRQL_MIN_, etc?
-  // May need to split into two libraries: "Actual" IRQL tracking and "annotation-based" IRQL tracking.
-  // Or maybe we keep the actual tracking for queries.
+                      cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
+                      getAllowableIrqlLevel(cfn.getControlFlowScope()) != -1
+                    then result = getAllowableIrqlLevel(cfn.getControlFlowScope())
+                    else result = 0
 }
 
 import semmle.code.cpp.controlflow.Dominance
