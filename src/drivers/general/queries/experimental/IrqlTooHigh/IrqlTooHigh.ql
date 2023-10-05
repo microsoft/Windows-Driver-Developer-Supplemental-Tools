@@ -2,35 +2,39 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/irql-too-high
- * @name IRQL too low (C28120)
+ * @name IRQL too high (C28120)
  * @description A function annotated with IRQL requirements was called at an IRQL too high for the requirements.
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
- * @impact Insecure Coding Practice
- * @repro.text A function annotated with IRQL requirements was called at an IRQL too high for the requirements.
+ * @impact Exploitable Design
+ * @repro.text The following function call is taking place at an IRQL too high for what the call target is annotated as.
  * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-C28120
  * @kind problem
  * @problem.severity warning
  * @precision medium
  * @tags correctness
  *       wddst
- * @query-version v1
+ * @scope domainspecific
+ * @query-version v2
  */
 
 import cpp
 import drivers.libraries.Irql
 
-from FunctionCall fc, IrqlRestrictsFunction imaf, ControlFlowNode e, int irqlRequirement
+from FunctionCall call, IrqlRestrictsFunction irqlFunc, ControlFlowNode prior, int irqlRequirement
 where
-  fc.getTarget() = imaf and
-  e = fc.getAPredecessor() and
+  call.getTarget() = irqlFunc and
+  prior = call.getAPredecessor() and
   (
-    imaf.(IrqlMaxAnnotatedFunction).getIrqlLevel() = irqlRequirement
+    irqlFunc.(IrqlMaxAnnotatedFunction).getIrqlLevel() = irqlRequirement
     or
-    imaf.(IrqlRequiresAnnotatedFunction).getIrqlLevel() = irqlRequirement
+    irqlFunc.(IrqlRequiresAnnotatedFunction).getIrqlLevel() = irqlRequirement
   ) and
-  irqlRequirement < min(getPotentialExitIrqlAtCfn(e))
-select fc,
-  "IRQL potentially too high at this call ($@).  Maximum irql level of this call: $@, Irql level at preceding node: $@",
-  fc, fc.getTarget().toString(), fc, "" + irqlRequirement, e, "" + min(getPotentialExitIrqlAtCfn(e))
+  irqlRequirement < min(getPotentialExitIrqlAtCfn(prior))
+select call,
+  "$@: IRQL potentially too high at call to $@.  Maximum IRQL for this call: " + irqlRequirement +
+    ", IRQL at preceding node: " + min(getPotentialExitIrqlAtCfn(prior)),
+  call.getControlFlowScope(), call.getControlFlowScope().getQualifiedName(), call,
+  call.getTarget().toString()
