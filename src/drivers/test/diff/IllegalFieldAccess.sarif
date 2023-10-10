@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 0
+        "-": 2
     },
     "error": {
         "+": 0,
@@ -10,8 +10,19 @@
     },
     "warning": {
         "+": 0,
-        "-": 0,
-        "codes": []
+        "-": 2,
+        "codes": [
+            [
+                "cpp/drivers/illegal-field-access An assignment to an IO DPC or one of its fields has been made directly. It should be made by IoInitializeDpcRequest.",
+                2,
+                0
+            ],
+            [
+                "cpp/drivers/illegal-field-access An assignment to an IRP CancelRoutine field was made directly. It should be made by IoSetCancelRoutine.",
+                1,
+                0
+            ]
+        ]
     },
     "note": {
         "+": 0,

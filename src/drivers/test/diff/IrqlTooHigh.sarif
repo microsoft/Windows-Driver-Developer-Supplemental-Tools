@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 0
+        "-": 3
     },
     "error": {
         "+": 0,
@@ -10,8 +10,24 @@
     },
     "warning": {
         "+": 0,
-        "-": 0,
-        "codes": []
+        "-": 3,
+        "codes": [
+            [
+                "cpp/drivers/irql-too-high IRQL potentially too high at this call ([TestInner2](1)).  Maximum irql level of this call: [1](2), Irql level at preceding node: [2](3)",
+                1,
+                0
+            ],
+            [
+                "cpp/drivers/irql-too-high IRQL potentially too high at this call ([TestInner4](1)).  Maximum irql level of this call: [0](2), Irql level at preceding node: [2](3)",
+                1,
+                0
+            ],
+            [
+                "cpp/drivers/irql-too-high IRQL potentially too high at this call ([IoGetInitialStack](1)).  Maximum irql level of this call: [1](2), Irql level at preceding node: [2](3)",
+                1,
+                0
+            ]
+        ]
     },
     "note": {
         "+": 0,

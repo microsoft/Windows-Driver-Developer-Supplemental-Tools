@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 0
+        "-": 1
     },
     "error": {
         "+": 0,
@@ -10,8 +10,14 @@
     },
     "warning": {
         "+": 0,
-        "-": 0,
-        "codes": []
+        "-": 1,
+        "codes": [
+            [
+                "cpp/drivers/examined-value Result of call to func2 is ignored; 77% of calls to this function have their result checked. Checked return values = 7 total calls = 9",
+                2,
+                0
+            ]
+        ]
     },
     "note": {
         "+": 0,

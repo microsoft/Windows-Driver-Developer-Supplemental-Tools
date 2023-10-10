@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 0
+        "-": 4
     },
     "error": {
         "+": 0,
@@ -10,8 +10,29 @@
     },
     "warning": {
         "+": 0,
-        "-": 0,
-        "codes": []
+        "-": 4,
+        "codes": [
+            [
+                "cpp/drivers/illegal-field-write The 'DeviceObject' field of the DriverObject struct is read-only.",
+                2,
+                0
+            ],
+            [
+                "cpp/drivers/illegal-field-write The 'DriverObject' field of the DeviceObject struct is read-only.",
+                2,
+                0
+            ],
+            [
+                "cpp/drivers/illegal-field-write The 'NextDevice' field of the DeviceObject struct is read-only.",
+                1,
+                0
+            ],
+            [
+                "cpp/drivers/illegal-field-write The 'SecurityDescriptor' field of the DeviceObject struct is read-only.",
+                1,
+                0
+            ]
+        ]
     },
     "note": {
         "+": 0,
