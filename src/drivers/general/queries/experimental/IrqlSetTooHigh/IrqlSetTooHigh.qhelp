@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The function has raised the IRQL to a level above what is allowed.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			A function has been annotated as having a max IRQL, but the execution of that function raises the IRQL above that maximum.  If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28150-function-causes-irq-level-to-be-set-above-max">
+				C28150
+			</a>
+		</li>
+	</references>
+</qhelp>

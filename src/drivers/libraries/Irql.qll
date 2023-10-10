@@ -60,21 +60,21 @@ class IrqlRestoresGlobalAnnotation extends SALAnnotation {
   }
 }
 
-/** Standard IRQL annotations which apply to entire functions and manipulate or constrain the IRQL. */
+/**
+ * Standard IRQL annotations which apply to entire functions and manipulate or constrain the IRQL.
+ */
 class IrqlFunctionAnnotation extends SALAnnotation {
   string irqlLevel;
   string irqlAnnotationName;
-  MacroInvocation irqlMacroInvocation;
 
   IrqlFunctionAnnotation() {
     this.getMacroName()
         .matches([
             "_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_", "_IRQL_raises_",
-            "_IRQL_saves_"
+            "_IRQL_saves_", "_IRQL_always_function_max_", "IRQL_always_function_min_"
           ]) and
     irqlAnnotationName = this.getMacroName() and
-    irqlMacroInvocation.getParentInvocation() = this and
-    irqlLevel = irqlMacroInvocation.getMacro().getHead()
+    irqlLevel = this.getUnexpandedArgument(0)
   }
 
   /** Returns the raw text of the IRQL value used in this annotation. */
@@ -83,18 +83,30 @@ class IrqlFunctionAnnotation extends SALAnnotation {
   /** Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.) */
   string getIrqlMacroName() { result = irqlAnnotationName }
 
-  /** Evaluate the IRQL specified in this annotation, if possible. */
+  /**
+   * Evaluate the IRQL specified in this annotation, if possible.
+   *
+   * This will return -1 if the IRQL specified is anything other than a standard
+   * IRQL level (i.e. PASSIVE_LEVEL).  This includes statements like "DPC_LEVEL - 1".
+   */
   int getIrqlLevel() {
-    if exists(IrqlMacro im | im.getHead().matches(this.getIrqlLevelString()))
-    then
-      result =
-        any(int i |
-          exists(IrqlMacro im |
-            im.getIrqlLevel() = i and
-            im.getHead().matches(this.getIrqlLevelString())
+    // Special case for DPC_LEVEL, which is not defined normally
+    if this.getIrqlLevelString().matches("DPC_LEVEL")
+    then result = 2
+    else
+      if exists(IrqlMacro im | im.getHead().matches(this.getIrqlLevelString()))
+      then
+        result =
+          any(int i |
+            exists(IrqlMacro im |
+              im.getIrqlLevel() = i and
+              im.getHead().matches(this.getIrqlLevelString())
+            )
           )
-        )
-    else result = -1
+      else
+        if exists(int i | i = this.getIrqlLevelString().toInt())
+        then result = this.getIrqlLevelString().toInt()
+        else result = -1
   }
 }
 
@@ -128,6 +140,14 @@ class IrqlMinAnnotation extends IrqlFunctionAnnotation {
 /** An "\_IRQL\_requires\_" annotation. */
 class IrqlRequiresAnnotation extends IrqlFunctionAnnotation {
   IrqlRequiresAnnotation() { this.getMacroName().matches("_IRQL_requires_") }
+}
+
+class IrqlAlwaysMaxAnnotation extends IrqlFunctionAnnotation {
+  IrqlAlwaysMaxAnnotation() { this.getMacroName().matches("_IRQL_always_function_max_") }
+}
+
+class IrqlAlwaysMinAnnotation extends IrqlFunctionAnnotation {
+  IrqlAlwaysMinAnnotation() { this.getMacroName().matches("_IRQL_always_function_min_") }
 }
 
 /**
@@ -250,6 +270,18 @@ class IrqlRaisesAnnotatedFunction extends IrqlRestrictsFunction, IrqlChangesFunc
   IrqlRaisesAnnotatedFunction() { irqlAnnotation instanceof IrqlRaisesAnnotation }
 
   int getIrqlLevel() { result = irqlAnnotation.(IrqlRaisesAnnotation).getIrqlLevel() }
+}
+
+class IrqlAlwaysMaxFunction extends IrqlRestrictsFunction {
+  IrqlAlwaysMaxFunction() { irqlAnnotation instanceof IrqlAlwaysMaxAnnotation }
+
+  int getIrqlLevel() { result = irqlAnnotation.(IrqlAlwaysMaxAnnotation).getIrqlLevel() }
+}
+
+class IrqlAlwaysMinFunction extends IrqlRestrictsFunction {
+  IrqlAlwaysMinFunction() { irqlAnnotation instanceof IrqlAlwaysMinAnnotation }
+
+  int getIrqlLevel() { result = irqlAnnotation.(IrqlAlwaysMinAnnotation).getIrqlLevel() }
 }
 
 /** A function annotated to save the IRQL at the specified location upon entry. */
@@ -514,6 +546,7 @@ private predicate exprsMatchText(Expr e1, Expr e2) {
  * Not implemented: _IRQL_limited_to_
  */
 cached
+pragma[assume_small_delta]
 int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
   if cfn instanceof KeRaiseIrqlCall
   then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
