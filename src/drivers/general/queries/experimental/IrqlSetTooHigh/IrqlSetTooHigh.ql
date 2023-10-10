@@ -23,6 +23,7 @@
 import cpp
 import drivers.libraries.Irql
 
+
 from IrqlRestrictsFunction irqlFunc, ControlFlowNode statement, int irqlRequirement
 where
   statement.getControlFlowScope() = irqlFunc and
