@@ -39,28 +39,99 @@ _IRQL_uses_cancel_	                //The annotated parameter is the IRQL value t
 
 
 
-
+/*
+Function which should only be called from PASSIVE_LEVEL
+*/
 _IRQL_requires_max_(PASSIVE_LEVEL) 
-VOID IrqlSetLower_fail(void){
+VOID DoNothing_Passive(void){
    __noop;
 }
 
+/*
+Function which should only be called from DISPATCH_LEVEL
+*/
+_IRQL_requires_max_(DISPATCH_LEVEL) 
+VOID DoNothing_Dispatch(void){
+   __noop;
+}
 
-VOID CallLowerIRQLFunction(void){
+/*
+Function which should only be called from PASSIVE_LEVEL but raises the IRQL to DISPATCH_LEVEL
+*/
+_IRQL_raises_(PASSIVE_LEVEL)
+VOID IrqlSetHigherFromPassive(void){
     KIRQL oldIRQL;
     oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
-    IrqlSetLower_fail();
 }
 
+/*
+Funciton which raises the IRQL to DISPATCH_LEVEL and then calls a function which should only be called from PASSIVE_LEVEL
+*/
 _IRQL_requires_max_(PASSIVE_LEVEL) 
 VOID IrqlRaiseLevelExplicit_fail1(void){
+    // Set IRQL to DISPATCH_LEVEL
+    KIRQL oldIRQL;
+    oldIRQL = KeGetCurrentIrql();
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
+    // Call a function at a lower IRQL than DISPATCH_LEVEL
+    DoNothing_Passive();
+}
+
+/*
+Function is entered at PASSIVE_LEVEL, but it raises the IRQL to DISPATCH_LEVEL.
+This is allowed because _IRQL_raises_(PASSIVE_LEVEL) specifies that the function can only be called to raise (not lower) the current IRQL of PASSIVE_LEVEL.
+*/
+_IRQL_raises_(PASSIVE_LEVEL)
+VOID IrqlRaiseLevelExplicit_pass(void){
     KIRQL oldIRQL;
     oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
 }
 
-_IRQL_raises_(PASSIVE_LEVEL)
-VOID IrqlRaiseLevelImplicit(void){
-//TODO
+/*
+Function specifies it must be called with max IRQL PASSIVE_LEVEL, but it raises the IRQL to DISPATCH_LEVEL through another function call.
+*/
+_IRQL_requires_max_(PASSIVE_LEVEL) 
+VOID CallFunctionThatRaisesIRQL_fail(void){
+    IrqlSetHigherFromPassive();
+}
+
+/*
+Function is annotated for max IRQL PASSIVE_LEVEL but raises the IRQL
+*/
+_IRQL_always_function_max_(PASSIVE_LEVEL)
+VOID IrqlRaiseLevelExplicit_fail2(void){
+    KIRQL oldIRQL;
+    oldIRQL = KeGetCurrentIrql();
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
+}
+
+/* 
+Function is annotated for max IRQL PASSIVE_LEVEL and does not raise the IRQL
+*/
+_IRQL_always_function_max_(PASSIVE_LEVEL)
+VOID IrqlRaiseLevelExplicit_pass(void){
+    DoNothing_Passive();
+}
+
+/*
+Function must enter and exit at the same IRQL, but raises and does not lower the IRQL
+*/
+_IRQL_requires_same_(PASSIVE_LEVEL)
+VOID IrqlRequiresSame_fail(void){
+    KIRQL oldIRQL;
+    oldIRQL = KeGetCurrentIrql();
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
+}
+
+/*
+Funciton must enter and exit at the same IRQL. IRQL is set higher but then set lower before exiting.
+*/
+_IRQL_requires_same_(PASSIVE_LEVEL)
+VOID IrqlRequiresSame_pass(void){
+    KIRQL oldIRQL;
+    oldIRQL = KeGetCurrentIrql();
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
+    KeLowerIrql(oldIRQL);
 }
