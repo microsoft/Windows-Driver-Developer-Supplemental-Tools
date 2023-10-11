@@ -111,14 +111,14 @@ VOID IrqlRaiseLevelExplicit_fail2(void){
 Function is annotated for max IRQL PASSIVE_LEVEL and does not raise the IRQL
 */
 _IRQL_always_function_max_(PASSIVE_LEVEL)
-VOID IrqlRaiseLevelExplicit_pass(void){
+VOID IrqlDontChange_pass(void){
     DoNothing_Passive();
 }
 
 /*
 Function must enter and exit at the same IRQL, but raises and does not lower the IRQL
 */
-_IRQL_requires_same_(PASSIVE_LEVEL)
+_IRQL_requires_same_
 VOID IrqlRequiresSame_fail(void){
     KIRQL oldIRQL;
     oldIRQL = KeGetCurrentIrql();
@@ -128,7 +128,7 @@ VOID IrqlRequiresSame_fail(void){
 /*
 Funciton must enter and exit at the same IRQL. IRQL is set higher but then set lower before exiting.
 */
-_IRQL_requires_same_(PASSIVE_LEVEL)
+_IRQL_requires_same_
 VOID IrqlRequiresSame_pass(void){
     KIRQL oldIRQL;
     oldIRQL = KeGetCurrentIrql();
