@@ -108,36 +108,6 @@ _IRQL_raises_(APC_LEVEL)
 
 
 /*
-Funciton which raises the IRQL to DISPATCH_LEVEL and then calls a function which should be called from *max* APC_LEVEL
-*/
-// TODO Is this OK?
-_IRQL_raises_(DISPATCH_LEVEL)
-VOID IrqlRaiseLevelExplicit_fail1(void)
-{
-    // Set IRQL to DISPATCH_LEVEL
-    KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
-    // Call a function at a lower IRQL than DISPATCH_LEVEL
-    DoNothing_MaxAPC();
-}
-
-/*
-Funciton which raises the IRQL to DISPATCH_LEVEL and then calls a function which should only be called from PASSIVE_LEVEL
-*/
-// TODO Is this OK?
-VOID IrqlRaiseLevelExplicit_fail2(void)
-{
-    // Set IRQL to DISPATCH_LEVEL
-    KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
-    // Call a function at a lower IRQL than DISPATCH_LEVEL
-    DoNothing_RequiresPassive();
-}
-
-
-/*
 Funciton which raises the IRQL to DISPATCH_LEVEL and then calls a function which should only be called from max DISPATCH_LEVEL
 */
 VOID IrqlRaiseLevelExplicit_pass3(void)
@@ -224,8 +194,22 @@ _IRQL_requires_same_
 {
     KIRQL oldIRQL;
     oldIRQL = KeGetCurrentIrql();
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
+}
+
+/*
+Function must enter and exit at the same IRQL, but raises and does not lower the IRQL
+*/
+_IRQL_requires_same_
+    VOID
+    IrqlRequiresSame_notsupported(void)
+{
+    KIRQL oldIRQL;
+    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(oldIRQL+1, &oldIRQL);
 }
+
+
 
 /*
 Funciton must enter and exit at the same IRQL. IRQL is set higher but then set lower before exiting.
