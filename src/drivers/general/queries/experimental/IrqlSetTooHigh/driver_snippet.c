@@ -10,6 +10,7 @@
 void top_level_call() {}
 
 #include <wdm.h>
+
 /*
 IRQL values:
 PASSIVE_LEVEL
@@ -93,8 +94,6 @@ _IRQL_raises_(DISPATCH_LEVEL)
     // Function Exits at DISPATCH_LEVEL 
 }
 
-
-
 /*
 Function can be called to raise the IRQL but needs to exit at APC_LEVEL, but it raises the IRQL to DISPATCH_LEVEL.
 */
@@ -105,33 +104,6 @@ _IRQL_raises_(APC_LEVEL)
     oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
 }
-
-
-/*
-Funciton which raises the IRQL to DISPATCH_LEVEL and then calls a function which should only be called from max DISPATCH_LEVEL
-*/
-VOID IrqlRaiseLevelExplicit_pass3(void)
-{
-    // Set IRQL to DISPATCH_LEVEL
-    KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
-    // Call a function at a lower IRQL than DISPATCH_LEVEL
-    DoNothing_MaxDispatch();
-}
-/*
-Funciton which raises the IRQL to APC_LEVEL and then calls a function which should only be called from max DISPATCH_LEVEL
-*/
-VOID IrqlRaiseLevelExplicit_pass2(void)
-{
-    // Set IRQL to DISPATCH_LEVEL
-    KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(APC_LEVEL, &oldIRQL);
-    // Call a function at a lower IRQL than DISPATCH_LEVEL
-    DoNothing_MaxDispatch();
-}
-
 
 /*
 Function is annotated for max IRQL PASSIVE_LEVEL but raises the IRQL
@@ -224,6 +196,50 @@ _IRQL_requires_same_
     KeLowerIrql(oldIRQL);
 }
 
+/*
+Function that calls another function by reference which correctly raises the IRQL. 
+This should pass since IrqlInderectCall_pass0 is not annotated for max IRQL.
+*/
+VOID IrqlInderectCall_pass0(void)
+{
+    void (*funcPtr)(void);
+    funcPtr = &IrqlSetHigherFromPassive_pass0;
+    funcPtr();
+}
+/*
+Function that calls another function by reference which correctly raises the IRQL. 
+This should pass since IrqlInderectCall_pass0 is annotated for max DISPATCH_LEVEL.
+*/
+_IRQL_always_function_max_(DISPATCH_LEVEL)
+VOID IrqlInderectCall_pass1(void)
+{
+    void (*funcPtr)(void);
+    funcPtr = &IrqlSetHigherFromPassive_pass0;
+    funcPtr();
+}
+
+/*
+Function that calls another function by reference which incorrectly raises the IRQL. 
+This should fail because the function pointer points to a function that should fail.
+*/
+VOID IrqlInderectCall_fail0(void)
+{
+    void (*funcPtr)(void);
+    funcPtr = &IrqlRaiseLevelExplicit_fail0;
+    funcPtr();
+}
+/*
+Function that calls another function by reference which incorrectly raises the IRQL. 
+This should fail because the function pointer points to a function that that raises the IRQL above PASSIVE_LEVEL.
+*/
+_IRQL_always_function_max_(PASSIVE_LEVEL)
+VOID IrqlInderectCall_fail1(void)
+{
+    void (*funcPtr)(void);
+    funcPtr = &IrqlSetHigherFromPassive_pass0;
+    funcPtr();
+}
+
+
 // TODO multi-threaded tests
 // function has max IRQL requirement, creates two threads where one is above that requirement and one is below
-// TODO test for IRQL change with function pointer
