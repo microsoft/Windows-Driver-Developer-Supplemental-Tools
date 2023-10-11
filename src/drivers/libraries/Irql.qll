@@ -68,13 +68,20 @@ class IrqlFunctionAnnotation extends SALAnnotation {
   string irqlAnnotationName;
 
   IrqlFunctionAnnotation() {
-    this.getMacroName()
-        .matches([
-            "_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_", "_IRQL_raises_",
-            "_IRQL_saves_", "_IRQL_always_function_max_", "IRQL_always_function_min_"
-          ]) and
-    irqlAnnotationName = this.getMacroName() and
-    irqlLevel = this.getUnexpandedArgument(0)
+    (
+      this.getMacroName()
+          .matches([
+              "_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_", "_IRQL_raises_",
+              "_IRQL_always_function_max_", "IRQL_always_function_min_"
+            ]) and
+      irqlLevel = this.getUnexpandedArgument(0)
+      or
+      // Special case: _IRQL_saves_ annotations can apply to a whole function,
+      // but do not have an associated IRQL value.
+      this.getMacroName().matches("_IRQL_saves_") and
+      irqlLevel = "NA_IRQL_SAVES"
+    ) and
+    irqlAnnotationName = this.getMacroName()
   }
 
   /** Returns the raw text of the IRQL value used in this annotation. */
@@ -545,8 +552,8 @@ private predicate exprsMatchText(Expr e1, Expr e2) {
  *
  * Not implemented: _IRQL_limited_to_
  */
-cached
 pragma[assume_small_delta]
+cached
 int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
   if cfn instanceof KeRaiseIrqlCall
   then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()

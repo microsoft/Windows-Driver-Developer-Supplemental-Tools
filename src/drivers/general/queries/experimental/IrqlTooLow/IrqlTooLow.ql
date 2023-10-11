@@ -32,6 +32,7 @@ where
     or
     irqlFunc.(IrqlRequiresAnnotatedFunction).getIrqlLevel() = irqlRequirement
   ) and
+  irqlRequirement != -1 and
   irqlRequirement > max(getPotentialExitIrqlAtCfn(prior))
 select call,
   "$@: IRQL potentially too low at call to $@.  Minimum IRQL for this call: " + irqlRequirement +

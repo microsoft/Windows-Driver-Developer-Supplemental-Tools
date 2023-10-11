@@ -27,7 +27,7 @@
           "id" : "cpp/drivers/irql-too-high",
           "name" : "cpp/drivers/irql-too-high",
           "shortDescription" : {
-            "text" : "IRQL too low (C28120)"
+            "text" : "IRQL too high (C28120)"
           },
           "fullDescription" : {
             "text" : "A function annotated with IRQL requirements was called at an IRQL too high for the requirements."
@@ -41,22 +41,24 @@
             "description" : "A function annotated with IRQL requirements was called at an IRQL too high for the requirements.",
             "feature.area" : "Multiple",
             "id" : "cpp/drivers/irql-too-high",
-            "impact" : "Insecure Coding Practice",
+            "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "IRQL too low (C28120)",
+            "name" : "IRQL too high (C28120)",
+            "opaqueid" : "CQLD-C28120",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
-            "query-version" : "v1",
-            "repro.text" : "A function annotated with IRQL requirements was called at an IRQL too high for the requirements.",
+            "query-version" : "v2",
+            "repro.text" : "The following function call is taking place at an IRQL too high for what the call target is annotated as.",
+            "scope" : "domainspecific",
             "security.severity" : "Low"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+564d095a856d34a82d25fe14755646b9db824593",
+        "semanticVersion" : "0.2.0+4842fd4116871d3b47eede85c2c4497b43c34d57",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -75,9 +77,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+              "index" : 0
             }
           }
         } ],
@@ -98,9 +100,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
+              "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+              "index" : 1
             }
           }
         } ],
@@ -170,7 +172,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "IRQL potentially too high at this call ([TestInner2](1)).  Maximum irql level of this call: [1](2), Irql level at preceding node: [2](3)"
+        "text" : "[TestInner1](1): IRQL potentially too high at call to [TestInner2](2).  Maximum IRQL for this call: 1, IRQL at preceding node: 2"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -199,13 +201,13 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 42,
-            "startColumn" : 12,
-            "endColumn" : 22
+            "startLine" : 41,
+            "startColumn" : 10,
+            "endColumn" : 20
           }
         },
         "message" : {
-          "text" : "TestInner2"
+          "text" : "TestInner1"
         }
       }, {
         "id" : 2,
@@ -222,24 +224,7 @@
           }
         },
         "message" : {
-          "text" : "1"
-        }
-      }, {
-        "id" : 3,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 42,
-            "startColumn" : 5,
-            "endColumn" : 25
-          }
-        },
-        "message" : {
-          "text" : "2"
+          "text" : "TestInner2"
         }
       } ]
     }, {
@@ -250,7 +235,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "IRQL potentially too high at this call ([TestInner4](1)).  Maximum irql level of this call: [0](2), Irql level at preceding node: [2](3)"
+        "text" : "[TestInner2](1): IRQL potentially too high at call to [TestInner4](2).  Maximum IRQL for this call: 0, IRQL at preceding node: 2"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -279,13 +264,13 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 36,
-            "startColumn" : 14,
-            "endColumn" : 24
+            "startLine" : 26,
+            "startColumn" : 10,
+            "endColumn" : 20
           }
         },
         "message" : {
-          "text" : "TestInner4"
+          "text" : "TestInner2"
         }
       }, {
         "id" : 2,
@@ -302,24 +287,7 @@
           }
         },
         "message" : {
-          "text" : "0"
-        }
-      }, {
-        "id" : 3,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 36,
-            "startColumn" : 5,
-            "endColumn" : 27
-          }
-        },
-        "message" : {
-          "text" : "2"
+          "text" : "TestInner4"
         }
       } ]
     }, {
@@ -330,7 +298,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "IRQL potentially too high at this call ([IoGetInitialStack](1)).  Maximum irql level of this call: [1](2), Irql level at preceding node: [2](3)"
+        "text" : "[DpcForIsrRoutine](1): IRQL potentially too high at call to [IoGetInitialStack](2).  Maximum IRQL for this call: 1, IRQL at preceding node: 2"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -359,13 +327,12 @@
             "index" : 1
           },
           "region" : {
-            "startLine" : 366,
-            "startColumn" : 5,
-            "endColumn" : 22
+            "startLine" : 347,
+            "endColumn" : 17
           }
         },
         "message" : {
-          "text" : "IoGetInitialStack"
+          "text" : "DpcForIsrRoutine"
         }
       }, {
         "id" : 2,
@@ -382,24 +349,7 @@
           }
         },
         "message" : {
-          "text" : "1"
-        }
-      }, {
-        "id" : 3,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/fail_driver1.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 1
-          },
-          "region" : {
-            "startLine" : 366,
-            "startColumn" : 5,
-            "endColumn" : 25
-          }
-        },
-        "message" : {
-          "text" : "2"
+          "text" : "IoGetInitialStack"
         }
       } ]
     } ],
