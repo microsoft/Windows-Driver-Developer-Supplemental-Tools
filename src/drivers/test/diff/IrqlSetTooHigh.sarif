@@ -1,6 +1,6 @@
 {
     "all": {
-        "+": 15,
+        "+": 19,
         "-": 0
     },
     "error": {
@@ -9,31 +9,51 @@
         "codes": []
     },
     "warning": {
-        "+": 15,
+        "+": 19,
         "-": 0,
         "codes": [
             [
-                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail2](1): IRQL potentially set too high at [IrqlRaiseLevelExplicit_fail2](1).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail4](1): IRQL potentially set too high at [oldIRQL](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                0,
+                2
+            ],
+            [
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail4](1): IRQL potentially set too high at [& ...](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
                 0,
                 1
             ],
             [
-                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail2](1): IRQL potentially set too high at [oldIRQL](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail4](1): IRQL potentially set too high at [* ...](2).  Maximum IRQL for this function: 0, IRQL at statement: 2\n[IrqlRaiseLevelExplicit_fail4](1): IRQL potentially set too high at [call to KfRaiseIrql](3).  Maximum IRQL for this function: 0, IRQL at statement: 2\n[IrqlRaiseLevelExplicit_fail4](1): IRQL potentially set too high at [... = ...](4).  Maximum IRQL for this function: 0, IRQL at statement: 2",
                 0,
                 1
             ],
             [
-                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail2](1): IRQL potentially set too high at [& ...](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail4](1): IRQL potentially set too high at [ExprStmt](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
                 0,
                 1
             ],
             [
-                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail2](1): IRQL potentially set too high at [* ...](2).  Maximum IRQL for this function: 0, IRQL at statement: 2\n[IrqlRaiseLevelExplicit_fail2](1): IRQL potentially set too high at [call to KfRaiseIrql](3).  Maximum IRQL for this function: 0, IRQL at statement: 2\n[IrqlRaiseLevelExplicit_fail2](1): IRQL potentially set too high at [... = ...](4).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail3](1): IRQL potentially set too high at [IrqlRaiseLevelExplicit_fail3](1).  Maximum IRQL for this function: 0, IRQL at statement: 2",
                 0,
                 1
             ],
             [
-                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail2](1): IRQL potentially set too high at [return ...](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail3](1): IRQL potentially set too high at [oldIRQL](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail3](1): IRQL potentially set too high at [& ...](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail3](1): IRQL potentially set too high at [* ...](2).  Maximum IRQL for this function: 0, IRQL at statement: 2\n[IrqlRaiseLevelExplicit_fail3](1): IRQL potentially set too high at [call to KfRaiseIrql](3).  Maximum IRQL for this function: 0, IRQL at statement: 2\n[IrqlRaiseLevelExplicit_fail3](1): IRQL potentially set too high at [... = ...](4).  Maximum IRQL for this function: 0, IRQL at statement: 2",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/irql-set-too-high [IrqlRaiseLevelExplicit_fail3](1): IRQL potentially set too high at [return ...](2).  Maximum IRQL for this function: 0, IRQL at statement: 2",
                 0,
                 1
             ],
