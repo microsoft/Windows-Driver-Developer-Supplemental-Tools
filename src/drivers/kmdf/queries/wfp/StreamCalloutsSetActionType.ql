@@ -1,0 +1,36 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+/**
+ * @name For non-inspection Stream callouts must set the actionType regardless
+ * @description checks that a stream callout sets the action type
+ * @platform Desktop
+ * @feature.area Multiple
+ * @repro.text The following function does not correctly set an action type for non-inspection Stream callouts
+ * @kind problem
+ * @id cpp/windows/drivers/kmdf/queries/wfp/queries
+ * @problem.severity warning
+ * @precision medium
+ * @tags correctness
+ * @query-version v1
+ */
+
+// COMPLETED AND FUNCTIONING
+
+import cpp
+import drivers.libraries.wfp
+
+// Contract
+// Every non-inspect callout at the stream layer must explicitly assign a value to the 
+// actionType member of the classifyOut parameter regardless of what value may have been previously set in that parameter
+
+// Returns TRUE when a non-inspection stream callout is tagged and the function does not
+// set the actionType member of the classifyOut parameter
+
+
+// Set the action RIGHT_WRITE FLAG - check for this
+from StreamInject waf 
+where
+   isWfpStreamInjectionClassifyCall(waf) and
+   not exists(ActionTypeExpr exp)
+select waf,
+    "Non-inspection Stream Classify Function: " + waf.getName() + " does not set an FWPS_ACTION_TYPE in the FWPS_CLASSIFY_OUT structure."

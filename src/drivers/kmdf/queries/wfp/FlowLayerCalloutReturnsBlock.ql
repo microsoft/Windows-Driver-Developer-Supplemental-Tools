@@ -1,0 +1,37 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+/**
+ * @name Flow Layer Callouts
+ * @description Checks that a Flow Layer Callout does not return FWP_ACTION-BLOCK
+ * @platform Desktop
+ * @feature.area Multiple
+ * @repro.text The following function sets FWP_ACTION_BLOCK on a callout registered to ALE_FLOW_ESTABLISHED_LAYERS
+ * @kind problem
+ * @id cpp/windows/drivers/kmdf/queries/wfp/queries
+ * @problem.severity warning
+ * @precision low
+ * @tags correctness
+ * @query-version v1
+ */
+
+import cpp
+import drivers.libraries.wfp
+
+// CORRECT AND FUNCTIONING
+
+// Contract
+// If a callout is added to the ALE_FLOW_ESTABLISHED it CANNOT return
+//  FWP_ACTION_BLOCK, unless an error which is a security risk occurs.
+
+// Returns True if a Flow established callout is tagged and
+// the actionType value is set to FWP_ACTION_BLOCK
+
+from FlowEstablished waf, ActionTypeExprBlock blk 
+where
+    blk.getEnclosingFunction() instanceof FlowEstablished and
+    blk.getLocation().getStartLine() > waf.getLocation().getStartLine() and
+    blk.getLocation().getFile().getShortName().matches(waf.getLocation().getFile().getShortName())
+select waf,
+    "Flow Established Callout Classify Function: " + waf.getName() +
+     " sets an FWPS_ACTION_TYPE to FWP_ACTION_BLOCK. This is a contract violation. " + blk.getLocation().getFile() + ". Line: " +
+     blk.getLocation().getStartLine()
