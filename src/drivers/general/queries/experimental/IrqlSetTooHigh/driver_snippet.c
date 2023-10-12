@@ -74,7 +74,6 @@ _IRQL_raises_(DISPATCH_LEVEL)
     VOID IrqlSetHigherFromPassive_pass0(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
 }
 
@@ -86,7 +85,6 @@ _IRQL_raises_(DISPATCH_LEVEL)
     VOID IrqlRaiseLevelExplicit_pass1(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(APC_LEVEL, &oldIRQL); // Raise level
     DoNothing_MaxDispatch(); // call function with max DISPATCH_LEVEL. This is OK since we're at APC_LEVEL and that is less than DISPATCH_LEVEL
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL); // Raise level again
@@ -101,7 +99,6 @@ _IRQL_raises_(APC_LEVEL)
     VOID IrqlRaiseLevelExplicit_fail0(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
 }
 
@@ -112,7 +109,6 @@ _IRQL_always_function_max_(PASSIVE_LEVEL)
     VOID IrqlRaiseLevelExplicit_fail3(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
 }
 /*
@@ -122,7 +118,6 @@ _IRQL_always_function_max_(PASSIVE_LEVEL)
     VOID IrqlRaiseLevelExplicit_fail4(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
     KeLowerIrql(oldIRQL);
 }
@@ -165,7 +160,6 @@ _IRQL_requires_same_
     IrqlRequiresSame_fail7(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
 }
 
@@ -177,7 +171,6 @@ _IRQL_requires_same_
     IrqlRequiresSame_notsupported(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(oldIRQL+1, &oldIRQL);
 }
 
@@ -191,7 +184,6 @@ _IRQL_requires_same_
     IrqlRequiresSame_pass(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
     KeLowerIrql(oldIRQL);
 }
