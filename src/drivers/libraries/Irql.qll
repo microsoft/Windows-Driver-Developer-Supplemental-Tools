@@ -72,7 +72,7 @@ class IrqlFunctionAnnotation extends SALAnnotation {
       this.getMacroName()
           .matches([
               "_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_", "_IRQL_raises_",
-              "_IRQL_always_function_max_", "IRQL_always_function_min_"
+              "_IRQL_always_function_max_", "_IRQL_always_function_min_"
             ]) and
       irqlLevel = this.getUnexpandedArgument(0)
       or
