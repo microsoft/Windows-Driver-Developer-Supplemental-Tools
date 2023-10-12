@@ -35,206 +35,75 @@ _IRQL_uses_cancel_	                //The annotated parameter is the IRQL value t
 */
 
 /*
-Function which should only be called from min APC_LEVEL
-*/
-_IRQL_requires_min_(APC_LEVEL)
-    VOID DoNothing_MinAPC(void)
-{
-    __noop;
-}
-
-/*
-Function which should only be called from min DISPATCH_LEVEL
-*/
-_IRQL_requires_min_(DISPATCH_LEVEL)
-    VOID DoNothing_MinDispatch(void)
-{
-    __noop;
-}
-
-/*
-Function which should only be called from PASSIVE_LEVEL
-*/
-_IRQL_requires_(PASSIVE_LEVEL)
-    VOID DoNothing_RequiresPassive(void)
-{
-    __noop;
-}
-
-/*
-Function which should only be called from DISPATCH_LEVEL
-*/
-_IRQL_requires_(DISPATCH_LEVEL)
-    VOID DoNothing_RequiresDispatch(void)
-{
-    __noop;
-}
-
-_IRQL_requires_min_(DISPATCH_LEVEL)
-    VOID IrqlSetLowerFromDispatch_pass0(void)
-{
-    KeLowerIrql(PASSIVE_LEVEL);
-}
-
-_IRQL_requires_min_(DISPATCH_LEVEL)
-    VOID IrqlSetAPCFromDispatch_pass0(void)
-{
-    KeLowerIrql(APC_LEVEL);
-}
-
-/*
-Function is annotated for min IRQL APC_LEVEL but lowers the IRQL
-*/
-_IRQL_always_function_min_(APC_LEVEL)
-    VOID IrqlLowerLevelExplicit_fail1(void)
-{
-    KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL); // Raise above APC_LEVEL
-    DoNothing_MinAPC();
-    KeLowerIrql(PASSIVE_LEVEL); // Lower to PASSIVE_LEVEL, which is below the min IRQL
-}
-/*
-Function is annotated for min IRQL APC_LEVEL but raises the IRQL and then lowers it.
-*/
-_IRQL_always_function_min_(APC_LEVEL)
-    VOID IrqlLowerLevelExplicit_fail4(void)
-{
-    KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
-    KeLowerIrql(PASSIVE_LEVEL);
-}
-
-/*
-Function is annotated for min IRQL DISPATCH_LEVEL, but it lowers the IRQL to PASSIVE_LEVEL through another function call.
+Call a function which should always be min DISPATCH_LEVEL but takes in an argument set to APC_LEVEL
 */
 _IRQL_always_function_min_(DISPATCH_LEVEL)
-    VOID CallFunctionThatLowersIRQL_fail5(void)
+    VOID IrqlMinDispatchLowerIrql_fail(KIRQL *oldIRQL)
 {
-    IrqlSetLowerFromDispatch_pass0();
+    KeLowerIrql(*oldIRQL);
 }
 
-/*
-Function is annotated for require same, but it lowers the IRQL to APC_LEVEL through another function call after raising.
-*/
-_IRQL_requires_same_
-    VOID
-    CallFunctionThatLowersIRQL_fail6(void)
+VOID IrqlLowerWithFunctionCall(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
-    IrqlSetAPCFromDispatch_pass0();
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL); // oldIRQL should be APC_LEVEL
+    IrqlMinDispatchLowerIrql_fail(&oldIRQL);
 }
 
 /*
-Function is annotated for min IRQL PASSIVE_LEVEL and does not raise the IRQL
+Call a function which should always be min APC_LEVEL but takes in an argument set to DISPATCH_LEVEL
 */
-_IRQL_always_function_min_(PASSIVE_LEVEL)
-    VOID IrqlDontChange_pass(void)
+_IRQL_always_function_min_(APC_LEVEL)
+    VOID IrqlMinAPCLowerIrql(KIRQL *oldIRQL)
 {
-    KeLowerIrql(PASSIVE_LEVEL);
+    KeLowerIrql(*oldIRQL);
 }
 
-/*
-Function must enter and exit at the same IRQL, but raises and does not lower the IRQL fully
-*/
-_IRQL_requires_same_
-    VOID
-    IrqlRequiresSame_fail7(void)
+VOID IrqlLowerWithFunctionCall_pass(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
-    if (oldIRQL <= PASSIVE_LEVEL)
-    {
-        KeLowerIrql(APC_LEVEL);
-    }
-    else if (oldIRQL <= APC_LEVEL)
-    {
-        KeLowerIrql(PASSIVE_LEVEL);
-    }
-    else
-    {
-        KeLowerIrql(DISPATCH_LEVEL);
-    }
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL); // oldIRQL should be APC_LEVEL
+    IrqlMinAPCLowerIrql(&oldIRQL);
 }
 
-/*
-Function must enter and exit at the same IRQL, but raises and does not lower the IRQL
-*/
-_IRQL_requires_same_
-    VOID
-    IrqlRequiresSame_notsupported(void)
+/* Set IRQL to PASSIVE_LEVEL inside function which is min APC_LEVEL*/
+_IRQL_always_function_min_(APC_LEVEL)
+    VOID IrqlAlwaysMinAPC_fail(KIRQL *oldIRQL)
 {
-    KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(oldIRQL + 2, &oldIRQL);
-    KeLowerIrql(oldIRQL + 1);
+    KeLowerIrql(*oldIRQL); // lowers to PASSIVE_LEVEL which is lower than APC_LEVEL
 }
 
-/*
-Funciton must enter and exit at the same IRQL. IRQL is set higher but then set lower before exiting.
-*/
-_IRQL_requires_same_
-    VOID
-    IrqlRequiresSame_pass(void)
+VOID IrqlCallAlwaysMinAPC(void)
 {
     KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
+    IrqlAlwaysMinAPC_fail(&oldIRQL); // oldIRQL should be PASSIVE_LEVEL
+}
+
+_IRQL_requires_same_
+    VOID
+    IrqlReqSame_pass(void)
+{
+    KIRQL oldIRQL;
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
     KeLowerIrql(oldIRQL);
 }
 
 /*
-Function that calls another function by reference which correctly lowers the IRQL.
-This should pass since IrqlInderectCall_pass0 is not annotated for min IRQL.
+Requires same but lowers IRQL
 */
-VOID IrqlInderectCall_pass0(void)
+_IRQL_requires_same_
+    VOID
+    IrqlReqSame_fail(KIRQL *oldIRQL)
 {
-    void (*funcPtr)(void);
-    KIRQL oldIRQL;
-    oldIRQL = KeGetCurrentIrql();
-    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
-    funcPtr = &IrqlSetLowerFromDispatch_pass0;
-    funcPtr();
+    KeLowerIrql(*oldIRQL);
 }
 
-/*
-Function that calls another function by reference which correctly lowers the IRQL.
-This should pass since IrqlInderectCall_pass0 is annotated for min PASSIVE_LEVEL.
-*/
-_IRQL_always_function_min_(PASSIVE_LEVEL)
-    VOID IrqlInderectCall_pass1(void)
+VOID IrqlCallReqSame(void)
 {
-    void (*funcPtr)(void);
-    funcPtr = &IrqlSetLowerFromDispatch_pass0;
-    funcPtr();
+     KIRQL oldIRQL;
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
+    IrqlReqSame_fail(&oldIRQL); // oldIRQL should be APC_LEVEL
 }
-
-/*
-Function that calls another function by reference which incorrectly lowers the IRQL.
-This should fail because the function pointer points to a function that should fail.
-*/
-VOID IrqlInderectCall_fail0(void)
-{
-    void (*funcPtr)(void);
-    funcPtr = &IrqlLowerLevelExplicit_fail1;
-    funcPtr();
-}
-/*
-Function that calls another function by reference which incorrectly raises the IRQL.
-This should fail because the function pointer points to a function that that raises the IRQL above PASSIVE_LEVEL.
-*/
-_IRQL_always_function_min_(PASSIVE_LEVEL)
-    VOID IrqlInderectCall_fail1(void)
-{
-    void (*funcPtr)(void);
-    funcPtr = &IrqlSetLowerFromDispatch_pass0;
-    funcPtr();
-}
-
-// TODO multi-threaded tests
-// function has max IRQL requirement, creates two threads where one is above that requirement and one is below
