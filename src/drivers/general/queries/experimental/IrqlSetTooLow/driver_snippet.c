@@ -50,22 +50,22 @@ VOID IrqlLowerWithFunctionCall(void)
     IrqlMinDispatchLowerIrql_fail(&oldIRQL);
 }
 
-// /*
-// Call a function which should always be min DISPATCH_LEVEL but takes in an argument set to APC_LEVEL
-// */
-// _IRQL_always_function_min_(DISPATCH_LEVEL)
-//     VOID IrqlMinDispatchLowerIrql_fail1(KIRQL *oldIRQL)
-// {
-//     KeLowerIrql(*oldIRQL); 
-// }
+/*
+Call a function which should always be min DISPATCH_LEVEL but takes in an argument set to APC_LEVEL
+*/
+_IRQL_always_function_min_(DISPATCH_LEVEL)
+    VOID IrqlMinDispatchLowerIrql_fail1(KIRQL *oldIRQL)
+{
+    KeLowerIrql(*oldIRQL); 
+}
 
-// VOID IrqlLowerWithFunctionCall1(void)
-// {
-//     KIRQL oldIRQL;
-//     KeRaiseIrql(APC_LEVEL, &oldIRQL);
-//     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL); // oldIRQL should be APC_LEVEL
-//     IrqlMinDispatchLowerIrql_fail(&oldIRQL); 
-// }
+VOID IrqlLowerWithFunctionCall1(void)
+{
+    KIRQL oldIRQL;
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL); // oldIRQL should be APC_LEVEL
+    IrqlMinDispatchLowerIrql_fail1(&oldIRQL); 
+}
 
 
 /*
