@@ -3,33 +3,33 @@ rd /s /q TestDB >NUL 2>&1
 rd /s /q AnalysisFiles >NUL 2>&1
 
 
-@REM call :test PendingStatusError WDMTestTemplate wdm queries
-@REM call :test ExaminedValue WDMTestTemplate wdm queries
-@REM call :test StrSafe KMDFTestTemplate kmdf queries
-@REM call :test MultiplePagedCode WDMTestTemplate wdm queries
-@REM call :test NoPagedCode WDMTestTemplate wdm queries
-@REM call :test NoPagingSegment WDMTestTemplate wdm queries
-@REM call :test OpaqueMdlUse WDMTestTemplate wdm queries
-@REM call :test OpaqueMdlWrite WDMTestTemplate wdm queries
-@REM call :test KeWaitLocal WDMTestTemplate wdm queries
-@REM call :test IrqlTooHigh WDMTestTemplate general queries\experimental
-@REM call :test IrqlTooLow WDMTestTemplate general queries\experimental
-@REM call :test IrqlSetTooHigh WDMTestTemplate general queries\experimental
+call :test PendingStatusError WDMTestTemplate wdm queries
+call :test ExaminedValue WDMTestTemplate wdm queries
+call :test StrSafe KMDFTestTemplate kmdf queries
+call :test MultiplePagedCode WDMTestTemplate wdm queries
+call :test NoPagedCode WDMTestTemplate wdm queries
+call :test NoPagingSegment WDMTestTemplate wdm queries
+call :test OpaqueMdlUse WDMTestTemplate wdm queries
+call :test OpaqueMdlWrite WDMTestTemplate wdm queries
+call :test KeWaitLocal WDMTestTemplate wdm queries
+call :test IrqlTooHigh WDMTestTemplate general queries\experimental
+call :test IrqlTooLow WDMTestTemplate general queries\experimental
+call :test IrqlSetTooHigh WDMTestTemplate general queries\experimental
 call :test IrqlSetTooLow WDMTestTemplate general queries\experimental
-@REM call :test WrongDispatchTableAssignment WDMTestTemplate wdm queries
-@REM call :test ExtendedDeprecatedApis WDMTestTemplate general queries
-@REM call :test WdkDeprecatedApis WDMTestTemplate general queries
-@REM call :test IllegalFieldAccess WDMTestTemplate wdm queries
-@REM call :test PoolTagIntegral WDMTestTemplate general queries
-@REM call :test ObReferenceMode WDMTestTemplate wdm queries
-@REM call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
-@REM call :test DefaultPoolTag WDMTestTemplate general queries
-@REM call :test DefaultPoolTagExtended WDMTestTemplate general queries\experimental
-@REM call :test InitNotCleared WDMTestTemplate wdm queries
-@REM call :test IrqlNotUsed WDMTestTemplate general queries
-@REM call :test IrqlNotSaved WDMTestTemplate general queries
-@REM call :test IllegalFieldWrite WDMTestTemplate wdm queries
-@REM call :test IllegalFieldAccess2 WDMTestTemplate wdm queries
+call :test WrongDispatchTableAssignment WDMTestTemplate wdm queries
+call :test ExtendedDeprecatedApis WDMTestTemplate general queries
+call :test WdkDeprecatedApis WDMTestTemplate general queries
+call :test IllegalFieldAccess WDMTestTemplate wdm queries
+call :test PoolTagIntegral WDMTestTemplate general queries
+call :test ObReferenceMode WDMTestTemplate wdm queries
+call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
+call :test DefaultPoolTag WDMTestTemplate general queries
+call :test DefaultPoolTagExtended WDMTestTemplate general queries\experimental
+call :test InitNotCleared WDMTestTemplate wdm queries
+call :test IrqlNotUsed WDMTestTemplate general queries
+call :test IrqlNotSaved WDMTestTemplate general queries
+call :test IllegalFieldWrite WDMTestTemplate wdm queries
+call :test IllegalFieldAccess2 WDMTestTemplate wdm queries
 
 exit /b 0
 
