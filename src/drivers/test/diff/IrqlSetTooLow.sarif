@@ -1,6 +1,6 @@
 {
     "all": {
-        "+": 0,
+        "+": 4,
         "-": 0
     },
     "error": {
@@ -9,9 +9,30 @@
         "codes": []
     },
     "warning": {
-        "+": 0,
+        "+": 4,
         "-": 0,
-        "codes": []
+        "codes": [
+            [
+                "cpp/drivers/irql-set-too-low funcIRQL 2 getPotentialExitIrqlAtCfn 1 irqlFunc IrqlMinDispatchLowerIrql_fail getQualifiedName IrqlMinDispatchLowerIrql_fail statement: IrqlMinDispatchLowerIrql_fail\nfuncIRQL 2 getPotentialExitIrqlAtCfn 1 irqlFunc IrqlMinDispatchLowerIrql_fail getQualifiedName IrqlMinDispatchLowerIrql_fail statement: {{ ... }}",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/irql-set-too-low funcIRQL 2 getPotentialExitIrqlAtCfn 1 irqlFunc IrqlMinDispatchLowerIrql_fail getQualifiedName IrqlMinDispatchLowerIrql_fail statement: * ...",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/irql-set-too-low funcIRQL 2 getPotentialExitIrqlAtCfn 1 irqlFunc IrqlMinDispatchLowerIrql_fail getQualifiedName IrqlMinDispatchLowerIrql_fail statement: call to KeLowerIrql",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/irql-set-too-low funcIRQL 2 getPotentialExitIrqlAtCfn 1 irqlFunc IrqlMinDispatchLowerIrql_fail getQualifiedName IrqlMinDispatchLowerIrql_fail statement: IrqlMinDispatchLowerIrql_fail",
+                0,
+                1
+            ]
+        ]
     },
     "note": {
         "+": 0,
