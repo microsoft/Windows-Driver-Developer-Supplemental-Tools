@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * Provides cata-flow analyses used in calculating the IRQL in a Windwos driver.
+ * Provides data-flow analyses used in calculating the IRQL in a Windows driver.
  */
 
 
