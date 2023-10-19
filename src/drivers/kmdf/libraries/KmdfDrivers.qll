@@ -45,12 +45,18 @@ class KmdfFunc extends Function {
   }
 }
  
+/**
+ * A KMDF Typedef type. This class is incomplete.  It is used to represent a TypedefType in the KMDF library.
+ */
 class KmdfTypedefType extends TypedefType {
   KmdfTypedefType() {
     this.getFile().getBaseName().matches("wdf%.h")
   }
 }
 
+/**
+ * A KMDF Struct. This class is incomplete.  It is used to represent a Struct in the KMDF library.
+ */
 class KmdfStruct extends Struct {
   KmdfStruct() {
     this.getFile().getBaseName().matches("wdf%.h")
@@ -67,9 +73,7 @@ class KmdfDriverEntry extends KmdfFunc {
   KmdfDriverEntry() { this.getName().matches("DriverEntry") }
 }
 
-class KmdfRtlAssert extends KmdfFunc { 
-  KmdfRtlAssert() { this.getName().matches("RtlAssert") }
-}
+
 class KmdfRtlAssert extends KmdfFunc { KmdfRtlAssert() { this.getName().matches("RtlAssert") }}
 class KmdfWdfChildListCreate extends KmdfFunc { KmdfWdfChildListCreate() { this.getName().matches("WdfChildListCreate") }}
 class KmdfWdfChildListGetDevice extends KmdfFunc { KmdfWdfChildListGetDevice() { this.getName().matches("WdfChildListGetDevice") }}
