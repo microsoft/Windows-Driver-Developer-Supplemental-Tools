@@ -5,26 +5,38 @@
 //
 
 #define SET_DISPATCH 1
-const extern ULONG myTag;
-char * myString = "Hello!";
-const ULONG myTag2 = '2gat';
-ULONG * myTag3;
 
 // Template. Not called in this test.
 void top_level_call() {}
 
-VOID PoolTagIntegral() {
+typedef
+void
+functionCall1(void);
 
-    myTag3 = ExAllocatePool2(POOL_FLAG_NON_PAGED, sizeof(ULONG), 'gaT_');
-    *myTag3 = '3gat';
+typedef functionCall1 *funcCall;
 
-    ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, myTag); // GOOD
-    ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, myTag2); // GOOD
-    ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, *myTag3); // GOOD
-    ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, 'gaT_'); // GOOD
-    
-    ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, myString); // ERROR
-    ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, &myTag); // ERROR
-    ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, myTag3); // ERROR
-    ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, "gaT_"); // ERROR
+void voidFunctionToCall(void){
+    return;
 }
+int intFunctionToCall(void){
+    return 0;
+}
+
+int (*fun_ptr1)(void) = intFunctionToCall;
+void (*fun_ptr2)(void) = voidFunctionToCall;
+
+void functionCallThatUsesFunctionPointer(funcCall functionPointer) {
+    functionPointer();
+}
+void callFunctionCallThatUsesFunctionPointer(void){
+    funcCall f1 = &voidFunctionToCall;
+    funcCall f2 = &intFunctionToCall;
+    functionCallThatUsesFunctionPointer(f1); // pass
+    functionCallThatUsesFunctionPointer(fun_ptr2); // pass
+
+    functionCallThatUsesFunctionPointer(fun_ptr1); // fail because this function returns an int
+    functionCallThatUsesFunctionPointer(f2); // fail because this function returns an int
+
+    functionCallThatUsesFunctionPointer(&voidFunctionToCall); // pass
+}
+

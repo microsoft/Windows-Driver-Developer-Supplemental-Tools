@@ -20,11 +20,20 @@
  * @query-version v1
  */
 
-import cpp
+ import cpp
 
-from FunctionCall fc, int i, FunctionAccess fa
-where 
-fc.getArgument(i) = fa and 
-fa.getTarget().getType() != fc.getArgument(i).(FunctionAccess).getTarget().getType() // compare return type of actual argument function pointer and expected
-
-select fa,  "Routine $@ may use a function (" + fa.getTarget().getName().toString() + ") with an unexpected return type ", fc.getTarget(), ""
+ from FunctionCall fc, int i, FunctionAccess fa
+ where 
+ (
+     fc.getArgument(i) = fa and 
+     fa.getTarget().getType() != fc.getArgument(i).(FunctionAccess).getTarget().getType() // compare return type of actual argument function pointer and expected
+ )
+ or(
+     fc.getArgument(i) instanceof AddressOfExpr and 
+     fc.getArgument(i).(AddressOfExpr).getOperand() = fa
+ )
+ // or(
+ // TODO - Add to query so it can check for function pointer vairables
+ // )
+ 
+ select fa,  "Routine $@ may use a function (" + fa.getTarget().getName().toString() + ") with an unexpected return type ", fc.getTarget(), ""
