@@ -1,0 +1,198 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.11.5",
+        "rules" : [ {
+          "id" : "cpp/drivers/pool-tag-integral",
+          "name" : "cpp/drivers/pool-tag-integral",
+          "shortDescription" : {
+            "text" : "Use of string in pool tag instead of integral (C28134)"
+          },
+          "fullDescription" : {
+            "text" : "Using a string or string pointer for a pool tag rather than a character integral will result in garbage in the tag."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "Using a string or string pointer for a pool tag rather than a character integral will result in garbage in the tag.",
+            "feature.area" : "Multiple",
+            "id" : "cpp/drivers/pool-tag-integral",
+            "impact" : "Attack Surface Reduction",
+            "kind" : "problem",
+            "name" : "Use of string in pool tag instead of integral (C28134)",
+            "opaqueid" : "CQLD-C28134",
+            "owner.email" : "sdat@microsoft.com",
+            "platform" : "Desktop",
+            "precision" : "high",
+            "problem.severity" : "warning",
+            "query-version" : "v1",
+            "repro.text" : "The following code locations call a pool allocation function with a tag that is not an integral type.",
+            "scope" : "domainspecific",
+            "security.severity" : "Low"
+          }
+        } ]
+      },
+      "extensions" : [ {
+        "name" : "microsoft/windows-drivers",
+        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "legacy-upgrades",
+        "semanticVersion" : "0.0.0",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      } ]
+    },
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    } ],
+    "results" : [ {
+      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/pool-tag-integral",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: char *)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 26,
+            "startColumn" : 5,
+            "endColumn" : 20
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "8ad0ec3c47c85fd3:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/pool-tag-integral",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: const ULONG *)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 27,
+            "startColumn" : 5,
+            "endColumn" : 20
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "e7715c6d25a17fc3:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/pool-tag-integral",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: ULONG *)"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 28,
+            "startColumn" : 5,
+            "endColumn" : 20
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "b4607ca2bc71911e:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/pool-tag-integral",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: char\\[5\\])"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 29,
+            "startColumn" : 5,
+            "endColumn" : 20
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "5a936be5671d65bf:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    } ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}
