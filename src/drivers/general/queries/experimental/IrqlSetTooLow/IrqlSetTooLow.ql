@@ -17,18 +17,30 @@
  * @tags correctness
  *       wddst
  * @scope domainspecific
- * @query-version v2
+ * @query-version v1
  */
 
 import cpp
 import drivers.libraries.Irql
 
-from IrqlRestrictsFunction irqlFunc, ControlFlowNode statement, int irqlRequirement
-where
+predicate tooLowForFunc(
+  IrqlRestrictsFunction irqlFunc, ControlFlowNode statement, int irqlRequirement
+) {
   statement.getControlFlowScope() = irqlFunc and
   irqlFunc.(IrqlAlwaysMinFunction).getIrqlLevel() = irqlRequirement and
   irqlRequirement > max(getPotentialExitIrqlAtCfn(statement)) and
   irqlRequirement != -1
+}
+
+from IrqlRestrictsFunction irqlFunc, ControlFlowNode statement, int irqlRequirement
+where
+  tooLowForFunc(irqlFunc, statement, irqlRequirement) and
+  // Only get the first node which is set too low
+  not exists(ControlFlowNode otherNode |
+    otherNode.getControlFlowScope() = irqlFunc and
+    otherNode = statement.getAPredecessor() and
+    tooLowForFunc(irqlFunc, otherNode, irqlRequirement)
+  )
 select statement,
   "$@: IRQL potentially set too low at $@.  Minimum IRQL for this function: " + irqlRequirement +
     ", IRQL at statement: " + max(getPotentialExitIrqlAtCfn(statement)), irqlFunc,

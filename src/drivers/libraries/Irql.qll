@@ -1,8 +1,21 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+/**
+ * Provides classes related to calculating and estimating the IRQL in a Windows device driver.
+ *
+ * For best results, this library expects to be used in tandem with IRQL annotations.  A limited
+ * amount of functionality is still present even when no annotations are present, primarily around
+ * measuring direct calls to KeRaiseIrql and KeLowerIrql.
+ *
+ * Much of this library's analysis is intraprocedural or limited interprocedural, using a simple
+ * analysis based on call sites to a given function.  Full interprocedural analysis that relies on the
+ * implicit behaviors of the WDM driver model, etc. is not yet supported.
+ */
+
 import cpp
 import drivers.libraries.SAL
 import drivers.wdm.libraries.WdmDrivers
+import drivers.libraries.IrqlDataFlow
 
 /**
  * A macro in wdm.h that represents an IRQL level,
@@ -457,17 +470,36 @@ class KeLowerIrqlCall extends FunctionCall {
    * "the IRQL before the most recent KeRaiseIrql call".
    */
   int getIrqlLevel() {
-    result = any(getPotentialExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
+    result =
+      any(getPotentialExitIrqlAtCfn(this.getMostRecentRaiseInterprocedural().getAPredecessor()))
   }
 
   /**
-   * Get the most recent call before this call that explicitly raised the IRQL.
+   * Get the most recent KeRaiseIrql call before this call.
+   *
+   * This performs a local (intraprocedural) analysis only.  It is unused in the library today,
+   * but can be inserted in place of the interprocedural analysis by modifying the getIrqlLevel()
+   * function above.
    */
   KeRaiseIrqlCall getMostRecentRaise() {
     result =
       any(KeRaiseIrqlCall sgic |
         this.getAPredecessor*() = sgic and
         not exists(KeRaiseIrqlCall kric2 | kric2 != sgic and kric2.getAPredecessor*() = sgic)
+      )
+  }
+
+  /**
+   * Get the corresponding KeRaiseIrql call that preceded this KeLowerIrql call.
+   *
+   * This performs an interprocedural analysis using CodeQL's DataFlow classes.
+   */
+  KeRaiseIrqlCall getMostRecentRaiseInterprocedural() {
+    result =
+      any(KeRaiseIrqlCall kric |
+        exists(IrqlRaiseLowerFlow irlf |
+          irlf.hasFlow(DataFlow::exprNode(kric), DataFlow::exprNode(this.getAnArgument()))
+        )
       )
   }
 }
@@ -489,7 +521,11 @@ class RestoresGlobalIrqlCall extends FunctionCall {
     result = any(getPotentialExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
   }
 
-  /** Returns the matching call to a function that saved the IRQL to a global state. */
+  /**
+   * Returns the matching call to a function that saved the IRQL to a global state.
+   *
+   * This is a strictly intraprocedural analysis.
+   */
   SavesGlobalIrqlCall getMostRecentRaise() {
     result =
       any(SavesGlobalIrqlCall sgic |
@@ -546,9 +582,9 @@ private predicate exprsMatchText(Expr e1, Expr e2) {
  * - If calling a function annotated to maintain the same IRQL, then the result is the IRQL at the previous CFN.
  * - If this node is calling a function with no annotations, the result is the IRQL that function exits at.
  * - If there is a prior CFN in the CFG, the result is the result for that prior CFN.
- * - If there is no prior CFN, then the result is whatever the IRQL was at a statement prior to a function call to this function.
- * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations.
- * - If there is nothing else, then IRQL is 0.
+ * - If there is no prior CFN, then the result is whatever the IRQL was at a statement prior to a function call to this function (a lazy interprocedural analysis.)
+ * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations applied to this function.
+ * - Failing all this, we set the IRQL to 0.
  *
  * Not implemented: _IRQL_limited_to_
  */
@@ -620,6 +656,8 @@ private ControlFlowNode getExitPointsOfFunction(Function f) {
 
 /**
  * Attempt to find the range of valid IRQL values when **entering** a given IRQL-annotated function.
+ *
+ * Note: we implicitly apply DISPATCH_LEVEL as the max when a max is not specified.
  */
 cached
 int getAllowableIrqlLevel(IrqlRestrictsFunction irqlFunc) {
@@ -640,12 +678,8 @@ int getAllowableIrqlLevel(IrqlRestrictsFunction irqlFunc) {
       then result = any([0 .. irqlFunc.(IrqlMaxAnnotatedFunction).getIrqlLevel()])
       else
         if irqlFunc instanceof IrqlMinAnnotatedFunction
-        then
-          result =
-            any([irqlFunc.(IrqlMinAnnotatedFunction).getIrqlLevel() .. any(IrqlMacro im)
-                      .getGlobalMaxIrqlLevel()]
-            )
+        then result = any([irqlFunc.(IrqlMinAnnotatedFunction).getIrqlLevel() .. 2])
         else
-          // No known restriction
-          result = any([0 .. any(IrqlMacro im).getGlobalMaxIrqlLevel()])
+          // No known restriction.  Default to between PASSIVE and DISPATCH.
+          result = any([0 .. 2])
 }
