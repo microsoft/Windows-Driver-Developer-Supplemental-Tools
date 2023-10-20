@@ -23,17 +23,18 @@
 import cpp
 import drivers.libraries.Irql
 
+bindingset[irqlRequirement]
 predicate tooLowForFunc(
   IrqlRestrictsFunction irqlFunc, ControlFlowNode statement, int irqlRequirement
 ) {
   statement.getControlFlowScope() = irqlFunc and
-  irqlFunc.(IrqlAlwaysMinFunction).getIrqlLevel() = irqlRequirement and
   irqlRequirement > max(getPotentialExitIrqlAtCfn(statement)) and
   irqlRequirement != -1
 }
 
 from IrqlRestrictsFunction irqlFunc, ControlFlowNode statement, int irqlRequirement
 where
+  irqlFunc.(IrqlAlwaysMinFunction).getIrqlLevel() = irqlRequirement and
   tooLowForFunc(irqlFunc, statement, irqlRequirement) and
   // Only get the first node which is set too low
   not exists(ControlFlowNode otherNode |
