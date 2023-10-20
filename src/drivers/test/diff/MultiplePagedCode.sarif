@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 1
+        "-": 0
     },
     "error": {
         "+": 0,
@@ -10,14 +10,8 @@
     },
     "warning": {
         "+": 0,
-        "-": 1,
-        "codes": [
-            [
-                "cpp/drivers/multiple-paged-code Functions in a paged section must have exactly one instance of the PAGED_CODE or PAGED_CODE_LOCKED macro",
-                1,
-                0
-            ]
-        ]
+        "-": 0,
+        "codes": []
     },
     "note": {
         "+": 0,

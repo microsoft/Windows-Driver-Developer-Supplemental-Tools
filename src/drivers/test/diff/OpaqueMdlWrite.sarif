@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 1
+        "-": 0
     },
     "error": {
         "+": 0,
@@ -10,14 +10,8 @@
     },
     "warning": {
         "+": 0,
-        "-": 1,
-        "codes": [
-            [
-                "cpp/drivers/opaque-mdl-write The driver is writing to an opaque MDL field (ByteCount).  MDLs are semi-opaque and opaque fields should not be modified.",
-                1,
-                0
-            ]
-        ]
+        "-": 0,
+        "codes": []
     },
     "note": {
         "+": 0,

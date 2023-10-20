@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 1
+        "-": 0
     },
     "error": {
         "+": 0,
@@ -10,14 +10,8 @@
     },
     "warning": {
         "+": 0,
-        "-": 1,
-        "codes": [
-            [
-                "cpp/drivers/str-safe Kernel Mode drivers should use ntstrsafe.h, not strsafe.h. Found in source file",
-                1,
-                0
-            ]
-        ]
+        "-": 0,
+        "codes": []
     },
     "note": {
         "+": 0,

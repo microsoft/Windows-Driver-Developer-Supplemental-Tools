@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 3
+        "-": 0
     },
     "error": {
         "+": 0,
@@ -10,24 +10,8 @@
     },
     "warning": {
         "+": 0,
-        "-": 3,
-        "codes": [
-            [
-                "cpp/drivers/wrong-dispatch-table-assignment The dispatch function does not have a dispatch type annotation matching this dispatch table entry.",
-                1,
-                0
-            ],
-            [
-                "cpp/drivers/wrong-dispatch-table-assignment Dispatch table assignment should have a DRIVER_DISPATCH type routine as its right-hand side value.",
-                1,
-                0
-            ],
-            [
-                "cpp/drivers/wrong-dispatch-table-assignment The dispatch function does not have a dispatch type annotation.",
-                1,
-                0
-            ]
-        ]
+        "-": 0,
+        "codes": []
     },
     "note": {
         "+": 0,
