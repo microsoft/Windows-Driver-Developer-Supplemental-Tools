@@ -228,7 +228,8 @@ Function that calls another function by reference which incorrectly raises the I
 This should fail because the function pointer points to a function that that raises the IRQL above PASSIVE_LEVEL.
 */
 _IRQL_always_function_max_(PASSIVE_LEVEL)
-VOID IrqlInderectCall_fail1(void)
+VOID IrqlIndirectCall_fail1(void)
+
 {
     void (*funcPtr)(void);
     funcPtr = &IrqlSetHigherFromPassive_pass0;
