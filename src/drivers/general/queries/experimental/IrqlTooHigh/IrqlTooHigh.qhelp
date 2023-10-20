@@ -7,7 +7,7 @@
 	</overview>
 	<recommendation>
 		<p>
-			The driver is executing at an IRQL that is too high for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called.
+			The driver is executing at an IRQL that is too high for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called.  If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.
 		</p>
 	</recommendation>
 	<example>

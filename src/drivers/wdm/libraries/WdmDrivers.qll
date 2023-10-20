@@ -48,6 +48,8 @@ class WdmCallbackRoutineTypedef extends TypedefType {
       or
       this.getName().matches("DRIVER_INITIALIZE")
       or
+      this.getName().matches("DRIVER_CANCEL")
+      or
       this.getName().matches("IO_COMPLETION_ROUTINE")
       or
       this.getName().matches("KSERVICE_ROUTINE")
@@ -91,6 +93,11 @@ class WdmDriverUnload extends WdmCallbackRoutine {
 /** A WDM DriverEntry callback routine. */
 class WdmDriverEntry extends WdmCallbackRoutine {
   WdmDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
+}
+
+/** A WDM DriverCancel callback routine. */
+class WdmDriverCancel extends WdmCallbackRoutine {
+  WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL")}
 }
 
 /**
