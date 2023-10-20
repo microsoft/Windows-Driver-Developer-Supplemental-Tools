@@ -216,7 +216,8 @@ VOID IrqlIndirectCall_pass1(void)
 Function that calls another function by reference which incorrectly raises the IRQL. 
 This should fail because the function pointer points to a function that should fail.
 */
-VOID IrqlInderectCall_fail0(void)
+VOID IrqlIndirectCall_fail0(void)
+
 {
     void (*funcPtr)(void);
     funcPtr = &IrqlRaiseLevelExplicit_fail0;
