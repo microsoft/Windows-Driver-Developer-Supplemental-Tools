@@ -204,7 +204,8 @@ Function that calls another function by reference which correctly raises the IRQ
 This should pass since IrqlInderectCall_pass0 is annotated for max DISPATCH_LEVEL.
 */
 _IRQL_always_function_max_(DISPATCH_LEVEL)
-VOID IrqlInderectCall_pass1(void)
+VOID IrqlIndirectCall_pass1(void)
+
 {
     void (*funcPtr)(void);
     funcPtr = &IrqlSetHigherFromPassive_pass0;
