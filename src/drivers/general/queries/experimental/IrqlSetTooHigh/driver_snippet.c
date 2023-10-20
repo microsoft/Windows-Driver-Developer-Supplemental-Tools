@@ -192,7 +192,8 @@ _IRQL_requires_same_
 Function that calls another function by reference which correctly raises the IRQL. 
 This should pass since IrqlInderectCall_pass0 is not annotated for max IRQL.
 */
-VOID IrqlInderectCall_pass0(void)
+VOID IrqlIndirectCall_pass0(void)
+
 {
     void (*funcPtr)(void);
     funcPtr = &IrqlSetHigherFromPassive_pass0;
