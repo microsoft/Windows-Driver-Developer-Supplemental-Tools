@@ -23,11 +23,11 @@
 import cpp
 import drivers.libraries.Irql
 
+bindingset[irqlRequirement]
 predicate tooHighForFunc(
   IrqlRestrictsFunction irqlFunc, ControlFlowNode statement, int irqlRequirement
 ) {
   statement.getControlFlowScope() = irqlFunc and
-  irqlFunc.(IrqlAlwaysMaxFunction).getIrqlLevel() = irqlRequirement and
   irqlRequirement < min(getPotentialExitIrqlAtCfn(statement)) and
   irqlRequirement != -1
 }
