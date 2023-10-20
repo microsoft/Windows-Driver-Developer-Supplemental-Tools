@@ -170,7 +170,7 @@ _IRQL_requires_same_
     VOID
     IrqlRequiresSame_notsupported(void)
 {
-    KIRQL oldIRQL;
+    KIRQL oldIRQL = PASSIVE_LEVEL;
     KeRaiseIrql(oldIRQL+1, &oldIRQL);
 }
 
