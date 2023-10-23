@@ -6,7 +6,7 @@ This repository contains open-source components for supplemental use in developi
 
 | Branch to use            | CodeQL CLI version |
 |--------------------------|--------------------|
-| main                     | 2.11.5             |
+| main                     | 2.14.4             |
 
 ### For Windows Hardware Compatibility Program Use
 
@@ -17,7 +17,7 @@ This repository contains open-source components for supplemental use in developi
 | Windows 11               | WHCP_21H2     | 2.4.6              |
 | Windows 11, version 22H2 | WHCP_22H2     | 2.6.3              |
 
-For general use, use the `main` branch along with [version 2.11.5 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.11.5).
+For general use, use the `main` branch along with [version 2.14.4 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.14.4).
 
 ## Quickstart
 
@@ -30,7 +30,7 @@ For general use, use the `main` branch along with [version 2.11.5 of the CodeQL 
 
     For the WHCP Program, use the CodeQL CLI version in accordance with the table above and Windows release you are certifying for: [version 2.4.6](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6) or [version 2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3).
 
-    For general use with the `main` branch, use [CodeQL CLI version 2.11.5](https://github.com/github/codeql-cli-binaries/releases/tag/v2.11.5).
+    For general use with the `main` branch, use [CodeQL CLI version 2.14.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.14.4).
     
 
 1. Clone and install the Windows Driver Developer Supplemental Tools repository which contains the CodeQL queries specific for drivers:
@@ -56,8 +56,8 @@ For general use, use the `main` branch along with [version 2.11.5 of the CodeQL 
 1. Verify CodeQL is installed correctly by checking the version:
     ```
     D:\codeql-home\codeql>codeql --version
-    CodeQL command-line toolchain release 2.11.5.
-    Copyright (C) 2019-2022 GitHub, Inc.
+    CodeQL command-line toolchain release 2.14.4.
+    Copyright (C) 2019-2023 GitHub, Inc.
     Unpacked in: D:\codeql-home\codeql
         Analysis results depend critically on separately distributed query and
         extractor modules. To list modules that are visible to the toolchain,
