@@ -235,7 +235,3 @@ VOID IrqlIndirectCall_fail1(void)
     funcPtr = &IrqlSetHigherFromPassive_pass0;
     funcPtr();
 }
-
-
-// TODO multi-threaded tests
-// function has max IRQL requirement, creates two threads where one is above that requirement and one is below
