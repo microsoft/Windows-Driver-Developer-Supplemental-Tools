@@ -22,15 +22,19 @@
 
 import cpp
 
-from FunctionCall fc, Function f_declr, Parameter p
-where
-  f_declr = fc.getTarget() and
-  f_declr = p.getFunction() and
-  p.getUnspecifiedType() instanceof FunctionPointerType and
-  fc.getAnArgument().getUnspecifiedType() instanceof FunctionPointerType and
-  fc.getAnArgument().getUnspecifiedType().(FunctionPointerType).getReturnType() != p.getUnspecifiedType().(FunctionPointerType).getReturnType()
+from FunctionCall fc, Function f_declr
+ where
+   f_declr = fc.getTarget() and
+   exists(Parameter p | 
+    p.getUnspecifiedType() instanceof FunctionPointerType and
+    (
+      p.getFunction() = f_declr 
+      and fc.getAnArgument().getUnspecifiedType() instanceof FunctionPointerType
+      and fc.getAnArgument().getUnspecifiedType().(FunctionPointerType).getReturnType() != p.getUnspecifiedType().(FunctionPointerType).getReturnType()
+    )
+   )
+
 
 select fc,
-  "Routine " + f_declr + " may use a function pointer("+
-    ") with an unexpected return type: "+fc.getAnArgument().getUnspecifiedType().(FunctionPointerType).getReturnType() + ". Expected: " +
-    p.getUnspecifiedType().(FunctionPointerType).getReturnType() + " " 
+  "Function " + fc + " may use a function pointer with an unexpected return type " + fc.getAnArgument().getUnspecifiedType().(FunctionPointerType).getReturnType()
+

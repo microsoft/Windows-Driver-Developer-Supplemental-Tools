@@ -6,15 +6,31 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.5",
+        "semanticVersion" : "2.14.6",
+        "notifications" : [ {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "name" : "cpp/baseline/expected-extracted-files",
+          "shortDescription" : {
+            "text" : "Expected extracted files"
+          },
+          "fullDescription" : {
+            "text" : "Files appearing in the source archive that are expected to be extracted."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          },
+          "properties" : {
+            "tags" : [ "expected-extracted-files", "telemetry" ]
+          }
+        } ],
         "rules" : [ {
           "id" : "cpp/drivers/pool-tag-integral",
           "name" : "cpp/drivers/pool-tag-integral",
           "shortDescription" : {
-            "text" : "Use of string in pool tag instead of integral (C28134)"
+            "text" : "Unexpected function return type for routine (C28127)"
           },
           "fullDescription" : {
-            "text" : "Using a string or string pointer for a pool tag rather than a character integral will result in garbage in the tag."
+            "text" : "The function being used as a routine does not exactly match the type expected."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -22,19 +38,19 @@
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "Using a string or string pointer for a pool tag rather than a character integral will result in garbage in the tag.",
+            "description" : "The function being used as a routine does not exactly match the type expected.",
             "feature.area" : "Multiple",
             "id" : "cpp/drivers/pool-tag-integral",
             "impact" : "Attack Surface Reduction",
             "kind" : "problem",
-            "name" : "Use of string in pool tag instead of integral (C28134)",
-            "opaqueid" : "CQLD-C28134",
+            "name" : "Unexpected function return type for routine (C28127)",
+            "opaqueid" : "CQLD-C28127",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "The following code locations call a pool allocation function with a tag that is not an integral type.",
+            "repro.text" : "The following code locations use a function pointer with a return type that does not match the expected type",
             "scope" : "domainspecific",
             "security.severity" : "Low"
           }
@@ -42,39 +58,110 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
+        "semanticVersion" : "0.1.0+9bc3957deaccff1fd18cfcd49df777e7d56ec975",
         "locations" : [ {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "uri" : "file:///c:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      }, {
-        "name" : "legacy-upgrades",
-        "semanticVersion" : "0.0.0",
-        "locations" : [ {
-          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
+          "uri" : "file:///c:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
         } ]
       } ]
     },
+    "invocations" : [ {
+      "toolExecutionNotifications" : [ {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 1
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      } ],
+      "executionSuccessful" : true
+    } ],
     "artifacts" : [ {
       "location" : {
         "uri" : "driver/driver_snippet.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 0
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 1
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 2
       }
     } ],
     "results" : [ {
@@ -85,7 +172,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: char *)"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer with an unexpected return type int"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -95,14 +182,14 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 26,
+            "startLine" : 52,
             "startColumn" : 5,
-            "endColumn" : 20
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "8ad0ec3c47c85fd3:1",
+        "primaryLocationLineHash" : "b6c3b797b0277bdd:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -113,7 +200,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: const ULONG *)"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer with an unexpected return type int"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -123,14 +210,14 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 27,
+            "startLine" : 54,
             "startColumn" : 5,
-            "endColumn" : 20
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "e7715c6d25a17fc3:1",
+        "primaryLocationLineHash" : "789a3ee1dd677a33:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -141,7 +228,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: ULONG *)"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer with an unexpected return type int"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -151,14 +238,14 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 28,
+            "startLine" : 56,
             "startColumn" : 5,
-            "endColumn" : 20
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "b4607ca2bc71911e:1",
+        "primaryLocationLineHash" : "b16f3331cfb3f2dd:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
@@ -169,7 +256,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "A non-CHAR tag was passed into a pool allocation function (actual type: char\\[5\\])"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer with an unexpected return type int"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -179,14 +266,42 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 29,
+            "startLine" : 59,
             "startColumn" : 5,
-            "endColumn" : 20
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "5a936be5671d65bf:1",
+        "primaryLocationLineHash" : "8a5840d23f7ece01:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/pool-tag-integral",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function call to functionCallThatUsesFunctionPointer2 may use a function pointer with an unexpected return type int"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 61,
+            "startColumn" : 5,
+            "endColumn" : 41
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "b2e192116459028c:1",
         "primaryLocationStartColumnFingerprint" : "0"
       }
     } ],

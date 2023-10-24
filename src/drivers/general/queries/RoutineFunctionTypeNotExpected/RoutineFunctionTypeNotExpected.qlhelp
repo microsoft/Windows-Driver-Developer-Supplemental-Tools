@@ -2,12 +2,12 @@
 <qhelp>
 	<overview>
 		<p>
-			The type of a pool tag should be integral, not a string or string pointer.
+			The return type of a function pointer used in a function call should match the declaration of the calling function
 		</p>
 	</overview>
 	<recommendation>
 		<p>
-			Instead of using strings or string pointers, pool tags should be four-character integrals.  For example, '_gaT'.
+			Verify function pointer is correct
 		</p>
 	</recommendation>
 	<example>
@@ -15,8 +15,8 @@
 	</example>
 	<references>
 		<li>
-			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28134-pool-tag-type-should-be-integral">
-				C28134 warning - Windows Drivers
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28127-function-routine-mismatch">
+				C28127 warning - Windows Drivers
 			</a>
 		</li>
 	</references>
