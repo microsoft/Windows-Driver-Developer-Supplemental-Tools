@@ -22,18 +22,16 @@
 
  import cpp
 
- from FunctionCall fc, int i, FunctionAccess fa
+ from FunctionCall fc, int i, FunctionAccess fa, Function f_declr, Parameter p 
  where 
  (
-     fc.getArgument(i) = fa and 
-     fa.getTarget().getType() != fc.getArgument(i).(FunctionAccess).getTarget().getType() // compare return type of actual argument function pointer and expected
+     fc.getArgument(i) instanceof FunctionAccess and 
+     fc.getArgument(i).(FunctionAccess).getTarget() = fa.getTarget() and 
+     f_declr = fc.getTarget() and 
+     f_declr = p.getFunction() and
+     p.getUnspecifiedType().(FunctionPointerType).getReturnType() != fc.getArgument(i).(FunctionAccess).getTarget().getType()
  )
- or(
-     fc.getArgument(i) instanceof AddressOfExpr and 
-     fc.getArgument(i).(AddressOfExpr).getOperand() = fa
- )
- // or(
- // TODO - Add to query so it can check for function pointer vairables
- // )
- 
- select fa,  "Routine $@ may use a function (" + fa.getTarget().getName().toString() + ") with an unexpected return type ", fc.getTarget(), ""
+ select fa,  
+ "Routine " + f_declr + " may use a function pointer(" + fa.getTarget().getName().toString() + ") with an unexpected return type: " 
+ + fa.getTarget().getType() +". Expected " + p.getUnspecifiedType().(FunctionPointerType).getReturnType()   
+

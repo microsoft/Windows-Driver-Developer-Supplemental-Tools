@@ -25,8 +25,9 @@ int intFunctionToCall(void){
 int (*fun_ptr1)(void) = intFunctionToCall;
 void (*fun_ptr2)(void) = voidFunctionToCall;
 
-void functionCallThatUsesFunctionPointer(funcCall functionPointer) {
+char functionCallThatUsesFunctionPointer(funcCall functionPointer) {
     functionPointer();
+    return 'a';
 }
 void callFunctionCallThatUsesFunctionPointer(void){
     funcCall f1 = &voidFunctionToCall;
@@ -38,5 +39,10 @@ void callFunctionCallThatUsesFunctionPointer(void){
     functionCallThatUsesFunctionPointer(f2); // fail because this function returns an int
 
     functionCallThatUsesFunctionPointer(&voidFunctionToCall); // pass
+    functionCallThatUsesFunctionPointer(&intFunctionToCall); // fail because this function returns an int
+
+    functionCallThatUsesFunctionPointer(voidFunctionToCall); // pass
+    functionCallThatUsesFunctionPointer(intFunctionToCall); // fail because this function returns an int
 }
+
 
