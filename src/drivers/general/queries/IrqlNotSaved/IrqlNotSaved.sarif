@@ -6,7 +6,23 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.5",
+        "semanticVersion" : "2.14.4",
+        "notifications" : [ {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "name" : "cpp/baseline/expected-extracted-files",
+          "shortDescription" : {
+            "text" : "Expected extracted files"
+          },
+          "fullDescription" : {
+            "text" : "Files appearing in the source archive that are expected to be extracted."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          },
+          "properties" : {
+            "tags" : [ "expected-extracted-files", "telemetry" ]
+          }
+        } ],
         "rules" : [ {
           "id" : "cpp/drivers/irql-not-saved",
           "name" : "cpp/drivers/irql-not-saved",
@@ -42,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
+        "semanticVersion" : "0.2.0+be14ce4fcaa9006e7636d8605fc53ea7c422a561",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -54,27 +70,98 @@
             "text" : "The QL pack definition file."
           }
         } ]
-      }, {
-        "name" : "legacy-upgrades",
-        "semanticVersion" : "0.0.0",
-        "locations" : [ {
-          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
       } ]
     },
+    "invocations" : [ {
+      "toolExecutionNotifications" : [ {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 1
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      } ],
+      "executionSuccessful" : true
+    } ],
     "artifacts" : [ {
       "location" : {
         "uri" : "driver/driver_snippet.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 0
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 1
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 2
       }
     } ],
     "results" : [ {
@@ -85,7 +172,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "The parameter [outIrql](1) is annotated \"_IRQL_saves_\" but never has the IRQL saved to it."
+        "text" : "The parameter [outIrqlFail](1) is annotated \"_IRQL_saves_\" but never has the IRQL saved to it."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -97,12 +184,12 @@
           "region" : {
             "startLine" : 51,
             "startColumn" : 44,
-            "endColumn" : 51
+            "endColumn" : 55
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "6276e1ac4864af21:1",
+        "primaryLocationLineHash" : "e054bbd9d7acc717:1",
         "primaryLocationStartColumnFingerprint" : "43"
       },
       "relatedLocations" : [ {
@@ -116,57 +203,11 @@
           "region" : {
             "startLine" : 51,
             "startColumn" : 44,
-            "endColumn" : 51
+            "endColumn" : 55
           }
         },
         "message" : {
-          "text" : "outIrql"
-        }
-      } ]
-    }, {
-      "ruleId" : "cpp/drivers/irql-not-saved",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/drivers/irql-not-saved",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "The parameter [myLock](1) is annotated \"_IRQL_saves_\" but never has the IRQL saved to it."
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 43,
-            "startColumn" : 48,
-            "endColumn" : 54
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "342705500599b584:1",
-        "primaryLocationStartColumnFingerprint" : "47"
-      },
-      "relatedLocations" : [ {
-        "id" : 1,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 43,
-            "startColumn" : 48,
-            "endColumn" : 54
-          }
-        },
-        "message" : {
-          "text" : "myLock"
+          "text" : "outIrqlFail"
         }
       } ]
     } ],
