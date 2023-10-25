@@ -23,6 +23,7 @@ call :test IrqlNotUsed WDMTestTemplate general queries
 call :test IrqlNotSaved WDMTestTemplate general queries
 call :test IllegalFieldWrite WDMTestTemplate wdm queries
 call :test IllegalFieldAccess2 WDMTestTemplate wdm queries
+call :test RoutineFunctionTypeNotExpected WDMTestTemplate general queries
 
 exit /b 0
 
