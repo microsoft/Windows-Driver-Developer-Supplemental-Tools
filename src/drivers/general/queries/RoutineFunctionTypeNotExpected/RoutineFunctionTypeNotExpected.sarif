@@ -24,8 +24,8 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/pool-tag-integral",
-          "name" : "cpp/drivers/pool-tag-integral",
+          "id" : "cpp/drivers/routine-function-type-not-expected",
+          "name" : "cpp/drivers/routine-function-type-not-expected",
           "shortDescription" : {
             "text" : "Unexpected function return type for routine (C28127)"
           },
@@ -40,7 +40,7 @@
             "tags" : [ "correctness", "wddst" ],
             "description" : "The function being used as a routine does not exactly match the type expected.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/pool-tag-integral",
+            "id" : "cpp/drivers/routine-function-type-not-expected",
             "impact" : "Attack Surface Reduction",
             "kind" : "problem",
             "name" : "Unexpected function return type for routine (C28127)",
@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+9bc3957deaccff1fd18cfcd49df777e7d56ec975",
+        "semanticVersion" : "0.1.0+626ab2156fae247d66b189fb2fa9a69c03082e3a",
         "locations" : [ {
           "uri" : "file:///c:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -77,9 +77,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
+              "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+              "index" : 1
             }
           }
         } ],
@@ -100,9 +100,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+              "index" : 0
             }
           }
         } ],
@@ -165,14 +165,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/pool-tag-integral",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer with an unexpected return type int"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (fun_ptr1) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -193,14 +193,14 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/pool-tag-integral",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer with an unexpected return type int"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (f3) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -221,14 +221,14 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/pool-tag-integral",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer with an unexpected return type int"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (& ...) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -249,14 +249,14 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/pool-tag-integral",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer with an unexpected return type int"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (intFunctionToCall) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -277,14 +277,14 @@
         "primaryLocationStartColumnFingerprint" : "0"
       }
     }, {
-      "ruleId" : "cpp/drivers/pool-tag-integral",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/pool-tag-integral",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "Function call to functionCallThatUsesFunctionPointer2 may use a function pointer with an unexpected return type int"
+        "text" : "Function call to functionCallThatUsesFunctionPointer2 may use a function pointer (intFunctionToCall) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
