@@ -22,16 +22,17 @@
 
 import cpp
 
-from FunctionCall fc, Function f_declr, Parameter p, FunctionAccess fa
+from FunctionCall fc, Function f_declr, Parameter p, FunctionAccess fa, int n
 where
   p.getFunction() = fc.getTarget() and
   p.getUnspecifiedType() instanceof FunctionPointerType and
-  fc.getAnArgument().getUnspecifiedType() instanceof FunctionPointerType and
-  fc.getAnArgument().getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType() !=
+  p.getIndex() = n and
+  fc.getArgument(n).getUnspecifiedType() instanceof FunctionPointerType and
+  fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType() !=
     p.getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType()
 select fc,
   "Function " + fc + " may use a function pointer with an unexpected return type: " +
-    fc.getAnArgument().getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType() + " expected: " +
+    fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType() + " expected: " +
     p.getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType()
 //  +
 //   fa.getTarget().getType().getUnderlyingType() + " Expected: " +
