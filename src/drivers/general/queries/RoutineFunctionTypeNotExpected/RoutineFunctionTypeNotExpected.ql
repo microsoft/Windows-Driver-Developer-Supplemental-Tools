@@ -22,29 +22,17 @@
 
 import cpp
 
-from FunctionCall fc, Function f_declr, Parameter p, FunctionAccess fa, int n
+from FunctionCall fc, Parameter p, int n
 where
   p.getFunction() = fc.getTarget() and
   p.getUnspecifiedType() instanceof FunctionPointerType and
   p.getIndex() = n and
   fc.getArgument(n).getUnspecifiedType() instanceof FunctionPointerType and
-  fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType() !=
-    p.getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType()
+  fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType().getUnspecifiedType() !=
+    p.getUnspecifiedType().(FunctionPointerType).getReturnType().getUnspecifiedType() 
+
 select fc,
-  "Function " + fc + " may use a function pointer with an unexpected return type: " +
-    fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType() + " expected: " +
-    p.getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType()
-//  +
-//   fa.getTarget().getType().getUnderlyingType() + " Expected: " +
-//   p.getUnspecifiedType().(FunctionPointerType).getReturnType().getUnderlyingType() + " "
-//     f_declr = fc.getTarget() and
-//     exists(Parameter p |
-//      p.getUnspecifiedType() instanceof FunctionPointerType and
-//      (
-//        p.getFunction() = f_declr
-//        and fc.getAnArgument().getUnspecifiedType() instanceof FunctionPointerType
-//        and fc.getAnArgument().getUnspecifiedType().(FunctionPointerType).getReturnType() != p.getUnspecifiedType().(FunctionPointerType).getReturnType()
-//      )
-//     )
-//  select fc,
-//    "Function " + fc + " may use a function pointer with an unexpected return type " + fc.getAnArgument().getUnspecifiedType().(FunctionPointerType).getReturnType()
+  "Function " + fc + " may use a function pointer (" + fc.getArgument(n) +
+    ") with an unexpected return type: " +
+    fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType() + " expected: " +
+    p.getUnspecifiedType().(FunctionPointerType).getReturnType()
