@@ -15,6 +15,8 @@
       - drivers/kmdf/queries/StrSafe/StrSafe.ql
       - drivers/general/queries/experimental/IrqlTooHigh/IrqlTooHigh.ql
       - drivers/general/queries/experimental/IrqlTooLow/IrqlTooLow.ql
+      - drivers/general/queries/experimental/IrqlSetTooHigh/IrqlSetTooHigh.ql
+      - drivers/general/queries/experimental/IrqlSetTooLow/IrqlSetTooLow.ql
       - drivers/wdm/queries/ExaminedValue/ExaminedValue.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
