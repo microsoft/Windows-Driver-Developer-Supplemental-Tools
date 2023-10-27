@@ -22,23 +22,8 @@
 
 import cpp
 import drivers.libraries.Irql
-import semmle.code.cpp.dataflow.DataFlow
-import semmle.code.cpp.dataflow.DataFlow2
-
-/**
- * A function that has at least one parameter annotated with "\_IRQL\_save\_".
- */
-class IrqlSaveFunction extends Function {
-  Parameter p;
-  int irqlIndex;
-
-  IrqlSaveFunction() {
-    p = this.getParameter(irqlIndex) and
-    p instanceof IrqlSaveParameter
-  }
-
-  int getIrqlIndex() { result = irqlIndex }
-}
+import semmle.code.cpp.dataflow.new.DataFlow
+import semmle.code.cpp.dataflow.new.DataFlow2
 
 /**
  * A data-flow configuration describing flow from an
@@ -55,7 +40,12 @@ class IrqlFlowConfiguration extends DataFlow::Configuration {
   override predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall fc, FundamentalIrqlSaveFunction fisf |
       fc.getTarget() = fisf and
-      sink.asExpr() = fc.getArgument(fisf.getIrqlIndex())
+      (
+        sink.asExpr() =
+          fc.getArgument(fisf.(IrqlSavesGlobalAnnotatedFunction).getIrqlParameterSlot())
+        or
+        sink.asExpr() = fc.getArgument(fisf.(IrqlSavesToParameterFunction).getIrqlParameterSlot())
+      )
     )
   }
 }
@@ -65,17 +55,25 @@ class IrqlFlowConfiguration extends DataFlow::Configuration {
  * by the Windows OS itself.  This is in general in a Windows Kits header.  For
  * extra clarity and internal use, we also list the exact header files.
  */
-class FundamentalIrqlSaveFunction extends IrqlSaveFunction {
+class FundamentalIrqlSaveFunction extends IrqlSavesFunction {
   FundamentalIrqlSaveFunction() {
-    this.getFile().getAbsolutePath().matches("%Windows Kits%.h") or
-    this.getFile()
-        .getBaseName()
-        .matches(["wdm.h", "wdfsync.h", "ntifs.h", "ndis.h", "video.h", "wdfinterrupt.h"])
+    (
+      this.getFile().getAbsolutePath().matches("%Windows Kits%.h")
+      or
+      this.getFile()
+          .getBaseName()
+          .matches(["wdm.h", "wdfsync.h", "ntifs.h", "ndis.h", "video.h", "wdfinterrupt.h"])
+    ) and
+    (
+      this instanceof IrqlSavesToParameterFunction or
+      this instanceof IrqlSavesViaReturnFunction or
+      this instanceof IrqlSavesGlobalAnnotatedFunction
+    )
   }
 }
 
 /**
- * A simple data flow from any IrqlSaveParameter to another variable.
+ * A simple data flow from any IrqlSaveParameter.
  */
 class IrqlSaveParameterFlowConfiguration extends DataFlow2::Configuration {
   IrqlSaveParameterFlowConfiguration() { this = "IrqlSaveParameterFlowConfiguration" }
@@ -84,7 +82,7 @@ class IrqlSaveParameterFlowConfiguration extends DataFlow2::Configuration {
     source.asParameter() instanceof IrqlSaveParameter
   }
 
-  override predicate isSink(DataFlow::Node sink) { sink.asExpr() instanceof VariableAccess }
+  override predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::Node }
 }
 
 /**
@@ -97,29 +95,15 @@ class IrqlAssignmentFlowConfiguration extends DataFlow::Configuration {
 
   override predicate isSource(DataFlow::Node source) {
     source.asExpr() instanceof FunctionCall and
-    source
-        .asExpr()
-        .(FunctionCall)
-        .getTarget()
-        .getName()
-        .matches([
-            "KeRaiseIrqlToDpcLevel", "KfRaiseIrql", "KfAcquireSpinLock",
-            "KeAcquireSpinLockAtDpcLevel", "KeAcquireSpinLock", "KeAcquireSpinLockRaiseToDpc"
-          ])
+    source.asExpr().(FunctionCall).getTarget() instanceof FundamentalIrqlSaveFunction and
+    source.asExpr().(FunctionCall).getTarget() instanceof IrqlSavesViaReturnFunction
   }
 
   override predicate isSink(DataFlow::Node sink) {
-    // Either we're sinking to a direct reference of a parameter, or...
-    sink.asExpr().(VariableAccess).getTarget() instanceof IrqlSaveParameter
-    or
-    // We a dereferenced pointer to the variable.
-    sink.asPartialDefinition()
-        .(PointerDereferenceExpr)
-        .getOperand()
-        .(AddressOfExpr)
-        .getOperand()
-        .(VariableAccess)
-        .getTarget() instanceof IrqlSaveVariableFlowedTo
+    exists(Assignment a |
+      a.getLValue().getAChild*().(VariableAccess).getTarget() instanceof IrqlSaveVariableFlowedTo and
+      a.getRValue() = sink.asExpr()
+    )
   }
 }
 
@@ -132,11 +116,14 @@ class IrqlSaveVariableFlowedTo extends Variable {
 
   IrqlSaveVariableFlowedTo() {
     exists(
-      IrqlSaveParameterFlowConfiguration difca, DataFlow::Node parameter, DataFlow::Node access
+      IrqlSaveParameterFlowConfiguration ispfc, DataFlow::Node parameter, DataFlow::Node assignment
     |
-      access.asExpr().(VariableAccess).getTarget() = this and
+      (
+        this.getAnAssignedValue() = assignment.asExpr() or
+        this = assignment.asParameter()
+      ) and
       parameter.asParameter() = isp and
-      difca.hasFlow(parameter, access)
+      ispfc.hasFlow(parameter, assignment)
     )
     or
     this = isp
@@ -150,26 +137,19 @@ where
   // Exclude OS functions
   not isp.getFunction() instanceof FundamentalIrqlSaveFunction and
   /*
-   * Case one: does the IrqlSaveParameter (or an alias of it) have the IRQL assigned to it
-   * directly by calling, for example, KeRaiseIrql?
+   *     Case one: does the IrqlSaveParameter (or an alias of it) have the IRQL assigned to it
+   *    directly by calling, for example, KeRaiseIrql?
    */
 
   not exists(
-    DataFlow::Node node, IrqlSaveVariableFlowedTo isvft, IrqlAssignmentFlowConfiguration difc
+    DataFlow::Node node, IrqlSaveVariableFlowedTo isvft, IrqlAssignmentFlowConfiguration iafc
   |
     isvft.getSaveParameter() = isp and
-    (
-      node.asExpr().(VariableAccess).getTarget() = isvft
-      or
-      node.asPartialDefinition()
-          .(PointerDereferenceExpr)
-          .getOperand()
-          .(AddressOfExpr)
-          .getOperand()
-          .(VariableAccess)
-          .getTarget() = isvft
+    exists(Assignment a |
+      a.getLValue().getAChild*().(VariableAccess).getTarget() = isvft and
+      a.getRValue() = node.asExpr()
     ) and
-    difc.hasFlow(_, node)
+    iafc.hasFlow(_, node)
   ) and
   // Case two: is the IrqlSaveParameter passed into an OS function that will save a value to it?
   not exists(DataFlow::Node node, IrqlFlowConfiguration ifc |

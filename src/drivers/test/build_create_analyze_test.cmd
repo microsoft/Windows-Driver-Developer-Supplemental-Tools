@@ -1,3 +1,8 @@
+rd /s /q working >NUL 2>&1
+rd /s /q TestDB >NUL 2>&1
+rd /s /q AnalysisFiles >NUL 2>&1
+
+
 call :test PendingStatusError WDMTestTemplate wdm queries
 call :test ExaminedValue WDMTestTemplate wdm queries
 call :test StrSafe KMDFTestTemplate kmdf queries
@@ -9,6 +14,8 @@ call :test OpaqueMdlWrite WDMTestTemplate wdm queries
 call :test KeWaitLocal WDMTestTemplate wdm queries
 call :test IrqlTooHigh WDMTestTemplate general queries\experimental
 call :test IrqlTooLow WDMTestTemplate general queries\experimental
+call :test IrqlSetTooHigh WDMTestTemplate general queries\experimental
+call :test IrqlSetTooLow WDMTestTemplate general queries\experimental
 call :test WrongDispatchTableAssignment WDMTestTemplate wdm queries
 call :test ExtendedDeprecatedApis WDMTestTemplate general queries
 call :test WdkDeprecatedApis WDMTestTemplate general queries

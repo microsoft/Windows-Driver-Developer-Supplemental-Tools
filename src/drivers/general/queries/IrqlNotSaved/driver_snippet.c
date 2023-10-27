@@ -17,24 +17,24 @@ void top_level_call() {}
 /* Auxillary function used in passing.
    Note that even though this function doesn't annotate KIRQL,
    it restores the IRQL correctly. */
-VOID IrqlNotSaved_passAux(KIRQL outIrql) {
+VOID IrqlNotSaved_passAux(KIRQL outIrqlPassAux) {
     
-    KeRaiseIrql(KeGetCurrentIrql(), &outIrql);
+    KeRaiseIrql(KeGetCurrentIrql(), &outIrqlPassAux);
 }
 
 /* Passing case one.
    Function directly calls a function that saves IRQL. */
-VOID IrqlNotSaved_pass(_IRQL_saves_ KIRQL outIrql, PKSPIN_LOCK myLock) {
+VOID IrqlNotSaved_pass(_IRQL_saves_ KIRQL outIrqlPass, PKSPIN_LOCK myLock) {
 
-    KeAcquireSpinLock(myLock, &outIrql);
+    KeAcquireSpinLock(myLock, &outIrqlPass);
 
 }
 
 /* Passing case two.
    Function indirectly calls a function that saves IRQL. */
-VOID IrqlNotSaved_pass2(_IRQL_saves_ KIRQL outIrql, PKSPIN_LOCK myLock) {
+VOID IrqlNotSaved_pass2(_IRQL_saves_ KIRQL outIrqlPass2, PKSPIN_LOCK myLock) {
 
-    IrqlNotSaved_passAux(outIrql);
+    IrqlNotSaved_passAux(outIrqlPass2);
 
 }
 
@@ -48,16 +48,16 @@ VOID IrqlNotSaved_pass3(_IRQL_saves_ PTestLock myLock) {
 
 /* Failing case one.
    Function does nothing with IRQL. */
-VOID IrqlNotSaved_fail1(_IRQL_saves_ KIRQL outIrql, PKSPIN_LOCK myLock) {
+VOID IrqlNotSaved_fail1(_IRQL_saves_ KIRQL outIrqlFail, PKSPIN_LOCK myLock) {
 
 }
 
 /* Failing case two.
    Function has a path where the IRQL is not saved.
    This requires must-flow analysis. */
-VOID IrqlNotSaved_fail2(_IRQL_saves_ KIRQL outIrql, PKSPIN_LOCK myLock, int testValue) {
+VOID IrqlNotSaved_fail2(_IRQL_saves_ KIRQL outIrqlFail2, PKSPIN_LOCK myLock, int testValue) {
 
-    if (testValue > 15)  {KeRaiseIrql(KeGetCurrentIrql(), &outIrql); }
+    if (testValue > 15)  {KeRaiseIrql(KeGetCurrentIrql(), &outIrqlFail2); }
     else { }
 
 }

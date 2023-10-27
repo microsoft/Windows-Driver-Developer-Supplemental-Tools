@@ -22,7 +22,8 @@
 
 import cpp
 import drivers.libraries.Irql
-import semmle.code.cpp.dataflow.DataFlow
+import semmle.code.cpp.dataflow.new.DataFlow
+import semmle.code.cpp.dataflow.new.DataFlow2
 
 /**
  * A function that has at least one parameter annotated with "\_IRQL\_restores\_".
@@ -70,7 +71,11 @@ class IrqlFlowConfiguration extends DataFlow::Configuration {
   override predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall fc, FundamentalIrqlRestoreFunction firf |
       fc.getTarget() = firf and
-      sink.asExpr() = fc.getArgument(firf.getIrqlIndex())
+      (
+        sink.asExpr() = fc.getArgument(firf.getIrqlIndex())
+        or
+        sink.asExpr() = fc.getArgument(firf.getIrqlIndex()).getAChild*()
+      )
     )
   }
 }
