@@ -40,7 +40,7 @@ For general use, use the `main` branch along with [version 2.15.1 of the CodeQL 
     D:\codeql-home\>git clone https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools.git --recurse-submodules
     ```
    
-   For MAIN BRANCH use:
+   For MAIN AND DEVELOPMENT BRANCHES use:
    
    ```
     D:\codeql-home\>git clone https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools.git
