@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The return type of a function pointer used in a function call should match the declaration of the calling function
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Verify function pointer is correct
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28127-function-routine-mismatch">
+				C28127 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>
