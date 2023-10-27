@@ -68,7 +68,7 @@ For general use, use the `main` branch along with [version 2.15.1 of the CodeQL 
 
    For WHCP BRANCHES: Skip this step.
 
-   For MAIN BRANCH use:
+   For MAIN AND DEVELOPMENT BRANCHES use:
 
    ```
     D:\codeql-home\codeql>codeql pack install D:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src
