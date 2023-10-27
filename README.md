@@ -77,11 +77,11 @@ For general use, use the `main` branch along with [version 2.15.1 of the CodeQL 
 1. Build your CodeQL database:
 
     ```
-    D:\codeql-home\codeql>codeql database create <path to new database> --language=cpp --source=<driver parent directory> --command=<build command or path to build file>
+    D:\codeql-home\codeql>codeql database create <path to new database> --language=cpp --source-root=<driver parent directory> --command=<build command or path to build file>
     ```
-    Single driver example: `codeql database create D:\DriverDatabase --language=cpp --source=D:\Drivers\SingleDriver --command="msbuild /t:rebuild D:\Drivers\SingleDriver\SingleDriver.sln"`
+    Single driver example: `codeql database create D:\DriverDatabase --language=cpp --source-root=D:\Drivers\SingleDriver --command="msbuild /t:rebuild D:\Drivers\SingleDriver\SingleDriver.sln"`
     
-    Multiple drivers example: `codeql database create D:\SampleDriversDatabase --language=cpp --source=D:\AllMyDrivers\SampleDrivers --command=D:\AllMyDrivers\SampleDrivers\BuildAllSampleDrivers.cmd`
+    Multiple drivers example: `codeql database create D:\SampleDriversDatabase --language=cpp --source-root=D:\AllMyDrivers\SampleDrivers --command=D:\AllMyDrivers\SampleDrivers\BuildAllSampleDrivers.cmd`
 
     _(Parameters: path for your new database, language, driver source directory, build command.)_
 
