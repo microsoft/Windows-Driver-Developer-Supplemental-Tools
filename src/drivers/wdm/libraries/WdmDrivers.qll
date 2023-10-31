@@ -60,6 +60,7 @@ class WdmCallbackRoutineTypedef extends TypedefType {
 }
 
 
+
 /**
  * Represents a function implementing a WDM callback routine.
  * Defines a function to be a callback routine iff it has a typedef
@@ -77,6 +78,9 @@ class WdmCallbackRoutine extends Function {
   }
 }
 
+/**
+ * Similar to WdmCallbackRoutine, but specifically for Role Types
+ */
 abstract class WdmRoleTypeFunction extends Function {
 
   WdmCallbackRoutineTypedef roleType;
@@ -87,7 +91,13 @@ abstract class WdmRoleTypeFunction extends Function {
     )
   }
   string getRoleType() { result = roleType.getName() } 
+
 }
+
+predicate hasRoleType(Function f){
+  f instanceof WdmRoleTypeFunction
+}
+
 
 /** A WDM DriverEntry callback routine. */
 class WdmDriverEntry extends WdmCallbackRoutine, WdmRoleTypeFunction{
