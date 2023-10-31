@@ -20,22 +20,18 @@
  * @query-version v1
  */
 
- import cpp
- import drivers.libraries.Irql
- 
+import cpp
+import drivers.libraries.Irql
 
- 
- from FunctionCall keSetEvent, Function enclosingFunc, PreprocessorPragma pragma, string functionName
- where
-    functionName =  keSetEvent.getTarget().getQualifiedName() and
-    functionName = "KeSetEvent" and
-    enclosingFunc = keSetEvent.getEnclosingFunction() and
-    pragma.toString().matches("%PAGE%") and
-    pragma.toString().matches("%" + enclosingFunc.toString() + "%") and
-    keSetEvent.getArgument(2).getValue() = "1"
-    and max(getPotentialExitIrqlAtCfn(keSetEvent)) = 0
+class KeSetEventCall extends FunctionCall {
+  KeSetEventCall() { this.getTarget().getName().matches("KeSetEvent") }
+}
 
- select keSetEvent,
- enclosingFunc + ": " + functionName + " " +  pragma
-    
- 
+from KeSetEventCall ksec, Function enclosingFunc, PreprocessorPragma pragma
+where
+  enclosingFunc = ksec.getEnclosingFunction() and
+  pragma.toString().matches("%PAGE%") and
+  pragma.toString().matches("%" + enclosingFunc.toString() + "%") and
+  ksec.getArgument(2).getValue() = "1" and
+  any(getPotentialExitIrqlAtCfn(ksec)) = 0
+select ksec, enclosingFunc + ": " + " " + pragma
