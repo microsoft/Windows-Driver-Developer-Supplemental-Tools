@@ -38,27 +38,27 @@ class DriverExtension extends Struct {
   }
 }
 
-/** A typedef for the standard WDM callback routines. */
+/** A typedef for the standard WDM callback routines. Aka Role Types */
 class WdmCallbackRoutineTypedef extends TypedefType {
   WdmCallbackRoutineTypedef() {
     (
-      this.getName().matches("DRIVER_UNLOAD")
-      or
-      this.getName().matches("DRIVER_DISPATCH")
-      or
-      this.getName().matches("DRIVER_INITIALIZE")
-      or
-      this.getName().matches("IO_COMPLETION_ROUTINE")
-      or
-      this.getName().matches("KSERVICE_ROUTINE")
-      or
-      this.getName().matches("IO_DPC_ROUTINE")
-      or
-      this.getName().matches("DRIVER_ADD_DEVICE")
+      this.getName().matches("DRIVER_INITIALIZE") or
+      this.getName().matches("DRIVER_STARTIO") or
+      this.getName().matches("DRIVER_UNLOAD") or
+      this.getName().matches("DRIVER_ADD_DEVICE") or
+      this.getName().matches("DRIVER_DISPATCH") or
+      this.getName().matches("IO_COMPLETION_ROUTINE") or
+      this.getName().matches("DRIVER_CANCEL") or
+      this.getName().matches("IO_DPC_ROUTINE") or
+      this.getName().matches("KDEFERRED_ROUTINE") or
+      this.getName().matches("KSERVICE_ROUTINE") or
+      this.getName().matches("REQUEST_POWER_COMPLETE") or
+      this.getName().matches("WORKER_THREAD_ROUTINE")
     ) and
     this.getFile().getBaseName().matches("wdm.h")
   }
 }
+
 
 /**
  * Represents a function implementing a WDM callback routine.
@@ -69,7 +69,6 @@ class WdmCallbackRoutineTypedef extends TypedefType {
 class WdmCallbackRoutine extends Function {
   /** The callback routine type, i.e. DRIVER_UNLOAD. */
   WdmCallbackRoutineTypedef callbackType;
-
   WdmCallbackRoutine() {
     exists(FunctionDeclarationEntry fde |
       fde.getFunction() = this and
@@ -78,19 +77,96 @@ class WdmCallbackRoutine extends Function {
   }
 }
 
-/** A WDM AddDevice callback routine. */
-class WdmAddDevice extends WdmCallbackRoutine {
-  WdmAddDevice() { callbackType.getName().matches("DRIVER_ADD_DEVICE") }
-}
+abstract class WdmRoleTypeFunction extends Function {
 
-/** A WDM DriverUnload callback routine. */
-class WdmDriverUnload extends WdmCallbackRoutine {
-  WdmDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
+  WdmCallbackRoutineTypedef roleType;
+  WdmRoleTypeFunction() {
+    exists(FunctionDeclarationEntry fde |
+      fde.getFunction() = this and
+      fde.getTypedefType() = roleType
+    )
+  }
+  string getRoleType() { result = roleType.getName() } 
 }
 
 /** A WDM DriverEntry callback routine. */
-class WdmDriverEntry extends WdmCallbackRoutine {
+class WdmDriverEntry extends WdmCallbackRoutine, WdmRoleTypeFunction{
   WdmDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
+}
+
+/** A WDM DrierStartIo callback routine */
+class WdmDriverStartIo extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverStartIo() { callbackType.getName().matches("DRIVER_STARTIO") }
+}
+
+/**
+ * A WDM DriverUnload callback routine.
+ */
+class WdmDriverUnload extends WdmCallbackRoutine , WdmRoleTypeFunction{
+  WdmDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
+}
+
+/**
+ * A WDM DriverAddDevice callback routine.
+ */
+class WdmDriverAddDevice extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverAddDevice() { callbackType.getName().matches("DRIVER_ADD_DEVICE") }
+}
+
+/**
+ * A WDM DriverDispatch callback routine.
+ */
+class WdmDriverDispatch extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverDispatch() { callbackType.getName().matches("DRIVER_DISPATCH") }
+}
+
+/**
+ * A WDM IO completion routine.
+ */
+class WdmDriverCompletionRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverCompletionRoutine() { callbackType.getName().matches("IO_COMPLETION_ROUTINE") }
+}
+
+/**
+ * A WDM DriverCancel callback routine.
+ */
+class WdmDriverCancel extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL") }
+}
+
+/**
+ * A WDM DriverDpcRoutine callback routine.
+ */
+class WdmDriverDpcRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverDpcRoutine() { callbackType.getName().matches("IO_DPC_ROUTINE") }
+}
+
+/**
+ * A WDM DriverDeferredRoutine callback routine.
+ */
+class WdmDriverDeferredRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverDeferredRoutine() { callbackType.getName().matches("KDEFERRED_ROUTINE") }
+}
+
+/**
+ * A WDM DriverServiceRoutine callback routine.
+ */
+class WdmDriverServiceRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverServiceRoutine() { callbackType.getName().matches("KSERVICE_ROUTINE") }
+}
+
+/**
+ * A WDM DriverPowerComplete callback routine.
+ */
+class WdmDriverPowerComplete extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverPowerComplete() { callbackType.getName().matches("REQUEST_POWER_COMPLETE") }
+}
+
+/**
+ * A WDM DriverWorkerThreadRoutine callback routine.
+ */
+class WdmDriverWorkerThreadRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+  WdmDriverWorkerThreadRoutine() { callbackType.getName().matches("WORKER_THREAD_ROUTINE") }
 }
 
 /**
