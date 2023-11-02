@@ -22,12 +22,19 @@ import cpp
 import drivers.wdm.libraries.WdmDrivers
 import semmle.code.cpp.TypedefType
 
+from WdmImplicitRoleTypeFunction irtf
+where
+  irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString()
 
-
-
-from WdmRoleTypeFunction rtf, WdmImplicitRoleTypeFunction irtf
-
-select rtf, rtf.getRoleTypeType() + "$@ used as an argument in $@ as if it has a Role Type $@ "
+select irtf,
+  "Function $@ declared with role type $@ but used as argument in function $@ that expects role type $@ for that argument",
+  irtf, irtf.toString(), 
+  irtf, irtf.getActualRoleTypeString().toString(),
+  irtf.getImplicitUse(), irtf.getImplicitUse().toString(),
+  irtf.getExpectedRoleTypeType(),irtf.getExpectedRoleTypeType().toString()
+//"$@ expected role type of $@ but was given a function $@ with role type $@",
+// rtf, rtf.toString(),
+// rtf.getRoleTypeType(), rtf.getRoleTypeType().toString()
 // TODO need to get the role type type of the parameter in the caller
 //f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
 //f.getADeclarationEntry().getParameterDeclarationEntry(n).getType()

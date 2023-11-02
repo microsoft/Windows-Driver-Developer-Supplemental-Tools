@@ -105,11 +105,12 @@ abstract class WdmRoleTypeFunction extends Function {
   WdmRoleTypeFunction() {
     exists(FunctionDeclarationEntry fde |
       fde.getFunction() = this and
-      fde.getTypedefType() = roleType
+      fde.getTypedefType() = roleType 
     )
   }
 
   string getRoleTypeString() { result = roleType.getName() }
+
   WdmRoleTypeType getRoleTypeType() { result = roleType }
 
 }
@@ -131,14 +132,19 @@ class WdmImplicitRoleTypeFunction extends Function {
       WdmRoleTypeType
   }
 
-  string getImplicitRoleTypeString() {
+  string getExpectedRoleTypeString() {
     result = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
   }
 
-  WdmRoleTypeType getImplicitRoleTypeType() {
+  WdmRoleTypeType getExpectedRoleTypeType() {
     result = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType()
   }
-
+  
+  string getActualRoleTypeString(){
+    if this instanceof WdmRoleTypeFunction
+    then result = this.(WdmRoleTypeFunction).getRoleTypeType().toString()
+    else result = "<NO_ROLE_TYPE>"
+  }
   FunctionCall getImplicitUse() { result = f_call }
 }
 
