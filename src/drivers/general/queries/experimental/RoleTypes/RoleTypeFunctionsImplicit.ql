@@ -24,7 +24,7 @@ import semmle.code.cpp.TypedefType
 
 from WdmImplicitRoleTypeFunction f
 select f, "$@ used as an argument in $@ as if it has a Role Type $@ ", f, f.toString(), f.getImplicitUse(), f.getImplicitUse().toString(),
-f.getImplicitRoleType(), f.getImplicitRoleType().toString()
+f.getImplicitRoleTypeType(), f.getImplicitRoleTypeString().toString()
 // TODO need to get the role type type of the parameter in the caller
 //f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
 //f.getADeclarationEntry().getParameterDeclarationEntry(n).getType()

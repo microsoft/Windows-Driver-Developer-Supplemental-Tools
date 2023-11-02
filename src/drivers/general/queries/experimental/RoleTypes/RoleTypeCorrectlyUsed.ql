@@ -25,19 +25,9 @@ import semmle.code.cpp.TypedefType
 
 
 
-from WdmRoleTypeFunction rtf, 
-where
-  fc.getArgument(n) instanceof FunctionAccess and
-  exists(FunctionAccess fa |
-    fa = fc.getArgument(n) and
-    f = fa.getTarget()
-  ) and
-  f_caller = fc.getTarget() and
-  f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-    WdmRoleTypeType
-select f, "$@ used as an argument in $@ as if it has a Role Type $@ ", f, f.toString(), fc,
-  fc.toString(), f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType(),
-  f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
+from WdmRoleTypeFunction rtf, WdmImplicitRoleTypeFunction irtf
+
+select rtf, rtf.getRoleTypeType() + "$@ used as an argument in $@ as if it has a Role Type $@ "
 // TODO need to get the role type type of the parameter in the caller
 //f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
 //f.getADeclarationEntry().getParameterDeclarationEntry(n).getType()

@@ -102,7 +102,6 @@ class WdmCallbackRoutine extends Function {
  */
 abstract class WdmRoleTypeFunction extends Function {
   WdmCallbackRoutineTypedef roleType;
-
   WdmRoleTypeFunction() {
     exists(FunctionDeclarationEntry fde |
       fde.getFunction() = this and
@@ -110,7 +109,9 @@ abstract class WdmRoleTypeFunction extends Function {
     )
   }
 
-  string getRoleType() { result = roleType.getName() }
+  string getRoleTypeString() { result = roleType.getName() }
+  WdmRoleTypeType getRoleTypeType() { result = roleType }
+
 }
 
 predicate hasRoleType(Function f) { f instanceof WdmRoleTypeFunction }
@@ -119,19 +120,26 @@ class WdmImplicitRoleTypeFunction extends Function {
   int n;
   Function f_caller;
   FunctionCall f_call;
+
   WdmImplicitRoleTypeFunction() {
     exists(FunctionCall fc | fc.getArgument(n) instanceof FunctionAccess |
-      this = fc.getArgument(n).(FunctionAccess).getTarget() and f_caller = fc.getTarget() and f_call = fc
+      this = fc.getArgument(n).(FunctionAccess).getTarget() and
+      f_caller = fc.getTarget() and
+      f_call = fc
     ) and
     f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
       WdmRoleTypeType
   }
 
-  string getImplicitRoleType() {
+  string getImplicitRoleTypeString() {
     result = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
   }
-  FunctionCall getImplicitUse(){result = f_call}
 
+  WdmRoleTypeType getImplicitRoleTypeType() {
+    result = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType()
+  }
+
+  FunctionCall getImplicitUse() { result = f_call }
 }
 
 /** A WDM DriverEntry callback routine. */
