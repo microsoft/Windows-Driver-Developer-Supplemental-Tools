@@ -75,10 +75,9 @@ class WdmRoleTypeType extends TypedefType {
       this.getName().matches("KSERVICE_ROUTINE") or
       this.getName().matches("REQUEST_POWER_COMPLETE") or
       this.getName().matches("WORKER_THREAD_ROUTINE")
-    ) 
+    )
   }
 }
-
 
 /**
  * Represents a function implementing a WDM callback routine.
@@ -89,6 +88,7 @@ class WdmRoleTypeType extends TypedefType {
 class WdmCallbackRoutine extends Function {
   /** The callback routine type, i.e. DRIVER_UNLOAD. */
   WdmCallbackRoutineTypedef callbackType;
+
   WdmCallbackRoutine() {
     exists(FunctionDeclarationEntry fde |
       fde.getFunction() = this and
@@ -101,25 +101,41 @@ class WdmCallbackRoutine extends Function {
  * Similar to WdmCallbackRoutine, but specifically for Role Types
  */
 abstract class WdmRoleTypeFunction extends Function {
-
   WdmCallbackRoutineTypedef roleType;
+
   WdmRoleTypeFunction() {
     exists(FunctionDeclarationEntry fde |
       fde.getFunction() = this and
       fde.getTypedefType() = roleType
     )
   }
-  string getRoleType() { result = roleType.getName() } 
 
+  string getRoleType() { result = roleType.getName() }
 }
 
-predicate hasRoleType(Function f){
-  f instanceof WdmRoleTypeFunction
-}
+predicate hasRoleType(Function f) { f instanceof WdmRoleTypeFunction }
 
+class WdmImplicitRoleTypeFunction extends Function {
+  int n;
+  Function f_caller;
+  FunctionCall f_call;
+  WdmImplicitRoleTypeFunction() {
+    exists(FunctionCall fc | fc.getArgument(n) instanceof FunctionAccess |
+      this = fc.getArgument(n).(FunctionAccess).getTarget() and f_caller = fc.getTarget() and f_call = fc
+    ) and
+    f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
+      WdmRoleTypeType
+  }
+
+  string getImplicitRoleType() {
+    result = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
+  }
+  FunctionCall getImplicitUse(){result = f_call}
+
+}
 
 /** A WDM DriverEntry callback routine. */
-class WdmDriverEntry extends WdmCallbackRoutine, WdmRoleTypeFunction{
+class WdmDriverEntry extends WdmCallbackRoutine, WdmRoleTypeFunction {
   WdmDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
 }
 
@@ -131,7 +147,7 @@ class WdmDriverStartIo extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverUnload callback routine.
  */
-class WdmDriverUnload extends WdmCallbackRoutine , WdmRoleTypeFunction{
+class WdmDriverUnload extends WdmCallbackRoutine, WdmRoleTypeFunction {
   WdmDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
 }
 
