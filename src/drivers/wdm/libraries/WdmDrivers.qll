@@ -59,6 +59,25 @@ class WdmCallbackRoutineTypedef extends TypedefType {
   }
 }
 
+/** A typedef for Role Types */
+class WdmRoleTypeType extends TypedefType {
+  WdmRoleTypeType() {
+    (
+      this.getName().matches("DRIVER_INITIALIZE") or
+      this.getName().matches("DRIVER_STARTIO") or
+      this.getName().matches("DRIVER_UNLOAD") or
+      this.getName().matches("DRIVER_ADD_DEVICE") or
+      this.getName().matches("DRIVER_DISPATCH") or
+      this.getName().matches("IO_COMPLETION_ROUTINE") or
+      this.getName().matches("DRIVER_CANCEL") or
+      this.getName().matches("IO_DPC_ROUTINE") or
+      this.getName().matches("KDEFERRED_ROUTINE") or
+      this.getName().matches("KSERVICE_ROUTINE") or
+      this.getName().matches("REQUEST_POWER_COMPLETE") or
+      this.getName().matches("WORKER_THREAD_ROUTINE")
+    ) 
+  }
+}
 
 
 /**

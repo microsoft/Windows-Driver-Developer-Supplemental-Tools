@@ -20,17 +20,9 @@
 import cpp
 import drivers.wdm.libraries.WdmDrivers
 
-from FunctionCall fc,int n, Function f
+from Function f
 where
-
-fc.getArgument(n) instanceof FunctionAccess and
-f = fc.getArgument(n).(FunctionAccess).getTarget() and
-hasRoleType(fc.getArgument(n).(FunctionAccess).getTarget()) and
-hasRoleType(f) 
-and
-f.(WdmRoleTypeFunction).getRoleType() != fc.getArgument(n).(FunctionAccess).getTarget().(WdmRoleTypeFunction).getRoleType() 
-
-select fc,
-fc.toString() + " " + fc.getArgument(n).(FunctionAccess).getTarget().(WdmRoleTypeFunction).getRoleType() + " " + 
- f.toString()+ " " +f.(WdmRoleTypeFunction).getRoleType() 
+f instanceof WdmRoleTypeFunction
+select f,
+f.toString() + " " +f.(WdmRoleTypeFunction).getRoleType() 
 
