@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/default-pool-tag-extended
+ * @id cpp/drivers/role-type-correctly-used
  * @kind problem
- * @name Use of default pool tag in memory allocation (C28147)
- * @description Tagging memory with the default tags of ' mdW' or ' kdD' can make it difficult to debug allocations.
+ * @name Incorrect Role Type Use
+ * @description A function is declared with a role type but used as an argument in a function that expects a different role type for that argument.
  * @platform Desktop
  * @feature.area Multiple
  * @impact Insecure Coding Practice
- * @repro.text The following code locations call a pool allocation function with one of the default tags (' mdW' or ' kdD').
+ * @repro.text 
  * @owner.email: sdat@microsoft.com
  * @opaqueid CQLD-C28147e
  * @problem.severity warning
@@ -22,23 +22,13 @@ import cpp
 import drivers.wdm.libraries.WdmDrivers
 import semmle.code.cpp.TypedefType
 
-from WdmImplicitRoleTypeFunction irtf, FunctionCall fc
+from WdmImplicitRoleTypeFunction irtf, FunctionCall fc, Function f, FunctionAccess fa
 where
   irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() and
-  irtf.getImplicitUse() = fc 
-
-select irtf,
-  "Function $@ declared with role type " +irtf.getActualRoleTypeString().toString() + 
-  " but used as argument in function $@ that expects role type " + irtf.getExpectedRoleTypeString().toString() + " for that argument",
-  irtf, irtf.toString(), 
-  fc, fc.toString()
-
-  // TODO get rid of multiple results
-
-
-//"$@ expected role type of $@ but was given a function $@ with role type $@",
-// rtf, rtf.toString(),
-// rtf.getRoleTypeType(), rtf.getRoleTypeType().toString()
-// TODO need to get the role type type of the parameter in the caller
-//f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
-//f.getADeclarationEntry().getParameterDeclarationEntry(n).getType()
+  irtf.getImplicitUse() = fc and
+  fa = irtf.getFunctionAccess() 
+  and f = fc.getTarget()
+select fc,
+  "Function " + irtf.toString() +" declared with role type " +irtf.getActualRoleTypeString().toString() + 
+  " but used as argument in function " + fc.toString() + " that expects role type " + irtf.getExpectedRoleTypeString().toString() + 
+  " for that argument"

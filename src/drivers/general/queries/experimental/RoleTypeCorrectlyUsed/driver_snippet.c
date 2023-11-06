@@ -17,6 +17,11 @@ void testFunctionCalled(
     IN PVOID SystemArg1,
     IN PVOID SystemArg2)
 {
+    // Do stuff with arguments to get rid of compiler warnings
+    Dpc = NULL;
+    DeferredContext = NULL;
+    SystemArg1 = NULL;
+    SystemArg2 = NULL;
 }
 KDEFERRED_ROUTINE testFunctionCalled;
 
@@ -26,6 +31,12 @@ void badTestFunctionCalled(
     IN PVOID SystemArg1,
     IN PVOID SystemArg2)
 {
+    // Do stuff with arguments to get rid of compiler warnings
+    Dpc = NULL;
+    DeferredContext = NULL;
+    SystemArg1 = NULL;
+    SystemArg2 = NULL;
+
 }
 
 void call()

@@ -121,12 +121,13 @@ class WdmImplicitRoleTypeFunction extends Function {
   int n;
   Function f_caller;
   FunctionCall f_call;
-
+  FunctionAccess fa;
   WdmImplicitRoleTypeFunction() {
     exists(FunctionCall fc | fc.getArgument(n) instanceof FunctionAccess |
       this = fc.getArgument(n).(FunctionAccess).getTarget() and
       f_caller = fc.getTarget() and
-      f_call = fc
+      f_call = fc and
+      fa = fc.getArgument(n)
     ) and
     f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
       WdmRoleTypeType
@@ -146,6 +147,8 @@ class WdmImplicitRoleTypeFunction extends Function {
     else result = "<NO_ROLE_TYPE>"
   }
   FunctionCall getImplicitUse() { result = f_call }
+
+  FunctionAccess getFunctionAccess() { result = fa }
 }
 
 /** A WDM DriverEntry callback routine. */
