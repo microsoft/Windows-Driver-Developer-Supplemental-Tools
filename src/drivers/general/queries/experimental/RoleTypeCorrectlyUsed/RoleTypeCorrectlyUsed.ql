@@ -22,16 +22,20 @@ import cpp
 import drivers.wdm.libraries.WdmDrivers
 import semmle.code.cpp.TypedefType
 
-from WdmImplicitRoleTypeFunction irtf
+from WdmImplicitRoleTypeFunction irtf, FunctionCall fc
 where
-  irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString()
+  irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() and
+  irtf.getImplicitUse() = fc 
 
 select irtf,
-  "Function $@ declared with role type $@ but used as argument in function $@ that expects role type $@ for that argument",
+  "Function $@ declared with role type " +irtf.getActualRoleTypeString().toString() + 
+  " but used as argument in function $@ that expects role type " + irtf.getExpectedRoleTypeString().toString() + " for that argument",
   irtf, irtf.toString(), 
-  irtf, irtf.getActualRoleTypeString().toString(),
-  irtf.getImplicitUse(), irtf.getImplicitUse().toString(),
-  irtf.getExpectedRoleTypeType(),irtf.getExpectedRoleTypeType().toString()
+  fc, fc.toString()
+
+  // TODO get rid of multiple results
+
+
 //"$@ expected role type of $@ but was given a function $@ with role type $@",
 // rtf, rtf.toString(),
 // rtf.getRoleTypeType(), rtf.getRoleTypeType().toString()
