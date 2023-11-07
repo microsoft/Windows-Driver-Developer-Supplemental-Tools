@@ -23,12 +23,11 @@ import drivers.wdm.libraries.WdmDrivers
 import semmle.code.cpp.TypedefType
 
 from WdmImplicitRoleTypeFunction irtf, FunctionCall fc, Function f, FunctionAccess fa
-// where
-//   irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() and
-//   irtf.getImplicitUse() = fc and
-//   fa = irtf.getFunctionAccess()
-//   and f = fc.getTarget()
-select irtf, "irtf: " + irtf.getExpectedRoleTypeType() + " actual " + irtf.getActualRoleTypeString()
-// "Function " + irtf.toString() +" declared with role type " +irtf.getActualRoleTypeString().toString() +
-// " but used as argument in function " + fc.toString() + " that expects role type " + irtf.getExpectedRoleTypeString().toString() +
-// " for that argument"
+where
+  irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() and
+  irtf.getImplicitUse() = fc and
+  fa = irtf.getFunctionAccess()
+  and f = fc.getTarget()
+select irtf,
+"Function " + irtf.toString() +" declared with role type " +irtf.getActualRoleTypeString().toString() +
+" but role type " + irtf.getExpectedRoleTypeString().toString() + " is expected."
