@@ -102,26 +102,58 @@ class WdmCallbackRoutine extends Function {
  */
 abstract class WdmRoleTypeFunction extends Function {
   WdmCallbackRoutineTypedef roleType;
+
   WdmRoleTypeFunction() {
     exists(FunctionDeclarationEntry fde |
       fde.getFunction() = this and
-      fde.getTypedefType() = roleType 
+      fde.getTypedefType() = roleType
     )
   }
 
   string getRoleTypeString() { result = roleType.getName() }
 
   WdmRoleTypeType getRoleTypeType() { result = roleType }
-
 }
 
 predicate hasRoleType(Function f) { f instanceof WdmRoleTypeFunction }
 
+predicate roleTypeAssignment(AssignExpr ae) {
+  exists(FunctionAccess fa |
+    ae.getRValue() = fa and
+    fa.getTarget() instanceof WdmDispatchRoutine
+  )
+  or
+  ae.getRValue() instanceof AssignExpr and
+  roleTypeAssignment(ae.getRValue().(AssignExpr))
+}
+
+
+class WdmDriverObjectFunctionAccess extends FunctionAccess {
+  WdmRoleTypeType rttExpected;
+
+  WdmDriverObjectFunctionAccess() {
+    exists(VariableAccess driverObjectAccess, AssignExpr driverObjectAssign |
+      driverObjectAccess.getTarget().getType().getName().matches("PDRIVER_OBJECT") and
+      this = driverObjectAssign.getRValue() and
+      rttExpected = driverObjectAssign.getLValue().getUnderlyingType().(PointerType).getBaseType()
+    ) 
+  }
+
+  WdmRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
+}
+
+class WdmDriverEntryPoint extends FunctionAccess {
+  WdmDriverEntryPoint() { this instanceof WdmDriverObjectFunctionAccess }
+}
+
+// declared functions that are used as if they have a role type, wether or not they do
 class WdmImplicitRoleTypeFunction extends Function {
   int n;
   Function f_caller;
   FunctionCall f_call;
   FunctionAccess fa;
+  WdmRoleTypeType rttExpected;
+
   WdmImplicitRoleTypeFunction() {
     exists(FunctionCall fc | fc.getArgument(n) instanceof FunctionAccess |
       this = fc.getArgument(n).(FunctionAccess).getTarget() and
@@ -129,23 +161,28 @@ class WdmImplicitRoleTypeFunction extends Function {
       f_call = fc and
       fa = fc.getArgument(n)
     ) and
+    rttExpected = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType() and
     f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
       WdmRoleTypeType
+    or
+    exists(WdmDriverObjectFunctionAccess funcAssign |
+      funcAssign.getTarget() = this and
+      rttExpected = funcAssign.getExpectedRoleTypeType() and
+      fa = funcAssign
+    ) and
+    n = -1
   }
 
-  string getExpectedRoleTypeString() {
-    result = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType().toString()
-  }
+  string getExpectedRoleTypeString() { result = rttExpected.toString() }
 
-  WdmRoleTypeType getExpectedRoleTypeType() {
-    result = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType()
-  }
-  
-  string getActualRoleTypeString(){
+  WdmRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
+
+  string getActualRoleTypeString() {
     if this instanceof WdmRoleTypeFunction
     then result = this.(WdmRoleTypeFunction).getRoleTypeType().toString()
     else result = "<NO_ROLE_TYPE>"
   }
+
   FunctionCall getImplicitUse() { result = f_call }
 
   FunctionAccess getFunctionAccess() { result = fa }
