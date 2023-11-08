@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 0
+        "-": 2
     },
     "error": {
         "+": 0,
@@ -10,8 +10,19 @@
     },
     "warning": {
         "+": 0,
-        "-": 0,
-        "codes": []
+        "-": 2,
+        "codes": [
+            [
+                "cpp/drivers/irql-not-used This function has annotated the parameter [inIrql](1) with \"_IRQL_restores_\" but does not use it to restore the IRQL.",
+                1,
+                0
+            ],
+            [
+                "cpp/drivers/irql-not-used This function has annotated the parameter [myLock](1) with \"_IRQL_restores_\" but does not use it to restore the IRQL.",
+                1,
+                0
+            ]
+        ]
     },
     "note": {
         "+": 0,

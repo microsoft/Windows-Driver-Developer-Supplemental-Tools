@@ -38,27 +38,6 @@ class DriverExtension extends Struct {
   }
 }
 
-/** A typedef for the standard WDM callback routines. Aka Role Types */
-class WdmCallbackRoutineTypedef extends TypedefType {
-  WdmCallbackRoutineTypedef() {
-    (
-      this.getName().matches("DRIVER_INITIALIZE") or
-      this.getName().matches("DRIVER_STARTIO") or
-      this.getName().matches("DRIVER_UNLOAD") or
-      this.getName().matches("DRIVER_ADD_DEVICE") or
-      this.getName().matches("DRIVER_DISPATCH") or
-      this.getName().matches("IO_COMPLETION_ROUTINE") or
-      this.getName().matches("DRIVER_CANCEL") or
-      this.getName().matches("IO_DPC_ROUTINE") or
-      this.getName().matches("KDEFERRED_ROUTINE") or
-      this.getName().matches("KSERVICE_ROUTINE") or
-      this.getName().matches("REQUEST_POWER_COMPLETE") or
-      this.getName().matches("WORKER_THREAD_ROUTINE")
-    ) and
-    this.getFile().getBaseName().matches("wdm.h")
-  }
-}
-
 /** A typedef for Role Types */
 class WdmRoleTypeType extends TypedefType {
   WdmRoleTypeType() {
@@ -77,6 +56,11 @@ class WdmRoleTypeType extends TypedefType {
       this.getName().matches("WORKER_THREAD_ROUTINE")
     )
   }
+}
+
+/** A typedef for the standard WDM callback routines. Aka Role Types */
+class WdmCallbackRoutineTypedef extends WdmRoleTypeType {
+  WdmCallbackRoutineTypedef() { this.getFile().getBaseName().matches("wdm.h") }
 }
 
 /**
@@ -127,7 +111,6 @@ predicate roleTypeAssignment(AssignExpr ae) {
   roleTypeAssignment(ae.getRValue().(AssignExpr))
 }
 
-
 class WdmDriverObjectFunctionAccess extends FunctionAccess {
   WdmRoleTypeType rttExpected;
 
@@ -136,7 +119,7 @@ class WdmDriverObjectFunctionAccess extends FunctionAccess {
       driverObjectAccess.getTarget().getType().getName().matches("PDRIVER_OBJECT") and
       this = driverObjectAssign.getRValue() and
       rttExpected = driverObjectAssign.getLValue().getUnderlyingType().(PointerType).getBaseType()
-    ) 
+    )
   }
 
   WdmRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
@@ -146,31 +129,26 @@ class WdmDriverEntryPoint extends FunctionAccess {
   WdmDriverEntryPoint() { this instanceof WdmDriverObjectFunctionAccess }
 }
 
+
 // declared functions that are used as if they have a role type, wether or not they do
 class WdmImplicitRoleTypeFunction extends Function {
-  int n;
-  Function f_caller;
-  FunctionCall f_call;
-  FunctionAccess fa;
+
   WdmRoleTypeType rttExpected;
 
   WdmImplicitRoleTypeFunction() {
-    exists(FunctionCall fc | fc.getArgument(n) instanceof FunctionAccess |
+    exists(FunctionCall fc ,  int n| fc.getArgument(n) instanceof FunctionAccess |
       this = fc.getArgument(n).(FunctionAccess).getTarget() and
-      f_caller = fc.getTarget() and
-      f_call = fc and
-      fa = fc.getArgument(n)
-    ) and
-    rttExpected = f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType() and
-    f_caller.getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-      WdmRoleTypeType
+      fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
+        WdmRoleTypeType and
+      rttExpected = fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() and
+      fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
+        WdmRoleTypeType
+    )
     or
     exists(WdmDriverObjectFunctionAccess funcAssign |
       funcAssign.getTarget() = this and
-      rttExpected = funcAssign.getExpectedRoleTypeType() and
-      fa = funcAssign
-    ) and
-    n = -1
+      rttExpected = funcAssign.getExpectedRoleTypeType()
+    )
   }
 
   string getExpectedRoleTypeString() { result = rttExpected.toString() }
@@ -182,10 +160,6 @@ class WdmImplicitRoleTypeFunction extends Function {
     then result = this.(WdmRoleTypeFunction).getRoleTypeType().toString()
     else result = "<NO_ROLE_TYPE>"
   }
-
-  FunctionCall getImplicitUse() { result = f_call }
-
-  FunctionAccess getFunctionAccess() { result = fa }
 }
 
 /** A WDM DriverEntry callback routine. */

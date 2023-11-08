@@ -13,12 +13,12 @@
         "-": 2,
         "codes": [
             [
-                "cpp/drivers/irql-not-saved The parameter [outIrql](1) is annotated \"_IRQL_saves_\" but never has the IRQL saved to it.",
+                "cpp/drivers/irql-too-low IRQL potentially too low at this call ([TestInner2](1)).  Minimum irql level of this call: [1](2), Irql level at preceding node: [0](3)",
                 1,
                 0
             ],
             [
-                "cpp/drivers/irql-not-saved The parameter [myLock](1) is annotated \"_IRQL_saves_\" but never has the IRQL saved to it.",
+                "cpp/drivers/irql-too-low IRQL potentially too low at this call ([TestInner3](1)).  Minimum irql level of this call: [2](2), Irql level at preceding node: [0](3)",
                 1,
                 0
             ]

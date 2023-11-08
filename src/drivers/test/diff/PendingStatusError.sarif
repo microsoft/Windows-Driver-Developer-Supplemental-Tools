@@ -11,13 +11,7 @@
     "warning": {
         "+": 0,
         "-": 1,
-        "codes": [
-            [
-                "cpp/drivers/pending-status-error The return type should be STATUS_PENDING when making IoMarkIrpPending calls",
-                1,
-                0
-            ]
-        ]
+        "codes": []
     },
     "note": {
         "+": 0,

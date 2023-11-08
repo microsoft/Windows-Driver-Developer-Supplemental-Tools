@@ -49,6 +49,11 @@ class SALAnnotation extends MacroInvocation {
     not result instanceof Type // exclude typedefs
   }
 
+  Declaration getTypedefDeclarations() {
+    annotatesAt(this, result.getADeclarationEntry(), _, _) and
+    result instanceof Type // include
+  }
+
   /** Gets the `DeclarationEntry` annotated by `this`. */
   DeclarationEntry getDeclarationEntry() {
     annotatesAt(this, result, _, _) and
