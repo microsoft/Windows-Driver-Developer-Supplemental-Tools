@@ -25,8 +25,8 @@ import semmle.code.cpp.TypedefType
 from KmdfImplicitRoleTypeFunction irtf
 where
   irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() 
-select irtf,
+select irtf.getFunctionUse(),
 "Function " + irtf.toString() +" declared with role type " +irtf.getActualRoleTypeString().toString() +
-" but role type " + irtf.getExpectedRoleTypeString().toString() + " is expected. $@", irtf.getFunctionUse(),  irtf.getFunctionUse().toString()
+" but role type " + irtf.getExpectedRoleTypeString().toString() + " is expected."
 
 
