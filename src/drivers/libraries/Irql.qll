@@ -649,3 +649,36 @@ int getAllowableIrqlLevel(IrqlRestrictsFunction irqlFunc) {
           // No known restriction
           result = any([0 .. any(IrqlMacro im).getGlobalMaxIrqlLevel()])
 }
+
+/**
+ * Find a range of valid IRQL values given an IrqlAnnotatedTypedef.
+ */
+cached
+int getAlloweableIrqlLevel(IrqlAnnotatedTypedef irqlTypedef) {
+  if irqlTypedef.getIrqlAnnotation() instanceof IrqlRequiresAnnotation
+  then result = irqlTypedef.getIrqlAnnotation().(IrqlRequiresAnnotation).getIrqlLevel()
+  else
+    if
+      irqlTypedef.getIrqlAnnotation() instanceof IrqlMaxAnnotation and
+      irqlTypedef.getIrqlAnnotation() instanceof IrqlMinAnnotation
+    then
+      result =
+        any([irqlTypedef.getIrqlAnnotation().(IrqlMinAnnotation).getIrqlLevel() .. irqlTypedef
+                  .getIrqlAnnotation()
+                  .(IrqlMaxAnnotation)
+                  .getIrqlLevel()]
+        )
+    else
+      if irqlTypedef.getIrqlAnnotation() instanceof IrqlMaxAnnotation
+      then result = any([0 .. irqlTypedef.getIrqlAnnotation().(IrqlMaxAnnotation).getIrqlLevel()])
+      else
+        if irqlTypedef.getIrqlAnnotation() instanceof IrqlMinAnnotation
+        then
+          result =
+            any([irqlTypedef.getIrqlAnnotation().(IrqlMinAnnotation).getIrqlLevel() .. any(IrqlMacro im
+                  ).getGlobalMaxIrqlLevel()]
+            )
+        else
+          // No known restriction
+          result = any([0 .. any(IrqlMacro im).getGlobalMaxIrqlLevel()])
+}

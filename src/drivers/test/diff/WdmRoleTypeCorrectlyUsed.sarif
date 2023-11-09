@@ -1,0 +1,37 @@
+{
+    "all": {
+        "+": 2,
+        "-": 1
+    },
+    "error": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    },
+    "warning": {
+        "+": 2,
+        "-": 1,
+        "codes": [
+            [
+                "cpp/drivers/wdm-role-type-correctly-used Function DriverUnload declared with role type <NO_ROLE_TYPE> but role type DRIVER_UNLOAD is expected.",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/wdm-role-type-correctly-used Function badTestFunctionCalled declared with role type <NO_ROLE_TYPE> but role type KDEFERRED_ROUTINE is expected.",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/role-type-correctly-used Function badTestFunctionCalled declared with role type <NO_ROLE_TYPE> but used as argument in function call to KeInitializeDpc that expects role type KDEFERRED_ROUTINE for that argument",
+                1,
+                0
+            ]
+        ]
+    },
+    "note": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    }
+}
