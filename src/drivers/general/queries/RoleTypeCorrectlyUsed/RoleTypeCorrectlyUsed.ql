@@ -19,10 +19,10 @@
  */
 
 import cpp
-import drivers.kmdf.libraries.KmdfDrivers
+import drivers.libraries.RoleTypes
 import semmle.code.cpp.TypedefType
 
-from KmdfImplicitRoleTypeFunction irtf
+from ImplicitRoleTypeFunction irtf
 where
   irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() 
 select irtf.getFunctionUse(),
