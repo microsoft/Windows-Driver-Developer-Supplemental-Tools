@@ -1,6 +1,6 @@
 {
     "all": {
-        "+": 1,
+        "+": 0,
         "-": 1
     },
     "error": {
@@ -9,14 +9,9 @@
         "codes": []
     },
     "warning": {
-        "+": 1,
+        "+": 0,
         "-": 1,
         "codes": [
-            [
-                "cpp/drivers/kmdf-role-type-correctly-used Function KMDFTestTemplateEvtDevicePrepareHardware declared with role type <NO_ROLE_TYPE> but role type EVT_WDF_DEVICE_PREPARE_HARDWARE is expected. [KMDFTestTemplateEvtDevicePrepareHardware](1)",
-                0,
-                1
-            ],
             [
                 "cpp/drivers/role-type-correctly-used Function badTestFunctionCalled declared with role type <NO_ROLE_TYPE> but used as argument in function call to KeInitializeDpc that expects role type KDEFERRED_ROUTINE for that argument",
                 1,

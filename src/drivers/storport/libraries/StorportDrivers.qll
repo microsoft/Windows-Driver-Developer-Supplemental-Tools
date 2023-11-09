@@ -9,43 +9,6 @@
 import cpp
 import drivers.libraries.SAL
 
-/** An assignment where the right-hand side is a NDIS callback routine. */
-class CallbackRoutineAssignment extends AssignExpr {
-  /*
-   * A common paradigm in dispatch routine setup is to chain assignments to cover multiple IRPs.
-   * As such, it's necessary to recursively walk the assignment to handle cases such as
-   *   DriverObject->MajorFunction[IRP_MJ_CREATE] =
-   *   DriverObject->MajorFunction[IRP_MJ_OPEN] =
-   *   MyMultiFunctionIrpHandler;
-   * However, characterstic predicates cannot be recurisve, so the logic is placed in a separate
-   * predicate below, isCallbackRoutineAssignment.
-   */
-
-  CallbackRoutineAssignment() { isCallbackRoutineAssignment(this) }
-
-  /** Gets the callback routine that this dispatch routine assignment is targeting. */
-  cached
-  StorportCallbackRoutine getTarget() {
-    if
-      exists(FunctionAccess fa |
-        this.getRValue() = fa and
-        fa.getTarget() instanceof StorportCallbackRoutine
-      )
-    then result = this.getRValue().(FunctionAccess).getTarget()
-    else result = getTarget_aux(this.getRValue())
-  }
-
-  /** Auxilliary function to getTarget(). */
-  private StorportCallbackRoutine getTarget_aux(AssignExpr ae) {
-    if
-      exists(FunctionAccess fa |
-        ae.getRValue() = fa and
-        fa.getTarget() instanceof StorportCallbackRoutine
-      )
-    then result = ae.getRValue().(FunctionAccess).getTarget()
-    else result = getTarget_aux(ae.getRValue())
-  }
-}
 
 /** Determines if a given assignment, recursively, has a NDIS callback routine as the right-hand side. */
 private predicate isCallbackRoutineAssignment(AssignExpr ae) {

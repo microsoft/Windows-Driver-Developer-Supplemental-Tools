@@ -16,7 +16,7 @@ import drivers.libraries.SAL
  * the dispatch table.
  */
 cached
-class NdisDispatchRoutine extends NdisRoleTypeFunction {
+class NdisDispatchRoutine extends NdisCallbackRoutine {
   /**
    * The OID type covered by this dispatch routine.
    */
@@ -32,9 +32,9 @@ class NdisDispatchRoutine extends NdisRoleTypeFunction {
    */
   cached
   NdisDispatchRoutine() {
-    roleType.getName().matches("NDIS_DISPATCH") and
+    callbackType.getName().matches("NDIS_DISPATCH") and
     exists(
-      CallbackRoutineAssignment cra, PointerFieldAccess dispatchTable,
+      NdisCallbackRoutineAssignment cra, PointerFieldAccess dispatchTable,
       PointerFieldAccess fieldAccess, VariableAccess driverObjectAccess
     |
       cra.getLValue() = fieldAccess and
@@ -56,7 +56,7 @@ class NdisDispatchRoutine extends NdisRoleTypeFunction {
 }
 
 /** An assignment where the right-hand side is a NDIS callback routine. */
-class CallbackRoutineAssignment extends AssignExpr {
+class NdisCallbackRoutineAssignment extends AssignExpr {
   /*
    * A common paradigm in dispatch routine setup is to chain assignments to cover multiple IRPs.
    * As such, it's necessary to recursively walk the assignment to handle cases such as
@@ -64,10 +64,10 @@ class CallbackRoutineAssignment extends AssignExpr {
    *   DriverObject->MajorFunction[IRP_MJ_OPEN] =
    *   MyMultiFunctionIrpHandler;
    * However, characterstic predicates cannot be recurisve, so the logic is placed in a separate
-   * predicate below, isCallbackRoutineAssignment.
+   * predicate below, isNdisCallbackRoutineAssignment.
    */
 
-  CallbackRoutineAssignment() { isCallbackRoutineAssignment(this) }
+  NdisCallbackRoutineAssignment() { isNdisCallbackRoutineAssignment(this) }
 
   /** Gets the callback routine that this dispatch routine assignment is targeting. */
   cached
@@ -94,14 +94,14 @@ class CallbackRoutineAssignment extends AssignExpr {
 }
 
 /** Determines if a given assignment, recursively, has a NDIS callback routine as the right-hand side. */
-private predicate isCallbackRoutineAssignment(AssignExpr ae) {
+private predicate isNdisCallbackRoutineAssignment(AssignExpr ae) {
   exists(FunctionAccess fa |
     ae.getRValue() = fa and
     fa.getTarget() instanceof NdisCallbackRoutine
   )
   or
   ae.getRValue() instanceof AssignExpr and
-  isCallbackRoutineAssignment(ae.getRValue().(AssignExpr))
+  isNdisCallbackRoutineAssignment(ae.getRValue().(AssignExpr))
 }
 
 /** A typedef for Role Types */
@@ -221,710 +221,627 @@ class NdisCallbackRoutine extends Function {
   }
 }
 
-/**
- * Similar to NdisCallbackRoutine, but specifically for Role Types
- */
-abstract class NdisRoleTypeFunction extends Function {
-  NdisCallbackRoutineTypedef roleType;
-
-  NdisRoleTypeFunction() {
-    exists(FunctionDeclarationEntry fde |
-      fde.getFunction() = this and
-      fde.getTypedefType() = roleType
-    )
-  }
-
-  string getRoleTypeString() { result = roleType.getName() }
-
-  NdisRoleTypeType getRoleTypeType() { result = roleType }
-}
-
-predicate hasRoleType(Function f) { f instanceof NdisRoleTypeFunction }
-
-predicate roleTypeAssignment(AssignExpr ae) {
-  exists(FunctionAccess fa |
-    ae.getRValue() = fa and
-    fa.getTarget() instanceof NdisDispatchRoutine
-  )
-  or
-  ae.getRValue() instanceof AssignExpr and
-  roleTypeAssignment(ae.getRValue().(AssignExpr))
-}
-
-class NdisDriverObjectFunctionAccess extends FunctionAccess {
-  NdisRoleTypeType rttExpected;
-
-  NdisDriverObjectFunctionAccess() {
-    exists(VariableAccess driverObjectAccess, AssignExpr driverObjectAssign |
-      driverObjectAccess.getTarget().getType().getName().matches("PDRIVER_OBJECT") and
-      this = driverObjectAssign.getRValue() and
-      rttExpected = driverObjectAssign.getLValue().getUnderlyingType().(PointerType).getBaseType()
-    )
-  }
-
-  NdisRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
-}
-
-class NdisDriverEntryPoint extends FunctionAccess {
-  NdisDriverEntryPoint() { this instanceof NdisDriverObjectFunctionAccess }
-}
-
-// declared functions that are used as if they have a role type, wether or not they do
-class NdisImplicitRoleTypeFunction extends Function {
-  NdisRoleTypeType rttExpected;
-  FunctionAccess funcUse;
-
-  NdisImplicitRoleTypeFunction() {
-    exists(FunctionCall fc, int n | fc.getArgument(n) instanceof FunctionAccess |
-      this = fc.getArgument(n).(FunctionAccess).getTarget() and
-      fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-        NdisRoleTypeType and
-      rttExpected = fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() and
-      fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-        NdisRoleTypeType and
-      funcUse = fc.getArgument(n)
-    )
-    or
-    exists(NdisDriverObjectFunctionAccess funcAssign |
-      funcAssign.getTarget() = this and
-      rttExpected = funcAssign.getExpectedRoleTypeType() and
-      funcUse = funcAssign
-    )
-  }
-
-  string getExpectedRoleTypeString() { result = rttExpected.toString() }
-
-  NdisRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
-
-  string getActualRoleTypeString() {
-    if this instanceof NdisRoleTypeFunction
-    then result = this.(NdisRoleTypeFunction).getRoleTypeType().toString()
-    else result = "<NO_ROLE_TYPE>"
-  }
-
-  FunctionAccess getFunctionUse() { result = funcUse }
-}
 
 /** A NDIS DriverEntry callback routine. */
-class NdisDriverEntry extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisDriverEntry extends NdisCallbackRoutine {
   NdisDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
 }
 
 /** A NDIS MiniportAllocateSharedMemoryComplete callback routine. */
-class NdisMiniportAllocateSharedMemoryComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportAllocateSharedMemoryComplete extends NdisCallbackRoutine {
   NdisMiniportAllocateSharedMemoryComplete() {
     callbackType.getName().matches("MINIPORT_ALLOCATE_SHARED_MEM_COMPLETE")
   }
 }
 
 /** A NDIS MiniportHalt callback routine. */
-class NdisMiniportHalt extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportHalt extends NdisCallbackRoutine {
   NdisMiniportHalt() { callbackType.getName().matches("MINIPORT_HALT") }
 }
 
 /** A NDIS MiniportSetOptions callback routine. */
-class NdisMiniportSetOptions extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportSetOptions extends NdisCallbackRoutine {
   NdisMiniportSetOptions() { callbackType.getName().matches("MINIPORT_SET_OPTIONS") }
 }
 
 /** A NDIS MiniportInitialize callback routine. */
-class NdisMiniportInitialize extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportInitialize extends NdisCallbackRoutine {
   NdisMiniportInitialize() { callbackType.getName().matches("MINIPORT_INITIALIZE") }
 }
 
 /** A NDIS MiniportPause callback routine. */
-class NdisMiniportPause extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportPause extends NdisCallbackRoutine {
   NdisMiniportPause() { callbackType.getName().matches("MINIPORT_PAUSE") }
 }
 
 /** A NDIS MiniportRestart callback routine. */
-class NdisMiniportRestart extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportRestart extends NdisCallbackRoutine {
   NdisMiniportRestart() { callbackType.getName().matches("MINIPORT_RESTART") }
 }
 
 /** A NDIS MiniportOidRequest callback routine. */
-class NdisMiniportOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportOidRequest extends NdisCallbackRoutine {
   NdisMiniportOidRequest() { callbackType.getName().matches("MINIPORT_OID_REQUEST") }
 }
 
 /** A NDIS MiniportInterruptDpc callback routine. */
-class NdisMiniportInterruptDpc extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportInterruptDpc extends NdisCallbackRoutine {
   NdisMiniportInterruptDpc() { callbackType.getName().matches("MINIPORT_INTERRUPT_DPC") }
 }
 
 /** A NDIS MiniportIsr callback routine. */
-class NdisMiniportIsr extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportIsr extends NdisCallbackRoutine {
   NdisMiniportIsr() { callbackType.getName().matches("MINIPORT_ISR") }
 }
 
 /** A NDIS MiniportReset callback routine. */
-class NdisMiniportReset extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportReset extends NdisCallbackRoutine {
   NdisMiniportReset() { callbackType.getName().matches("MINIPORT_RESET") }
 }
 
 /** A NDIS MiniportReturnNetBufferLists callback routine. */
-class NdisMiniportReturnNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportReturnNetBufferLists extends NdisCallbackRoutine {
   NdisMiniportReturnNetBufferLists() {
     callbackType.getName().matches("MINIPORT_RETURN_NET_BUFFER_LISTS")
   }
 }
 
 /** A NDIS MiniportCancelOidRequest callback routine. */
-class NdisMiniportCancelOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCancelOidRequest extends NdisCallbackRoutine {
   NdisMiniportCancelOidRequest() { callbackType.getName().matches("MINIPORT_CANCEL_OID_REQUEST") }
 }
 
 /** A NDIS MiniportShutdown callback routine. */
-class NdisMiniportShutdown extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportShutdown extends NdisCallbackRoutine {
   NdisMiniportShutdown() { callbackType.getName().matches("MINIPORT_SHUTDOWN") }
 }
 
 /** A NDIS MiniportSendNetBufferLists callback routine. */
-class NdisMiniportSendNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportSendNetBufferLists extends NdisCallbackRoutine {
   NdisMiniportSendNetBufferLists() {
     callbackType.getName().matches("MINIPORT_SEND_NET_BUFFER_LISTS")
   }
 }
 
 /** A NDIS MiniportCancelSend callback routine. */
-class NdisMiniportCancelSend extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCancelSend extends NdisCallbackRoutine {
   NdisMiniportCancelSend() { callbackType.getName().matches("MINIPORT_CANCEL_SEND") }
 }
 
 /** A NDIS MiniportDevicePnpEventNotify callback routine. */
-class NdisMiniportDevicePnpEventNotify extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportDevicePnpEventNotify extends NdisCallbackRoutine {
   NdisMiniportDevicePnpEventNotify() {
     callbackType.getName().matches("MINIPORT_DEVICE_PNP_EVENT_NOTIFY")
   }
 }
 
 /** A NDIS MiniportUnload callback routine. */
-class NdisMiniportUnload extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportUnload extends NdisCallbackRoutine {
   NdisMiniportUnload() { callbackType.getName().matches("MINIPORT_UNLOAD") }
 }
 
 /** A NDIS MiniportCheckForHang callback routine. */
-class NdisMiniportCheckForHang extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCheckForHang extends NdisCallbackRoutine {
   NdisMiniportCheckForHang() { callbackType.getName().matches("MINIPORT_CHECK_FOR_HANG") }
 }
 
 /** A NDIS MiniportEnableInterrupt callback routine. */
-class NdisMiniportEnableInterrupt extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportEnableInterrupt extends NdisCallbackRoutine {
   NdisMiniportEnableInterrupt() { callbackType.getName().matches("MINIPORT_ENABLE_INTERRUPT") }
 }
 
 /** A NDIS MiniportDisableInterrupt callback routine. */
-class NdisMiniportDisableInterrupt extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportDisableInterrupt extends NdisCallbackRoutine {
   NdisMiniportDisableInterrupt() { callbackType.getName().matches("MINIPORT_DISABLE_INTERRUPT") }
 }
 
 /** A NDIS MiniportSynchronizeInterrupt callback routine. */
-class NdisMiniportSynchronizeInterrupt extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportSynchronizeInterrupt extends NdisCallbackRoutine {
   NdisMiniportSynchronizeInterrupt() {
     callbackType.getName().matches("MINIPORT_SYNCHRONIZE_INTERRUPT")
   }
 }
 
 /** A NDIS MiniportProcessSgList callback routine. */
-class NdisMiniportProcessSgList extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportProcessSgList extends NdisCallbackRoutine {
   NdisMiniportProcessSgList() { callbackType.getName().matches("MINIPORT_PROCESS_SG_LIST") }
 }
 
 /** A NDIS timer callback routine. */
-class NdisTimerFunction extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisTimerFunction extends NdisCallbackRoutine {
   NdisTimerFunction() { callbackType.getName().matches("NDIS_TIMER_FUNCTION") }
 }
 
 /** A NDIS I/O work item callback routine. */
-class NdisIoWorkitem extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisIoWorkitem extends NdisCallbackRoutine {
   NdisIoWorkitem() { callbackType.getName().matches("NDIS_IO_WORKITEM") }
 }
 
 /** A NDIS MiniportAddDevice callback routine. */
-class NdisMiniportAddDevice extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportAddDevice extends NdisCallbackRoutine {
   NdisMiniportAddDevice() { callbackType.getName().matches("MINIPORT_ADD_DEVICE") }
 }
 
 /** A NDIS MiniportCancelDirectOidRequest callback routine. */
-class NdisMiniportCancelDirectOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCancelDirectOidRequest extends NdisCallbackRoutine {
   NdisMiniportCancelDirectOidRequest() {
     callbackType.getName().matches("MINIPORT_CANCEL_DIRECT_OID_REQUEST")
   }
 }
 
 /** A NDIS MiniportDirectOidRequest callback routine. */
-class NdisMiniportDirectOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportDirectOidRequest extends NdisCallbackRoutine {
   NdisMiniportDirectOidRequest() { callbackType.getName().matches("MINIPORT_DIRECT_OID_REQUEST") }
 }
 
 /** A NDIS MiniportFilterResourceRequirements callback routine. */
-class NdisMiniportFilterResourceRequirements extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportFilterResourceRequirements extends NdisCallbackRoutine {
   NdisMiniportFilterResourceRequirements() {
     callbackType.getName().matches("MINIPORT_FILTER_RESOURCE_REQUIREMENTS")
   }
 }
 
 /** A NDIS MiniportStartDevice callback routine. */
-class NdisMiniportStartDevice extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportStartDevice extends NdisCallbackRoutine {
   NdisMiniportStartDevice() { callbackType.getName().matches("MINIPORT_START_DEVICE") }
 }
 
 /** A NDIS MiniportSynchronizeMessageInterrupt callback routine. */
-class NdisMiniportSynchronizeMessageInterrupt extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportSynchronizeMessageInterrupt extends NdisCallbackRoutine {
   NdisMiniportSynchronizeMessageInterrupt() {
     callbackType.getName().matches("MINIPORT_SYNCHRONIZE_MESSAGE_INTERRUPT")
   }
 }
 
 /** A NDIS IoWorkItemFunction callback routine. */
-class NdisIoWorkItemFunction extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisIoWorkItemFunction extends NdisCallbackRoutine {
   NdisIoWorkItemFunction() { callbackType.getName().matches("NDIS_IO_WORKITEM_FUNCTION") }
 }
 
 /** A NDIS filter attach callback routine. */
-class NdisFilterAttach extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterAttach extends NdisCallbackRoutine {
   NdisFilterAttach() { callbackType.getName().matches("FILTER_ATTACH") }
 }
 
 /** A NDIS filter cancel direct OID request callback routine. */
-class NdisFilterCancelDirectOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterCancelDirectOidRequest extends NdisCallbackRoutine {
   NdisFilterCancelDirectOidRequest() {
     callbackType.getName().matches("FILTER_CANCEL_DIRECT_OID_REQUEST")
   }
 }
 
 /** A NDIS filter cancel send net buffer lists callback routine. */
-class NdisFilterCancelSendNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterCancelSendNetBufferLists extends NdisCallbackRoutine {
   NdisFilterCancelSendNetBufferLists() {
     callbackType.getName().matches("FILTER_CANCEL_SEND_NET_BUFFER_LISTS")
   }
 }
 
 /** A NDIS filter cancel OID request callback routine. */
-class NdisFilterCancelOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterCancelOidRequest extends NdisCallbackRoutine {
   NdisFilterCancelOidRequest() { callbackType.getName().matches("FILTER_CANCEL_OID_REQUEST") }
 }
 
 /** A NDIS filter detach callback routine. */
-class NdisFilterDetach extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterDetach extends NdisCallbackRoutine {
   NdisFilterDetach() { callbackType.getName().matches("FILTER_DETACH") }
 }
 
 /** A NDIS filter device PNP event notify callback routine. */
-class NdisFilterDevicePnpEventNotify extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterDevicePnpEventNotify extends NdisCallbackRoutine {
   NdisFilterDevicePnpEventNotify() {
     callbackType.getName().matches("FILTER_DEVICE_PNP_EVENT_NOTIFY")
   }
 }
 
 /** A NDIS filter direct OID request callback routine. */
-class NdisFilterDirectOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterDirectOidRequest extends NdisCallbackRoutine {
   NdisFilterDirectOidRequest() { callbackType.getName().matches("FILTER_DIRECT_OID_REQUEST") }
 }
 
 /** A NDIS filter direct OID request complete callback routine. */
-class NdisFilterDirectOidRequestComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterDirectOidRequestComplete extends NdisCallbackRoutine {
   NdisFilterDirectOidRequestComplete() {
     callbackType.getName().matches("FILTER_DIRECT_OID_REQUEST_COMPLETE")
   }
 }
 
 /** A NDIS driver unload callback routine. */
-class NdisDriverUnload extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisDriverUnload extends NdisCallbackRoutine {
   NdisDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
 }
 
 /** A NDIS filter net PNP event callback routine. */
-class NdisFilterNetPnpEvent extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterNetPnpEvent extends NdisCallbackRoutine {
   NdisFilterNetPnpEvent() { callbackType.getName().matches("FILTER_NET_PNP_EVENT") }
 }
 
 /** A NDIS filter OID request callback routine. */
-class NdisFilterOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterOidRequest extends NdisCallbackRoutine {
   NdisFilterOidRequest() { callbackType.getName().matches("FILTER_OID_REQUEST") }
 }
 
 /** A NDIS filter OID request complete callback routine. */
-class NdisFilterOidRequestComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterOidRequestComplete extends NdisCallbackRoutine {
   NdisFilterOidRequestComplete() { callbackType.getName().matches("FILTER_OID_REQUEST_COMPLETE") }
 }
 
 /** A NDIS filter pause callback routine. */
-class NdisFilterPause extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterPause extends NdisCallbackRoutine {
   NdisFilterPause() { callbackType.getName().matches("FILTER_PAUSE") }
 }
 
 /** A NDIS filter receive net buffer lists callback routine. */
-class NdisFilterReceiveNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterReceiveNetBufferLists extends NdisCallbackRoutine {
   NdisFilterReceiveNetBufferLists() {
     callbackType.getName().matches("FILTER_RECEIVE_NET_BUFFER_LISTS")
   }
 }
 
 /** A NDIS filter restart callback routine. */
-class NdisFilterRestart extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterRestart extends NdisCallbackRoutine {
   NdisFilterRestart() { callbackType.getName().matches("FILTER_RESTART") }
 }
 
 /** A NDIS filter return net buffer lists callback routine. */
-class NdisFilterReturnNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterReturnNetBufferLists extends NdisCallbackRoutine {
   NdisFilterReturnNetBufferLists() {
     callbackType.getName().matches("FILTER_RETURN_NET_BUFFER_LISTS")
   }
 }
 
 /** A NDIS filter send net buffer lists callback routine. */
-class NdisFilterSendNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterSendNetBufferLists extends NdisCallbackRoutine {
   NdisFilterSendNetBufferLists() { callbackType.getName().matches("FILTER_SEND_NET_BUFFER_LISTS") }
 }
 
 /** A NDIS filter send net buffer lists complete callback routine. */
-class NdisFilterSendNetBufferListsComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterSendNetBufferListsComplete extends NdisCallbackRoutine {
   NdisFilterSendNetBufferListsComplete() {
     callbackType.getName().matches("FILTER_SEND_NET_BUFFER_LISTS_COMPLETE")
   }
 }
 
 /** A NDIS filter set module options callback routine. */
-class NdisFilterSetModuleOptions extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterSetModuleOptions extends NdisCallbackRoutine {
   NdisFilterSetModuleOptions() { callbackType.getName().matches("FILTER_SET_MODULE_OPTIONS") }
 }
 
 /** A NDIS filter set options callback routine. */
-class NdisFilterSetOptions extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterSetOptions extends NdisCallbackRoutine {
   NdisFilterSetOptions() { callbackType.getName().matches("FILTER_SET_OPTIONS") }
 }
 
 /** A NDIS filter status callback routine. */
-class NdisFilterStatus extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisFilterStatus extends NdisCallbackRoutine {
   NdisFilterStatus() { callbackType.getName().matches("FILTER_STATUS") }
 }
 
 /** A NDIS miniport CO activate VC callback routine. */
-class NdisMiniportCoActivateVc extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCoActivateVc extends NdisCallbackRoutine {
   NdisMiniportCoActivateVc() { callbackType.getName().matches("MINIPORT_CO_ACTIVATE_VC") }
 }
 
 /** A NDIS miniport CO create VC callback routine. */
-class NdisMiniportCoCreateVc extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCoCreateVc extends NdisCallbackRoutine {
   NdisMiniportCoCreateVc() { callbackType.getName().matches("MINIPORT_CO_CREATE_VC") }
 }
 
 /** A NDIS miniport CO deactivate VC callback routine. */
-class NdisMiniportCoDeactivateVc extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCoDeactivateVc extends NdisCallbackRoutine {
   NdisMiniportCoDeactivateVc() { callbackType.getName().matches("MINIPORT_CO_DEACTIVATE_VC") }
 }
 
 /** A NDIS miniport CO delete VC callback routine. */
-class NdisMiniportCoDeleteVc extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCoDeleteVc extends NdisCallbackRoutine {
   NdisMiniportCoDeleteVc() { callbackType.getName().matches("MINIPORT_CO_DELETE_VC") }
 }
 
 /** A NDIS miniport CO OID request callback routine. */
-class NdisMiniportCoOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCoOidRequest extends NdisCallbackRoutine {
   NdisMiniportCoOidRequest() { callbackType.getName().matches("MINIPORT_CO_OID_REQUEST") }
 }
 
 /** A NDIS miniport CO send net buffer lists callback routine. */
-class NdisMiniportCoSendNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisMiniportCoSendNetBufferLists extends NdisCallbackRoutine {
   NdisMiniportCoSendNetBufferLists() {
     callbackType.getName().matches("MINIPORT_CO_SEND_NET_BUFFER_LISTS")
   }
 }
 
 /** A NDIS protocol bind adapter ex callback routine. */
-class NdisProtocolBindAdapterEx extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolBindAdapterEx extends NdisCallbackRoutine {
   NdisProtocolBindAdapterEx() { callbackType.getName().matches("PROTOCOL_BIND_ADAPTER_EX") }
 }
 
 /** A NDIS protocol close adapter complete ex callback routine. */
-class NdisProtocolCloseAdapterCompleteEx extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCloseAdapterCompleteEx extends NdisCallbackRoutine {
   NdisProtocolCloseAdapterCompleteEx() {
     callbackType.getName().matches("PROTOCOL_CLOSE_ADAPTER_COMPLETE_EX")
   }
 }
 
 /** A NDIS protocol direct OID request complete callback routine. */
-class NdisProtocolDirectOidRequestComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolDirectOidRequestComplete extends NdisCallbackRoutine {
   NdisProtocolDirectOidRequestComplete() {
     callbackType.getName().matches("PROTOCOL_DIRECT_OID_REQUEST_COMPLETE")
   }
 }
 
 /** A NDIS protocol net PNP event callback routine. */
-class NdisProtocolNetPnpEvent extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolNetPnpEvent extends NdisCallbackRoutine {
   NdisProtocolNetPnpEvent() { callbackType.getName().matches("PROTOCOL_NET_PNP_EVENT") }
 }
 
 /** A NDIS protocol OID request complete callback routine. */
-class NdisProtocolOidRequestComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolOidRequestComplete extends NdisCallbackRoutine {
   NdisProtocolOidRequestComplete() {
     callbackType.getName().matches("PROTOCOL_OID_REQUEST_COMPLETE")
   }
 }
 
 /** A NDIS protocol open adapter complete ex callback routine. */
-class NdisProtocolOpenAdapterCompleteEx extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolOpenAdapterCompleteEx extends NdisCallbackRoutine {
   NdisProtocolOpenAdapterCompleteEx() {
     callbackType.getName().matches("PROTOCOL_OPEN_ADAPTER_COMPLETE_EX")
   }
 }
 
 /** A NDIS protocol receive net buffer lists callback routine. */
-class NdisProtocolReceiveNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolReceiveNetBufferLists extends NdisCallbackRoutine {
   NdisProtocolReceiveNetBufferLists() {
     callbackType.getName().matches("PROTOCOL_RECEIVE_NET_BUFFER_LISTS")
   }
 }
 
 /** A NDIS protocol send net buffer lists complete callback routine. */
-class NdisProtocolSendNetBufferListsComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolSendNetBufferListsComplete extends NdisCallbackRoutine {
   NdisProtocolSendNetBufferListsComplete() {
     callbackType.getName().matches("PROTOCOL_SEND_NET_BUFFER_LISTS_COMPLETE")
   }
 }
 
 /** A NDIS protocol set options callback routine. */
-class NdisProtocolSetOptions extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolSetOptions extends NdisCallbackRoutine {
   NdisProtocolSetOptions() { callbackType.getName().matches("PROTOCOL_SET_OPTIONS") }
 }
 
 /** A NDIS protocol status ex callback routine. */
-class NdisProtocolStatusEx extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolStatusEx extends NdisCallbackRoutine {
   NdisProtocolStatusEx() { callbackType.getName().matches("PROTOCOL_STATUS_EX") }
 }
 
 /** A NDIS protocol unbind adapter ex callback routine. */
-class NdisProtocolUnbindAdapterEx extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolUnbindAdapterEx extends NdisCallbackRoutine {
   NdisProtocolUnbindAdapterEx() { callbackType.getName().matches("PROTOCOL_UNBIND_ADAPTER_EX") }
 }
 
 /** A NDIS protocol uninstall callback routine. */
-class NdisProtocolUninstall extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolUninstall extends NdisCallbackRoutine {
   NdisProtocolUninstall() { callbackType.getName().matches("PROTOCOL_UNINSTALL") }
 }
 
 /** A NDIS protocol call manager add party complete callback routine. */
-class NdisProtocolClAddPartyComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClAddPartyComplete extends NdisCallbackRoutine {
   NdisProtocolClAddPartyComplete() {
     callbackType.getName().matches("PROTOCOL_CL_ADD_PARTY_COMPLETE")
   }
 }
 
 /** A NDIS protocol call manager call connected callback routine. */
-class NdisProtocolClCallConnected extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClCallConnected extends NdisCallbackRoutine {
   NdisProtocolClCallConnected() { callbackType.getName().matches("PROTOCOL_CL_CALL_CONNECTED") }
 }
 
 /** A NDIS protocol call manager close AF complete callback routine. */
-class NdisProtocolClCloseAfComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClCloseAfComplete extends NdisCallbackRoutine {
   NdisProtocolClCloseAfComplete() {
     callbackType.getName().matches("PROTOCOL_CL_CLOSE_AF_COMPLETE")
   }
 }
 
 /** A NDIS protocol call manager close call complete callback routine. */
-class NdisProtocolClCloseCallComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClCloseCallComplete extends NdisCallbackRoutine {
   NdisProtocolClCloseCallComplete() {
     callbackType.getName().matches("PROTOCOL_CL_CLOSE_CALL_COMPLETE")
   }
 }
 
 /** A NDIS protocol call manager deregister SAP complete callback routine. */
-class NdisProtocolClDeregisterSapComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClDeregisterSapComplete extends NdisCallbackRoutine {
   NdisProtocolClDeregisterSapComplete() {
     callbackType.getName().matches("PROTOCOL_CL_DEREGISTER_SAP_COMPLETE")
   }
 }
 
 /** A NDIS protocol call manager drop party complete callback routine. */
-class NdisProtocolClDropPartyComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClDropPartyComplete extends NdisCallbackRoutine {
   NdisProtocolClDropPartyComplete() {
     callbackType.getName().matches("PROTOCOL_CL_DROP_PARTY_COMPLETE")
   }
 }
 
 /** A NDIS protocol call manager incoming call callback routine. */
-class NdisProtocolClIncomingCall extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClIncomingCall extends NdisCallbackRoutine {
   NdisProtocolClIncomingCall() { callbackType.getName().matches("PROTOCOL_CL_INCOMING_CALL") }
 }
 
 /** A NDIS protocol call manager incoming call QoS change callback routine. */
-class NdisProtocolClIncomingCallQosChange extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClIncomingCallQosChange extends NdisCallbackRoutine {
   NdisProtocolClIncomingCallQosChange() {
     callbackType.getName().matches("PROTOCOL_CL_INCOMING_CALL_QOS_CHANGE")
   }
 }
 
 /** A NDIS protocol call manager incoming close call callback routine. */
-class NdisProtocolClIncomingCloseCall extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClIncomingCloseCall extends NdisCallbackRoutine {
   NdisProtocolClIncomingCloseCall() {
     callbackType.getName().matches("PROTOCOL_CL_INCOMING_CLOSE_CALL")
   }
 }
 
 /** A NDIS protocol call manager incoming drop party callback routine. */
-class NdisProtocolClIncomingDropParty extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClIncomingDropParty extends NdisCallbackRoutine {
   NdisProtocolClIncomingDropParty() {
     callbackType.getName().matches("PROTOCOL_CL_INCOMING_DROP_PARTY")
   }
 }
 
 /** A NDIS protocol call manager make call complete callback routine. */
-class NdisProtocolClMakeCallComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClMakeCallComplete extends NdisCallbackRoutine {
   NdisProtocolClMakeCallComplete() {
     callbackType.getName().matches("PROTOCOL_CL_MAKE_CALL_COMPLETE")
   }
 }
 
 /** A NDIS protocol call manager modify call QoS complete callback routine. */
-class NdisProtocolClModifyCallQosComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClModifyCallQosComplete extends NdisCallbackRoutine {
   NdisProtocolClModifyCallQosComplete() {
     callbackType.getName().matches("PROTOCOL_CL_MODIFY_CALL_QOS_COMPLETE")
   }
 }
 
 /** A NDIS protocol call manager notify close AF callback routine. */
-class NdisProtocolClNotifyCloseAf extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClNotifyCloseAf extends NdisCallbackRoutine {
   NdisProtocolClNotifyCloseAf() { callbackType.getName().matches("PROTOCOL_CL_NOTIFY_CLOSE_AF") }
 }
 
 /** A NDIS protocol call manager open AF complete callback routine. */
-class NdisProtocolClOpenAfComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClOpenAfComplete extends NdisCallbackRoutine {
   NdisProtocolClOpenAfComplete() { callbackType.getName().matches("PROTOCOL_CL_OPEN_AF_COMPLETE") }
 }
 
 /** A NDIS protocol call manager open AF complete ex callback routine. */
-class NdisProtocolClOpenAfCompleteEx extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClOpenAfCompleteEx extends NdisCallbackRoutine {
   NdisProtocolClOpenAfCompleteEx() {
     callbackType.getName().matches("PROTOCOL_CL_OPEN_AF_COMPLETE_EX")
   }
 }
 
 /** A NDIS protocol call manager register SAP complete callback routine. */
-class NdisProtocolClRegisterSapComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolClRegisterSapComplete extends NdisCallbackRoutine {
   NdisProtocolClRegisterSapComplete() {
     callbackType.getName().matches("PROTOCOL_CL_REGISTER_SAP_COMPLETE")
   }
 }
 
 /** A NDIS protocol connection manager activate VC complete callback routine. */
-class NdisProtocolCmActivateVcComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmActivateVcComplete extends NdisCallbackRoutine {
   NdisProtocolCmActivateVcComplete() {
     callbackType.getName().matches("PROTOCOL_CM_ACTIVATE_VC_COMPLETE")
   }
 }
 
 /** A NDIS protocol connection manager add party callback routine. */
-class NdisProtocolCmAddParty extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmAddParty extends NdisCallbackRoutine {
   NdisProtocolCmAddParty() { callbackType.getName().matches("PROTOCOL_CM_ADD_PARTY") }
 }
 
 /** A NDIS protocol connection manager close AF callback routine. */
-class NdisProtocolCmCloseAf extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmCloseAf extends NdisCallbackRoutine {
   NdisProtocolCmCloseAf() { callbackType.getName().matches("PROTOCOL_CM_CLOSE_AF") }
 }
 
 /** A NDIS protocol connection manager close call callback routine. */
-class NdisProtocolCmCloseCall extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmCloseCall extends NdisCallbackRoutine {
   NdisProtocolCmCloseCall() { callbackType.getName().matches("PROTOCOL_CM_CLOSE_CALL") }
 }
 
 /** A NDIS protocol connection manager deactivate VC complete callback routine. */
-class NdisProtocolCmDeactivateVcComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmDeactivateVcComplete extends NdisCallbackRoutine {
   NdisProtocolCmDeactivateVcComplete() {
     callbackType.getName().matches("PROTOCOL_CM_DEACTIVATE_VC_COMPLETE")
   }
 }
 
 /** A NDIS protocol connection manager deregister SAP callback routine. */
-class NdisProtocolCmDeregisterSap extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmDeregisterSap extends NdisCallbackRoutine {
   NdisProtocolCmDeregisterSap() { callbackType.getName().matches("PROTOCOL_CM_DEREGISTER_SAP") }
 }
 
 /** A NDIS protocol connection manager drop party callback routine. */
-class NdisProtocolCmDropParty extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmDropParty extends NdisCallbackRoutine {
   NdisProtocolCmDropParty() { callbackType.getName().matches("PROTOCOL_CM_DROP_PARTY") }
 }
 
 /** A NDIS protocol connection manager incoming call complete callback routine. */
-class NdisProtocolCmIncomingCallComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmIncomingCallComplete extends NdisCallbackRoutine {
   NdisProtocolCmIncomingCallComplete() {
     callbackType.getName().matches("PROTOCOL_CM_INCOMING_CALL_COMPLETE")
   }
 }
 
 /** A NDIS protocol connection manager make call callback routine. */
-class NdisProtocolCmMakeCall extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmMakeCall extends NdisCallbackRoutine {
   NdisProtocolCmMakeCall() { callbackType.getName().matches("PROTOCOL_CM_MAKE_CALL") }
 }
 
 /** A NDIS protocol connection manager modify QoS call callback routine. */
-class NdisProtocolCmModifyQosCall extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmModifyQosCall extends NdisCallbackRoutine {
   NdisProtocolCmModifyQosCall() { callbackType.getName().matches("PROTOCOL_CM_MODIFY_QOS_CALL") }
 }
 
 /** A NDIS protocol connection manager notify close AF complete callback routine. */
-class NdisProtocolCmNotifyCloseAfComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmNotifyCloseAfComplete extends NdisCallbackRoutine {
   NdisProtocolCmNotifyCloseAfComplete() {
     callbackType.getName().matches("PROTOCOL_CM_NOTIFY_CLOSE_AF_COMPLETE")
   }
 }
 
 /** A NDIS protocol connection manager open AF callback routine. */
-class NdisProtocolCmOpenAf extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmOpenAf extends NdisCallbackRoutine {
   NdisProtocolCmOpenAf() { callbackType.getName().matches("PROTOCOL_CM_OPEN_AF") }
 }
 
 /** A NDIS protocol connection manager register SAP callback routine. */
-class NdisProtocolCmRegSap extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCmRegSap extends NdisCallbackRoutine {
   NdisProtocolCmRegSap() { callbackType.getName().matches("PROTOCOL_CM_REG_SAP") }
 }
 
 /** A NDIS protocol CO AF register notify callback routine. */
-class NdisProtocolCoAfRegisterNotify extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCoAfRegisterNotify extends NdisCallbackRoutine {
   NdisProtocolCoAfRegisterNotify() {
     callbackType.getName().matches("PROTCOL_CO_AF_REGISTER_NOTIFY")
   }
 }
 
 /** A NDIS protocol CO create VC callback routine. */
-class NdisProtocolCoCreateVc extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCoCreateVc extends NdisCallbackRoutine {
   NdisProtocolCoCreateVc() { callbackType.getName().matches("PROTOCOL_CO_CREATE_VC") }
 }
 
 /** A NDIS protocol CO delete VC callback routine. */
-class NdisProtocolCoDeleteVc extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCoDeleteVc extends NdisCallbackRoutine {
   NdisProtocolCoDeleteVc() { callbackType.getName().matches("PROTOCOL_CO_DELETE_VC") }
 }
 
 /** A NDIS protocol CO OID request callback routine. */
-class NdisProtocolCoOidRequest extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCoOidRequest extends NdisCallbackRoutine {
   NdisProtocolCoOidRequest() { callbackType.getName().matches("PROTOCOL_CO_OID_REQUEST") }
 }
 
 /** A NDIS protocol CO OID request complete callback routine. */
-class NdisProtocolCoOidRequestComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCoOidRequestComplete extends NdisCallbackRoutine {
   NdisProtocolCoOidRequestComplete() {
     callbackType.getName().matches("PROTOCOL_CO_OID_REQUEST_COMPLETE")
   }
 }
 
 /** A NDIS protocol CO receive net buffer lists callback routine. */
-class NdisProtocolCoReceiveNetBufferLists extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCoReceiveNetBufferLists extends NdisCallbackRoutine {
   NdisProtocolCoReceiveNetBufferLists() {
     callbackType.getName().matches("PROTOCOL_CO_RECEIVE_NET_BUFFER_LISTS")
   }
 }
 
 /** A NDIS protocol CO send net buffer lists complete callback routine. */
-class NdisProtocolCoSendNetBufferListsComplete extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCoSendNetBufferListsComplete extends NdisCallbackRoutine {
   NdisProtocolCoSendNetBufferListsComplete() {
     callbackType.getName().matches("PROTOCOL_CO_SEND_NET_BUFFER_LISTS_COMPLETE")
   }
 }
 
 /** A NDIS protocol CO status ex callback routine. */
-class NdisProtocolCoStatusEx extends NdisCallbackRoutine, NdisRoleTypeFunction {
+class NdisProtocolCoStatusEx extends NdisCallbackRoutine {
   NdisProtocolCoStatusEx() { callbackType.getName().matches("PROTOCOL_CO_STATUS_EX") }
 }

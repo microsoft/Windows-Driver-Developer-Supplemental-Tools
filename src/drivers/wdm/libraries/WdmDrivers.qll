@@ -82,114 +82,8 @@ class WdmCallbackRoutine extends Function {
   }
 }
 
-/**
- * Similar to WdmCallbackRoutine, but specifically for Role Types. These are functions explicitly declared with a role type.
- */
-abstract class WdmRoleTypeFunction extends Function {
-  WdmRoleTypeType roleType;
-  int irqlLevel;
-
-  WdmRoleTypeFunction() {
-    exists(FunctionDeclarationEntry fde |
-      fde.getFunction() = this and
-      fde.getTypedefType() = roleType
-    ) and
-    if this instanceof IrqlRestrictsFunction
-    then irqlLevel = getAllowableIrqlLevel(this)
-    else irqlLevel = -1
-  }
-
-  int getExpectedIrqlLevelString() { result = irqlLevel }
-
-  string getRoleTypeString() { result = roleType.getName() }
-
-  WdmRoleTypeType getRoleTypeType() { result = roleType }
-}
-
-predicate hasRoleType(Function f) { f instanceof WdmRoleTypeFunction }
-
-predicate roleTypeAssignment(AssignExpr ae) {
-  exists(FunctionAccess fa |
-    ae.getRValue() = fa and
-    fa.getTarget() instanceof WdmDispatchRoutine
-  )
-  or
-  ae.getRValue() instanceof AssignExpr and
-  roleTypeAssignment(ae.getRValue().(AssignExpr))
-}
-
-class WdmDriverObjectFunctionAccess extends FunctionAccess {
-  WdmRoleTypeType rttExpected;
-
-  WdmDriverObjectFunctionAccess() {
-    exists(VariableAccess driverObjectAccess, AssignExpr driverObjectAssign |
-      driverObjectAccess.getTarget().getType().getName().matches("PDRIVER_OBJECT") and
-      this = driverObjectAssign.getRValue() and
-      rttExpected = driverObjectAssign.getLValue().getUnderlyingType().(PointerType).getBaseType()
-    )
-  }
-
-  WdmRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
-}
-
-class WdmDriverEntryPoint extends FunctionAccess {
-  WdmDriverEntryPoint() { this instanceof WdmDriverObjectFunctionAccess }
-}
-
-// declared functions that are used as if they have a role type, wether or not they do
-class WdmImplicitRoleTypeFunction extends Function {
-  WdmRoleTypeType rttExpected;
-  FunctionAccess funcUse;
-  int irqlLevelExpected;
-  int irqlLevelFound;
-
-  WdmImplicitRoleTypeFunction() {
-    (
-      exists(FunctionCall fc, int n | fc.getArgument(n) instanceof FunctionAccess |
-        this = fc.getArgument(n).(FunctionAccess).getTarget() and
-        fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-          WdmRoleTypeType and
-        rttExpected = fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() and
-        fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-          WdmRoleTypeType and
-        funcUse = fc.getArgument(n)
-      )
-      or
-      exists(WdmDriverObjectFunctionAccess funcAssign |
-        funcAssign.getTarget() = this and
-        rttExpected = funcAssign.getExpectedRoleTypeType() and
-        funcUse = funcAssign
-      )
-    ) and
-    (
-      if this instanceof IrqlRestrictsFunction
-      then irqlLevelFound = getAllowableIrqlLevel(this)
-      else irqlLevelFound = -1
-    ) and
-    if rttExpected instanceof IrqlAnnotatedTypedef
-    then irqlLevelExpected = getAlloweableIrqlLevel(rttExpected)
-    else irqlLevelExpected = -1
-  }
-
-  string getExpectedRoleTypeString() { result = rttExpected.toString() }
-
-  WdmRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
-
-  string getActualRoleTypeString() {
-    if this instanceof WdmRoleTypeFunction
-    then result = this.(WdmRoleTypeFunction).getRoleTypeType().toString()
-    else result = "<NO_ROLE_TYPE>"
-  }
-
-  int getExpectedIrqlLevel() { result = irqlLevelExpected }
-
-  int getFoundIrqlLevel() { result = irqlLevelFound }
-
-  FunctionAccess getFunctionUse() { result = funcUse }
-}
-
 /** A WDM DriverEntry callback routine. */
-class WdmDriverEntry extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverEntry extends WdmCallbackRoutine {
   WdmDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
@@ -198,7 +92,7 @@ class WdmDriverEntry extends WdmCallbackRoutine, WdmRoleTypeFunction {
 }
 
 /** A WDM DrierStartIo callback routine */
-class WdmDriverStartIo extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverStartIo extends WdmCallbackRoutine {
   WdmDriverStartIo() { callbackType.getName().matches("DRIVER_STARTIO") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
@@ -209,7 +103,7 @@ class WdmDriverStartIo extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverUnload callback routine.
  */
-class WdmDriverUnload extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverUnload extends WdmCallbackRoutine {
   WdmDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
@@ -220,7 +114,7 @@ class WdmDriverUnload extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverAddDevice callback routine.
  */
-class WdmDriverAddDevice extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverAddDevice extends WdmCallbackRoutine {
   WdmDriverAddDevice() { callbackType.getName().matches("DRIVER_ADD_DEVICE") }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
@@ -231,7 +125,7 @@ class WdmDriverAddDevice extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverDispatch callback routine.
  */
-class WdmDriverDispatch extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverDispatch extends WdmCallbackRoutine {
   WdmDriverDispatch() { callbackType.getName().matches("DRIVER_DISPATCH") }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
@@ -242,7 +136,7 @@ class WdmDriverDispatch extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM IO completion routine.
  */
-class WdmDriverCompletionRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverCompletionRoutine extends WdmCallbackRoutine {
   WdmDriverCompletionRoutine() { callbackType.getName().matches("IO_COMPLETION_ROUTINE") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL " }
@@ -253,7 +147,7 @@ class WdmDriverCompletionRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction
 /**
  * A WDM DriverCancel callback routine.
  */
-class WdmDriverCancel extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverCancel extends WdmCallbackRoutine {
   WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL " }
@@ -262,7 +156,7 @@ class WdmDriverCancel extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverDpcRoutine callback routine.
  */
-class WdmDriverDpcRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverDpcRoutine extends WdmCallbackRoutine {
   WdmDriverDpcRoutine() { callbackType.getName().matches("IO_DPC_ROUTINE") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
@@ -273,7 +167,7 @@ class WdmDriverDpcRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverDeferredRoutine callback routine.
  */
-class WdmDriverDeferredRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverDeferredRoutine extends WdmCallbackRoutine {
   WdmDriverDeferredRoutine() { callbackType.getName().matches("KDEFERRED_ROUTINE") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
@@ -284,7 +178,7 @@ class WdmDriverDeferredRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverServiceRoutine callback routine.
  */
-class WdmDriverServiceRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverServiceRoutine extends WdmCallbackRoutine {
   WdmDriverServiceRoutine() { callbackType.getName().matches("KSERVICE_ROUTINE") }
 
   string getExpectedMaxIrqlLevelString() { result = "DIRQL" }
@@ -295,7 +189,7 @@ class WdmDriverServiceRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverPowerComplete callback routine.
  */
-class WdmDriverPowerComplete extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverPowerComplete extends WdmCallbackRoutine {
   WdmDriverPowerComplete() { callbackType.getName().matches("REQUEST_POWER_COMPLETE") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL " }
@@ -306,7 +200,7 @@ class WdmDriverPowerComplete extends WdmCallbackRoutine, WdmRoleTypeFunction {
 /**
  * A WDM DriverWorkerThreadRoutine callback routine.
  */
-class WdmDriverWorkerThreadRoutine extends WdmCallbackRoutine, WdmRoleTypeFunction {
+class WdmDriverWorkerThreadRoutine extends WdmCallbackRoutine {
   WdmDriverWorkerThreadRoutine() { callbackType.getName().matches("WORKER_THREAD_ROUTINE") }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
@@ -342,7 +236,7 @@ class WdmDispatchRoutine extends WdmCallbackRoutine {
   WdmDispatchRoutine() {
     callbackType.getName().matches("DRIVER_DISPATCH") and
     exists(
-      CallbackRoutineAssignment cra, ArrayExpr dispatchTable, PointerFieldAccess fieldAccess,
+      WdmCallbackRoutineAssignment cra, ArrayExpr dispatchTable, PointerFieldAccess fieldAccess,
       VariableAccess driverObjectAccess
     |
       cra.getLValue() = dispatchTable and
@@ -369,7 +263,7 @@ class WdmDispatchRoutine extends WdmCallbackRoutine {
 }
 
 /** An assignment where the right-hand side is a WDM callback routine. */
-class CallbackRoutineAssignment extends AssignExpr {
+class WdmCallbackRoutineAssignment extends AssignExpr {
   /*
    * A common paradigm in dispatch routine setup is to chain assignments to cover multiple IRPs.
    * As such, it's necessary to recursively walk the assignment to handle cases such as
@@ -380,7 +274,7 @@ class CallbackRoutineAssignment extends AssignExpr {
    * predicate below, isCallbackRoutineAssignment.
    */
 
-  CallbackRoutineAssignment() { isCallbackRoutineAssignment(this) }
+  WdmCallbackRoutineAssignment() { isCallbackRoutineAssignment(this) }
 
   /** Gets the callback routine that this dispatch routine assignment is targeting. */
   cached

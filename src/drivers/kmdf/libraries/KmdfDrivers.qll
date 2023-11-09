@@ -126,627 +126,552 @@ class KmdfCallbackRoutineTypedef extends KmdfRoleTypeType {
   KmdfCallbackRoutineTypedef() { this.getFile().getBaseName().matches("%wdf.h") }
 }
 
-/**
- * KMDF RoleType Function
- */
-abstract class KmdfRoleTypeFunction extends Function {
-  KmdfRoleTypeType roleType;
-
-  KmdfRoleTypeFunction() {
-    exists(FunctionDeclarationEntry fde |
-      fde.getFunction() = this and
-      fde.getTypedefType() = roleType
-    )
-  }
-
-  string getRoleTypeString() { result = roleType.getName() }
-
-  KmdfRoleTypeType getRoleTypeType() { result = roleType }
-}
-
-
-
-class KmdfDriverObjectFunctionAccess extends FunctionAccess {
-  KmdfRoleTypeType rttExpected;
-
-  KmdfDriverObjectFunctionAccess() {
-    exists(VariableAccess driverObjectAccess, AssignExpr driverObjectAssign |
-      driverObjectAccess.getTarget().getType().getName().matches("PDRIVER_OBJECT") and
-      this = driverObjectAssign.getRValue() and
-      rttExpected = driverObjectAssign.getLValue().getUnderlyingType().(PointerType).getBaseType()
-    )
-  }
-
-  KmdfRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
-}
-
-class KmdfDriverEntryPoint extends FunctionAccess {
-  KmdfDriverEntryPoint() { this instanceof KmdfDriverObjectFunctionAccess }
-}
-
-
-// declared functions that are used as if they have a role type, wether or not they do
-class KmdfImplicitRoleTypeFunction extends Function {
-
-  KmdfRoleTypeType rttExpected;
-  FunctionAccess funcUse;
-  KmdfImplicitRoleTypeFunction() {
-    exists(FunctionCall fc ,  int n| fc.getArgument(n) instanceof FunctionAccess |
-      this = fc.getArgument(n).(FunctionAccess).getTarget() and
-      fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-        KmdfRoleTypeType and
-      rttExpected = fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() and
-      fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-        KmdfRoleTypeType
-      and funcUse = fc.getArgument(n)
-    )
-    or
-    exists(KmdfDriverObjectFunctionAccess funcAssign |
-      funcAssign.getTarget() = this and
-      rttExpected = funcAssign.getExpectedRoleTypeType()
-      and funcUse = funcAssign
-    )
-  }
-
-  string getExpectedRoleTypeString() { result = rttExpected.toString() }
-
-  KmdfRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
-
-  string getActualRoleTypeString() {
-    if this instanceof KmdfRoleTypeFunction
-    then result = this.(KmdfRoleTypeFunction).getRoleTypeType().toString()
-    else result = "<NO_ROLE_TYPE>"
-  }
-  FunctionAccess getFunctionUse() { result = funcUse }
-}
-
-
 
 /* Callbacks */
-class KmdfEVTWdfChildListCreateDevice extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListCreateDevice extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListCreateDevice() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_CREATE_DEVICE")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_CREATE_DEVICE")
   }
 }
 
-class KmdfEVTWdfChildListScanForChildren extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListScanForChildren extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListScanForChildren() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_SCAN_FOR_CHILDREN")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_SCAN_FOR_CHILDREN")
   }
 }
 
-class KmdfEVTWdfChildListIdentificationDescriptionCopy extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListIdentificationDescriptionCopy extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListIdentificationDescriptionCopy() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_COPY")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_COPY")
   }
 }
 
-class KmdfEVTWdfChildListIdentificationDescriptionDuplicate extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListIdentificationDescriptionDuplicate extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListIdentificationDescriptionDuplicate() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_DUPLICATE")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_DUPLICATE")
   }
 }
 
-class KmdfEVTWdfChildListIdentificationDescriptionCompare extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListIdentificationDescriptionCompare extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListIdentificationDescriptionCompare() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_COMPARE")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_COMPARE")
   }
 }
 
-class KmdfEVTWdfChildListIdentificationDescriptionCleanup extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListIdentificationDescriptionCleanup extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListIdentificationDescriptionCleanup() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_CLEANUP")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_CLEANUP")
   }
 }
 
-class KmdfEVTWdfChildListAddressDescriptionCopy extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListAddressDescriptionCopy extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListAddressDescriptionCopy() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_ADDRESS_DESCRIPTION_COPY")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_ADDRESS_DESCRIPTION_COPY")
   }
 }
 
-class KmdfEVTWdfChildListAddressDescriptionDuplicate extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListAddressDescriptionDuplicate extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListAddressDescriptionDuplicate() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_ADDRESS_DESCRIPTION_DUPLICATE")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_ADDRESS_DESCRIPTION_DUPLICATE")
   }
 }
 
-class KmdfEVTWdfChildListAddressDescriptionCleanup extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListAddressDescriptionCleanup extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListAddressDescriptionCleanup() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_ADDRESS_DESCRIPTION_CLEANUP")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_ADDRESS_DESCRIPTION_CLEANUP")
   }
 }
 
-class KmdfEVTWdfChildListDeviceReenumerated extends KmdfRoleTypeFunction {
+class KmdfEVTWdfChildListDeviceReenumerated extends KmdfCallbackRoutine {
   KmdfEVTWdfChildListDeviceReenumerated() {
-    roleType.getName().matches("EVT_WDF_CHILD_LIST_DEVICE_REENUMERATED")
+    callbackType.getName().matches("EVT_WDF_CHILD_LIST_DEVICE_REENUMERATED")
   }
 }
 
-class KmdfEVTWdfDeviceShutdownNotification extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceShutdownNotification extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceShutdownNotification() {
-    roleType.getName().matches("EVT_WDF_DEVICE_SHUTDOWN_NOTIFICATION")
+    callbackType.getName().matches("EVT_WDF_DEVICE_SHUTDOWN_NOTIFICATION")
   }
 }
 
-class KmdfEVTWdfDeviceFileCreate extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceFileCreate() { roleType.getName().matches("EVT_WDF_DEVICE_FILE_CREATE") }
+class KmdfEVTWdfDeviceFileCreate extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceFileCreate() { callbackType.getName().matches("EVT_WDF_DEVICE_FILE_CREATE") }
 }
 
-class KmdfEVTWdfFileClose extends KmdfRoleTypeFunction {
-  KmdfEVTWdfFileClose() { roleType.getName().matches("EVT_WDF_FILE_CLOSE") }
+class KmdfEVTWdfFileClose extends KmdfCallbackRoutine {
+  KmdfEVTWdfFileClose() { callbackType.getName().matches("EVT_WDF_FILE_CLOSE") }
 }
 
-class KmdfEVTWdfFileCleanup extends KmdfRoleTypeFunction {
-  KmdfEVTWdfFileCleanup() { roleType.getName().matches("EVT_WDF_FILE_CLEANUP") }
+class KmdfEVTWdfFileCleanup extends KmdfCallbackRoutine {
+  KmdfEVTWdfFileCleanup() { callbackType.getName().matches("EVT_WDF_FILE_CLEANUP") }
 }
 
-class KmdfEVTWdfDevicePnpStateChangeNotification extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDevicePnpStateChangeNotification extends KmdfCallbackRoutine {
   KmdfEVTWdfDevicePnpStateChangeNotification() {
-    roleType.getName().matches("EVT_WDF_DEVICE_PNP_STATE_CHANGE_NOTIFICATION")
+    callbackType.getName().matches("EVT_WDF_DEVICE_PNP_STATE_CHANGE_NOTIFICATION")
   }
 }
 
-class KmdfEVTWdfDevicePowerStateChangeNotification extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDevicePowerStateChangeNotification extends KmdfCallbackRoutine {
   KmdfEVTWdfDevicePowerStateChangeNotification() {
-    roleType.getName().matches("EVT_WDF_DEVICE_POWER_STATE_CHANGE_NOTIFICATION")
+    callbackType.getName().matches("EVT_WDF_DEVICE_POWER_STATE_CHANGE_NOTIFICATION")
   }
 }
 
-class KmdfEVTWdfDevicePowerPolicyStateChangeNotification extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDevicePowerPolicyStateChangeNotification extends KmdfCallbackRoutine {
   KmdfEVTWdfDevicePowerPolicyStateChangeNotification() {
-    roleType.getName().matches("EVT_WDF_DEVICE_POWER_POLICY_STATE_CHANGE_NOTIFICATION")
+    callbackType.getName().matches("EVT_WDF_DEVICE_POWER_POLICY_STATE_CHANGE_NOTIFICATION")
   }
 }
 
-class KmdfEVTWdfDeviceD0Entry extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceD0Entry() { roleType.getName().matches("EVT_WDF_DEVICE_D0_ENTRY") }
+class KmdfEVTWdfDeviceD0Entry extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceD0Entry() { callbackType.getName().matches("EVT_WDF_DEVICE_D0_ENTRY") }
 }
 
-class KmdfEVTWdfDeviceD0EntryPostInterruptsEnabled extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceD0EntryPostInterruptsEnabled extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceD0EntryPostInterruptsEnabled() {
-    roleType.getName().matches("EVT_WDF_DEVICE_D0_ENTRY_POST_INTERRUPTS_ENABLED")
+    callbackType.getName().matches("EVT_WDF_DEVICE_D0_ENTRY_POST_INTERRUPTS_ENABLED")
   }
 }
 
-class KmdfEVTWdfDeviceD0EntryPostHardwareEnabled extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceD0EntryPostHardwareEnabled extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceD0EntryPostHardwareEnabled() {
-    roleType.getName().matches("EVT_WDF_DEVICE_D0_ENTRY_POST_HARDWARE_ENABLED")
+    callbackType.getName().matches("EVT_WDF_DEVICE_D0_ENTRY_POST_HARDWARE_ENABLED")
   }
 }
 
-class KmdfEVTWdfDeviceD0Exit extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceD0Exit() { roleType.getName().matches("EVT_WDF_DEVICE_D0_EXIT") }
+class KmdfEVTWdfDeviceD0Exit extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceD0Exit() { callbackType.getName().matches("EVT_WDF_DEVICE_D0_EXIT") }
 }
 
-class KmdfEVTWdfDeviceD0ExitPreInterruptsDisabled extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceD0ExitPreInterruptsDisabled extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceD0ExitPreInterruptsDisabled() {
-    roleType.getName().matches("EVT_WDF_DEVICE_D0_EXIT_PRE_INTERRUPTS_DISABLED")
+    callbackType.getName().matches("EVT_WDF_DEVICE_D0_EXIT_PRE_INTERRUPTS_DISABLED")
   }
 }
 
-class KmdfEVTWdfDeviceD0ExitPreHardwareDisabled extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceD0ExitPreHardwareDisabled extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceD0ExitPreHardwareDisabled() {
-    roleType.getName().matches("EVT_WDF_DEVICE_D0_EXIT_PRE_HARDWARE_DISABLED")
+    callbackType.getName().matches("EVT_WDF_DEVICE_D0_EXIT_PRE_HARDWARE_DISABLED")
   }
 }
 
-class KmdfEVTWdfDevicePrepareHardware extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDevicePrepareHardware extends KmdfCallbackRoutine {
   KmdfEVTWdfDevicePrepareHardware() {
-    roleType.getName().matches("EVT_WDF_DEVICE_PREPARE_HARDWARE")
+    callbackType.getName().matches("EVT_WDF_DEVICE_PREPARE_HARDWARE")
   }
 }
 
-class KmdfEVTWdfDeviceReleaseHardware extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceReleaseHardware extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceReleaseHardware() {
-    roleType.getName().matches("EVT_WDF_DEVICE_RELEASE_HARDWARE")
+    callbackType.getName().matches("EVT_WDF_DEVICE_RELEASE_HARDWARE")
   }
 }
 
-class KmdfEVTWdfDeviceSelfManagedIoCleanup extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceSelfManagedIoCleanup extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceSelfManagedIoCleanup() {
-    roleType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_CLEANUP")
+    callbackType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_CLEANUP")
   }
 }
 
-class KmdfEVTWdfDeviceSelfManagedIoFlush extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceSelfManagedIoFlush extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceSelfManagedIoFlush() {
-    roleType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_FLUSH")
+    callbackType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_FLUSH")
   }
 }
 
-class KmdfEVTWdfDeviceSelfManagedIoInit extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceSelfManagedIoInit extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceSelfManagedIoInit() {
-    roleType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT")
+    callbackType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_INIT")
   }
 }
 
-class KmdfEVTWdfDeviceSelfManagedIoSuspend extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceSelfManagedIoSuspend extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceSelfManagedIoSuspend() {
-    roleType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_SUSPEND")
+    callbackType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_SUSPEND")
   }
 }
 
-class KmdfEVTWdfDeviceSelfManagedIoRestart extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceSelfManagedIoRestart extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceSelfManagedIoRestart() {
-    roleType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_RESTART")
+    callbackType.getName().matches("EVT_WDF_DEVICE_SELF_MANAGED_IO_RESTART")
   }
 }
 
-class KmdfEVTWdfDeviceQueryStop extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceQueryStop() { roleType.getName().matches("EVT_WDF_DEVICE_QUERY_STOP") }
+class KmdfEVTWdfDeviceQueryStop extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceQueryStop() { callbackType.getName().matches("EVT_WDF_DEVICE_QUERY_STOP") }
 }
 
-class KmdfEVTWdfDeviceQueryRemove extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceQueryRemove() { roleType.getName().matches("EVT_WDF_DEVICE_QUERY_REMOVE") }
+class KmdfEVTWdfDeviceQueryRemove extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceQueryRemove() { callbackType.getName().matches("EVT_WDF_DEVICE_QUERY_REMOVE") }
 }
 
-class KmdfEVTWdfDeviceSurpriseRemoval extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceSurpriseRemoval extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceSurpriseRemoval() {
-    roleType.getName().matches("EVT_WDF_DEVICE_SURPRISE_REMOVAL")
+    callbackType.getName().matches("EVT_WDF_DEVICE_SURPRISE_REMOVAL")
   }
 }
 
-class KmdfEVTWdfDeviceUsageNotification extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceUsageNotification extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceUsageNotification() {
-    roleType.getName().matches("EVT_WDF_DEVICE_USAGE_NOTIFICATION")
+    callbackType.getName().matches("EVT_WDF_DEVICE_USAGE_NOTIFICATION")
   }
 }
 
-class KmdfEVTWdfDeviceUsageNotificationEx extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceUsageNotificationEx extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceUsageNotificationEx() {
-    roleType.getName().matches("EVT_WDF_DEVICE_USAGE_NOTIFICATION_EX")
+    callbackType.getName().matches("EVT_WDF_DEVICE_USAGE_NOTIFICATION_EX")
   }
 }
 
-class KmdfEVTWdfDeviceRelationsQuery extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceRelationsQuery() { roleType.getName().matches("EVT_WDF_DEVICE_RELATIONS_QUERY") }
+class KmdfEVTWdfDeviceRelationsQuery extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceRelationsQuery() { callbackType.getName().matches("EVT_WDF_DEVICE_RELATIONS_QUERY") }
 }
 
-class KmdfEVTWdfDeviceArmWakeFromS0 extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceArmWakeFromS0() { roleType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_S0") }
+class KmdfEVTWdfDeviceArmWakeFromS0 extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceArmWakeFromS0() { callbackType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_S0") }
 }
 
-class KmdfEVTWdfDeviceArmWakeFromSx extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceArmWakeFromSx() { roleType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_SX") }
+class KmdfEVTWdfDeviceArmWakeFromSx extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceArmWakeFromSx() { callbackType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_SX") }
 }
 
-class KmdfEVTWdfDeviceArmWakeFromSxWithReason extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceArmWakeFromSxWithReason extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceArmWakeFromSxWithReason() {
-    roleType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_SX_WITH_REASON")
+    callbackType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_SX_WITH_REASON")
   }
 }
 
-class KmdfEVTWdfDeviceDisarmWakeFromS0 extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceDisarmWakeFromS0 extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceDisarmWakeFromS0() {
-    roleType.getName().matches("EVT_WDF_DEVICE_DISARM_WAKE_FROM_S0")
+    callbackType.getName().matches("EVT_WDF_DEVICE_DISARM_WAKE_FROM_S0")
   }
 }
 
-class KmdfEVTWdfDeviceDisarmWakeFromSx extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceDisarmWakeFromSx extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceDisarmWakeFromSx() {
-    roleType.getName().matches("EVT_WDF_DEVICE_DISARM_WAKE_FROM_SX")
+    callbackType.getName().matches("EVT_WDF_DEVICE_DISARM_WAKE_FROM_SX")
   }
 }
 
-class KmdfEVTWdfDeviceWakeFromS0Triggered extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceWakeFromS0Triggered extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceWakeFromS0Triggered() {
-    roleType.getName().matches("EVT_WDF_DEVICE_WAKE_FROM_S0_TRIGGERED")
+    callbackType.getName().matches("EVT_WDF_DEVICE_WAKE_FROM_S0_TRIGGERED")
   }
 }
 
-class KmdfEVTWdfDeviceWakeFromSxTriggered extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceWakeFromSxTriggered extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceWakeFromSxTriggered() {
-    roleType.getName().matches("EVT_WDF_DEVICE_WAKE_FROM_SX_TRIGGERED")
+    callbackType.getName().matches("EVT_WDF_DEVICE_WAKE_FROM_SX_TRIGGERED")
   }
 }
 
-class KmdfEVTWdfdeviceWdmIrpPreprocess extends KmdfRoleTypeFunction {
+class KmdfEVTWdfdeviceWdmIrpPreprocess extends KmdfCallbackRoutine {
   KmdfEVTWdfdeviceWdmIrpPreprocess() {
-    roleType.getName().matches("EVT_WDFDEVICE_WDM_IRP_PREPROCESS")
+    callbackType.getName().matches("EVT_WDFDEVICE_WDM_IRP_PREPROCESS")
   }
 }
 
-class KmdfEVTWdfdeviceWdmIrpDispatch extends KmdfRoleTypeFunction {
-  KmdfEVTWdfdeviceWdmIrpDispatch() { roleType.getName().matches("EVT_WDFDEVICE_WDM_IRP_DISPATCH") }
+class KmdfEVTWdfdeviceWdmIrpDispatch extends KmdfCallbackRoutine {
+  KmdfEVTWdfdeviceWdmIrpDispatch() { callbackType.getName().matches("EVT_WDFDEVICE_WDM_IRP_DISPATCH") }
 }
 
-class KmdfEVTWdfIoInCallerContext extends KmdfRoleTypeFunction {
-  KmdfEVTWdfIoInCallerContext() { roleType.getName().matches("EVT_WDF_IO_IN_CALLER_CONTEXT") }
+class KmdfEVTWdfIoInCallerContext extends KmdfCallbackRoutine {
+  KmdfEVTWdfIoInCallerContext() { callbackType.getName().matches("EVT_WDF_IO_IN_CALLER_CONTEXT") }
 }
 
-class KmdfEVTWdfdeviceWdmPostPoFxRegisterDevice extends KmdfRoleTypeFunction {
+class KmdfEVTWdfdeviceWdmPostPoFxRegisterDevice extends KmdfCallbackRoutine {
   KmdfEVTWdfdeviceWdmPostPoFxRegisterDevice() {
-    roleType.getName().matches("EVT_WDFDEVICE_WDM_POST_PO_FX_REGISTER_DEVICE")
+    callbackType.getName().matches("EVT_WDFDEVICE_WDM_POST_PO_FX_REGISTER_DEVICE")
   }
 }
 
-class KmdfEVTWdfdeviceWdmPrePoFxUnregisterDevice extends KmdfRoleTypeFunction {
+class KmdfEVTWdfdeviceWdmPrePoFxUnregisterDevice extends KmdfCallbackRoutine {
   KmdfEVTWdfdeviceWdmPrePoFxUnregisterDevice() {
-    roleType.getName().matches("EVT_WDFDEVICE_WDM_PRE_PO_FX_UNREGISTER_DEVICE")
+    callbackType.getName().matches("EVT_WDFDEVICE_WDM_PRE_PO_FX_UNREGISTER_DEVICE")
   }
 }
 
-class KmdfEVTWdfDmaEnablerFill extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDmaEnablerFill() { roleType.getName().matches("EVT_WDF_DMA_ENABLER_FILL") }
+class KmdfEVTWdfDmaEnablerFill extends KmdfCallbackRoutine {
+  KmdfEVTWdfDmaEnablerFill() { callbackType.getName().matches("EVT_WDF_DMA_ENABLER_FILL") }
 }
 
-class KmdfEVTWdfDmaEnablerFlush extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDmaEnablerFlush() { roleType.getName().matches("EVT_WDF_DMA_ENABLER_FLUSH") }
+class KmdfEVTWdfDmaEnablerFlush extends KmdfCallbackRoutine {
+  KmdfEVTWdfDmaEnablerFlush() { callbackType.getName().matches("EVT_WDF_DMA_ENABLER_FLUSH") }
 }
 
-class KmdfEVTWdfDmaEnablerEnable extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDmaEnablerEnable() { roleType.getName().matches("EVT_WDF_DMA_ENABLER_ENABLE") }
+class KmdfEVTWdfDmaEnablerEnable extends KmdfCallbackRoutine {
+  KmdfEVTWdfDmaEnablerEnable() { callbackType.getName().matches("EVT_WDF_DMA_ENABLER_ENABLE") }
 }
 
-class KmdfEVTWdfDmaEnablerDisable extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDmaEnablerDisable() { roleType.getName().matches("EVT_WDF_DMA_ENABLER_DISABLE") }
+class KmdfEVTWdfDmaEnablerDisable extends KmdfCallbackRoutine {
+  KmdfEVTWdfDmaEnablerDisable() { callbackType.getName().matches("EVT_WDF_DMA_ENABLER_DISABLE") }
 }
 
-class KmdfEVTWdfDmaEnablerSelfmanagedIoStart extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDmaEnablerSelfmanagedIoStart extends KmdfCallbackRoutine {
   KmdfEVTWdfDmaEnablerSelfmanagedIoStart() {
-    roleType.getName().matches("EVT_WDF_DMA_ENABLER_SELFMANAGED_IO_START")
+    callbackType.getName().matches("EVT_WDF_DMA_ENABLER_SELFMANAGED_IO_START")
   }
 }
 
-class KmdfEVTWdfDmaEnablerSelfmanagedIoStop extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDmaEnablerSelfmanagedIoStop extends KmdfCallbackRoutine {
   KmdfEVTWdfDmaEnablerSelfmanagedIoStop() {
-    roleType.getName().matches("EVT_WDF_DMA_ENABLER_SELFMANAGED_IO_STOP")
+    callbackType.getName().matches("EVT_WDF_DMA_ENABLER_SELFMANAGED_IO_STOP")
   }
 }
 
-class KmdfEVTWdfProgramDma extends KmdfRoleTypeFunction {
-  KmdfEVTWdfProgramDma() { roleType.getName().matches("EVT_WDF_PROGRAM_DMA") }
+class KmdfEVTWdfProgramDma extends KmdfCallbackRoutine {
+  KmdfEVTWdfProgramDma() { callbackType.getName().matches("EVT_WDF_PROGRAM_DMA") }
 }
 
-class KmdfEVTWdfDmaTransactionConfigureDmaChannel extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDmaTransactionConfigureDmaChannel extends KmdfCallbackRoutine {
   KmdfEVTWdfDmaTransactionConfigureDmaChannel() {
-    roleType.getName().matches("EVT_WDF_DMA_TRANSACTION_CONFIGURE_DMA_CHANNEL")
+    callbackType.getName().matches("EVT_WDF_DMA_TRANSACTION_CONFIGURE_DMA_CHANNEL")
   }
 }
 
-class KmdfEVTWdfDmaTransactionDmaTransferComplete extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDmaTransactionDmaTransferComplete extends KmdfCallbackRoutine {
   KmdfEVTWdfDmaTransactionDmaTransferComplete() {
-    roleType.getName().matches("EVT_WDF_DMA_TRANSACTION_DMA_TRANSFER_COMPLETE")
+    callbackType.getName().matches("EVT_WDF_DMA_TRANSACTION_DMA_TRANSFER_COMPLETE")
   }
 }
 
-class KmdfEVTWdfReserveDma extends KmdfRoleTypeFunction {
-  KmdfEVTWdfReserveDma() { roleType.getName().matches("EVT_WDF_RESERVE_DMA") }
+class KmdfEVTWdfReserveDma extends KmdfCallbackRoutine {
+  KmdfEVTWdfReserveDma() { callbackType.getName().matches("EVT_WDF_RESERVE_DMA") }
 }
 
-class KmdfEVTWdfDpc extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDpc() { roleType.getName().matches("EVT_WDF_DPC") }
+class KmdfEVTWdfDpc extends KmdfCallbackRoutine {
+  KmdfEVTWdfDpc() { callbackType.getName().matches("EVT_WDF_DPC") }
 }
 
-class KmdfEVTWdfDriverDeviceAdd extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDriverDeviceAdd() { roleType.getName().matches("EVT_WDF_DRIVER_DEVICE_ADD") }
+class KmdfEVTWdfDriverDeviceAdd extends KmdfCallbackRoutine {
+  KmdfEVTWdfDriverDeviceAdd() { callbackType.getName().matches("EVT_WDF_DRIVER_DEVICE_ADD") }
 }
 
-class KmdfEVTWdfDriverUnload extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDriverUnload() { roleType.getName().matches("EVT_WDF_DRIVER_UNLOAD") }
+class KmdfEVTWdfDriverUnload extends KmdfCallbackRoutine {
+  KmdfEVTWdfDriverUnload() { callbackType.getName().matches("EVT_WDF_DRIVER_UNLOAD") }
 }
 
-class KmdfEVTWdfTraceCallback extends KmdfRoleTypeFunction {
-  KmdfEVTWdfTraceCallback() { roleType.getName().matches("EVT_WDF_TRACE_CALLBACK") }
+class KmdfEVTWdfTraceCallback extends KmdfCallbackRoutine {
+  KmdfEVTWdfTraceCallback() { callbackType.getName().matches("EVT_WDF_TRACE_CALLBACK") }
 }
 
-class KmdfEVTWdfDeviceFilterResourceRequirements extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceFilterResourceRequirements extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceFilterResourceRequirements() {
-    roleType.getName().matches("EVT_WDF_DEVICE_FILTER_RESOURCE_REQUIREMENTS")
+    callbackType.getName().matches("EVT_WDF_DEVICE_FILTER_RESOURCE_REQUIREMENTS")
   }
 }
 
-class KmdfEVTWdfDeviceRemoveAddedResources extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceRemoveAddedResources extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceRemoveAddedResources() {
-    roleType.getName().matches("EVT_WDF_DEVICE_REMOVE_ADDED_RESOURCES")
+    callbackType.getName().matches("EVT_WDF_DEVICE_REMOVE_ADDED_RESOURCES")
   }
 }
 
-class KmdfEVTWdfInterruptIsr extends KmdfRoleTypeFunction {
-  KmdfEVTWdfInterruptIsr() { roleType.getName().matches("EVT_WDF_INTERRUPT_ISR") }
+class KmdfEVTWdfInterruptIsr extends KmdfCallbackRoutine {
+  KmdfEVTWdfInterruptIsr() { callbackType.getName().matches("EVT_WDF_INTERRUPT_ISR") }
 }
 
-class KmdfEVTWdfInterruptSynchronize extends KmdfRoleTypeFunction {
-  KmdfEVTWdfInterruptSynchronize() { roleType.getName().matches("EVT_WDF_INTERRUPT_SYNCHRONIZE") }
+class KmdfEVTWdfInterruptSynchronize extends KmdfCallbackRoutine {
+  KmdfEVTWdfInterruptSynchronize() { callbackType.getName().matches("EVT_WDF_INTERRUPT_SYNCHRONIZE") }
 }
 
-class KmdfEVTWdfInterruptDpc extends KmdfRoleTypeFunction {
-  KmdfEVTWdfInterruptDpc() { roleType.getName().matches("EVT_WDF_INTERRUPT_DPC") }
+class KmdfEVTWdfInterruptDpc extends KmdfCallbackRoutine {
+  KmdfEVTWdfInterruptDpc() { callbackType.getName().matches("EVT_WDF_INTERRUPT_DPC") }
 }
 
-class KmdfEVTWdfInterruptWorkitem extends KmdfRoleTypeFunction {
-  KmdfEVTWdfInterruptWorkitem() { roleType.getName().matches("EVT_WDF_INTERRUPT_WORKITEM") }
+class KmdfEVTWdfInterruptWorkitem extends KmdfCallbackRoutine {
+  KmdfEVTWdfInterruptWorkitem() { callbackType.getName().matches("EVT_WDF_INTERRUPT_WORKITEM") }
 }
 
-class KmdfEVTWdfInterruptEnable extends KmdfRoleTypeFunction {
-  KmdfEVTWdfInterruptEnable() { roleType.getName().matches("EVT_WDF_INTERRUPT_ENABLE") }
+class KmdfEVTWdfInterruptEnable extends KmdfCallbackRoutine {
+  KmdfEVTWdfInterruptEnable() { callbackType.getName().matches("EVT_WDF_INTERRUPT_ENABLE") }
 }
 
-class KmdfEVTWdfInterruptDisable extends KmdfRoleTypeFunction {
-  KmdfEVTWdfInterruptDisable() { roleType.getName().matches("EVT_WDF_INTERRUPT_DISABLE") }
+class KmdfEVTWdfInterruptDisable extends KmdfCallbackRoutine {
+  KmdfEVTWdfInterruptDisable() { callbackType.getName().matches("EVT_WDF_INTERRUPT_DISABLE") }
 }
 
-class KmdfEVTWdfIoQueueIoDefault extends KmdfRoleTypeFunction {
-  KmdfEVTWdfIoQueueIoDefault() { roleType.getName().matches("EVT_WDF_IO_QUEUE_IO_DEFAULT") }
+class KmdfEVTWdfIoQueueIoDefault extends KmdfCallbackRoutine {
+  KmdfEVTWdfIoQueueIoDefault() { callbackType.getName().matches("EVT_WDF_IO_QUEUE_IO_DEFAULT") }
 }
 
-class KmdfEVTWdfIoQueueIoStop extends KmdfRoleTypeFunction {
-  KmdfEVTWdfIoQueueIoStop() { roleType.getName().matches("EVT_WDF_IO_QUEUE_IO_STOP") }
+class KmdfEVTWdfIoQueueIoStop extends KmdfCallbackRoutine {
+  KmdfEVTWdfIoQueueIoStop() { callbackType.getName().matches("EVT_WDF_IO_QUEUE_IO_STOP") }
 }
 
-class KmdfEVTWdfIoQueueIoResume extends KmdfRoleTypeFunction {
-  KmdfEVTWdfIoQueueIoResume() { roleType.getName().matches("EVT_WDF_IO_QUEUE_IO_RESUME") }
+class KmdfEVTWdfIoQueueIoResume extends KmdfCallbackRoutine {
+  KmdfEVTWdfIoQueueIoResume() { callbackType.getName().matches("EVT_WDF_IO_QUEUE_IO_RESUME") }
 }
 
-class KmdfEVTWdfIoQueueIoRead extends KmdfRoleTypeFunction {
-  KmdfEVTWdfIoQueueIoRead() { roleType.getName().matches("EVT_WDF_IO_QUEUE_IO_READ") }
+class KmdfEVTWdfIoQueueIoRead extends KmdfCallbackRoutine {
+  KmdfEVTWdfIoQueueIoRead() { callbackType.getName().matches("EVT_WDF_IO_QUEUE_IO_READ") }
 }
 
-class KmdfEVTWdfIoQueueIoWrite extends KmdfRoleTypeFunction {
-  KmdfEVTWdfIoQueueIoWrite() { roleType.getName().matches("EVT_WDF_IO_QUEUE_IO_WRITE") }
+class KmdfEVTWdfIoQueueIoWrite extends KmdfCallbackRoutine {
+  KmdfEVTWdfIoQueueIoWrite() { callbackType.getName().matches("EVT_WDF_IO_QUEUE_IO_WRITE") }
 }
 
-class KmdfEVTWdfIoQueueIoDeviceControl extends KmdfRoleTypeFunction {
+class KmdfEVTWdfIoQueueIoDeviceControl extends KmdfCallbackRoutine {
   KmdfEVTWdfIoQueueIoDeviceControl() {
-    roleType.getName().matches("EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL")
+    callbackType.getName().matches("EVT_WDF_IO_QUEUE_IO_DEVICE_CONTROL")
   }
 }
 
-class KmdfEVTWdfIoQueueIoInternalDeviceControl extends KmdfRoleTypeFunction {
+class KmdfEVTWdfIoQueueIoInternalDeviceControl extends KmdfCallbackRoutine {
   KmdfEVTWdfIoQueueIoInternalDeviceControl() {
-    roleType.getName().matches("EVT_WDF_IO_QUEUE_IO_INTERNAL_DEVICE_CONTROL")
+    callbackType.getName().matches("EVT_WDF_IO_QUEUE_IO_INTERNAL_DEVICE_CONTROL")
   }
 }
 
-class KmdfEVTWdfIoQueueIoCanceledOnQueue extends KmdfRoleTypeFunction {
+class KmdfEVTWdfIoQueueIoCanceledOnQueue extends KmdfCallbackRoutine {
   KmdfEVTWdfIoQueueIoCanceledOnQueue() {
-    roleType.getName().matches("EVT_WDF_IO_QUEUE_IO_CANCELED_ON_QUEUE")
+    callbackType.getName().matches("EVT_WDF_IO_QUEUE_IO_CANCELED_ON_QUEUE")
   }
 }
 
-class KmdfEVTWdfIoQueueState extends KmdfRoleTypeFunction {
-  KmdfEVTWdfIoQueueState() { roleType.getName().matches("EVT_WDF_IO_QUEUE_STATE") }
+class KmdfEVTWdfIoQueueState extends KmdfCallbackRoutine {
+  KmdfEVTWdfIoQueueState() { callbackType.getName().matches("EVT_WDF_IO_QUEUE_STATE") }
 }
 
-class KmdfEVTWdfIoAllocateResourcesForReservedRequest extends KmdfRoleTypeFunction {
+class KmdfEVTWdfIoAllocateResourcesForReservedRequest extends KmdfCallbackRoutine {
   KmdfEVTWdfIoAllocateResourcesForReservedRequest() {
-    roleType.getName().matches("EVT_WDF_IO_ALLOCATE_RESOURCES_FOR_RESERVED_REQUEST")
+    callbackType.getName().matches("EVT_WDF_IO_ALLOCATE_RESOURCES_FOR_RESERVED_REQUEST")
   }
 }
 
-class KmdfEVTWdfIoAllocateRequestResources extends KmdfRoleTypeFunction {
+class KmdfEVTWdfIoAllocateRequestResources extends KmdfCallbackRoutine {
   KmdfEVTWdfIoAllocateRequestResources() {
-    roleType.getName().matches("EVT_WDF_IO_ALLOCATE_REQUEST_RESOURCES")
+    callbackType.getName().matches("EVT_WDF_IO_ALLOCATE_REQUEST_RESOURCES")
   }
 }
 
-class KmdfEVTWdfIoWdmIrpForForwardProgress extends KmdfRoleTypeFunction {
+class KmdfEVTWdfIoWdmIrpForForwardProgress extends KmdfCallbackRoutine {
   KmdfEVTWdfIoWdmIrpForForwardProgress() {
-    roleType.getName().matches("EVT_WDF_IO_WDM_IRP_FOR_FORWARD_PROGRESS")
+    callbackType.getName().matches("EVT_WDF_IO_WDM_IRP_FOR_FORWARD_PROGRESS")
   }
 }
 
-class KmdfEVTWdfIoTargetQueryRemove extends KmdfRoleTypeFunction {
-  KmdfEVTWdfIoTargetQueryRemove() { roleType.getName().matches("EVT_WDF_IO_TARGET_QUERY_REMOVE") }
+class KmdfEVTWdfIoTargetQueryRemove extends KmdfCallbackRoutine {
+  KmdfEVTWdfIoTargetQueryRemove() { callbackType.getName().matches("EVT_WDF_IO_TARGET_QUERY_REMOVE") }
 }
 
-class KmdfEVTWdfIoTargetRemoveCanceled extends KmdfRoleTypeFunction {
+class KmdfEVTWdfIoTargetRemoveCanceled extends KmdfCallbackRoutine {
   KmdfEVTWdfIoTargetRemoveCanceled() {
-    roleType.getName().matches("EVT_WDF_IO_TARGET_REMOVE_CANCELED")
+    callbackType.getName().matches("EVT_WDF_IO_TARGET_REMOVE_CANCELED")
   }
 }
 
-class KmdfEVTWdfIoTargetRemoveComplete extends KmdfRoleTypeFunction {
+class KmdfEVTWdfIoTargetRemoveComplete extends KmdfCallbackRoutine {
   KmdfEVTWdfIoTargetRemoveComplete() {
-    roleType.getName().matches("EVT_WDF_IO_TARGET_REMOVE_COMPLETE")
+    callbackType.getName().matches("EVT_WDF_IO_TARGET_REMOVE_COMPLETE")
   }
 }
 
-class KmdfEVTWdfObjectContextCleanup extends KmdfRoleTypeFunction {
-  KmdfEVTWdfObjectContextCleanup() { roleType.getName().matches("EVT_WDF_OBJECT_CONTEXT_CLEANUP") }
+class KmdfEVTWdfObjectContextCleanup extends KmdfCallbackRoutine {
+  KmdfEVTWdfObjectContextCleanup() { callbackType.getName().matches("EVT_WDF_OBJECT_CONTEXT_CLEANUP") }
 }
 
-class KmdfEVTWdfObjectContextDestroy extends KmdfRoleTypeFunction {
-  KmdfEVTWdfObjectContextDestroy() { roleType.getName().matches("EVT_WDF_OBJECT_CONTEXT_DESTROY") }
+class KmdfEVTWdfObjectContextDestroy extends KmdfCallbackRoutine {
+  KmdfEVTWdfObjectContextDestroy() { callbackType.getName().matches("EVT_WDF_OBJECT_CONTEXT_DESTROY") }
 }
 
-class KmdfEVTWdfDeviceResourcesQuery extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceResourcesQuery() { roleType.getName().matches("EVT_WDF_DEVICE_RESOURCES_QUERY") }
+class KmdfEVTWdfDeviceResourcesQuery extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceResourcesQuery() { callbackType.getName().matches("EVT_WDF_DEVICE_RESOURCES_QUERY") }
 }
 
-class KmdfEVTWdfDeviceResourceRequirementsQuery extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceResourceRequirementsQuery extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceResourceRequirementsQuery() {
-    roleType.getName().matches("EVT_WDF_DEVICE_RESOURCE_REQUIREMENTS_QUERY")
+    callbackType.getName().matches("EVT_WDF_DEVICE_RESOURCE_REQUIREMENTS_QUERY")
   }
 }
 
-class KmdfEVTWdfDeviceEject extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceEject() { roleType.getName().matches("EVT_WDF_DEVICE_EJECT") }
+class KmdfEVTWdfDeviceEject extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceEject() { callbackType.getName().matches("EVT_WDF_DEVICE_EJECT") }
 }
 
-class KmdfEVTWdfDeviceSetLock extends KmdfRoleTypeFunction {
-  KmdfEVTWdfDeviceSetLock() { roleType.getName().matches("EVT_WDF_DEVICE_SET_LOCK") }
+class KmdfEVTWdfDeviceSetLock extends KmdfCallbackRoutine {
+  KmdfEVTWdfDeviceSetLock() { callbackType.getName().matches("EVT_WDF_DEVICE_SET_LOCK") }
 }
 
-class KmdfEVTWdfDeviceEnableWakeAtBus extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceEnableWakeAtBus extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceEnableWakeAtBus() {
-    roleType.getName().matches("EVT_WDF_DEVICE_ENABLE_WAKE_AT_BUS")
+    callbackType.getName().matches("EVT_WDF_DEVICE_ENABLE_WAKE_AT_BUS")
   }
 }
 
-class KmdfEVTWdfDeviceDisableWakeAtBus extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceDisableWakeAtBus extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceDisableWakeAtBus() {
-    roleType.getName().matches("EVT_WDF_DEVICE_DISABLE_WAKE_AT_BUS")
+    callbackType.getName().matches("EVT_WDF_DEVICE_DISABLE_WAKE_AT_BUS")
   }
 }
 
-class KmdfEVTWdfDeviceReportedMissing extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceReportedMissing extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceReportedMissing() {
-    roleType.getName().matches("EVT_WDF_DEVICE_REPORTED_MISSING")
+    callbackType.getName().matches("EVT_WDF_DEVICE_REPORTED_MISSING")
   }
 }
 
-class KmdfEVTWdfDeviceProcessQueryInterfaceRequest extends KmdfRoleTypeFunction {
+class KmdfEVTWdfDeviceProcessQueryInterfaceRequest extends KmdfCallbackRoutine {
   KmdfEVTWdfDeviceProcessQueryInterfaceRequest() {
-    roleType.getName().matches("EVT_WDF_DEVICE_PROCESS_QUERY_INTERFACE_REQUEST")
+    callbackType.getName().matches("EVT_WDF_DEVICE_PROCESS_QUERY_INTERFACE_REQUEST")
   }
 }
 
-class KmdfEVTWdfRequestCancel extends KmdfRoleTypeFunction {
-  KmdfEVTWdfRequestCancel() { roleType.getName().matches("EVT_WDF_REQUEST_CANCEL") }
+class KmdfEVTWdfRequestCancel extends KmdfCallbackRoutine {
+  KmdfEVTWdfRequestCancel() { callbackType.getName().matches("EVT_WDF_REQUEST_CANCEL") }
 }
 
-class KmdfEVTWdfRequestCompletionRoutine extends KmdfRoleTypeFunction {
+class KmdfEVTWdfRequestCompletionRoutine extends KmdfCallbackRoutine {
   KmdfEVTWdfRequestCompletionRoutine() {
-    roleType.getName().matches("EVT_WDF_REQUEST_COMPLETION_ROUTINE")
+    callbackType.getName().matches("EVT_WDF_REQUEST_COMPLETION_ROUTINE")
   }
 }
 
-class KmdfEVTWdfTimer extends KmdfRoleTypeFunction {
-  KmdfEVTWdfTimer() { roleType.getName().matches("EVT_WDF_TIMER") }
+class KmdfEVTWdfTimer extends KmdfCallbackRoutine {
+  KmdfEVTWdfTimer() { callbackType.getName().matches("EVT_WDF_TIMER") }
 }
 
-class KmdfEVTWdfUsbReaderCompletionRoutine extends KmdfRoleTypeFunction {
+class KmdfEVTWdfUsbReaderCompletionRoutine extends KmdfCallbackRoutine {
   KmdfEVTWdfUsbReaderCompletionRoutine() {
-    roleType.getName().matches("EVT_WDF_USB_READER_COMPLETION_ROUTINE")
+    callbackType.getName().matches("EVT_WDF_USB_READER_COMPLETION_ROUTINE")
   }
 }
 
-class KmdfEVTWdfUsbReadersFailed extends KmdfRoleTypeFunction {
-  KmdfEVTWdfUsbReadersFailed() { roleType.getName().matches("EVT_WDF_USB_READERS_FAILED") }
+class KmdfEVTWdfUsbReadersFailed extends KmdfCallbackRoutine {
+  KmdfEVTWdfUsbReadersFailed() { callbackType.getName().matches("EVT_WDF_USB_READERS_FAILED") }
 }
 
-class KmdfEVTWdfWmiInstanceQueryInstance extends KmdfRoleTypeFunction {
+class KmdfEVTWdfWmiInstanceQueryInstance extends KmdfCallbackRoutine {
   KmdfEVTWdfWmiInstanceQueryInstance() {
-    roleType.getName().matches("EVT_WDF_WMI_INSTANCE_QUERY_INSTANCE")
+    callbackType.getName().matches("EVT_WDF_WMI_INSTANCE_QUERY_INSTANCE")
   }
 }
 
-class KmdfEVTWdfWmiInstanceSetInstance extends KmdfRoleTypeFunction {
+class KmdfEVTWdfWmiInstanceSetInstance extends KmdfCallbackRoutine {
   KmdfEVTWdfWmiInstanceSetInstance() {
-    roleType.getName().matches("EVT_WDF_WMI_INSTANCE_SET_INSTANCE")
+    callbackType.getName().matches("EVT_WDF_WMI_INSTANCE_SET_INSTANCE")
   }
 }
 
-class KmdfEVTWdfWmiInstanceSetItem extends KmdfRoleTypeFunction {
-  KmdfEVTWdfWmiInstanceSetItem() { roleType.getName().matches("EVT_WDF_WMI_INSTANCE_SET_ITEM") }
+class KmdfEVTWdfWmiInstanceSetItem extends KmdfCallbackRoutine {
+  KmdfEVTWdfWmiInstanceSetItem() { callbackType.getName().matches("EVT_WDF_WMI_INSTANCE_SET_ITEM") }
 }
 
-class KmdfEVTWdfWmiInstanceExecuteMethod extends KmdfRoleTypeFunction {
+class KmdfEVTWdfWmiInstanceExecuteMethod extends KmdfCallbackRoutine {
   KmdfEVTWdfWmiInstanceExecuteMethod() {
-    roleType.getName().matches("EVT_WDF_WMI_INSTANCE_EXECUTE_METHOD")
+    callbackType.getName().matches("EVT_WDF_WMI_INSTANCE_EXECUTE_METHOD")
   }
 }
 
-class KmdfEVTWdfWmiProviderFunctionControl extends KmdfRoleTypeFunction {
+class KmdfEVTWdfWmiProviderFunctionControl extends KmdfCallbackRoutine {
   KmdfEVTWdfWmiProviderFunctionControl() {
-    roleType.getName().matches("EVT_WDF_WMI_PROVIDER_FUNCTION_CONTROL")
+    callbackType.getName().matches("EVT_WDF_WMI_PROVIDER_FUNCTION_CONTROL")
   }
 }
 
-class KmdfEVTWdfWorkitem extends KmdfRoleTypeFunction {
-  KmdfEVTWdfWorkitem() { roleType.getName().matches("EVT_WDF_WORKITEM") }
+class KmdfEVTWdfWorkitem extends KmdfCallbackRoutine {
+  KmdfEVTWdfWorkitem() { callbackType.getName().matches("EVT_WDF_WORKITEM") }
 }
 
 /**

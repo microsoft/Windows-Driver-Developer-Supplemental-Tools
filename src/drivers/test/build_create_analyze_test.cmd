@@ -31,7 +31,7 @@ call :test IrqlNotSaved WDMTestTemplate general queries
 call :test IllegalFieldWrite WDMTestTemplate wdm queries
 call :test IllegalFieldAccess2 WDMTestTemplate wdm queries
 call :test WdmRoleTypeCorrectlyUsed WDMTestTemplate wdm queries
-call :test KmdfRoleTypeCorrectlyUsed KMDFTestTemplate kmdf queries\experimental
+call :test KmdfRoleTypeCorrectlyUsed KMDFTestTemplate kmdf queries
 
 exit /b 0
 
