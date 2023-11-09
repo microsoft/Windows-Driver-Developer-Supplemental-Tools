@@ -9,7 +9,6 @@
 import cpp
 import drivers.libraries.SAL
 
-
 /** An assignment where the right-hand side is a NDIS callback routine. */
 class CallbackRoutineAssignment extends AssignExpr {
   /*
@@ -63,24 +62,24 @@ private predicate isCallbackRoutineAssignment(AssignExpr ae) {
 class StorportRoleTypeType extends TypedefType {
   StorportRoleTypeType() {
     (
-    this.getName().matches("sp_DRIVER_INITIALIZE") or
-    this.getName().matches("HW_INITIALIZE") or
-    this.getName().matches("HW_BUILDIO") or
-    this.getName().matches("HW_STARTIO") or
-    this.getName().matches("HW_INTERRUPT") or
-    this.getName().matches("HW_TIMER") or
-    this.getName().matches("HW_FIND_ADAPTER") or
-    this.getName().matches("HW_RESET_BUS") or
-    this.getName().matches("HW_ADAPTER_CONTROL") or
-    this.getName().matches("HW_PASSIVE_INITIALIZE_ROUTINE") or
-    this.getName().matches("HW_DPC_ROUTINE") or
-    this.getName().matches("HW_FREE_ADAPTER_RESOURCES") or
-    this.getName().matches("HW_PROCESS_SERVICE_REQUEST") or
-    this.getName().matches("HW_COMPLETE_SERVICE_IRP") or
-    this.getName().matches("HW_INITIALIZE_TRACING") or
-    this.getName().matches("HW_CLEANUP_TRACING") or
-    this.getName().matches("VIRTUAL_HW_FIND_ADAPTER") or
-    this.getName().matches("HW_MESSAGE_SIGNALED_INTERRUPT_ROUTINE") 
+      this.getName().matches("sp_DRIVER_INITIALIZE") or
+      this.getName().matches("HW_INITIALIZE") or
+      this.getName().matches("HW_BUILDIO") or
+      this.getName().matches("HW_STARTIO") or
+      this.getName().matches("HW_INTERRUPT") or
+      this.getName().matches("HW_TIMER") or
+      this.getName().matches("HW_FIND_ADAPTER") or
+      this.getName().matches("HW_RESET_BUS") or
+      this.getName().matches("HW_ADAPTER_CONTROL") or
+      this.getName().matches("HW_PASSIVE_INITIALIZE_ROUTINE") or
+      this.getName().matches("HW_DPC_ROUTINE") or
+      this.getName().matches("HW_FREE_ADAPTER_RESOURCES") or
+      this.getName().matches("HW_PROCESS_SERVICE_REQUEST") or
+      this.getName().matches("HW_COMPLETE_SERVICE_IRP") or
+      this.getName().matches("HW_INITIALIZE_TRACING") or
+      this.getName().matches("HW_CLEANUP_TRACING") or
+      this.getName().matches("VIRTUAL_HW_FIND_ADAPTER") or
+      this.getName().matches("HW_MESSAGE_SIGNALED_INTERRUPT_ROUTINE")
     )
   }
 }
@@ -182,8 +181,6 @@ class StorportImplicitRoleTypeFunction extends Function {
   FunctionAccess getFunctionUse() { result = funcUse }
 }
 
-
-
 /** A Storport protocol Driver Initialize callback routine. */
 class StorportDriverInitialize extends StorportCallbackRoutine, StorportRoleTypeFunction {
   StorportDriverInitialize() { callbackType.getName().matches("sp_DRIVER_INITIALIZE") }
@@ -231,7 +228,9 @@ class StorportHwAdapterControl extends StorportCallbackRoutine, StorportRoleType
 
 /** A Storport protocol Hardware Passive Initialize callback routine. */
 class StorportHwPassiveInitializeRoutine extends StorportCallbackRoutine, StorportRoleTypeFunction {
-  StorportHwPassiveInitializeRoutine() { callbackType.getName().matches("HW_PASSIVE_INITIALIZE_ROUTINE") }
+  StorportHwPassiveInitializeRoutine() {
+    callbackType.getName().matches("HW_PASSIVE_INITIALIZE_ROUTINE")
+  }
 }
 
 /** A Storport protocol Hardware DPC callback routine. */
@@ -270,17 +269,15 @@ class StorportVirtualHwFindAdapter extends StorportCallbackRoutine, StorportRole
 }
 
 /** A Storport protocol Hardware Message Signaled Interrupt callback routine. */
-class StorportHwMessageSignaledInterruptRoutine extends StorportCallbackRoutine, StorportRoleTypeFunction {
-  StorportHwMessageSignaledInterruptRoutine() { callbackType.getName().matches("HW_MESSAGE_SIGNALED_INTERRUPT_ROUTINE") }
+class StorportHwMessageSignaledInterruptRoutine extends StorportCallbackRoutine,
+  StorportRoleTypeFunction
+{
+  StorportHwMessageSignaledInterruptRoutine() {
+    callbackType.getName().matches("HW_MESSAGE_SIGNALED_INTERRUPT_ROUTINE")
+  }
 }
 
 /** A Storport protocol Driver Unload callback routine. */
 class StorportDriverUnload extends StorportCallbackRoutine, StorportRoleTypeFunction {
   StorportDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
 }
-
-
-
-
-
-

@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/ndis-role-type-correctly-used
+ * @id cpp/drivers/storport-role-type-correctly-used
  * @kind problem
  * @name Incorrect Role Type Use
  * @description A function is declared with a role type but used as an argument in a function that expects a different role type for that argument.
@@ -19,10 +19,10 @@
  */
 
 import cpp
-import drivers.ndis.libraries.NdisDrivers
+import drivers.storport.libraries.StorportDrivers
 import semmle.code.cpp.TypedefType
 
-from NdisImplicitRoleTypeFunction irtf
+from StorportImplicitRoleTypeFunction irtf
 where
   irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() 
 select irtf.getFunctionUse(),
