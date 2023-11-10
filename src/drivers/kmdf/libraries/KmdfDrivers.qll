@@ -118,14 +118,20 @@ class KmdfRoleTypeType extends TypedefType {
     this.getName().matches("EVT_WDF_WMI_INSTANCE_SET_ITEM") or
     this.getName().matches("EVT_WDF_WMI_INSTANCE_EXECUTE_METHOD") or
     this.getName().matches("EVT_WDF_WMI_PROVIDER_FUNCTION_CONTROL") or
-    this.getName().matches("EVT_WDF_WORKITEM")
+    this.getName().matches("EVT_WDF_WORKITEM") or
+    // extras from wdfroletypes.h
+    this.getName().matches("EVT_WDF_DEVICE_CONTEXT_CLEANUP") or
+    this.getName().matches("EVT_WDF_DEVICE_CONTEXT_DESTROY") or
+    this.getName().matches("EVT_WDF_IO_QUEUE_CONTEXT_CLEANUP_CALLBACK") or
+    this.getName().matches("EVT_WDF_IO_QUEUE_CONTEXT_DESTROY_CALLBACK") or
+    this.getName().matches("EVT_WDF_FILE_CONTEXT_CLEANUP_CALLBACK") or
+    this.getName().matches("EVT_WDF_FILE_CONTEXT_DESTROY_CALLBACK")
   }
 }
 
 class KmdfCallbackRoutineTypedef extends KmdfRoleTypeType {
   KmdfCallbackRoutineTypedef() { this.getFile().getBaseName().matches("%wdf.h") }
 }
-
 
 /* Callbacks */
 class KmdfEVTWdfChildListCreateDevice extends KmdfCallbackRoutine {
@@ -325,15 +331,21 @@ class KmdfEVTWdfDeviceUsageNotificationEx extends KmdfCallbackRoutine {
 }
 
 class KmdfEVTWdfDeviceRelationsQuery extends KmdfCallbackRoutine {
-  KmdfEVTWdfDeviceRelationsQuery() { callbackType.getName().matches("EVT_WDF_DEVICE_RELATIONS_QUERY") }
+  KmdfEVTWdfDeviceRelationsQuery() {
+    callbackType.getName().matches("EVT_WDF_DEVICE_RELATIONS_QUERY")
+  }
 }
 
 class KmdfEVTWdfDeviceArmWakeFromS0 extends KmdfCallbackRoutine {
-  KmdfEVTWdfDeviceArmWakeFromS0() { callbackType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_S0") }
+  KmdfEVTWdfDeviceArmWakeFromS0() {
+    callbackType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_S0")
+  }
 }
 
 class KmdfEVTWdfDeviceArmWakeFromSx extends KmdfCallbackRoutine {
-  KmdfEVTWdfDeviceArmWakeFromSx() { callbackType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_SX") }
+  KmdfEVTWdfDeviceArmWakeFromSx() {
+    callbackType.getName().matches("EVT_WDF_DEVICE_ARM_WAKE_FROM_SX")
+  }
 }
 
 class KmdfEVTWdfDeviceArmWakeFromSxWithReason extends KmdfCallbackRoutine {
@@ -373,7 +385,9 @@ class KmdfEVTWdfdeviceWdmIrpPreprocess extends KmdfCallbackRoutine {
 }
 
 class KmdfEVTWdfdeviceWdmIrpDispatch extends KmdfCallbackRoutine {
-  KmdfEVTWdfdeviceWdmIrpDispatch() { callbackType.getName().matches("EVT_WDFDEVICE_WDM_IRP_DISPATCH") }
+  KmdfEVTWdfdeviceWdmIrpDispatch() {
+    callbackType.getName().matches("EVT_WDFDEVICE_WDM_IRP_DISPATCH")
+  }
 }
 
 class KmdfEVTWdfIoInCallerContext extends KmdfCallbackRoutine {
@@ -473,7 +487,9 @@ class KmdfEVTWdfInterruptIsr extends KmdfCallbackRoutine {
 }
 
 class KmdfEVTWdfInterruptSynchronize extends KmdfCallbackRoutine {
-  KmdfEVTWdfInterruptSynchronize() { callbackType.getName().matches("EVT_WDF_INTERRUPT_SYNCHRONIZE") }
+  KmdfEVTWdfInterruptSynchronize() {
+    callbackType.getName().matches("EVT_WDF_INTERRUPT_SYNCHRONIZE")
+  }
 }
 
 class KmdfEVTWdfInterruptDpc extends KmdfCallbackRoutine {
@@ -553,7 +569,9 @@ class KmdfEVTWdfIoWdmIrpForForwardProgress extends KmdfCallbackRoutine {
 }
 
 class KmdfEVTWdfIoTargetQueryRemove extends KmdfCallbackRoutine {
-  KmdfEVTWdfIoTargetQueryRemove() { callbackType.getName().matches("EVT_WDF_IO_TARGET_QUERY_REMOVE") }
+  KmdfEVTWdfIoTargetQueryRemove() {
+    callbackType.getName().matches("EVT_WDF_IO_TARGET_QUERY_REMOVE")
+  }
 }
 
 class KmdfEVTWdfIoTargetRemoveCanceled extends KmdfCallbackRoutine {
@@ -569,15 +587,21 @@ class KmdfEVTWdfIoTargetRemoveComplete extends KmdfCallbackRoutine {
 }
 
 class KmdfEVTWdfObjectContextCleanup extends KmdfCallbackRoutine {
-  KmdfEVTWdfObjectContextCleanup() { callbackType.getName().matches("EVT_WDF_OBJECT_CONTEXT_CLEANUP") }
+  KmdfEVTWdfObjectContextCleanup() {
+    callbackType.getName().matches("EVT_WDF_OBJECT_CONTEXT_CLEANUP")
+  }
 }
 
 class KmdfEVTWdfObjectContextDestroy extends KmdfCallbackRoutine {
-  KmdfEVTWdfObjectContextDestroy() { callbackType.getName().matches("EVT_WDF_OBJECT_CONTEXT_DESTROY") }
+  KmdfEVTWdfObjectContextDestroy() {
+    callbackType.getName().matches("EVT_WDF_OBJECT_CONTEXT_DESTROY")
+  }
 }
 
 class KmdfEVTWdfDeviceResourcesQuery extends KmdfCallbackRoutine {
-  KmdfEVTWdfDeviceResourcesQuery() { callbackType.getName().matches("EVT_WDF_DEVICE_RESOURCES_QUERY") }
+  KmdfEVTWdfDeviceResourcesQuery() {
+    callbackType.getName().matches("EVT_WDF_DEVICE_RESOURCES_QUERY")
+  }
 }
 
 class KmdfEVTWdfDeviceResourceRequirementsQuery extends KmdfCallbackRoutine {

@@ -19,10 +19,10 @@
  */
 
 import cpp
-import drivers.wdm.libraries.WdmDrivers
+import drivers.libraries.RoleTypes
 import semmle.code.cpp.TypedefType
 
-from WdmImplicitRoleTypeFunction irtf
+from ImplicitRoleTypeFunction irtf
 where
   irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() 
 select irtf,

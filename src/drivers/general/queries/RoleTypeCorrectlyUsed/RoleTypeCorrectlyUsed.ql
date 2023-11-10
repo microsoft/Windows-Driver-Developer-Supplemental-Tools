@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/kmdf-role-type-correctly-used
+ * @id cpp/drivers/role-type-correctly-used
  * @kind problem
  * @name Incorrect Role Type Use
  * @description A function is declared with a role type but used as an argument in a function that expects a different role type for that argument.
@@ -24,9 +24,9 @@ import semmle.code.cpp.TypedefType
 
 from ImplicitRoleTypeFunction irtf
 where
-  irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() 
-select irtf.getFunctionUse(),
+   irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() 
+select irtf,
 "Function " + irtf.toString() +" declared with role type " +irtf.getActualRoleTypeString().toString() +
-" but role type " + irtf.getExpectedRoleTypeString().toString() + " is expected."
+" but role type " + irtf.getExpectedRoleTypeString().toString() + " is expected." 
 
 

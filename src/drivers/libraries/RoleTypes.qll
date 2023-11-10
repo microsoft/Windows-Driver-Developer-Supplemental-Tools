@@ -3,18 +3,80 @@ import drivers.libraries.SAL
 import drivers.libraries.Irql
 import drivers.wdm.libraries.WdmDrivers
 import drivers.kmdf.libraries.KmdfDrivers
-import drivers.ndis.libraries.NdisDrivers 
-import drivers.storport.libraries.StorportDrivers 
+import drivers.ndis.libraries.NdisDrivers
+import drivers.storport.libraries.StorportDrivers
+
 /**
  * Generic role type for WDM,KMDF, and others
  */
 class RoleTypeType extends TypedefType {
   RoleTypeType() {
     this instanceof WdmRoleTypeType or
-    this instanceof KmdfRoleTypeType or 
+    this instanceof KmdfRoleTypeType or
     this instanceof NdisRoleTypeType or
     this instanceof StorportRoleTypeType
   }
+}
+
+/**
+ * Standard IRQL annotations which apply to entire functions and manipulate or constrain the IRQL.
+ */
+class RoleTypeFunctionAnnotation extends SALAnnotation {
+  string roleType;
+  string roleTypeName;
+
+  RoleTypeFunctionAnnotation() {
+    (
+      this.getMacroName()
+          .matches([
+              "_Function_class_"
+            ]) and
+      roleType = this.getUnexpandedArgument(0)
+    ) and
+    roleTypeName = this.getMacroName()
+  }
+
+  /** Returns the raw text of the IRQL value used in this annotation. */
+  string getRoleTypeString() { result = roleType }
+
+  /** Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.) */
+  string getRoleTypeMacroName() { result = roleTypeName }
+}
+/** A typedef that has IRQL annotations applied to it. */
+class RoleTypeAnnotatedTypedef extends TypedefType {
+  RoleTypeFunctionAnnotation roleTypeAnnotation;
+
+  RoleTypeAnnotatedTypedef() { roleTypeAnnotation.getTypedefDeclarations() = this }
+
+  RoleTypeFunctionAnnotation getRoleTypeAnnotation() { result = roleTypeAnnotation }
+}
+/**
+ * A function that is annotated to specify role type
+ */
+cached
+class RoleTypeAnnotatedFunction extends Function {
+  RoleTypeFunctionAnnotation roleTypeAnnotation;
+
+  cached
+  RoleTypeAnnotatedFunction() {
+    (exists(FunctionDeclarationEntry fde |
+      fde = this.getADeclarationEntry() and
+      roleTypeAnnotation.getDeclarationEntry() = fde
+    )
+    or
+    exists(FunctionDeclarationEntry fde |
+      fde.getFunction() = this and
+      fde.getTypedefType().(RoleTypeAnnotatedTypedef).getRoleTypeAnnotation() = roleTypeAnnotation
+    )) 
+
+  }
+
+  cached 
+  string getFuncRoleTypeAnnotation() { result = roleTypeAnnotation.getRoleTypeMacroName() }
+  
+  cached
+  RoleTypeFunctionAnnotation getRoleTypeAnnotation() { result = roleTypeAnnotation }
+
 }
 
 /** */
@@ -23,9 +85,16 @@ class RoleTypeFunction extends Function {
   int irqlLevel;
 
   RoleTypeFunction() {
-    exists(FunctionDeclarationEntry fde |
-      fde.getFunction() = this and
-      fde.getTypedefType() = roleType
+    (
+      exists(FunctionDeclarationEntry fde |
+        (
+          fde.getFunction() = this and
+          fde.getTypedefType() = roleType
+        )
+      )
+      or
+      this instanceof RoleTypeAnnotatedFunction
+      and roleType.getName() = this.(RoleTypeAnnotatedFunction).getRoleTypeAnnotation().getRoleTypeString()
     ) and
     if this instanceof IrqlRestrictsFunction
     then irqlLevel = getAllowableIrqlLevel(this)
@@ -36,7 +105,7 @@ class RoleTypeFunction extends Function {
 
   string getRoleTypeString() { result = roleType.getName() }
 
-  WdmRoleTypeType getRoleTypeType() { result = roleType }
+  RoleTypeType getRoleTypeType() { result = roleType }
 }
 
 /** */
@@ -114,15 +183,13 @@ class ImplicitRoleTypeFunction extends Function {
   FunctionAccess getFunctionUse() { result = funcUse }
 }
 
-
 /** Predicates */
-
 predicate roleTypeAssignment(AssignExpr ae) {
-    exists(FunctionAccess fa |
-      ae.getRValue() = fa and
-      fa.getTarget() instanceof WdmDispatchRoutine
-    )
-    or
-    ae.getRValue() instanceof AssignExpr and
-    roleTypeAssignment(ae.getRValue().(AssignExpr))
-  }
+  exists(FunctionAccess fa |
+    ae.getRValue() = fa and
+    fa.getTarget() instanceof WdmDispatchRoutine
+  )
+  or
+  ae.getRValue() instanceof AssignExpr and
+  roleTypeAssignment(ae.getRValue().(AssignExpr))
+}
