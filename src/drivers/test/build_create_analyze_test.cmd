@@ -31,6 +31,8 @@ call :test IrqlNotSaved WDMTestTemplate general queries
 call :test IllegalFieldWrite WDMTestTemplate wdm queries
 call :test IllegalFieldAccess2 WDMTestTemplate wdm queries
 call :test RoutineFunctionTypeNotExpected WDMTestTemplate general queries
+call :test KeSetEventIrql WDMTestTemplate general queries\experimental
+call :test KeSetEventPaged WDMTestTemplate general queries
 
 exit /b 0
 
