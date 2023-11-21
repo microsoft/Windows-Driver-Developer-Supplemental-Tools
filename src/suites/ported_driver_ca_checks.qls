@@ -10,6 +10,7 @@
       - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
       - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
+      - drivers/general/queries/RoutineFunctionTypeNotExpected/RoutineFunctionTypeNotExpected.ql
       - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
       - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
       - drivers/kmdf/queries/StrSafe/StrSafe.ql

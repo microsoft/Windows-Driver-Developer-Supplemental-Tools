@@ -24,33 +24,33 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/ke-set-event-irql",
-          "name" : "cpp/drivers/ke-set-event-irql",
+          "id" : "cpp/drivers/ke-set-event-pageable",
+          "name" : "cpp/drivers/ke-set-event-pageable",
           "shortDescription" : {
-            "text" : "KeSetEvent called in paged segment with wait"
+            "text" : "KeSetEvent called in pageable segment with wait"
           },
           "fullDescription" : {
-            "text" : "Calles to KeSetEvent in a paged segment must not call with the Wait parameter set to true. This can cause a system crash if the segment is paged out."
+            "text" : "Calls to KeSetEvent in a pageable segment must not call with the Wait parameter set to true. This can cause a system crash if the segment is paged out."
           },
           "defaultConfiguration" : {
             "enabled" : true,
-            "level" : "warning"
+            "level" : "error"
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "Calles to KeSetEvent in a paged segment must not call with the Wait parameter set to true.  This can cause a system crash if the segment is paged out.",
+            "description" : "Calls to KeSetEvent in a pageable segment must not call with the Wait parameter set to true.  This can cause a system crash if the segment is paged out.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/ke-set-event-irql",
+            "id" : "cpp/drivers/ke-set-event-pageable",
             "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "KeSetEvent called in paged segment with wait",
+            "name" : "KeSetEvent called in pageable segment with wait",
             "opaqueid" : "CQLD-D0004",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
-            "precision" : "medium",
-            "problem.severity" : "warning",
+            "precision" : "high",
+            "problem.severity" : "error",
             "query-version" : "v1",
-            "repro.text" : "The following call to KeSetEvent has Wait set to true while in a paged segment.",
+            "repro.text" : "The following call to KeSetEvent has Wait set to true while in a pageable segment.",
             "scope" : "domainspecific",
             "security.severity" : "Low"
           }
@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+234ee9b709196a3a802b2c02ad7945ba0dfb0ac0",
+        "semanticVersion" : "0.2.0+143fe74d66f4093412a7b21390672217b557bba2",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -165,14 +165,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/ke-set-event-irql",
+      "ruleId" : "cpp/drivers/ke-set-event-pageable",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/ke-set-event-irql",
+        "id" : "cpp/drivers/ke-set-event-pageable",
         "index" : 0
       },
       "message" : {
-        "text" : "[KeSetEventIrql_Fail2](1): KeSetEvent should not be called with the Wait parameter set to true when in a paged function."
+        "text" : "[KeSetEventIrql_Fail2](1): KeSetEvent should not be called with the Wait parameter set to true when in a pageable segment."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -211,14 +211,14 @@
         }
       } ]
     }, {
-      "ruleId" : "cpp/drivers/ke-set-event-irql",
+      "ruleId" : "cpp/drivers/ke-set-event-pageable",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/ke-set-event-irql",
+        "id" : "cpp/drivers/ke-set-event-pageable",
         "index" : 0
       },
       "message" : {
-        "text" : "[KeSetEventIrql_Fail1](1): KeSetEvent should not be called with the Wait parameter set to true when in a paged function."
+        "text" : "[KeSetEventIrql_Fail1](1): KeSetEvent should not be called with the Wait parameter set to true when in a pageable segment."
       },
       "locations" : [ {
         "physicalLocation" : {
