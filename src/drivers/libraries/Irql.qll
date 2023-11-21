@@ -29,7 +29,7 @@ class IrqlMacro extends Macro {
   cached
   IrqlMacro() {
     this.getName().matches("%_LEVEL") and
-    this.getFile().getBaseName().matches("wdm.h") and
+    this.getFile().getBaseName() = "wdm.h" and
     this.getBody().toInt() = irqlLevelAsInt and
     irqlLevelAsInt >= 0 and
     irqlLevelAsInt <= 31
@@ -72,7 +72,7 @@ class IrqlSavesGlobalAnnotation extends SALAnnotation {
   cached
   IrqlSavesGlobalAnnotation() {
     // Needs to include other function and parameter annotations too
-    this.getMacroName().matches(["__drv_savesIRQLGlobal", "_IRQL_saves_global_"]) and
+    this.getMacroName() = ["__drv_savesIRQLGlobal", "_IRQL_saves_global_"] and
     irqlMacroInvocation.getParentInvocation() = this
   }
 }
@@ -85,8 +85,20 @@ class IrqlRestoresGlobalAnnotation extends SALAnnotation {
   cached
   IrqlRestoresGlobalAnnotation() {
     // Needs to include other function and parameter annotations too
-    this.getMacroName().matches(["__drv_restoresIRQLGlobal", "_IRQL_restores_global_"]) and
+    this.getMacroName() = ["__drv_restoresIRQLGlobal", "_IRQL_restores_global_"] and
     irqlMacroInvocation.getParentInvocation() = this
+  }
+}
+
+class PerfTestAnnotation extends SALAnnotation {
+  PerfTestAnnotation() {
+    this.getMacroName() =
+      [
+        "__drv_requiresIRQL", "_IRQL_requires_", "_drv_minIRQL", "_IRQL_requires_min_",
+        "_drv_maxIRQL", "_IRQL_requires_max_", "__drv_raisesIRQL", "_IRQL_raises_",
+        "__drv_maxFunctionIRQL", "_IRQL_always_function_max_", "__drv_minFunctionIRQL",
+        "_IRQL_always_function_min_"
+      ]
   }
 }
 
@@ -101,18 +113,18 @@ class IrqlFunctionAnnotation extends SALAnnotation {
   cached
   IrqlFunctionAnnotation() {
     (
-      this.getMacroName()
-          .matches([
-              "__drv_requiresIRQL", "_IRQL_requires_", "_drv_minIRQL", "_IRQL_requires_min_",
-              "_drv_maxIRQL", "_IRQL_requires_max_", "__drv_raisesIRQL", "_IRQL_raises_",
-              "__drv_maxFunctionIRQL", "_IRQL_always_function_max_", "__drv_minFunctionIRQL",
-              "_IRQL_always_function_min_"
-            ]) and
+      this.getMacroName() =
+        [
+          "__drv_requiresIRQL", "_IRQL_requires_", "_drv_minIRQL", "_IRQL_requires_min_",
+          "_drv_maxIRQL", "_IRQL_requires_max_", "__drv_raisesIRQL", "_IRQL_raises_",
+          "__drv_maxFunctionIRQL", "_IRQL_always_function_max_", "__drv_minFunctionIRQL",
+          "_IRQL_always_function_min_"
+        ] and
       irqlLevel = this.getUnexpandedArgument(0)
       or
       // Special case: _IRQL_saves_ annotations can apply to a whole function,
       // but do not have an associated IRQL value.
-      this.getMacroName().matches(["__drv_savesIRQL", "_IRQL_saves_"]) and
+      this.getMacroName() = ["__drv_savesIRQL", "_IRQL_saves_"] and
       irqlLevel = "NA_IRQL_SAVES"
     ) and
     irqlAnnotationName = this.getMacroName()
@@ -135,7 +147,7 @@ class IrqlFunctionAnnotation extends SALAnnotation {
   cached
   int getIrqlLevel() {
     // Special case for DPC_LEVEL, which is not defined normally
-    if this.getIrqlLevelString().matches("DPC_LEVEL")
+    if this.getIrqlLevelString() = "DPC_LEVEL"
     then result = 2
     else
       if exists(IrqlMacro im | im.getHead().matches(this.getIrqlLevelString()))
@@ -159,7 +171,7 @@ class IrqlSameAnnotation extends SALAnnotation {
   string irqlAnnotationName;
 
   IrqlSameAnnotation() {
-    this.getMacroName().matches(["__drv_sameIRQL", "_IRQL_requires_same_"]) and
+    this.getMacroName() = ["__drv_sameIRQL", "_IRQL_requires_same_"] and
     irqlAnnotationName = this.getMacroName()
   }
 
@@ -168,37 +180,35 @@ class IrqlSameAnnotation extends SALAnnotation {
 
 /** An "\_IRQL\_requires\_max\_" annotation. */
 class IrqlMaxAnnotation extends IrqlFunctionAnnotation {
-  IrqlMaxAnnotation() { this.getMacroName().matches(["_drv_maxIRQL", "_IRQL_requires_max_"]) }
+  IrqlMaxAnnotation() { this.getMacroName() = ["_drv_maxIRQL", "_IRQL_requires_max_"] }
 }
 
 /** An "\_IRQL\_raises\_" annotation. */
 class IrqlRaisesAnnotation extends IrqlFunctionAnnotation {
-  IrqlRaisesAnnotation() { this.getMacroName().matches(["__drv_raisesIRQL", "_IRQL_raises_"]) }
+  IrqlRaisesAnnotation() { this.getMacroName() = ["__drv_raisesIRQL", "_IRQL_raises_"] }
 }
 
 /** An "\_IRQL\_requires\_min\_" annotation. */
 class IrqlMinAnnotation extends IrqlFunctionAnnotation {
-  IrqlMinAnnotation() { this.getMacroName().matches(["_drv_minIRQL", "_IRQL_requires_min_"]) }
+  IrqlMinAnnotation() { this.getMacroName() = ["_drv_minIRQL", "_IRQL_requires_min_"] }
 }
 
 /** An "\_IRQL\_requires\_" annotation. */
 class IrqlRequiresAnnotation extends IrqlFunctionAnnotation {
-  IrqlRequiresAnnotation() {
-    this.getMacroName().matches(["__drv_requiresIRQL", "_IRQL_requires_"])
-  }
+  IrqlRequiresAnnotation() { this.getMacroName() = ["__drv_requiresIRQL", "_IRQL_requires_"] }
 }
 
 /** An "\_IRQL\_always\_function\_max\_" annotation. */
 class IrqlAlwaysMaxAnnotation extends IrqlFunctionAnnotation {
   IrqlAlwaysMaxAnnotation() {
-    this.getMacroName().matches(["__drv_maxFunctionIRQL", "_IRQL_always_function_max_"])
+    this.getMacroName() = ["__drv_maxFunctionIRQL", "_IRQL_always_function_max_"]
   }
 }
 
 /** An "\_IRQL\_always\_function\_min\_" annotation. */
 class IrqlAlwaysMinAnnotation extends IrqlFunctionAnnotation {
   IrqlAlwaysMinAnnotation() {
-    this.getMacroName().matches(["__drv_minFunctionIRQL", "_IRQL_always_function_min_"])
+    this.getMacroName() = ["__drv_minFunctionIRQL", "_IRQL_always_function_min_"]
   }
 }
 
@@ -210,8 +220,8 @@ class IrqlParameterAnnotation extends SALAnnotation {
   string irqlAnnotationName;
 
   IrqlParameterAnnotation() {
-    this.getMacroName()
-        .matches(["__drv_restoresIRQL", "_IRQL_restores_", "__drv_savesIRQL", "_IRQL_saves_"]) and
+    this.getMacroName() =
+      ["__drv_restoresIRQL", "_IRQL_restores_", "__drv_savesIRQL", "_IRQL_saves_"] and
     irqlAnnotationName = this.getMacroName() and
     exists(MacroInvocation mi | mi.getParentInvocation() = this)
   }
@@ -225,7 +235,7 @@ class IrqlParameterAnnotation extends SALAnnotation {
  * question contains an IRQL value that the system will be set to.
  */
 class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
-  IrqlRestoreAnnotation() { this.getMacroName().matches(["__drv_restoresIRQL", "_IRQL_restores_"]) }
+  IrqlRestoreAnnotation() { this.getMacroName() = ["__drv_restoresIRQL", "_IRQL_restores_"] }
 }
 
 /**
@@ -234,7 +244,7 @@ class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
  * - If applied to a parameter, the function saves the IRQL to the parameter.
  */
 class IrqlSaveAnnotation extends IrqlFunctionAnnotation {
-  IrqlSaveAnnotation() { this.getMacroName().matches(["__drv_savesIRQL", "_IRQL_saves_"]) }
+  IrqlSaveAnnotation() { this.getMacroName() = ["__drv_savesIRQL", "_IRQL_saves_"] }
 }
 
 /** A parameter that is annotated with "\_IRQL\_restores\_". */
@@ -481,13 +491,12 @@ class IrqlSaveCall extends FunctionCall {
 /** A call to a KeRaiseIRQL API that directly raises the IRQL. */
 class KeRaiseIrqlCall extends FunctionCall {
   KeRaiseIrqlCall() {
-    this.getTarget()
-        .getName()
-        .matches(["KeRaiseIrql", "KfRaiseIrql", "KeRaiseIrqlToDPCLevel", "KfRaiseIrqlToDPCLevel"])
+    this.getTarget().getName() =
+      ["KeRaiseIrql", "KfRaiseIrql", "KeRaiseIrqlToDPCLevel", "KfRaiseIrqlToDPCLevel"]
   }
 
   int getIrqlLevel() {
-    if this.getTarget().getName().matches(["KeRaiseIrqlToDPCLevel", "KfRaiseIrqlToDPCLevel"])
+    if this.getTarget().getName() = ["KeRaiseIrqlToDPCLevel", "KfRaiseIrqlToDPCLevel"]
     then result = 2
     else result = this.getArgument(0).(Literal).getValue().toInt()
   }
@@ -495,7 +504,7 @@ class KeRaiseIrqlCall extends FunctionCall {
 
 /** A direct call to a function that lowers the IRQL. */
 class KeLowerIrqlCall extends FunctionCall {
-  KeLowerIrqlCall() { this.getTarget().getName().matches(["KeLowerIrql", "KfLowerIrql"]) }
+  KeLowerIrqlCall() { this.getTarget().getName() = ["KeLowerIrql", "KfLowerIrql"] }
 
   /**
    * A heuristic evaluation of the IRQL that the system is lowering to.  This is defined as
@@ -592,7 +601,7 @@ class RestoresGlobalIrqlCall extends FunctionCall {
  *
  * This function is obviously _not_ a guarantee that two expressions refer to the same thing.
  * Use this locally and with caution.
- * 
+ *
  * TODO: Compare with global value numbering (both accuracy and performance)
  */
 pragma[inline]
