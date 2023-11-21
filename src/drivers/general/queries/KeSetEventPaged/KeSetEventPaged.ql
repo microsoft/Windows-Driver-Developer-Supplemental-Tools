@@ -12,8 +12,8 @@
  * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-D0004
  * @kind problem
- * @problem.severity warning
- * @precision medium
+ * @problem.severity error
+ * @precision high
  * @tags correctness
  *       wddst
  * @scope domainspecific
@@ -21,7 +21,6 @@
  */
 
 import cpp
-import drivers.libraries.Irql
 import drivers.libraries.Page
 
 class KeSetEventCall extends FunctionCall {

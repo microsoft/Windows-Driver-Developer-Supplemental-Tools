@@ -1,6 +1,5 @@
 import cpp
 import drivers.libraries.Irql
-import semmle.code.cpp.dataflow.new.DataFlow
 
 /**
  * A debugging function used to print the rationale for why a given CFN has the IRQL value it does.
