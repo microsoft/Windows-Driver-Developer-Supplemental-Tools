@@ -11,8 +11,7 @@ import cpp
 class KmdfRoleTypeType extends TypedefType {
   /* Callbacks */
   KmdfRoleTypeType() {
-    //   this.getName().matches("DRIVER_INITIALIZE") or
-    // ? wdm types?
+
     this.getName().matches("EVT_WDF_CHILD_LIST_CREATE_DEVICE") or
     this.getName().matches("EVT_WDF_CHILD_LIST_SCAN_FOR_CHILDREN") or
     this.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_COPY") or
@@ -120,6 +119,8 @@ class KmdfRoleTypeType extends TypedefType {
     this.getName().matches("EVT_WDF_WMI_PROVIDER_FUNCTION_CONTROL") or
     this.getName().matches("EVT_WDF_WORKITEM") or
     // extras from wdfroletypes.h
+    // TODO is it OK for these to be used interchangabley with EVT_WDF_OBJECT_CONTEXT_* above since they are 
+    // just redefinitions?
     this.getName().matches("EVT_WDF_DEVICE_CONTEXT_CLEANUP") or
     this.getName().matches("EVT_WDF_DEVICE_CONTEXT_DESTROY") or
     this.getName().matches("EVT_WDF_IO_QUEUE_CONTEXT_CLEANUP_CALLBACK") or
@@ -130,7 +131,7 @@ class KmdfRoleTypeType extends TypedefType {
 }
 
 class KmdfCallbackRoutineTypedef extends KmdfRoleTypeType {
-  KmdfCallbackRoutineTypedef() { this.getFile().getBaseName().matches("%wdf.h") }
+  KmdfCallbackRoutineTypedef() { this.getFile().getBaseName().matches("%wdf%.h") }
 }
 
 /* Callbacks */

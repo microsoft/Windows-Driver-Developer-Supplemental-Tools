@@ -10,6 +10,7 @@ import drivers.storport.libraries.StorportDrivers
  * Generic role type for WDM,KMDF, and others
  */
 class RoleTypeType extends TypedefType {
+
   RoleTypeType() {
     this instanceof WdmRoleTypeType or
     this instanceof KmdfRoleTypeType or
@@ -22,26 +23,24 @@ class RoleTypeType extends TypedefType {
  * Standard IRQL annotations which apply to entire functions and manipulate or constrain the IRQL.
  */
 class RoleTypeFunctionAnnotation extends SALAnnotation {
-  string roleType;
+  string roleTypeString;
   string roleTypeName;
 
   RoleTypeFunctionAnnotation() {
     (
-      this.getMacroName()
-          .matches([
-              "_Function_class_"
-            ]) and
-      roleType = this.getUnexpandedArgument(0)
+      this.getMacroName().matches(["_Function_class_"]) and
+      roleTypeString = this.getUnexpandedArgument(0)
     ) and
     roleTypeName = this.getMacroName()
   }
 
   /** Returns the raw text of the IRQL value used in this annotation. */
-  string getRoleTypeString() { result = roleType }
+  string getRoleTypeString() { result = roleTypeString }
 
   /** Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.) */
   string getRoleTypeMacroName() { result = roleTypeName }
 }
+
 /** A typedef that has IRQL annotations applied to it. */
 class RoleTypeAnnotatedTypedef extends TypedefType {
   RoleTypeFunctionAnnotation roleTypeAnnotation;
@@ -50,6 +49,7 @@ class RoleTypeAnnotatedTypedef extends TypedefType {
 
   RoleTypeFunctionAnnotation getRoleTypeAnnotation() { result = roleTypeAnnotation }
 }
+
 /**
  * A function that is annotated to specify role type
  */
@@ -59,24 +59,29 @@ class RoleTypeAnnotatedFunction extends Function {
 
   cached
   RoleTypeAnnotatedFunction() {
-    (exists(FunctionDeclarationEntry fde |
-      fde = this.getADeclarationEntry() and
-      roleTypeAnnotation.getDeclarationEntry() = fde
+    (
+      exists(
+        FunctionDeclarationEntry fde // actual function declarations
+      |
+        fde = this.getADeclarationEntry() and
+        roleTypeAnnotation.getDeclarationEntry() = fde
+        and fde.hasCLinkage()
+      )
+      or
+      exists(
+        FunctionDeclarationEntry fde // typedefs
+      |
+        fde.getFunction() = this and
+        fde.getTypedefType().(RoleTypeAnnotatedTypedef).getRoleTypeAnnotation() = roleTypeAnnotation
+      )
     )
-    or
-    exists(FunctionDeclarationEntry fde |
-      fde.getFunction() = this and
-      fde.getTypedefType().(RoleTypeAnnotatedTypedef).getRoleTypeAnnotation() = roleTypeAnnotation
-    )) 
-
   }
 
-  cached 
+  cached
   string getFuncRoleTypeAnnotation() { result = roleTypeAnnotation.getRoleTypeMacroName() }
-  
+
   cached
   RoleTypeFunctionAnnotation getRoleTypeAnnotation() { result = roleTypeAnnotation }
-
 }
 
 /** */
@@ -89,12 +94,14 @@ class RoleTypeFunction extends Function {
       exists(FunctionDeclarationEntry fde |
         (
           fde.getFunction() = this and
-          fde.getTypedefType() = roleType
+         fde.getTypedefType() = roleType and 
+         fde.hasCLinkage()
         )
       )
       or
       this instanceof RoleTypeAnnotatedFunction
       and roleType.getName() = this.(RoleTypeAnnotatedFunction).getRoleTypeAnnotation().getRoleTypeString()
+      
     ) and
     if this instanceof IrqlRestrictsFunction
     then irqlLevel = getAllowableIrqlLevel(this)
@@ -128,8 +135,6 @@ cached
 class ImplicitRoleTypeFunction extends Function {
   RoleTypeType rttExpected;
   FunctionAccess funcUse;
-  int irqlLevelExpected;
-  int irqlLevelFound;
 
   cached
   ImplicitRoleTypeFunction() {
@@ -149,22 +154,14 @@ class ImplicitRoleTypeFunction extends Function {
         rttExpected = funcAssign.getExpectedRoleTypeType() and
         funcUse = funcAssign
       )
-    ) and
-    (
-      if this instanceof IrqlRestrictsFunction
-      then irqlLevelFound = getAllowableIrqlLevel(this)
-      else irqlLevelFound = -1
-    ) and
-    if rttExpected instanceof IrqlAnnotatedTypedef
-    then irqlLevelExpected = getAlloweableIrqlLevel(rttExpected)
-    else irqlLevelExpected = -1
+    ) and this.hasCLinkage()
   }
 
   cached
   string getExpectedRoleTypeString() { result = rttExpected.toString() }
 
   cached
-  WdmRoleTypeType getExpectedRoleTypeType() { result = rttExpected }
+  RoleTypeType getExpectedRoleTypeType() { result = rttExpected }
 
   cached
   string getActualRoleTypeString() {
@@ -174,10 +171,18 @@ class ImplicitRoleTypeFunction extends Function {
   }
 
   cached
-  int getExpectedIrqlLevel() { result = irqlLevelExpected }
+  int getExpectedIrqlLevel() {
+    if rttExpected instanceof IrqlAnnotatedTypedef
+    then result = getAlloweableIrqlLevel(rttExpected)
+    else result = -1
+  }
 
   cached
-  int getFoundIrqlLevel() { result = irqlLevelFound }
+  int getFoundIrqlLevel() {
+    if this instanceof IrqlRestrictsFunction
+    then result = getAllowableIrqlLevel(this)
+    else result = -1
+  }
 
   cached
   FunctionAccess getFunctionUse() { result = funcUse }
