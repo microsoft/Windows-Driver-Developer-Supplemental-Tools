@@ -90,18 +90,6 @@ class IrqlRestoresGlobalAnnotation extends SALAnnotation {
   }
 }
 
-class PerfTestAnnotation extends SALAnnotation {
-  PerfTestAnnotation() {
-    this.getMacroName() =
-      [
-        "__drv_requiresIRQL", "_IRQL_requires_", "_drv_minIRQL", "_IRQL_requires_min_",
-        "_drv_maxIRQL", "_IRQL_requires_max_", "__drv_raisesIRQL", "_IRQL_raises_",
-        "__drv_maxFunctionIRQL", "_IRQL_always_function_max_", "__drv_minFunctionIRQL",
-        "_IRQL_always_function_min_"
-      ]
-  }
-}
-
 /**
  * Standard IRQL annotations which apply to entire functions and manipulate or constrain the IRQL.
  */
