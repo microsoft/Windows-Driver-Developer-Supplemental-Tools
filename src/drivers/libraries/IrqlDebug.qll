@@ -56,7 +56,7 @@ string getIrqlDebugInfoAtCfn(ControlFlowNode cfn) {
                   else
                     if
                       cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
-                      getAllowableIrqlLevelAlt(cfn.getControlFlowScope()) != -1
+                      getAllowableIrqlLevel(cfn.getControlFlowScope()) != -1
                     then
                       result =
                         "This function has no callers but is annotated to have IRQL restrictions on it, so we use those restrictions"
