@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.15.1",
+        "semanticVersion" : "2.14.6",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -24,13 +24,13 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
-          "name" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
+          "id" : "cpp/drivers/routine-function-type-not-expected",
+          "name" : "cpp/drivers/routine-function-type-not-expected",
           "shortDescription" : {
-            "text" : "Use of local variable and UserMode in call to KeWaitSingleObject"
+            "text" : "Unexpected function return type for routine (C28127)"
           },
           "fullDescription" : {
-            "text" : "When the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode."
+            "text" : "The function being used as a routine does not exactly match the type expected."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -38,19 +38,19 @@
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "When the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode.",
+            "description" : "The function being used as a routine does not exactly match the type expected.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
-            "impact" : "Exploitable Design",
+            "id" : "cpp/drivers/routine-function-type-not-expected",
+            "impact" : "Attack Surface Reduction",
             "kind" : "problem",
-            "name" : "Use of local variable and UserMode in call to KeWaitSingleObject",
-            "opaqueid" : "CQLD-C28135",
+            "name" : "Unexpected function return type for routine (C28127)",
+            "opaqueid" : "CQLD-C28127",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
             "problem.severity" : "warning",
-            "query-version" : "v2",
-            "repro.text" : "The following code locations contain a call to KeWaitForSingleObject while waiting for a local kernel-mode object, but the Mode parameter has not been set to KernelMode.",
+            "query-version" : "v1",
+            "repro.text" : "The following code locations use a function pointer with a return type that does not match the expected type",
             "scope" : "domainspecific",
             "security.severity" : "Low"
           }
@@ -58,14 +58,14 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+143fe74d66f4093412a7b21390672217b557bba2",
+        "semanticVersion" : "0.1.0+626ab2156fae247d66b189fb2fa9a69c03082e3a",
         "locations" : [ {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "uri" : "file:///c:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+          "uri" : "file:///c:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -77,9 +77,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
+              "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+              "index" : 1
             }
           }
         } ],
@@ -100,9 +100,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+              "index" : 0
             }
           }
         } ],
@@ -165,14 +165,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "[good_use](1): KeWaitForSingleObject should have a KernelMode AccessMode when the [first argument](2) is local"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (fun_ptr1) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -182,18 +182,27 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 10,
+            "startLine" : 52,
             "startColumn" : 5,
-            "endColumn" : 26
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "61bc3c7079348327:1",
+        "primaryLocationLineHash" : "b6c3b797b0277bdd:1",
         "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
       },
-      "relatedLocations" : [ {
-        "id" : 1,
+      "message" : {
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (f3) with an unexpected return type: int expected: void"
+      },
+      "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
             "uri" : "driver/driver_snippet.c",
@@ -201,16 +210,27 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 7,
-            "startColumn" : 6,
-            "endColumn" : 14
+            "startLine" : 54,
+            "startColumn" : 5,
+            "endColumn" : 40
           }
-        },
-        "message" : {
-          "text" : "good_use"
         }
-      }, {
-        "id" : 2,
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "789a3ee1dd677a33:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (& ...) with an unexpected return type: int expected: void"
+      },
+      "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
             "uri" : "driver/driver_snippet.c",
@@ -218,15 +238,72 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 9,
-            "startColumn" : 12,
-            "endColumn" : 19
+            "startLine" : 56,
+            "startColumn" : 5,
+            "endColumn" : 40
           }
-        },
-        "message" : {
-          "text" : "first argument"
         }
-      } ]
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "b16f3331cfb3f2dd:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (intFunctionToCall) with an unexpected return type: int expected: void"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 59,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "8a5840d23f7ece01:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function call to functionCallThatUsesFunctionPointer2 may use a function pointer (intFunctionToCall) with an unexpected return type: int expected: void"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 61,
+            "startColumn" : 5,
+            "endColumn" : 41
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "b2e192116459028c:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
     } ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {

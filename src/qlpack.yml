@@ -2,10 +2,10 @@
 # Licensed under the MIT license.
 
 name: microsoft/windows-drivers
-version: 0.1.0
+version: 0.2.0
 dependencies:
-    codeql/cpp-queries: ^0.4.5
-    codeql/cpp-all: ^0.4.5
+    codeql/cpp-queries: 0.8.1
+    codeql/cpp-all: 0.10.1
 suites: suites
 extractor: cpp
 licenses: MIT

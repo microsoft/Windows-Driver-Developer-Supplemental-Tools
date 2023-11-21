@@ -31,3 +31,4 @@
       - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
       - microsoft/Likely Bugs/UninitializedPtrField.ql
       - microsoft/Security/Crytpography/HardcodedIVCNG.ql
+      - drivers/general/queries/KeSetEventPaged/KeSetEventPageable.ql
