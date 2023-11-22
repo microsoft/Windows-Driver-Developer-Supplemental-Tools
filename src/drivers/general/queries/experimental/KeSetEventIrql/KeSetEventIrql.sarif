@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.14.4",
+        "semanticVersion" : "2.15.1",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -24,13 +24,13 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/irql-not-used",
-          "name" : "cpp/drivers/irql-not-used",
+          "id" : "cpp/drivers/ke-set-event-irql",
+          "name" : "cpp/drivers/ke-set-event-irql",
           "shortDescription" : {
-            "text" : "IRQL not restored (C28157)"
+            "text" : "KeSetEvent called at wrong IRQL"
           },
           "fullDescription" : {
-            "text" : "Any parameter annotated \\_IRQL\\_restores\\_ must be read and used to restore the IRQL value."
+            "text" : "KeSetEvent must be called at DISPATCH_LEVEL or below. If the Wait argument is set to TRUE, it must be called at APC_LEVEL or below."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -38,19 +38,19 @@
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "Any parameter annotated \\_IRQL\\_restores\\_ must be read and used to restore the IRQL value.",
+            "description" : "KeSetEvent must be called at DISPATCH_LEVEL or below.  If the Wait argument is set to TRUE, it must be called at APC_LEVEL or below.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/irql-not-used",
-            "impact" : "Insecure Coding Practice",
+            "id" : "cpp/drivers/ke-set-event-irql",
+            "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "IRQL not restored (C28157)",
-            "opaqueid" : "CQLD-C28157",
+            "name" : "KeSetEvent called at wrong IRQL",
+            "opaqueid" : "CQLD-D0005",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "This function has a parameter annotated \\_IRQL\\_restores\\_, but does not have a code path where this parameter is read and used to restore the IRQL.",
+            "repro.text" : "The following call to KeSetEvent occurs at too high of an IRQL.",
             "scope" : "domainspecific",
             "security.severity" : "Low"
           }
@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+079028b57055ccd2fea3bae5a9ecc283d9ee56bb",
+        "semanticVersion" : "0.2.0+234ee9b709196a3a802b2c02ad7945ba0dfb0ac0",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -165,14 +165,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/irql-not-used",
+      "ruleId" : "cpp/drivers/ke-set-event-irql",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/irql-not-used",
+        "id" : "cpp/drivers/ke-set-event-irql",
         "index" : 0
       },
       "message" : {
-        "text" : "This function has annotated the parameter [inIrql](1) with \"_IRQL_restores_\" but does not use it to restore the IRQL."
+        "text" : "[KeSetEventIrql_Fail1](1): KeSetEvent should not be called above DISPATCH_LEVEL when Wait is set to false."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -182,15 +182,15 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 51,
-            "startColumn" : 6,
-            "endColumn" : 23
+            "startLine" : 34,
+            "startColumn" : 5,
+            "endColumn" : 15
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "f06af79f118bcf42:1",
-        "primaryLocationStartColumnFingerprint" : "5"
+        "primaryLocationLineHash" : "3f0c2c1bba9b015e:1",
+        "primaryLocationStartColumnFingerprint" : "0"
       },
       "relatedLocations" : [ {
         "id" : 1,
@@ -201,13 +201,58 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 51,
-            "startColumn" : 46,
-            "endColumn" : 52
+            "startLine" : 30,
+            "startColumn" : 6,
+            "endColumn" : 26
           }
         },
         "message" : {
-          "text" : "inIrql"
+          "text" : "KeSetEventIrql_Fail1"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/ke-set-event-irql",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/ke-set-event-irql",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "[CompletionRoutine](1): KeSetEvent should not be called at or above DISPATCH_LEVEL when Wait is set to true."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/fail_driver1.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 1
+          },
+          "region" : {
+            "startLine" : 324,
+            "startColumn" : 5,
+            "endColumn" : 15
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "779dfb1bf8eb10c3:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/fail_driver1.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 1
+          },
+          "region" : {
+            "startLine" : 303,
+            "endColumn" : 18
+          }
+        },
+        "message" : {
+          "text" : "CompletionRoutine"
         }
       } ]
     } ],

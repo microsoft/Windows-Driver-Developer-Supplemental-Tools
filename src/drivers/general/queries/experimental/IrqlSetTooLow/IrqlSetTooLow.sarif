@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.15.1",
+        "semanticVersion" : "2.14.4",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -24,13 +24,13 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
-          "name" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
+          "id" : "cpp/drivers/irql-set-too-low",
+          "name" : "cpp/drivers/irql-set-too-low",
           "shortDescription" : {
-            "text" : "Use of local variable and UserMode in call to KeWaitSingleObject"
+            "text" : "IRQL set too low (C28124)"
           },
           "fullDescription" : {
-            "text" : "When the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode."
+            "text" : "A function annotated with a minimum IRQL for execution lowers the IRQL below that amount."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -38,19 +38,19 @@
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "When the first argument to KeWaitForSingleObject is a local variable, the Mode parameter must be KernelMode.",
+            "description" : "A function annotated with a minimum IRQL for execution lowers the IRQL below that amount.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
+            "id" : "cpp/drivers/irql-set-too-low",
             "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "Use of local variable and UserMode in call to KeWaitSingleObject",
-            "opaqueid" : "CQLD-C28135",
+            "name" : "IRQL set too low (C28124)",
+            "opaqueid" : "CQLD-C28124",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
-            "precision" : "high",
+            "precision" : "medium",
             "problem.severity" : "warning",
-            "query-version" : "v2",
-            "repro.text" : "The following code locations contain a call to KeWaitForSingleObject while waiting for a local kernel-mode object, but the Mode parameter has not been set to KernelMode.",
+            "query-version" : "v1",
+            "repro.text" : "The following statement exits at an IRQL too low for the function it is contained in.",
             "scope" : "domainspecific",
             "security.severity" : "Low"
           }
@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+143fe74d66f4093412a7b21390672217b557bba2",
+        "semanticVersion" : "0.2.0+9e5ae32394a3e411584e20e992a697add48b30b5",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -165,14 +165,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
+      "ruleId" : "cpp/drivers/irql-set-too-low",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
+        "id" : "cpp/drivers/irql-set-too-low",
         "index" : 0
       },
       "message" : {
-        "text" : "[good_use](1): KeWaitForSingleObject should have a KernelMode AccessMode when the [first argument](2) is local"
+        "text" : "[IrqlAlwaysMinAPC_fail](1): IRQL potentially set too low at [call to KeLowerIrql](2).  Minimum IRQL for this function: 1, IRQL at statement: 0"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -182,14 +182,14 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 10,
+            "startLine" : 92,
             "startColumn" : 5,
-            "endColumn" : 26
+            "endColumn" : 16
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "61bc3c7079348327:1",
+        "primaryLocationLineHash" : "8a19ae2477ed23d3:1",
         "primaryLocationStartColumnFingerprint" : "0"
       },
       "relatedLocations" : [ {
@@ -201,13 +201,13 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 7,
-            "startColumn" : 6,
-            "endColumn" : 14
+            "startLine" : 90,
+            "startColumn" : 10,
+            "endColumn" : 31
           }
         },
         "message" : {
-          "text" : "good_use"
+          "text" : "IrqlAlwaysMinAPC_fail"
         }
       }, {
         "id" : 2,
@@ -218,13 +218,139 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 9,
-            "startColumn" : 12,
-            "endColumn" : 19
+            "startLine" : 92,
+            "startColumn" : 5,
+            "endColumn" : 16
           }
         },
         "message" : {
-          "text" : "first argument"
+          "text" : "call to KeLowerIrql"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/irql-set-too-low",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/irql-set-too-low",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "[IrqlMinDispatchLowerIrql_fail1](1): IRQL potentially set too low at [call to KeLowerIrql](2).  Minimum IRQL for this function: 2, IRQL at statement: 1"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 59,
+            "startColumn" : 5,
+            "endColumn" : 16
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "c6798a9b4760c05b:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 57,
+            "startColumn" : 10,
+            "endColumn" : 40
+          }
+        },
+        "message" : {
+          "text" : "IrqlMinDispatchLowerIrql_fail1"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 59,
+            "startColumn" : 5,
+            "endColumn" : 16
+          }
+        },
+        "message" : {
+          "text" : "call to KeLowerIrql"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/irql-set-too-low",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/irql-set-too-low",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "[IrqlMinDispatchLowerIrql_fail](1): IRQL potentially set too low at [{{ ... }}](2).  Minimum IRQL for this function: 2, IRQL at statement: 1"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 42,
+            "endLine" : 44,
+            "endColumn" : 2
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "83574f45ab0b5d97:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 41,
+            "startColumn" : 10,
+            "endColumn" : 39
+          }
+        },
+        "message" : {
+          "text" : "IrqlMinDispatchLowerIrql_fail"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 42,
+            "endLine" : 44,
+            "endColumn" : 2
+          }
+        },
+        "message" : {
+          "text" : "{{ ... }}"
         }
       } ]
     } ],
