@@ -22,11 +22,18 @@ import cpp
 import drivers.libraries.RoleTypes
 import semmle.code.cpp.TypedefType
 
-from ImplicitRoleTypeFunction irtf
+from ImplicitRoleTypeFunction irtf, Function f, string rtActual, string rtExpected
 where
    irtf.getActualRoleTypeString() != irtf.getExpectedRoleTypeString() 
+   and f = irtf.getFunctionUse().getTarget()
+   and if f instanceof RoleTypeFunction then rtActual = f.(RoleTypeFunction).getRoleTypeString() else rtActual = "<NO_ROLE_TYPE>"
+   and rtExpected = irtf.getExpectedRoleTypeString()
+   and rtActual != rtExpected
 select irtf,
-"Function " + irtf.toString() +" declared with role type " +irtf.getActualRoleTypeString().toString() +
-" but role type " + irtf.getExpectedRoleTypeString().toString() + " is expected." 
+"Function $@ declared with role type " + rtActual +
+" but role type " +rtExpected +" is expected.", 
+irtf.getFunctionUse(), f.toString()
 
-
+// from Function fde
+// where fde.getName() = "FdoEvtDeviceArmWake"
+// select fde,fde+ "  declared " + fde.(RoleTypeFunction).getRoleTypeType()

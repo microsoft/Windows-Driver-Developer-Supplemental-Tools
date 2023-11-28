@@ -10,7 +10,6 @@ import drivers.storport.libraries.StorportDrivers
  * Generic role type for WDM,KMDF, and others
  */
 class RoleTypeType extends TypedefType {
-
   RoleTypeType() {
     this instanceof WdmRoleTypeType or
     this instanceof KmdfRoleTypeType or
@@ -60,12 +59,12 @@ class RoleTypeAnnotatedFunction extends Function {
   cached
   RoleTypeAnnotatedFunction() {
     (
+      this.hasCLinkage() and
       exists(
         FunctionDeclarationEntry fde // actual function declarations
       |
         fde = this.getADeclarationEntry() and
         roleTypeAnnotation.getDeclarationEntry() = fde
-        and fde.hasCLinkage()
       )
       or
       exists(
@@ -90,18 +89,18 @@ class RoleTypeFunction extends Function {
   int irqlLevel;
 
   RoleTypeFunction() {
+    this.hasCLinkage() and
     (
       exists(FunctionDeclarationEntry fde |
         (
           fde.getFunction() = this and
-         fde.getTypedefType() = roleType and 
-         fde.hasCLinkage()
+          fde.getTypedefType() = roleType
         )
       )
       or
-      this instanceof RoleTypeAnnotatedFunction
-      and roleType.getName() = this.(RoleTypeAnnotatedFunction).getRoleTypeAnnotation().getRoleTypeString()
-      
+      this instanceof RoleTypeAnnotatedFunction and
+      roleType.getName() =
+        this.(RoleTypeAnnotatedFunction).getRoleTypeAnnotation().getRoleTypeString()
     ) and
     if this instanceof IrqlRestrictsFunction
     then irqlLevel = getAllowableIrqlLevel(this)
@@ -141,11 +140,7 @@ class ImplicitRoleTypeFunction extends Function {
     (
       exists(FunctionCall fc, int n | fc.getArgument(n) instanceof FunctionAccess |
         this = fc.getArgument(n).(FunctionAccess).getTarget() and
-        fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-          RoleTypeType and
         rttExpected = fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() and
-        fc.getTarget().getParameter(n).getUnderlyingType().(PointerType).getBaseType() instanceof
-          RoleTypeType and
         funcUse = fc.getArgument(n)
       )
       or
@@ -154,7 +149,8 @@ class ImplicitRoleTypeFunction extends Function {
         rttExpected = funcAssign.getExpectedRoleTypeType() and
         funcUse = funcAssign
       )
-    ) and this.hasCLinkage()
+    ) and
+    this.hasCLinkage()
   }
 
   cached
