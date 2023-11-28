@@ -1,7 +1,7 @@
 {
     "all": {
-        "+": 7,
-        "-": 1
+        "+": 0,
+        "-": 0
     },
     "error": {
         "+": 0,
@@ -9,50 +9,9 @@
         "codes": []
     },
     "warning": {
-        "+": 7,
-        "-": 1,
-        "codes": [
-            [
-                "cpp/drivers/role-type-correctly-used irtf: DispatchCreate",
-                0,
-                1
-            ],
-            [
-                "cpp/drivers/role-type-correctly-used irtf: DispatchRead",
-                0,
-                1
-            ],
-            [
-                "cpp/drivers/role-type-correctly-used irtf: DispatchPower",
-                0,
-                1
-            ],
-            [
-                "cpp/drivers/role-type-correctly-used irtf: DispatchSystemControl",
-                0,
-                1
-            ],
-            [
-                "cpp/drivers/role-type-correctly-used irtf: DispatchPnp",
-                0,
-                1
-            ],
-            [
-                "cpp/drivers/role-type-correctly-used irtf: DriverAddDevice",
-                0,
-                1
-            ],
-            [
-                "cpp/drivers/role-type-correctly-used irtf: DriverUnload",
-                0,
-                1
-            ],
-            [
-                "cpp/drivers/role-type-correctly-used Function badTestFunctionCalled declared with role type <NO_ROLE_TYPE> but used as argument in function call to KeInitializeDpc that expects role type KDEFERRED_ROUTINE for that argument",
-                1,
-                0
-            ]
-        ]
+        "+": 0,
+        "-": 0,
+        "codes": []
     },
     "note": {
         "+": 0,
