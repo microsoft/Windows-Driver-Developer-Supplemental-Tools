@@ -97,8 +97,8 @@ class KmdfRoleTypeType extends TypedefType {
     this.getName().matches("EVT_WDF_IO_TARGET_QUERY_REMOVE") or
     this.getName().matches("EVT_WDF_IO_TARGET_REMOVE_CANCELED") or
     this.getName().matches("EVT_WDF_IO_TARGET_REMOVE_COMPLETE") or
-    this.getName().matches("EVT_WDF_OBJECT_CONTEXT_CLEANUP") or
-    this.getName().matches("EVT_WDF_OBJECT_CONTEXT_DESTROY") or
+    this.getName().matches("EVT_WDF_%_CONTEXT_CLEANUP%") or
+    this.getName().matches("EVT_WDF_%_CONTEXT_DESTROY%") or
     this.getName().matches("EVT_WDF_DEVICE_RESOURCES_QUERY") or
     this.getName().matches("EVT_WDF_DEVICE_RESOURCE_REQUIREMENTS_QUERY") or
     this.getName().matches("EVT_WDF_DEVICE_EJECT") or
@@ -117,16 +117,8 @@ class KmdfRoleTypeType extends TypedefType {
     this.getName().matches("EVT_WDF_WMI_INSTANCE_SET_ITEM") or
     this.getName().matches("EVT_WDF_WMI_INSTANCE_EXECUTE_METHOD") or
     this.getName().matches("EVT_WDF_WMI_PROVIDER_FUNCTION_CONTROL") or
-    this.getName().matches("EVT_WDF_WORKITEM") or
-    // extras from wdfroletypes.h
-    // TODO is it OK for these to be used interchangabley with EVT_WDF_OBJECT_CONTEXT_* above since they are 
-    // just redefinitions?
-    this.getName().matches("EVT_WDF_DEVICE_CONTEXT_CLEANUP") or
-    this.getName().matches("EVT_WDF_DEVICE_CONTEXT_DESTROY") or
-    this.getName().matches("EVT_WDF_IO_QUEUE_CONTEXT_CLEANUP_CALLBACK") or
-    this.getName().matches("EVT_WDF_IO_QUEUE_CONTEXT_DESTROY_CALLBACK") or
-    this.getName().matches("EVT_WDF_FILE_CONTEXT_CLEANUP_CALLBACK") or
-    this.getName().matches("EVT_WDF_FILE_CONTEXT_DESTROY_CALLBACK")
+    this.getName().matches("EVT_WDF_WORKITEM") 
+
   }
 }
 

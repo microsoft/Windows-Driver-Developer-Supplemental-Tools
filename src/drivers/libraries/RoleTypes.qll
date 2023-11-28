@@ -7,6 +7,19 @@ import drivers.ndis.libraries.NdisDrivers
 import drivers.storport.libraries.StorportDrivers
 
 /**
+ * Special case to check for RoleType equality for role types in wdfroletypes.h
+ */
+bindingset[rtt1, rtt2]
+predicate isEqualRoleTypes(string rtt1, string rtt2) {
+  rtt1.matches("EVT_WDF_%_CONTEXT_DESTROY%") and
+  rtt2.matches("EVT_WDF_%_CONTEXT_DESTROY%")
+  or
+  rtt1.matches("EVT_WDF_%_CONTEXT_CLEANUP%") and
+  rtt2.matches("EVT_WDF_%_CONTEXT_CLEANUP%")
+  or
+  rtt1 = rtt2
+}
+/**
  * Generic role type for WDM,KMDF, and others
  */
 class RoleTypeType extends TypedefType {
@@ -33,14 +46,20 @@ class RoleTypeFunctionAnnotation extends SALAnnotation {
     roleTypeName = this.getMacroName()
   }
 
-  /** Returns the raw text of the IRQL value used in this annotation. */
+  /**
+   *  Returns the raw text of the IRQL value used in this annotation.
+   */
   string getRoleTypeString() { result = roleTypeString }
 
-  /** Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.) */
+  /**
+   * Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.)
+   */
   string getRoleTypeMacroName() { result = roleTypeName }
 }
 
-/** A typedef that has IRQL annotations applied to it. */
+/**
+ * A typedef that has IRQL annotations applied to it.
+ */
 class RoleTypeAnnotatedTypedef extends TypedefType {
   RoleTypeFunctionAnnotation roleTypeAnnotation;
 
@@ -83,7 +102,9 @@ class RoleTypeAnnotatedFunction extends Function {
   RoleTypeFunctionAnnotation getRoleTypeAnnotation() { result = roleTypeAnnotation }
 }
 
-/** */
+/**
+ * A function that is annotated or declared to specify role type
+ */
 class RoleTypeFunction extends Function {
   RoleTypeType roleType;
   int irqlLevel;
@@ -114,7 +135,8 @@ class RoleTypeFunction extends Function {
   RoleTypeType getRoleTypeType() { result = roleType }
 }
 
-/** */
+/**
+ */
 class DriverObjectFunctionAccess extends FunctionAccess {
   RoleTypeType rttExpected;
 
@@ -129,7 +151,9 @@ class DriverObjectFunctionAccess extends FunctionAccess {
   RoleTypeType getExpectedRoleTypeType() { result = rttExpected }
 }
 
-/** Declared functions that are used as if they have a role type, wether or not they do */
+/**
+ *  Declared functions that are used as if they have a role type, wether or not they do
+ */
 cached
 class ImplicitRoleTypeFunction extends Function {
   RoleTypeType rttExpected;
@@ -154,16 +178,16 @@ class ImplicitRoleTypeFunction extends Function {
   }
 
   cached
-  string getExpectedRoleTypeString() { result = rttExpected.toString() }
+  string getExpectedRoleTypeString() { result = rttExpected.getName() }
 
   cached
   RoleTypeType getExpectedRoleTypeType() { result = rttExpected }
 
   cached
   string getActualRoleTypeString() {
-    if this instanceof RoleTypeFunction
-    then result = this.(RoleTypeFunction).getRoleTypeType().toString()
-    else result = "<NO_ROLE_TYPE>"
+    if not this instanceof RoleTypeFunction
+    then result = "<NO_ROLE_TYPE>"
+    else result = this.(RoleTypeFunction).getRoleTypeType().toString()
   }
 
   cached
