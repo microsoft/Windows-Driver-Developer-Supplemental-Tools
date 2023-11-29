@@ -170,7 +170,7 @@ _IRQL_requires_same_
     VOID
     IrqlRequiresSame_notsupported(void)
 {
-    KIRQL oldIRQL;
+    KIRQL oldIRQL = PASSIVE_LEVEL;
     KeRaiseIrql(oldIRQL+1, &oldIRQL);
 }
 
@@ -192,7 +192,8 @@ _IRQL_requires_same_
 Function that calls another function by reference which correctly raises the IRQL. 
 This should pass since IrqlInderectCall_pass0 is not annotated for max IRQL.
 */
-VOID IrqlInderectCall_pass0(void)
+VOID IrqlIndirectCall_pass0(void)
+
 {
     void (*funcPtr)(void);
     funcPtr = &IrqlSetHigherFromPassive_pass0;
@@ -203,7 +204,8 @@ Function that calls another function by reference which correctly raises the IRQ
 This should pass since IrqlInderectCall_pass0 is annotated for max DISPATCH_LEVEL.
 */
 _IRQL_always_function_max_(DISPATCH_LEVEL)
-VOID IrqlInderectCall_pass1(void)
+VOID IrqlIndirectCall_pass1(void)
+
 {
     void (*funcPtr)(void);
     funcPtr = &IrqlSetHigherFromPassive_pass0;
@@ -214,7 +216,8 @@ VOID IrqlInderectCall_pass1(void)
 Function that calls another function by reference which incorrectly raises the IRQL. 
 This should fail because the function pointer points to a function that should fail.
 */
-VOID IrqlInderectCall_fail0(void)
+VOID IrqlIndirectCall_fail0(void)
+
 {
     void (*funcPtr)(void);
     funcPtr = &IrqlRaiseLevelExplicit_fail0;
@@ -225,7 +228,8 @@ Function that calls another function by reference which incorrectly raises the I
 This should fail because the function pointer points to a function that that raises the IRQL above PASSIVE_LEVEL.
 */
 _IRQL_always_function_max_(PASSIVE_LEVEL)
-VOID IrqlInderectCall_fail1(void)
+VOID IrqlIndirectCall_fail1(void)
+
 {
     void (*funcPtr)(void);
     funcPtr = &IrqlSetHigherFromPassive_pass0;

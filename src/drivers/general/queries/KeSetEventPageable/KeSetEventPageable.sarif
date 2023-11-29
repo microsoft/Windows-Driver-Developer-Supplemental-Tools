@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.14.4",
+        "semanticVersion" : "2.15.1",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -24,33 +24,33 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/irql-not-used",
-          "name" : "cpp/drivers/irql-not-used",
+          "id" : "cpp/drivers/ke-set-event-pageable",
+          "name" : "cpp/drivers/ke-set-event-pageable",
           "shortDescription" : {
-            "text" : "IRQL not restored (C28157)"
+            "text" : "KeSetEvent called in pageable segment with wait"
           },
           "fullDescription" : {
-            "text" : "Any parameter annotated \\_IRQL\\_restores\\_ must be read and used to restore the IRQL value."
+            "text" : "Calls to KeSetEvent in a pageable segment must not call with the Wait parameter set to true. This can cause a system crash if the segment is paged out."
           },
           "defaultConfiguration" : {
             "enabled" : true,
-            "level" : "warning"
+            "level" : "error"
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "Any parameter annotated \\_IRQL\\_restores\\_ must be read and used to restore the IRQL value.",
+            "description" : "Calls to KeSetEvent in a pageable segment must not call with the Wait parameter set to true.  This can cause a system crash if the segment is paged out.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/irql-not-used",
-            "impact" : "Insecure Coding Practice",
+            "id" : "cpp/drivers/ke-set-event-pageable",
+            "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "IRQL not restored (C28157)",
-            "opaqueid" : "CQLD-C28157",
+            "name" : "KeSetEvent called in pageable segment with wait",
+            "opaqueid" : "CQLD-D0004",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
-            "precision" : "medium",
-            "problem.severity" : "warning",
+            "precision" : "high",
+            "problem.severity" : "error",
             "query-version" : "v1",
-            "repro.text" : "This function has a parameter annotated \\_IRQL\\_restores\\_, but does not have a code path where this parameter is read and used to restore the IRQL.",
+            "repro.text" : "The following call to KeSetEvent has Wait set to true while in a pageable segment.",
             "scope" : "domainspecific",
             "security.severity" : "Low"
           }
@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+079028b57055ccd2fea3bae5a9ecc283d9ee56bb",
+        "semanticVersion" : "0.2.0+143fe74d66f4093412a7b21390672217b557bba2",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -165,14 +165,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/irql-not-used",
+      "ruleId" : "cpp/drivers/ke-set-event-pageable",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/irql-not-used",
+        "id" : "cpp/drivers/ke-set-event-pageable",
         "index" : 0
       },
       "message" : {
-        "text" : "This function has annotated the parameter [inIrql](1) with \"_IRQL_restores_\" but does not use it to restore the IRQL."
+        "text" : "[KeSetEventIrql_Fail2](1): KeSetEvent should not be called with the Wait parameter set to true when in a pageable segment."
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -182,15 +182,15 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 51,
-            "startColumn" : 6,
-            "endColumn" : 23
+            "startLine" : 40,
+            "startColumn" : 5,
+            "endColumn" : 15
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "f06af79f118bcf42:1",
-        "primaryLocationStartColumnFingerprint" : "5"
+        "primaryLocationLineHash" : "1853d3bfdff8bc5c:2",
+        "primaryLocationStartColumnFingerprint" : "0"
       },
       "relatedLocations" : [ {
         "id" : 1,
@@ -201,13 +201,59 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 51,
-            "startColumn" : 46,
-            "endColumn" : 52
+            "startLine" : 36,
+            "startColumn" : 6,
+            "endColumn" : 26
           }
         },
         "message" : {
-          "text" : "inIrql"
+          "text" : "KeSetEventIrql_Fail2"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/ke-set-event-pageable",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/ke-set-event-pageable",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "[KeSetEventIrql_Fail1](1): KeSetEvent should not be called with the Wait parameter set to true when in a pageable segment."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 33,
+            "startColumn" : 5,
+            "endColumn" : 15
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "1853d3bfdff8bc5c:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 29,
+            "startColumn" : 6,
+            "endColumn" : 26
+          }
+        },
+        "message" : {
+          "text" : "KeSetEventIrql_Fail1"
         }
       } ]
     } ],

@@ -1,61 +1,91 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
+/**
+ * Provides classes related to calculating and estimating the IRQL in a Windows device driver.
+ *
+ * For best results, this library expects to be used in tandem with IRQL annotations.  A limited
+ * amount of functionality is still present even when no annotations are present, primarily around
+ * measuring direct calls to KeRaiseIrql and KeLowerIrql.
+ *
+ * Much of this library's analysis is intraprocedural or limited interprocedural, using a simple
+ * analysis based on call sites to a given function.  Full interprocedural analysis that relies on the
+ * implicit behaviors of the WDM driver model, etc. is not yet supported.
+ */
+
 import cpp
 import drivers.libraries.SAL
 import drivers.wdm.libraries.WdmDrivers
+import drivers.libraries.IrqlDataFlow
+import drivers.libraries.Page
 
 /**
  * A macro in wdm.h that represents an IRQL level,
  * such as PASSIVE_LEVEL, DISPATCH_LEVEL, etc.
  */
+cached
 class IrqlMacro extends Macro {
   int irqlLevelAsInt;
 
+  cached
   IrqlMacro() {
     this.getName().matches("%_LEVEL") and
-    this.getFile().getBaseName().matches("wdm.h") and
+    this.getFile().getBaseName() = "wdm.h" and
     this.getBody().toInt() = irqlLevelAsInt and
     irqlLevelAsInt >= 0 and
     irqlLevelAsInt <= 31
   }
 
   /** Returns the integer value of this IRQL level. */
+  cached
   int getIrqlLevel() { result = irqlLevelAsInt }
+}
 
-  /**
-   * Returns the highest IRQL in wdm.h across this database.
-   * May cause incorrect results if database contains both 32-bit
-   * and 64-bit builds.
-   */
-  int getGlobalMaxIrqlLevel() {
-    result =
-      any(int i |
-        exists(IrqlMacro im |
-          i = im.getIrqlLevel() and
-          not exists(IrqlMacro im2 | im2 != im and im2.getIrqlLevel() > im.getIrqlLevel())
-        )
+/**
+ * Returns the highest IRQL in wdm.h across this database.
+ * May cause incorrect results if database contains both 32-bit
+ * and 64-bit builds.
+ */
+cached
+int getGlobalMaxIrqlLevel() {
+  result =
+    any(int i |
+      exists(IrqlMacro im |
+        i = im.getIrqlLevel() and
+        not exists(IrqlMacro im2 | im2 != im and im2.getIrqlLevel() > im.getIrqlLevel())
       )
-  }
+    )
+}
+
+/**
+ * Represents a real (not -1) Irql level, between 0 and the max for the architecture this
+ * database was built to target.
+ */
+class IrqlValue extends int {
+  IrqlValue() { this = [0 .. getGlobalMaxIrqlLevel()] }
 }
 
 /** An \_IRQL\_saves\_global\_(parameter, kind) annotation. */
+cached
 class IrqlSavesGlobalAnnotation extends SALAnnotation {
   MacroInvocation irqlMacroInvocation;
 
+  cached
   IrqlSavesGlobalAnnotation() {
     // Needs to include other function and parameter annotations too
-    this.getMacroName().matches(["_IRQL_saves_global_"]) and
+    this.getMacroName() = ["__drv_savesIRQLGlobal", "_IRQL_saves_global_"] and
     irqlMacroInvocation.getParentInvocation() = this
   }
 }
 
 /** An \_IRQL\_restores\_global\_(parameter, kind) annotation. */
+cached
 class IrqlRestoresGlobalAnnotation extends SALAnnotation {
   MacroInvocation irqlMacroInvocation;
 
+  cached
   IrqlRestoresGlobalAnnotation() {
     // Needs to include other function and parameter annotations too
-    this.getMacroName().matches(["_IRQL_restores_global_"]) and
+    this.getMacroName() = ["__drv_restoresIRQLGlobal", "_IRQL_restores_global_"] and
     irqlMacroInvocation.getParentInvocation() = this
   }
 }
@@ -63,31 +93,37 @@ class IrqlRestoresGlobalAnnotation extends SALAnnotation {
 /**
  * Standard IRQL annotations which apply to entire functions and manipulate or constrain the IRQL.
  */
+cached
 class IrqlFunctionAnnotation extends SALAnnotation {
   string irqlLevel;
   string irqlAnnotationName;
 
+  cached
   IrqlFunctionAnnotation() {
     (
-      this.getMacroName()
-          .matches([
-              "_IRQL_requires_", "_IRQL_requires_min_", "_IRQL_requires_max_", "_IRQL_raises_",
-              "_IRQL_always_function_max_", "_IRQL_always_function_min_"
-            ]) and
+      this.getMacroName() =
+        [
+          "__drv_requiresIRQL", "_IRQL_requires_", "_drv_minIRQL", "_IRQL_requires_min_",
+          "_drv_maxIRQL", "_IRQL_requires_max_", "__drv_raisesIRQL", "_IRQL_raises_",
+          "__drv_maxFunctionIRQL", "_IRQL_always_function_max_", "__drv_minFunctionIRQL",
+          "_IRQL_always_function_min_"
+        ] and
       irqlLevel = this.getUnexpandedArgument(0)
       or
       // Special case: _IRQL_saves_ annotations can apply to a whole function,
       // but do not have an associated IRQL value.
-      this.getMacroName().matches("_IRQL_saves_") and
+      this.getMacroName() = ["__drv_savesIRQL", "_IRQL_saves_"] and
       irqlLevel = "NA_IRQL_SAVES"
     ) and
     irqlAnnotationName = this.getMacroName()
   }
 
   /** Returns the raw text of the IRQL value used in this annotation. */
+  cached
   string getIrqlLevelString() { result = irqlLevel }
 
   /** Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.) */
+  cached
   string getIrqlMacroName() { result = irqlAnnotationName }
 
   /**
@@ -96,9 +132,10 @@ class IrqlFunctionAnnotation extends SALAnnotation {
    * This will return -1 if the IRQL specified is anything other than a standard
    * IRQL level (i.e. PASSIVE_LEVEL).  This includes statements like "DPC_LEVEL - 1".
    */
+  cached
   int getIrqlLevel() {
     // Special case for DPC_LEVEL, which is not defined normally
-    if this.getIrqlLevelString().matches("DPC_LEVEL")
+    if this.getIrqlLevelString() = "DPC_LEVEL"
     then result = 2
     else
       if exists(IrqlMacro im | im.getHead().matches(this.getIrqlLevelString()))
@@ -122,7 +159,7 @@ class IrqlSameAnnotation extends SALAnnotation {
   string irqlAnnotationName;
 
   IrqlSameAnnotation() {
-    this.getMacroName().matches(["_IRQL_requires_same_"]) and
+    this.getMacroName() = ["__drv_sameIRQL", "_IRQL_requires_same_"] and
     irqlAnnotationName = this.getMacroName()
   }
 
@@ -131,30 +168,36 @@ class IrqlSameAnnotation extends SALAnnotation {
 
 /** An "\_IRQL\_requires\_max\_" annotation. */
 class IrqlMaxAnnotation extends IrqlFunctionAnnotation {
-  IrqlMaxAnnotation() { this.getMacroName().matches("_IRQL_requires_max_") }
+  IrqlMaxAnnotation() { this.getMacroName() = ["_drv_maxIRQL", "_IRQL_requires_max_"] }
 }
 
 /** An "\_IRQL\_raises\_" annotation. */
 class IrqlRaisesAnnotation extends IrqlFunctionAnnotation {
-  IrqlRaisesAnnotation() { this.getMacroName().matches("_IRQL_raises_") }
+  IrqlRaisesAnnotation() { this.getMacroName() = ["__drv_raisesIRQL", "_IRQL_raises_"] }
 }
 
 /** An "\_IRQL\_requires\_min\_" annotation. */
 class IrqlMinAnnotation extends IrqlFunctionAnnotation {
-  IrqlMinAnnotation() { this.getMacroName().matches("_IRQL_requires_min_") }
+  IrqlMinAnnotation() { this.getMacroName() = ["_drv_minIRQL", "_IRQL_requires_min_"] }
 }
 
 /** An "\_IRQL\_requires\_" annotation. */
 class IrqlRequiresAnnotation extends IrqlFunctionAnnotation {
-  IrqlRequiresAnnotation() { this.getMacroName().matches("_IRQL_requires_") }
+  IrqlRequiresAnnotation() { this.getMacroName() = ["__drv_requiresIRQL", "_IRQL_requires_"] }
 }
 
+/** An "\_IRQL\_always\_function\_max\_" annotation. */
 class IrqlAlwaysMaxAnnotation extends IrqlFunctionAnnotation {
-  IrqlAlwaysMaxAnnotation() { this.getMacroName().matches("_IRQL_always_function_max_") }
+  IrqlAlwaysMaxAnnotation() {
+    this.getMacroName() = ["__drv_maxFunctionIRQL", "_IRQL_always_function_max_"]
+  }
 }
 
+/** An "\_IRQL\_always\_function\_min\_" annotation. */
 class IrqlAlwaysMinAnnotation extends IrqlFunctionAnnotation {
-  IrqlAlwaysMinAnnotation() { this.getMacroName().matches("_IRQL_always_function_min_") }
+  IrqlAlwaysMinAnnotation() {
+    this.getMacroName() = ["__drv_minFunctionIRQL", "_IRQL_always_function_min_"]
+  }
 }
 
 /**
@@ -165,7 +208,8 @@ class IrqlParameterAnnotation extends SALAnnotation {
   string irqlAnnotationName;
 
   IrqlParameterAnnotation() {
-    this.getMacroName().matches(["_IRQL_restores_", "_IRQL_saves_"]) and
+    this.getMacroName() =
+      ["__drv_restoresIRQL", "_IRQL_restores_", "__drv_savesIRQL", "_IRQL_saves_"] and
     irqlAnnotationName = this.getMacroName() and
     exists(MacroInvocation mi | mi.getParentInvocation() = this)
   }
@@ -179,7 +223,7 @@ class IrqlParameterAnnotation extends SALAnnotation {
  * question contains an IRQL value that the system will be set to.
  */
 class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
-  IrqlRestoreAnnotation() { this.getMacroName().matches(["_IRQL_restores_"]) }
+  IrqlRestoreAnnotation() { this.getMacroName() = ["__drv_restoresIRQL", "_IRQL_restores_"] }
 }
 
 /**
@@ -188,7 +232,7 @@ class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
  * - If applied to a parameter, the function saves the IRQL to the parameter.
  */
 class IrqlSaveAnnotation extends IrqlFunctionAnnotation {
-  IrqlSaveAnnotation() { this.getMacroName().matches(["_IRQL_saves_"]) }
+  IrqlSaveAnnotation() { this.getMacroName() = ["__drv_savesIRQL", "_IRQL_saves_"] }
 }
 
 /** A parameter that is annotated with "\_IRQL\_restores\_". */
@@ -279,12 +323,14 @@ class IrqlRaisesAnnotatedFunction extends IrqlRestrictsFunction, IrqlChangesFunc
   int getIrqlLevel() { result = irqlAnnotation.(IrqlRaisesAnnotation).getIrqlLevel() }
 }
 
+/** A function that is never allowed to run with the IRQL above a given value. */
 class IrqlAlwaysMaxFunction extends IrqlRestrictsFunction {
   IrqlAlwaysMaxFunction() { irqlAnnotation instanceof IrqlAlwaysMaxAnnotation }
 
   int getIrqlLevel() { result = irqlAnnotation.(IrqlAlwaysMaxAnnotation).getIrqlLevel() }
 }
 
+/** A function that is never allowed to run with the IRQL above a given value. */
 class IrqlAlwaysMinFunction extends IrqlRestrictsFunction {
   IrqlAlwaysMinFunction() { irqlAnnotation instanceof IrqlAlwaysMinAnnotation }
 
@@ -433,16 +479,12 @@ class IrqlSaveCall extends FunctionCall {
 /** A call to a KeRaiseIRQL API that directly raises the IRQL. */
 class KeRaiseIrqlCall extends FunctionCall {
   KeRaiseIrqlCall() {
-    this.getTarget()
-        .getName()
-        .matches(any([
-                "KeRaiseIrql", "KfRaiseIrql", "KeRaiseIrqlToDPCLevel", "KfRaiseIrqlToDPCLevel"
-              ]
-          ))
+    this.getTarget().getName() =
+      ["KeRaiseIrql", "KfRaiseIrql", "KeRaiseIrqlToDPCLevel", "KfRaiseIrqlToDPCLevel"]
   }
 
   int getIrqlLevel() {
-    if this.getTarget().getName().matches(any(["KeRaiseIrqlToDPCLevel", "KfRaiseIrqlToDPCLevel"]))
+    if this.getTarget().getName() = ["KeRaiseIrqlToDPCLevel", "KfRaiseIrqlToDPCLevel"]
     then result = 2
     else result = this.getArgument(0).(Literal).getValue().toInt()
   }
@@ -450,24 +492,43 @@ class KeRaiseIrqlCall extends FunctionCall {
 
 /** A direct call to a function that lowers the IRQL. */
 class KeLowerIrqlCall extends FunctionCall {
-  KeLowerIrqlCall() { this.getTarget().getName().matches(any(["KeLowerIrql", "KfLowerIrql"])) }
+  KeLowerIrqlCall() { this.getTarget().getName() = ["KeLowerIrql", "KfLowerIrql"] }
 
   /**
    * A heuristic evaluation of the IRQL that the system is lowering to.  This is defined as
    * "the IRQL before the most recent KeRaiseIrql call".
    */
   int getIrqlLevel() {
-    result = any(getPotentialExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
+    result =
+      any(getPotentialExitIrqlAtCfn(this.getMostRecentRaiseInterprocedural().getAPredecessor()))
   }
 
   /**
-   * Get the most recent call before this call that explicitly raised the IRQL.
+   * Get the most recent KeRaiseIrql call before this call.
+   *
+   * This performs a local (intraprocedural) analysis only.  It is unused in the library today,
+   * but can be inserted in place of the interprocedural analysis by modifying the getIrqlLevel()
+   * function above.
    */
   KeRaiseIrqlCall getMostRecentRaise() {
     result =
       any(KeRaiseIrqlCall sgic |
         this.getAPredecessor*() = sgic and
         not exists(KeRaiseIrqlCall kric2 | kric2 != sgic and kric2.getAPredecessor*() = sgic)
+      )
+  }
+
+  /**
+   * Get the corresponding KeRaiseIrql call that preceded this KeLowerIrql call.
+   *
+   * This performs an interprocedural analysis using CodeQL's DataFlow classes.
+   */
+  KeRaiseIrqlCall getMostRecentRaiseInterprocedural() {
+    result =
+      any(KeRaiseIrqlCall kric |
+        exists(IrqlRaiseLowerFlow irlf |
+          irlf.hasFlow(DataFlow::exprNode(kric), DataFlow::exprNode(this.getAnArgument()))
+        )
       )
   }
 }
@@ -489,7 +550,11 @@ class RestoresGlobalIrqlCall extends FunctionCall {
     result = any(getPotentialExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
   }
 
-  /** Returns the matching call to a function that saved the IRQL to a global state. */
+  /**
+   * Returns the matching call to a function that saved the IRQL to a global state.
+   *
+   * This is a strictly intraprocedural analysis.
+   */
   SavesGlobalIrqlCall getMostRecentRaise() {
     result =
       any(SavesGlobalIrqlCall sgic |
@@ -524,6 +589,8 @@ class RestoresGlobalIrqlCall extends FunctionCall {
  *
  * This function is obviously _not_ a guarantee that two expressions refer to the same thing.
  * Use this locally and with caution.
+ *
+ * TODO: Compare with global value numbering (both accuracy and performance)
  */
 pragma[inline]
 private predicate exprsMatchText(Expr e1, Expr e2) {
@@ -546,13 +613,12 @@ private predicate exprsMatchText(Expr e1, Expr e2) {
  * - If calling a function annotated to maintain the same IRQL, then the result is the IRQL at the previous CFN.
  * - If this node is calling a function with no annotations, the result is the IRQL that function exits at.
  * - If there is a prior CFN in the CFG, the result is the result for that prior CFN.
- * - If there is no prior CFN, then the result is whatever the IRQL was at a statement prior to a function call to this function.
- * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations.
- * - If there is nothing else, then IRQL is 0.
+ * - If there is no prior CFN, then the result is whatever the IRQL was at a statement prior to a function call to this function (a lazy interprocedural analysis.)
+ * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations applied to this function.
+ * - Failing all this, we set the IRQL to 0.
  *
  * Not implemented: _IRQL_limited_to_
  */
-pragma[assume_small_delta]
 cached
 int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
   if cfn instanceof KeRaiseIrqlCall
@@ -593,6 +659,9 @@ int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
                       cfn2.getASuccessor() = fc
                     )
                   then
+                    // TODO: Check that this node is actually a function entry point and not just
+                    // an isolated part of the CFN.  Sometimes we get nodes that are "in" a function's
+                    // CFN, but have no predecessors, but are not function entry.  (Why?)
                     result =
                       any(getPotentialExitIrqlAtCfn(any(ControlFlowNode cfn2 |
                               cfn2.getASuccessor().(FunctionCall).getTarget() =
@@ -620,65 +689,91 @@ private ControlFlowNode getExitPointsOfFunction(Function f) {
 
 /**
  * Attempt to find the range of valid IRQL values when **entering** a given IRQL-annotated function.
+ * This is used as a heuristic when no other IRQL information is available (i.e. we are at the top
+ * of a call stack.)
+ *
+ * Note: we implicitly apply DISPATCH_LEVEL as the max when a max is not specified but a minimum is,
+ * and the global max if the minimum is > DISPATCH_LEVEL.
  */
 cached
-int getAllowableIrqlLevel(IrqlRestrictsFunction irqlFunc) {
-  if irqlFunc instanceof IrqlRequiresAnnotatedFunction
-  then result = irqlFunc.(IrqlRequiresAnnotatedFunction).getIrqlLevel()
+int getAllowableIrqlLevel(Function func) {
+  if
+    exists(IrqlValue lowerBound, IrqlValue upperBound |
+      hasLowerBound(func, lowerBound) and hasUpperBound(func, upperBound)
+    )
+  then
+    result =
+      [any(IrqlValue lowerBound | hasLowerBound(func, lowerBound)) .. any(IrqlValue upperBound |
+          hasUpperBound(func, upperBound)
+        )]
   else
     if
-      irqlFunc instanceof IrqlMaxAnnotatedFunction and
-      irqlFunc instanceof IrqlMinAnnotatedFunction
-    then
-      result =
-        any([irqlFunc.(IrqlMinAnnotatedFunction).getIrqlLevel() .. irqlFunc
-                  .(IrqlMaxAnnotatedFunction)
-                  .getIrqlLevel()]
-        )
+      exists(IrqlValue upperBound | hasUpperBound(func, upperBound)) and
+      not exists(IrqlValue lowerBound | hasLowerBound(func, lowerBound))
+    then result = [0 .. any(IrqlValue upperBound | hasUpperBound(func, upperBound))]
     else
-      if irqlFunc instanceof IrqlMaxAnnotatedFunction
-      then result = any([0 .. irqlFunc.(IrqlMaxAnnotatedFunction).getIrqlLevel()])
+      if
+        not exists(IrqlValue upperBound | hasUpperBound(func, upperBound)) and
+        exists(IrqlValue lowerBound | hasLowerBound(func, lowerBound) and lowerBound > 2)
+      then
+        result =
+          [any(IrqlValue lowerBound | hasLowerBound(func, lowerBound)) .. getGlobalMaxIrqlLevel()]
       else
-        if irqlFunc instanceof IrqlMinAnnotatedFunction
-        then
-          result =
-            any([irqlFunc.(IrqlMinAnnotatedFunction).getIrqlLevel() .. any(IrqlMacro im)
-                      .getGlobalMaxIrqlLevel()]
-            )
-        else
-          // No known restriction
-          result = any([0 .. any(IrqlMacro im).getGlobalMaxIrqlLevel()])
+        if
+          not exists(IrqlValue upperBound | hasUpperBound(func, upperBound)) and
+          exists(IrqlValue lowerBound | hasLowerBound(func, lowerBound) and lowerBound <= 2)
+        then result = [any(IrqlValue lowerBound | hasLowerBound(func, lowerBound)) .. 2]
+        else result = -1
 }
 
-/**
- * Find a range of valid IRQL values given an IrqlAnnotatedTypedef.
- */
-cached
-int getAlloweableIrqlLevel(IrqlAnnotatedTypedef irqlTypedef) {
-  if irqlTypedef.getIrqlAnnotation() instanceof IrqlRequiresAnnotation
-  then result = irqlTypedef.getIrqlAnnotation().(IrqlRequiresAnnotation).getIrqlLevel()
-  else
-    if
-      irqlTypedef.getIrqlAnnotation() instanceof IrqlMaxAnnotation and
-      irqlTypedef.getIrqlAnnotation() instanceof IrqlMinAnnotation
-    then
-      result =
-        any([irqlTypedef.getIrqlAnnotation().(IrqlMinAnnotation).getIrqlLevel() .. irqlTypedef
-                  .getIrqlAnnotation()
-                  .(IrqlMaxAnnotation)
-                  .getIrqlLevel()]
-        )
-    else
-      if irqlTypedef.getIrqlAnnotation() instanceof IrqlMaxAnnotation
-      then result = any([0 .. irqlTypedef.getIrqlAnnotation().(IrqlMaxAnnotation).getIrqlLevel()])
-      else
-        if irqlTypedef.getIrqlAnnotation() instanceof IrqlMinAnnotation
-        then
-          result =
-            any([irqlTypedef.getIrqlAnnotation().(IrqlMinAnnotation).getIrqlLevel() .. any(IrqlMacro im
-                  ).getGlobalMaxIrqlLevel()]
-            )
-        else
-          // No known restriction
-          result = any([0 .. any(IrqlMacro im).getGlobalMaxIrqlLevel()])
+/** Attempts to find an upper bound on the expected entry IRQL for a function. */
+private predicate hasUpperBound(Function func, IrqlValue upperBound) {
+  // The instanceof checks may seem redundant, but in fact they let us
+  // implement a "priority" if there are multiple, possibly conflicting annotations.
+  (
+    func.(IrqlMaxAnnotatedFunction).getIrqlLevel() = upperBound
+    or
+    not func instanceof IrqlMaxAnnotatedFunction and
+    func.(IrqlAlwaysMaxFunction).getIrqlLevel() = upperBound
+    or
+    (
+      not func instanceof IrqlMaxAnnotatedFunction and
+      not func instanceof IrqlAlwaysMaxFunction
+    ) and
+    func.(IrqlRequiresAnnotatedFunction).getIrqlLevel() = upperBound
+    or
+    (
+      not func instanceof IrqlMaxAnnotatedFunction and
+      not func instanceof IrqlAlwaysMaxFunction and
+      not func instanceof IrqlRequiresAnnotatedFunction
+    ) and
+    func instanceof PagedFunctionDeclaration and
+    upperBound = 1
+  )
+}
+
+/** Attempts to find a lower bound on the expected entry IRQL for a function. */
+private predicate hasLowerBound(Function func, IrqlValue lowerBound) {
+  // The instanceof checks may seem redundant, but in fact they let us
+  // implement a "priority" if there are multiple, possibly conflicting annotations.
+  (
+    func.(IrqlMinAnnotatedFunction).getIrqlLevel() = lowerBound
+    or
+    not func instanceof IrqlMinAnnotatedFunction and
+    func.(IrqlAlwaysMinFunction).getIrqlLevel() = lowerBound
+    or
+    (
+      not func instanceof IrqlMinAnnotatedFunction and
+      not func instanceof IrqlAlwaysMinFunction
+    ) and
+    func.(IrqlRequiresAnnotatedFunction).getIrqlLevel() = lowerBound
+    or
+    (
+      not func instanceof IrqlMinAnnotatedFunction and
+      not func instanceof IrqlAlwaysMinFunction and
+      not func instanceof IrqlRequiresAnnotatedFunction
+    ) and
+    func instanceof PagedFunctionDeclaration and
+    lowerBound = 0
+  )
 }

@@ -208,6 +208,11 @@ class WdmDriverWorkerThreadRoutine extends WdmCallbackRoutine {
   string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
 }
 
+/** A WDM DriverCancel callback routine. */
+class WdmDriverCancel extends WdmCallbackRoutine {
+  WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL")}
+}
+
 /**
  * WDM dispatch routine class.
  * We hold a routine to be a dispatch routine if there is

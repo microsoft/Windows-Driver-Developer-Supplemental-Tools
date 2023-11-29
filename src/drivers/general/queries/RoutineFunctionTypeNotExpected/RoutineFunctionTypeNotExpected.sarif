@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.14.4",
+        "semanticVersion" : "2.14.6",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -24,13 +24,13 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/irql-set-too-high",
-          "name" : "cpp/drivers/irql-set-too-high",
+          "id" : "cpp/drivers/routine-function-type-not-expected",
+          "name" : "cpp/drivers/routine-function-type-not-expected",
           "shortDescription" : {
-            "text" : "IRQL set too high (C28150)"
+            "text" : "Unexpected function return type for routine (C28127)"
           },
           "fullDescription" : {
-            "text" : "A function annotated with a maximum IRQL for execution raises the IRQL above that amount."
+            "text" : "The function being used as a routine does not exactly match the type expected."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -38,19 +38,19 @@
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "A function annotated with a maximum IRQL for execution raises the IRQL above that amount.",
+            "description" : "The function being used as a routine does not exactly match the type expected.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/irql-set-too-high",
-            "impact" : "Exploitable Design",
+            "id" : "cpp/drivers/routine-function-type-not-expected",
+            "impact" : "Attack Surface Reduction",
             "kind" : "problem",
-            "name" : "IRQL set too high (C28150)",
-            "opaqueid" : "CQLD-C28150",
+            "name" : "Unexpected function return type for routine (C28127)",
+            "opaqueid" : "CQLD-C28127",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
-            "precision" : "medium",
+            "precision" : "high",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "The following statement exits at an IRQL too high for the function it is contained in.",
+            "repro.text" : "The following code locations use a function pointer with a return type that does not match the expected type",
             "scope" : "domainspecific",
             "security.severity" : "Low"
           }
@@ -58,14 +58,14 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+9e5ae32394a3e411584e20e992a697add48b30b5",
+        "semanticVersion" : "0.1.0+626ab2156fae247d66b189fb2fa9a69c03082e3a",
         "locations" : [ {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "uri" : "file:///c:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+          "uri" : "file:///c:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -77,9 +77,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
+              "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+              "index" : 1
             }
           }
         } ],
@@ -100,9 +100,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+              "index" : 0
             }
           }
         } ],
@@ -165,14 +165,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/irql-set-too-high",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/irql-set-too-high",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "[CallFunctionThatRaisesIRQL_fail5](1): IRQL potentially set too high at [call to IrqlSetHigherFromPassive_pass0](2).  Maximum IRQL for this function: 0, IRQL at statement: 2"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (fun_ptr1) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -182,60 +182,25 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 131,
+            "startLine" : 52,
             "startColumn" : 5,
-            "endColumn" : 35
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "50d7736bf7d9212d:1",
+        "primaryLocationLineHash" : "b6c3b797b0277bdd:1",
         "primaryLocationStartColumnFingerprint" : "0"
-      },
-      "relatedLocations" : [ {
-        "id" : 1,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 129,
-            "startColumn" : 10,
-            "endColumn" : 42
-          }
-        },
-        "message" : {
-          "text" : "CallFunctionThatRaisesIRQL_fail5"
-        }
-      }, {
-        "id" : 2,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 131,
-            "startColumn" : 5,
-            "endColumn" : 35
-          }
-        },
-        "message" : {
-          "text" : "call to IrqlSetHigherFromPassive_pass0"
-        }
-      } ]
+      }
     }, {
-      "ruleId" : "cpp/drivers/irql-set-too-high",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/irql-set-too-high",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "[IrqlRaiseLevelExplicit_fail4](1): IRQL potentially set too high at [call to KfRaiseIrql](2).  Maximum IRQL for this function: 0, IRQL at statement: 2"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (f3) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -245,60 +210,25 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 121,
+            "startLine" : 54,
             "startColumn" : 5,
-            "endColumn" : 42
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "b7bb153208f2004d:1",
+        "primaryLocationLineHash" : "789a3ee1dd677a33:1",
         "primaryLocationStartColumnFingerprint" : "0"
-      },
-      "relatedLocations" : [ {
-        "id" : 1,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 118,
-            "startColumn" : 10,
-            "endColumn" : 38
-          }
-        },
-        "message" : {
-          "text" : "IrqlRaiseLevelExplicit_fail4"
-        }
-      }, {
-        "id" : 2,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 121,
-            "startColumn" : 5,
-            "endColumn" : 42
-          }
-        },
-        "message" : {
-          "text" : "call to KfRaiseIrql"
-        }
-      } ]
+      }
     }, {
-      "ruleId" : "cpp/drivers/irql-set-too-high",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/irql-set-too-high",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "[IrqlRaiseLevelExplicit_fail3](1): IRQL potentially set too high at [call to KfRaiseIrql](2).  Maximum IRQL for this function: 0, IRQL at statement: 2"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (& ...) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -308,60 +238,25 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 112,
+            "startLine" : 56,
             "startColumn" : 5,
-            "endColumn" : 42
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "988957c55591351a:1",
+        "primaryLocationLineHash" : "b16f3331cfb3f2dd:1",
         "primaryLocationStartColumnFingerprint" : "0"
-      },
-      "relatedLocations" : [ {
-        "id" : 1,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 109,
-            "startColumn" : 10,
-            "endColumn" : 38
-          }
-        },
-        "message" : {
-          "text" : "IrqlRaiseLevelExplicit_fail3"
-        }
-      }, {
-        "id" : 2,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 112,
-            "startColumn" : 5,
-            "endColumn" : 42
-          }
-        },
-        "message" : {
-          "text" : "call to KfRaiseIrql"
-        }
-      } ]
+      }
     }, {
-      "ruleId" : "cpp/drivers/irql-set-too-high",
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/irql-set-too-high",
+        "id" : "cpp/drivers/routine-function-type-not-expected",
         "index" : 0
       },
       "message" : {
-        "text" : "[IrqlRaiseLevelExplicit_fail0](1): IRQL potentially set too high at [call to KfRaiseIrql](2).  Maximum IRQL for this function: 1, IRQL at statement: 2"
+        "text" : "Function call to functionCallThatUsesFunctionPointer may use a function pointer (intFunctionToCall) with an unexpected return type: int expected: void"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -371,18 +266,27 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 102,
+            "startLine" : 59,
             "startColumn" : 5,
-            "endColumn" : 42
+            "endColumn" : 40
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "71b218a9127ea6cb:1",
+        "primaryLocationLineHash" : "8a5840d23f7ece01:1",
         "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
       },
-      "relatedLocations" : [ {
-        "id" : 1,
+      "message" : {
+        "text" : "Function call to functionCallThatUsesFunctionPointer2 may use a function pointer (intFunctionToCall) with an unexpected return type: int expected: void"
+      },
+      "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
             "uri" : "driver/driver_snippet.c",
@@ -390,32 +294,16 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 99,
-            "startColumn" : 10,
-            "endColumn" : 38
-          }
-        },
-        "message" : {
-          "text" : "IrqlRaiseLevelExplicit_fail0"
-        }
-      }, {
-        "id" : 2,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 102,
+            "startLine" : 61,
             "startColumn" : 5,
-            "endColumn" : 42
+            "endColumn" : 41
           }
-        },
-        "message" : {
-          "text" : "call to KfRaiseIrql"
         }
-      } ]
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "b2e192116459028c:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
     } ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {

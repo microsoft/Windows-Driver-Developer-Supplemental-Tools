@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			KeSetEvent must not be called in a paged segment when the Wait argument is set to TRUE.  This can cause a system crash the segment is paged out.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Adjust the KeSetEvent call to pass FALSE to the wait parameter.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-kesetevent">
+				KeSetEvent (MSDN)
+			</a>
+		</li>
+	</references>
+</qhelp>
