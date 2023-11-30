@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.15.1",
+        "semanticVersion" : "2.14.6",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -24,13 +24,13 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/ke-set-event-irql",
-          "name" : "cpp/drivers/ke-set-event-irql",
+          "id" : "cpp/drivers/unicode-string-not-freed",
+          "name" : "cpp/drivers/unicode-string-not-freed",
           "shortDescription" : {
-            "text" : "KeSetEvent called at wrong IRQL"
+            "text" : "Unicode String Not Freed"
           },
           "fullDescription" : {
-            "text" : "KeSetEvent must be called at DISPATCH_LEVEL or below. If the Wait argument is set to TRUE, it must be called at APC_LEVEL or below."
+            "text" : "UnicodeString objects created with RtlCreateUnicodeString must be freed with RtlFreeUnicodeString."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -38,27 +38,27 @@
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "KeSetEvent must be called at DISPATCH_LEVEL or below.  If the Wait argument is set to TRUE, it must be called at APC_LEVEL or below.",
+            "description" : "UnicodeString objects created with RtlCreateUnicodeString must be freed with RtlFreeUnicodeString.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/ke-set-event-irql",
+            "id" : "cpp/drivers/unicode-string-not-freed",
             "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "KeSetEvent called at wrong IRQL",
+            "name" : "Unicode String Not Freed",
             "opaqueid" : "CQLD-D0005",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "The following call to KeSetEvent occurs at too high of an IRQL.",
+            "repro.text" : "A UNICODE_STRING object is created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString.",
             "scope" : "domainspecific",
-            "security.severity" : "Low"
+            "security.severity" : "Medium"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+234ee9b709196a3a802b2c02ad7945ba0dfb0ac0",
+        "semanticVersion" : "0.2.0+a08d7295da27d419b470f9c2a145863490c73521",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -165,14 +165,14 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/ke-set-event-irql",
+      "ruleId" : "cpp/drivers/unicode-string-not-freed",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/ke-set-event-irql",
+        "id" : "cpp/drivers/unicode-string-not-freed",
         "index" : 0
       },
       "message" : {
-        "text" : "[KeSetEventIrql_Fail1](1): KeSetEvent should not be called above DISPATCH_LEVEL when Wait is set to false."
+        "text" : "PUNICODE_STRING object [unicodeStringNotFreed](1) created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -182,15 +182,15 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 34,
-            "startColumn" : 5,
-            "endColumn" : 15
+            "startLine" : 29,
+            "startColumn" : 28,
+            "endColumn" : 49
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "3f0c2c1bba9b015e:1",
-        "primaryLocationStartColumnFingerprint" : "0"
+        "primaryLocationLineHash" : "e56c61209e3933d3:1",
+        "primaryLocationStartColumnFingerprint" : "23"
       },
       "relatedLocations" : [ {
         "id" : 1,
@@ -201,58 +201,13 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 30,
-            "startColumn" : 6,
-            "endColumn" : 26
+            "startLine" : 29,
+            "startColumn" : 28,
+            "endColumn" : 49
           }
         },
         "message" : {
-          "text" : "KeSetEventIrql_Fail1"
-        }
-      } ]
-    }, {
-      "ruleId" : "cpp/drivers/ke-set-event-irql",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/drivers/ke-set-event-irql",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "[CompletionRoutine](1): KeSetEvent should not be called at or above DISPATCH_LEVEL when Wait is set to true."
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/fail_driver1.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 1
-          },
-          "region" : {
-            "startLine" : 324,
-            "startColumn" : 5,
-            "endColumn" : 15
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "779dfb1bf8eb10c3:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      },
-      "relatedLocations" : [ {
-        "id" : 1,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/fail_driver1.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 1
-          },
-          "region" : {
-            "startLine" : 303,
-            "endColumn" : 18
-          }
-        },
-        "message" : {
-          "text" : "CompletionRoutine"
+          "text" : "unicodeStringNotFreed"
         }
       } ]
     } ],

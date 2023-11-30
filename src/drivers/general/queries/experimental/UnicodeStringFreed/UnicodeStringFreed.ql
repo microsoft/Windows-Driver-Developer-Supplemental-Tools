@@ -1,15 +1,25 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/ke-set-event-irql
- * @name Unicode String Freed
+ * @id cpp/drivers/unicode-string-not-freed
+ * @name Unicode String Not Freed
  * @description UnicodeString objects created with RtlCreateUnicodeString must be freed with RtlFreeUnicodeString.
+ * @platform Desktop
+ * @security.severity Medium
+ * @feature.area Multiple
+ * @impact Exploitable Design
+ * @repro.text A UNICODE_STRING object is created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString.
+ * @owner.email sdat@microsoft.com
+ * @opaqueid CQLD-D0005
+ * @kind problem
  * @problem.severity warning
  * @precision medium
  * @tags correctness
  *       wddst
- * @kind problem
+ * @scope domainspecific
+ * @query-version v1
  */
+
 
 import cpp
 import semmle.code.cpp.dataflow.new.DataFlow

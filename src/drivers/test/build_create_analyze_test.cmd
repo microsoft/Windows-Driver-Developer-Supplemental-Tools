@@ -33,6 +33,7 @@ call :test IllegalFieldAccess2 WDMTestTemplate wdm queries
 call :test RoutineFunctionTypeNotExpected WDMTestTemplate general queries
 call :test KeSetEventIrql WDMTestTemplate general queries\experimental
 call :test KeSetEventPageable WDMTestTemplate general queries
+call :test UnicodeStringFreed WDMTestTemplate general queries\experimental
 
 exit /b 0
 
