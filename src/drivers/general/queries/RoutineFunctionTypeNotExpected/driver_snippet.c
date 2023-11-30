@@ -100,7 +100,7 @@ void callFunctionCallThatUsesFunctionPointer(void)
     functionCallThatUsesFunctionPointer3(voidFunctionToCallWithParams); // pass because voidFunctionToCallWithParams matches the parameters expected by funcCall2
 
     functionCallThatUsesFunctionPointer3(f1);                 // fail because voidFunctionToCall has no parameters. NOTE the compiler warns about this
-    functionCallThatUsesFunctionPointer3(f_bad_params);       // fail because voidFunctionToCall has no parameters. The compiler does not warn about this BUT it warns about the intial asignemnt of f_bad_params
-    functionCallThatUsesFunctionPointer3(f_bad_params2);       // fail because voidFunctionToCall has no parameters. The compiler does not warn about this and does not warn about the intial asignemnt of f_bad_params2 because it is cast to a funcCall2 type
+    functionCallThatUsesFunctionPointer3(f_bad_params);       // pass because voidFunctionToCall f_bad_params is declared with funcCall2 type. The compiler warns about the initial assignemnt of f_bad_params
+    functionCallThatUsesFunctionPointer3(f_bad_params2);       // pass because voidFunctionToCall is cast to funcCall2 type. The compiler does not warn about this and does not warn about the initial assignment of f_bad_params2 because it is cast to a funcCall2 type
     functionCallThatUsesFunctionPointer3(voidFunctionToCall); // fail because voidFunctionToCall has no parameters. NOTE the compiler warns about this
 }

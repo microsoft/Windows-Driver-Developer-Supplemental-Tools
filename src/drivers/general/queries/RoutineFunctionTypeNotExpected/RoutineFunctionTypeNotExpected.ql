@@ -23,7 +23,7 @@
 import cpp
 import semmle.code.cpp.exprs.Cast
 
-from FunctionCall fc, Parameter p, int n, Cast c
+from FunctionCall fc, Parameter p, int n
 where
   fc.getArgument(n).getUnspecifiedType() instanceof FunctionPointerType and
   p.getFunction() = fc.getTarget() and
