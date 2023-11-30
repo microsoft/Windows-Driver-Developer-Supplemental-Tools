@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			KeSetEvent must be called at DISPATCH_LEVEL or below.  If the Wait argument is set to TRUE, it must be called at APC_LEVEL or below.  Failure to follow these guidelines can lead to system crashes.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Ensure that the IRQL at this statement is low enough.  If you are calling with Wait set to TRUE, consider setting it to FALSE instead.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-kesetevent">
+				KeSetEvent (MSDN)
+			</a>
+		</li>
+	</references>
+</qhelp>
