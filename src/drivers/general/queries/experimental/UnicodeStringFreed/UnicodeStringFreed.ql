@@ -8,7 +8,7 @@
  * @precision medium
  * @tags correctness
  *       wddst
- * @kind path-problem
+ * @kind problem
  */
 
 import cpp
@@ -19,9 +19,7 @@ class UnicodeStringAccess extends VariableAccess {
 }
 
 class UnicodeString extends Variable {
-  UnicodeString() {
-    this.getType().getName() = "PUNICODE_STRING"
-  }
+  UnicodeString() { this.getType().getName() = "PUNICODE_STRING" }
 }
 
 module MyFlowConfiguration implements DataFlow::ConfigSig {
@@ -61,10 +59,8 @@ module Flow = DataFlow::Global<MyFlowConfiguration>;
 
 from DataFlow::Node source
 where
-  not exists(DataFlow::Node sink | 
-    Flow::flow(source, sink)
-  ) 
-and MyFlowConfiguration::isSource(source)
-
+  not exists(DataFlow::Node sink | Flow::flow(source, sink)) and
+  MyFlowConfiguration::isSource(source)
 select source,
-  "PUNICODE_STRING object $@ created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString ",source, source.toString()
+  "PUNICODE_STRING object $@ created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString",
+  source.asExpr(), source.asExpr().toString()
