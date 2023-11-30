@@ -2,22 +2,13 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/ke-set-event-irql
- * @name KeSetEvent called at wrong IRQL
- * @description KeSetEvent must be called at DISPATCH_LEVEL or below.  If the Wait argument is set to TRUE, it must be called at APC_LEVEL or below.
- * @platform Desktop
- * @security.severity Low
- * @feature.area Multiple
- * @impact Exploitable Design
- * @repro.text The following call to KeSetEvent occurs at too high of an IRQL.
- * @owner.email sdat@microsoft.com
- * @opaqueid CQLD-D0005
- * @kind problem
+ * @name Unicode String Freed
+ * @description UnicodeString objects created with RtlCreateUnicodeString must be freed with RtlFreeUnicodeString.
  * @problem.severity warning
  * @precision medium
  * @tags correctness
  *       wddst
- * @scope domainspecific
- * @query-version v1
+ * @kind path-problem
  */
 
 import cpp
@@ -28,10 +19,10 @@ class UnicodeStringAccess extends VariableAccess {
 }
 
 class UnicodeString extends Variable {
-  UnicodeString() { this.getType().getName() = "PUNICODE_STRING" and this instanceof GlobalVariable }
-  
+  UnicodeString() {
+    this.getType().getName() = "PUNICODE_STRING"
+  }
 }
-
 
 module MyFlowConfiguration implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
@@ -50,45 +41,30 @@ module MyFlowConfiguration implements DataFlow::ConfigSig {
 
   predicate isAdditionalFlowStep(DataFlow::Node pred, DataFlow::Node succ) {
     exists(FunctionCall fc, DataFlow::VariableNode var |
-      fc.getArgument(0).getAChild*() = pred.asExpr()
-      and(
+      fc.getArgument(0).getAChild*() = pred.asExpr() and
+      (
         fc.getTarget().getName() = ("RtlFreeUnicodeString")
         or
         fc.getTarget().getName() = ("RtlCreateUnicodeString")
-      )
-      and fc.getArgument(0).getAChild*() instanceof UnicodeStringAccess
+      ) and
+      fc.getArgument(0).getAChild*() instanceof UnicodeStringAccess
     |
-      succ = var and 
+      succ = var and
       var.asVariable() instanceof UnicodeString and
-      var.asVariable() instanceof GlobalVariable and 
-      var.asVariable().getName() = fc.getArgument(0).(VariableAccess).getTarget().getName() 
-      // rtlCreate.getArgument(0).getAChild*() = source.asExpr() and
-      // rtlCreate.getTarget().getName() = ("RtlCreateUnicodeString") and
-      // rtlFree.getArgument(0).getAChild*() = sink.asExpr() and
-      // rtlFree.getTarget().getName() = ("RtlFreeUnicodeString") and
-      // rtlFree.getArgument(0).getAChild*() = var.asExpr()
-      // getArgument(0) = var.asIndirectArgument()
+      var.asVariable() instanceof GlobalVariable and
+      var.asVariable().getName() = fc.getArgument(0).(VariableAccess).getTarget().getName()
     )
   }
 }
 
 module Flow = DataFlow::Global<MyFlowConfiguration>;
 
-from DataFlow::Node source, DataFlow::Node sink
-where Flow::flow(source, sink)
-select source, "This " + source + " uses data from $@.", sink, sink.toString()
-/*
- * from FunctionCall rtlCreate, VariableAccess unicodeString, VariableAccess freeString
- * where
- *  rtlCreate.getTarget().getName() = "RtlCreateUnicodeString" and
- *  unicodeString = rtlCreate.getArgument(0) and
- *  exists(FunctionCall rtlFree |
- *    rtlFree.getTarget().getName() = "RtlFreeUnicodeString" and
- *    rtlFree.getArgument(0) = freeString
- *  ) and
- *  freeString.getTarget() = unicodeString.getTarget()
- *  and exists(GlobalVariable g | g.getADeclarationEntry() = unicodeString.getTarget().getADeclarationEntry())
- *
- * select unicodeString, "Function " + rtlCreate + " arg " + unicodeString + " " + freeString
- */
+from DataFlow::Node source
+where
+  not exists(DataFlow::Node sink | 
+    Flow::flow(source, sink)
+  ) 
+and MyFlowConfiguration::isSource(source)
 
+select source,
+  "PUNICODE_STRING object $@ created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString ",source, source.toString()
