@@ -2,7 +2,6 @@
 // Licensed under the MIT license.
 import cpp
 import drivers.libraries.SAL
-import drivers.libraries.Irql
 
 class Irp extends Struct {
   Irp() {
