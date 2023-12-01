@@ -243,7 +243,7 @@ class WdmDispatchRoutine extends WdmCallbackRoutine {
   WdmDispatchRoutine() {
     callbackType.getName().matches("DRIVER_DISPATCH") and
     exists(
-      WdmCallbackRoutineAssignment cra, ArrayExpr dispatchTable, PointerFieldAccess fieldAccess,
+      CallbackRoutineAssignment cra, ArrayExpr dispatchTable, PointerFieldAccess fieldAccess,
       VariableAccess driverObjectAccess
     |
       cra.getLValue() = dispatchTable and
@@ -270,7 +270,7 @@ class WdmDispatchRoutine extends WdmCallbackRoutine {
 }
 
 /** An assignment where the right-hand side is a WDM callback routine. */
-class WdmCallbackRoutineAssignment extends AssignExpr {
+class CallbackRoutineAssignment extends AssignExpr {
   /*
    * A common paradigm in dispatch routine setup is to chain assignments to cover multiple IRPs.
    * As such, it's necessary to recursively walk the assignment to handle cases such as
@@ -281,7 +281,7 @@ class WdmCallbackRoutineAssignment extends AssignExpr {
    * predicate below, isCallbackRoutineAssignment.
    */
 
-  WdmCallbackRoutineAssignment() { isCallbackRoutineAssignment(this) }
+  CallbackRoutineAssignment() { isCallbackRoutineAssignment(this) }
 
   /** Gets the callback routine that this dispatch routine assignment is targeting. */
   cached
