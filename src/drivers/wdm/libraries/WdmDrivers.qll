@@ -82,6 +82,7 @@ class WdmCallbackRoutine extends Function {
   }
 }
 
+
 /** A WDM DriverEntry callback routine. */
 class WdmDriverEntry extends WdmCallbackRoutine {
   WdmDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
@@ -109,6 +110,12 @@ class WdmDriverUnload extends WdmCallbackRoutine {
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
   string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+}
+
+// NOTE duplicate for backward compatibility with other query. Remove when other query is updated.
+/** A WDM AddDevice callback routine. */
+class WdmAddDevice extends WdmCallbackRoutine {
+  WdmAddDevice() { callbackType.getName().matches("DRIVER_ADD_DEVICE") }
 }
 
 /**
