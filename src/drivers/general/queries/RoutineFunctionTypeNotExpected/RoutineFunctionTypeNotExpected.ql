@@ -17,22 +17,24 @@
  * @tags correctness
  *       wddst
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
+import semmle.code.cpp.exprs.Cast
 
 from FunctionCall fc, Parameter p, int n
 where
+  fc.getArgument(n).getUnspecifiedType() instanceof FunctionPointerType and
   p.getFunction() = fc.getTarget() and
   p.getUnspecifiedType() instanceof FunctionPointerType and
   p.getIndex() = n and
-  fc.getArgument(n).getUnspecifiedType() instanceof FunctionPointerType and
-  fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType().getUnspecifiedType() !=
-    p.getUnspecifiedType().(FunctionPointerType).getReturnType().getUnspecifiedType() 
-
+ 
+  fc.getArgument(n).hasImplicitConversion()
+    and not fc.getArgument(n).hasExplicitConversion()
 select fc,
-  "Function " + fc + " may use a function pointer (" + fc.getArgument(n) +
-    ") with an unexpected return type: " +
-    fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType() + " expected: " +
-    p.getUnspecifiedType().(FunctionPointerType).getReturnType()
+   "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type. Expected formal parameter is: $@ ("
+  + p.getFunction().getNumberOfParameters() + " parameters). Actual argument: $@ (" + fc.getTarget().getNumberOfParameters() + " arguments).",
+  fc, fc.toString(), fc.getArgument(n), fc.getArgument(n).toString(),p,p.getName(), 
+  p, p.getUnspecifiedType().(FunctionPointerType).explain(),
+  fc.getArgument(n),fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).explain()
