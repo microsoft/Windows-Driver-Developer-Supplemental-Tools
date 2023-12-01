@@ -10,7 +10,7 @@
  * @impact Exploitable Design
  * @repro.text A UNICODE_STRING object is created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQLD-D0005
+ * @opaqueid CQLD-D0006
  * @kind problem
  * @problem.severity warning
  * @precision medium
@@ -25,14 +25,14 @@ import cpp
 import semmle.code.cpp.dataflow.new.DataFlow
 
 class UnicodeStringAccess extends VariableAccess {
-  UnicodeStringAccess() { this.getType().getName() = "PUNICODE_STRING" }
+  UnicodeStringAccess() { this.getTarget() instanceof UnicodeString }
 }
 
 class UnicodeString extends Variable {
   UnicodeString() { this.getType().getName() = "PUNICODE_STRING" }
 }
 
-module MyFlowConfiguration implements DataFlow::ConfigSig {
+module UnicodeStringDataFlowConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     exists(FunctionCall rtlCreate |
       rtlCreate.getArgument(0).getAChild*() = source.asExpr() and
@@ -65,12 +65,12 @@ module MyFlowConfiguration implements DataFlow::ConfigSig {
   }
 }
 
-module Flow = DataFlow::Global<MyFlowConfiguration>;
+module Flow = DataFlow::Global<UnicodeStringDataFlowConfig>;
 
 from DataFlow::Node source
 where
   not exists(DataFlow::Node sink | Flow::flow(source, sink)) and
-  MyFlowConfiguration::isSource(source)
+  UnicodeStringDataFlowConfig::isSource(source)
 select source,
   "PUNICODE_STRING object $@ created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString",
   source.asExpr(), source.asExpr().toString()

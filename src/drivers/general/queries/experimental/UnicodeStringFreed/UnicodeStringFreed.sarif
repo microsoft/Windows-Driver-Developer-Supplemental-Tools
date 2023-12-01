@@ -44,7 +44,7 @@
             "impact" : "Exploitable Design",
             "kind" : "problem",
             "name" : "Unicode String Not Freed",
-            "opaqueid" : "CQLD-D0005",
+            "opaqueid" : "CQLD-D0006",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+a08d7295da27d419b470f9c2a145863490c73521",
+        "semanticVersion" : "0.2.0+60b1cef4f56fea2f366724a51097b65da6b795b9",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -182,7 +182,7 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 29,
+            "startLine" : 31,
             "startColumn" : 28,
             "endColumn" : 49
           }
@@ -201,7 +201,7 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 29,
+            "startLine" : 31,
             "startColumn" : 28,
             "endColumn" : 49
           }

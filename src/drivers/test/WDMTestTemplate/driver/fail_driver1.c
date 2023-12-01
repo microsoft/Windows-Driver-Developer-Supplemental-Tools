@@ -21,9 +21,9 @@ Environment:
 
 --*/
 
+#include "driver_snippet.c"
 #include "fail_driver1.h"
 
-#include "driver_snippet.c"
 
 #define _DRIVER_NAME_ "fail_driver1"
 
