@@ -15,7 +15,13 @@ Environment:
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#ifdef USE_NTIFS
+#include "ntifs.h"
+#else
 #include <wdm.h>
+#endif
+
 #ifdef __cplusplus
 }
 #endif
