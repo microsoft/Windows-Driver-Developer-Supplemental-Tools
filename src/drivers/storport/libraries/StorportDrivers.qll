@@ -10,7 +10,8 @@ import cpp
 import drivers.libraries.SAL
 
 
-/** Determines if a given assignment, recursively, has a NDIS callback routine as the right-hand side. */
+/** Determines if a given assignment, recursively, has a Storport callback routine as the right-hand side. */
+
 private predicate isCallbackRoutineAssignment(AssignExpr ae) {
   exists(FunctionAccess fa |
     ae.getRValue() = fa and
