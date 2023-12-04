@@ -48,7 +48,8 @@ class StorportRoleTypeType extends TypedefType {
   }
 }
 
-/** A typedef for the standard NDIS callback routines. Aka Role Types */
+/** A typedef for the standard Storport callback routines. Aka Role Types */
+
 class StorportCallbackRoutineTypedef extends StorportRoleTypeType {
   StorportCallbackRoutineTypedef() { this.getFile().getBaseName().matches("storport.h") }
 }
