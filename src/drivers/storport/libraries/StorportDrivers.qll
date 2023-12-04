@@ -58,7 +58,8 @@ class StorportCallbackRoutineTypedef extends StorportRoleTypeType {
  * Represents a function implementing a Storport callback routine.
 
  * Defines a function to be a callback routine iff it has a typedef
- * in its definition which matches the NDIS callback typedefs, and it
+ * in its definition which matches the Storport callback typedefs, and it
+
  * is in a NDIS driver (includes wdm.h.)
  */
 class StorportCallbackRoutine extends Function {
