@@ -16,7 +16,7 @@ Environment:
 extern "C" {
 #endif
 
-#ifdef USE_NTIFS
+#if USE_NTIFS
 #include "ntifs.h"
 #else
 #include <wdm.h>

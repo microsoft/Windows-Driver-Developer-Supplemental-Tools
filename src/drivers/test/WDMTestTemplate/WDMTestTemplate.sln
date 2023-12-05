@@ -9,8 +9,6 @@ Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
 		Debug|x64 = Debug|x64
-		NTIFS|Win32 = NTIFS|Win32
-		NTIFS|x64 = NTIFS|x64
 		Release|Win32 = Release|Win32
 		Release|x64 = Release|x64
 	EndGlobalSection
@@ -19,12 +17,6 @@ Global
 		{7F88D5C5-F05F-4817-89F5-C811053277A0}.Debug|Win32.Build.0 = Debug|Win32
 		{7F88D5C5-F05F-4817-89F5-C811053277A0}.Debug|x64.ActiveCfg = Debug|x64
 		{7F88D5C5-F05F-4817-89F5-C811053277A0}.Debug|x64.Build.0 = Debug|x64
-		{7F88D5C5-F05F-4817-89F5-C811053277A0}.NTIFS|Win32.ActiveCfg = NTIFS|Win32
-		{7F88D5C5-F05F-4817-89F5-C811053277A0}.NTIFS|Win32.Build.0 = NTIFS|Win32
-		{7F88D5C5-F05F-4817-89F5-C811053277A0}.NTIFS|Win32.Deploy.0 = NTIFS|Win32
-		{7F88D5C5-F05F-4817-89F5-C811053277A0}.NTIFS|x64.ActiveCfg = NTIFS|x64
-		{7F88D5C5-F05F-4817-89F5-C811053277A0}.NTIFS|x64.Build.0 = NTIFS|x64
-		{7F88D5C5-F05F-4817-89F5-C811053277A0}.NTIFS|x64.Deploy.0 = NTIFS|x64
 		{7F88D5C5-F05F-4817-89F5-C811053277A0}.Release|Win32.ActiveCfg = Release|Win32
 		{7F88D5C5-F05F-4817-89F5-C811053277A0}.Release|Win32.Build.0 = Release|Win32
 		{7F88D5C5-F05F-4817-89F5-C811053277A0}.Release|x64.ActiveCfg = Release|x64
@@ -32,5 +24,8 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B5DD9EDC-06C8-4BC7-BEC8-179828286FF8}
 	EndGlobalSection
 EndGlobal
