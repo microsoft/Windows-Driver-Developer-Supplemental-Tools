@@ -67,11 +67,4 @@ KSERVICE_ROUTINE InterruptServiceRoutine;
 
 IO_DPC_ROUTINE DpcForIsrRoutine;
 
-VOID
-DriverUnload(
-
-    _In_ PDRIVER_OBJECT DriverObject
-
-    );
-
-// DRIVER_UNLOAD DriverUnload;
+DRIVER_UNLOAD DriverUnload;

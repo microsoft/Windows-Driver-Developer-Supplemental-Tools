@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 1
+        "-": 0
     },
     "error": {
         "+": 0,
@@ -10,14 +10,8 @@
     },
     "warning": {
         "+": 0,
-        "-": 1,
-        "codes": [
-            [
-                "cpp/drivers/no-paged-code The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment",
-                2,
-                0
-            ]
-        ]
+        "-": 0,
+        "codes": []
     },
     "note": {
         "+": 0,

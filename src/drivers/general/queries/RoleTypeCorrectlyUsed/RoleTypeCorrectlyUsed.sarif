@@ -57,7 +57,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+89c5bbb932add8b9f527d104a47ab0828cb93370",
+        "semanticVersion" : "0.2.0+688db58415e76d66f8b04a2bb6931f3d56028174",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -76,9 +76,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
+              "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+              "index" : 0
             }
           }
         } ],
@@ -99,9 +99,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+              "index" : 1
             }
           }
         } ],
@@ -163,35 +163,7 @@
         "index" : 2
       }
     } ],
-    "results" : [ {
-      "ruleId" : "cpp/drivers/role-type-correctly-used",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/drivers/role-type-correctly-used",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "Function DriverUnload declared with role type <NO_ROLE_TYPE> but role type DRIVER_UNLOAD is expected."
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/fail_driver1.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 83,
-            "startColumn" : 60,
-            "endColumn" : 72
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "b54b2cfbe2573eb8:1",
-        "primaryLocationStartColumnFingerprint" : "55"
-      }
-    } ],
+    "results" : [ ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {
       "semmle.formatSpecifier" : "sarifv2.1.0"

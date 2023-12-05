@@ -1,7 +1,7 @@
 {
     "all": {
         "+": 0,
-        "-": 4
+        "-": 0
     },
     "error": {
         "+": 0,
@@ -10,29 +10,8 @@
     },
     "warning": {
         "+": 0,
-        "-": 4,
-        "codes": [
-            [
-                "cpp/drivers/illegal-field-access-2 The 'Flags' field of the DriverObject struct cannot be accessed by a driver.",
-                2,
-                0
-            ],
-            [
-                "cpp/drivers/illegal-field-access-2 The 'NextDevice' field of the DeviceObject struct can only be accessed in DriverEntry or DriverUnload.",
-                1,
-                0
-            ],
-            [
-                "cpp/drivers/illegal-field-access-2 The 'Dpc' field of the DeviceObject struct cannot be accessed by a driver.",
-                1,
-                0
-            ],
-            [
-                "cpp/drivers/illegal-field-access-2 The 'DriverExtension' field of the DriverObject struct can only be accessed in a DriverEntry routine.",
-                1,
-                0
-            ]
-        ]
+        "-": 0,
+        "codes": []
     },
     "note": {
         "+": 0,
