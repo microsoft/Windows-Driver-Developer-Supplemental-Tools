@@ -88,7 +88,7 @@ class WdmDriverEntry extends WdmCallbackRoutine {
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 /** A WDM DrierStartIo callback routine */
@@ -97,7 +97,7 @@ class WdmDriverStartIo extends WdmCallbackRoutine {
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 /**
@@ -108,7 +108,7 @@ class WdmDriverUnload extends WdmCallbackRoutine {
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 // NOTE duplicate for backward compatibility with other query. Remove when other query is updated.
@@ -125,7 +125,7 @@ class WdmDriverAddDevice extends WdmCallbackRoutine {
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 /**
@@ -136,7 +136,7 @@ class WdmDriverDispatch extends WdmCallbackRoutine {
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 /**
@@ -145,9 +145,9 @@ class WdmDriverDispatch extends WdmCallbackRoutine {
 class WdmDriverCompletionRoutine extends WdmCallbackRoutine {
   WdmDriverCompletionRoutine() { callbackType.getName().matches("IO_COMPLETION_ROUTINE") }
 
-  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL " }
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 /**
@@ -156,7 +156,7 @@ class WdmDriverCompletionRoutine extends WdmCallbackRoutine {
 class WdmDriverCancel extends WdmCallbackRoutine {
   WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL") }
 
-  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL " }
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 }
 
 /**
@@ -198,9 +198,9 @@ class WdmDriverServiceRoutine extends WdmCallbackRoutine {
 class WdmDriverPowerComplete extends WdmCallbackRoutine {
   WdmDriverPowerComplete() { callbackType.getName().matches("REQUEST_POWER_COMPLETE") }
 
-  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL " }
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 /**
@@ -211,7 +211,7 @@ class WdmDriverWorkerThreadRoutine extends WdmCallbackRoutine {
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL " }
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 /**
