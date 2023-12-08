@@ -2,38 +2,38 @@ rd /s /q working >NUL 2>&1
 rd /s /q TestDB >NUL 2>&1
 rd /s /q AnalysisFiles >NUL 2>&1
 
-
-call :test PendingStatusError WDMTestTemplate wdm queries
-call :test ExaminedValue WDMTestTemplate wdm queries
-call :test StrSafe KMDFTestTemplate kmdf queries
-call :test MultiplePagedCode WDMTestTemplate wdm queries
-call :test NoPagedCode WDMTestTemplate wdm queries
-call :test NoPagingSegment WDMTestTemplate wdm queries
-call :test OpaqueMdlUse WDMTestTemplate wdm queries
-call :test OpaqueMdlWrite WDMTestTemplate wdm queries
-call :test KeWaitLocal WDMTestTemplate wdm queries
-call :test IrqlTooHigh WDMTestTemplate general queries\experimental
-call :test IrqlTooLow WDMTestTemplate general queries\experimental
-call :test IrqlSetTooHigh WDMTestTemplate general queries\experimental
-call :test IrqlSetTooLow WDMTestTemplate general queries\experimental
-call :test WrongDispatchTableAssignment WDMTestTemplate wdm queries
-call :test ExtendedDeprecatedApis WDMTestTemplate general queries
-call :test WdkDeprecatedApis WDMTestTemplate general queries
-call :test IllegalFieldAccess WDMTestTemplate wdm queries
-call :test PoolTagIntegral WDMTestTemplate general queries
-call :test ObReferenceMode WDMTestTemplate wdm queries
-call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental
-call :test DefaultPoolTag WDMTestTemplate general queries
-call :test DefaultPoolTagExtended WDMTestTemplate general queries\experimental
-call :test InitNotCleared WDMTestTemplate wdm queries
-call :test IrqlNotUsed WDMTestTemplate general queries
-call :test IrqlNotSaved WDMTestTemplate general queries
-call :test IllegalFieldWrite WDMTestTemplate wdm queries
-call :test IllegalFieldAccess2 WDMTestTemplate wdm queries
-call :test RoutineFunctionTypeNotExpected WDMTestTemplate general queries
-call :test KeSetEventIrql WDMTestTemplate general queries\experimental
-call :test KeSetEventPageable WDMTestTemplate general queries
-call :test UnicodeStringFreed WDMTestTemplate general queries\experimental
+@REM call :test <DriverName> <DriverTemplate> <DriverType> <DriverDirectory> <UseNTIFS parameter value>
+call :test PendingStatusError WDMTestTemplate wdm queries 0
+call :test ExaminedValue WDMTestTemplate wdm queries 0
+call :test StrSafe KMDFTestTemplate kmdf queries 0
+call :test MultiplePagedCode WDMTestTemplate wdm queries 0
+call :test NoPagedCode WDMTestTemplate wdm queries 0
+call :test NoPagingSegment WDMTestTemplate wdm queries 0
+call :test OpaqueMdlUse WDMTestTemplate wdm queries 0
+call :test OpaqueMdlWrite WDMTestTemplate wdm queries 0
+call :test KeWaitLocal WDMTestTemplate wdm queries 0
+call :test IrqlTooHigh WDMTestTemplate general queries\experimental 0
+call :test IrqlTooLow WDMTestTemplate general queries\experimental 0
+call :test IrqlSetTooHigh WDMTestTemplate general queries\experimental 0
+call :test IrqlSetTooLow WDMTestTemplate general queries\experimental 0
+call :test WrongDispatchTableAssignment WDMTestTemplate wdm queries 0
+call :test ExtendedDeprecatedApis WDMTestTemplate general queries 0
+call :test WdkDeprecatedApis WDMTestTemplate general queries 0
+call :test IllegalFieldAccess WDMTestTemplate wdm queries 0
+call :test PoolTagIntegral WDMTestTemplate general queries 0
+call :test ObReferenceMode WDMTestTemplate wdm queries 0
+call :test DeviceInitApi KMDFTestTemplate kmdf queries\experimental 0
+call :test DefaultPoolTag WDMTestTemplate general queries 0
+call :test DefaultPoolTagExtended WDMTestTemplate general queries\experimental 0
+call :test InitNotCleared WDMTestTemplate wdm queries 0
+call :test IrqlNotUsed WDMTestTemplate general queries 0
+call :test IrqlNotSaved WDMTestTemplate general queries 0
+call :test IllegalFieldWrite WDMTestTemplate wdm queries 0
+call :test IllegalFieldAccess2 WDMTestTemplate wdm queries 0
+call :test RoutineFunctionTypeNotExpected WDMTestTemplate general queries 0
+call :test KeSetEventIrql WDMTestTemplate general queries\experimental 0
+call :test KeSetEventPageable WDMTestTemplate general queries 0
+call :test UnicodeStringFreed WDMTestTemplate general queries\experimental 1
 
 exit /b 0
 
@@ -46,14 +46,14 @@ robocopy /e ..\%3\%4\%1\ working\%1\driver\
 cd working\%1
 
 echo building
-msbuild /t:rebuild /p:platform=x64
+msbuild /t:rebuild /p:platform=x64 /p:UseNTIFS=%5
 
 
 @REM the "..\..\TestDB\%1" in the command below specifies a location for the database we want to create. The %1 will correspond to the 
 @REM first argument of the calls above, for example, PendingStatusError for the first call.
 echo creating_database
 mkdir ..\..\TestDB
-codeql database create -l=cpp -c "msbuild /p:Platform=x64 /t:rebuild" "..\..\TestDB\%1" 
+codeql database create -l=cpp -c "msbuild /p:Platform=x64;UseNTIFS=%5 /t:rebuild" "..\..\TestDB\%1" 
 
 @REM Similar to the case above, the %1 corresponds to PendingStatusError
 cd ..\..
