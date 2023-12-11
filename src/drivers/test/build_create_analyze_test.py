@@ -2,6 +2,7 @@ import os
 import sys
 import subprocess
 import shutil
+import threading
 
 def walk_files(directory, extension):
     ql_files = []
@@ -16,7 +17,7 @@ def walk_files(directory, extension):
 
 # walk through files in the src directory and look for .ql files
 # @REM call :test <DriverName> <DriverTemplate> <DriverType> <DriverDirectory> <UseNTIFS parameter value>
-def run_test(arg1, arg2, arg3, arg4, arg5):
+def run_test(arg1, arg2, arg3, arg4, arg5, output=True):
     print(arg1, arg2, arg3, arg4, arg5)
     
     if os.path.exists(os.path.join(os.getcwd(), "working/"+arg1+'/').strip()):
@@ -26,26 +27,27 @@ def run_test(arg1, arg2, arg3, arg4, arg5):
     for file in os.listdir(os.path.join(os.getcwd(),"..\\"+arg3+"\\"+arg4+"\\"+arg1)):
         shutil.copyfile(os.path.join(os.getcwd(),"..\\"+arg3+"\\"+arg4+"\\"+arg1,file), os.path.join(os.getcwd(),"working\\"+arg1+"\\driver\\",file))
 
-    subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+arg5+""],cwd=os.path.join(os.getcwd(),"working\\"+arg1), shell=True) 
+    out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+arg5+""],cwd=os.path.join(os.getcwd(),"working\\"+arg1), shell=True, capture_output=output  ) 
     os.makedirs("TestDB", exist_ok=True) 
-    subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+arg5+ " /t:rebuild", "..\\..\\TestDB\\"+arg1],
+    out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+arg5+ " /t:rebuild", "..\\..\\TestDB\\"+arg1],
                     cwd=os.path.join(os.getcwd(),"working\\"+arg1), 
-                    shell=True) 
+                    shell=True, capture_output=output  ) 
 
-    os.makedirs("AnalysisFiles\Test Samples", exist_ok=True) 
+    if not os.path.exists("AnalysisFiles\Test Samples"):
+        os.makedirs("AnalysisFiles\Test Samples", exist_ok=True) 
   
-    subprocess.run(["codeql", "database", "analyze", "TestDB\\"+arg1, "--format=sarifv2.1.0", "--output=AnalysisFiles\\Test Samples\\"+arg1+".sarif", "..\\"+arg3+"\\"+arg4+"\\"+arg1+"\*.ql" ], 
-                    shell=True) 
-    subprocess.run(["sarif", "diff", "-o", "diff\\"+arg1+".sarif", "..\\"+arg3+"\\"+arg4+"\\"+arg1+"\\"+arg1+".sarif", "AnalysisFiles\Test Samples\\"+arg1+".sarif"], 
-                    shell=True)
-    # sarif diff -o "diff\"+arg1+".sarif" "..\"+arg2+"\"+arg2+"\"+arg1+"\"+arg1+".sarif" "AnalysisFiles\Test Samples\"+arg1+".sarif"
+    out3 = subprocess.run(["codeql", "database", "analyze", "TestDB\\"+arg1, "--format=sarifv2.1.0", "--output=AnalysisFiles\\Test Samples\\"+arg1+".sarif", "..\\"+arg3+"\\"+arg4+"\\"+arg1+"\*.ql" ], 
+                    shell=True, capture_output=output  ) 
+    out4 = subprocess.run(["sarif", "diff", "-o", "diff\\"+arg1+".sarif", "..\\"+arg3+"\\"+arg4+"\\"+arg1+"\\"+arg1+".sarif", "AnalysisFiles\Test Samples\\"+arg1+".sarif"], 
+                    shell=True, capture_output=output  ) 
+    
+    print(out1, out2, out3, out4)
 
 def run_tests(ql_files):
     for query in ql_files:
 
         path = os.path.normpath(query)
         path = path.split(os.sep)
-
         ql_file = path[-1]
         ql_name = path[-2]
         di = path.index("drivers")
@@ -70,7 +72,7 @@ def usage():
     print("Options:")
     print("-h: help")
     print("-i <name>: run only the tests with <name> in the name")
-
+    print("-t: run multithreaded")
 if __name__ == "__main__":
     subprocess.run(["clean.cmd"]) 
     cwd = os.getcwd()
@@ -80,21 +82,30 @@ if __name__ == "__main__":
 
     ql_files = walk_files(dir_to_search, ".ql")
 
+    threads = False    
     if "-h" in sys.argv:
         usage()
-    elif "-i" in sys.argv:
-        name = sys.argv[sys.argv.index("-i")+1]
-        ql_files = [x for x in ql_files if name in x]
-        run_tests(ql_files)
-  
-
-    elif len(sys.argv) > 1:
-        print("Invalid argument")
-        usage()
-        exit(1)
-    elif len(sys.argv) == 1:
-        run_tests(ql_files)
     else:
-        print("Invalid argument")
-        usage()
-        exit(1)
+        if "-i" in sys.argv:
+            name = sys.argv[sys.argv.index("-i")+1]
+            ql_files_final = [x for x in ql_files if name in x]
+        elif "-t" in sys.argv:
+            ql_files_final = ql_files
+        elif len(sys.argv) == 1:
+            ql_files_final = ql_files
+       
+        if "-t" in sys.argv:
+            threads = [threading.Thread(target=run_tests, args=([q],), kwargs={}) for q in ql_files_final]
+
+        if ql_files_final == []:
+            print("Invalid argument")
+            usage()
+            exit(1)
+        
+    if threads:
+        for thread in threads:
+            print('Start thread ' + thread.name )
+            thread.start()
+
+    else:
+        run_tests(ql_files_final)
