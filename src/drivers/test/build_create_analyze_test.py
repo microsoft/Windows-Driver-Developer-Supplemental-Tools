@@ -3,6 +3,7 @@ import sys
 import subprocess
 import shutil
 import threading
+import time
 
 def walk_files(directory, extension):
     ql_files = []
@@ -74,6 +75,7 @@ def usage():
     print("-i <name>: run only the tests with <name> in the name")
     print("-t: run multithreaded")
 if __name__ == "__main__":
+    start_time = time.time()
     subprocess.run(["clean.cmd"]) 
     cwd = os.getcwd()
     path = os.path.normpath(cwd)
@@ -106,6 +108,10 @@ if __name__ == "__main__":
         for thread in threads:
             print('Start thread ' + thread.name )
             thread.start()
-
+        for thread in threads:
+            thread.join()
+        
     else:
         run_tests(ql_files_final)
+    end_time = time.time()
+    print("Total run time: " + str(end_time - start_time) + " seconds")
