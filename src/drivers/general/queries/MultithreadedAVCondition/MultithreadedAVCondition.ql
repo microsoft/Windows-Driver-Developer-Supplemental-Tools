@@ -1,14 +1,14 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/unicode-string-not-freed
- * @name Unicode String Not Freed
- * @description UnicodeString objects created with RtlCreateUnicodeString must be freed with RtlFreeUnicodeString.
+ * @id cpp/drivers/multithreaded-av-condition
+ * @name Multithreaded Access Violation Condition
+ * @description This warning indicates that a thread has potential to access deleted objects if preempted.
  * @platform Desktop
  * @security.severity Medium
  * @feature.area Multiple
  * @impact Exploitable Design
- * @repro.text A UNICODE_STRING object is created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString.
+ * @repro.text There should be no access to a reference-counted object after the reference count is at zero
  * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-D0006
  * @kind problem
@@ -20,57 +20,37 @@
  * @query-version v1
  */
 
-
 import cpp
 import semmle.code.cpp.dataflow.new.DataFlow
+import semmle.code.cpp.ir.IR
+import semmle.code.cpp.ir.dataflow.MustFlow
+import PathGraph
 
-class UnicodeStringAccess extends VariableAccess {
-  UnicodeStringAccess() { this.getTarget() instanceof UnicodeString }
-}
-
-class UnicodeString extends Variable {
-  UnicodeString() { this.getType().getName() = "PUNICODE_STRING" }
-}
-
-module UnicodeStringDataFlowConfig implements DataFlow::ConfigSig {
+module MultithreadAccessViolationConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    exists(FunctionCall rtlCreate |
-      rtlCreate.getArgument(0).getAChild*() = source.asExpr() and
-      rtlCreate.getTarget().getName() = ("RtlCreateUnicodeString")
+    exists(DeleteExpr del |
+      del.getExpr() = source.asExpr() //and
+      //source.asExpr() instanceof ThisExpr
     )
   }
 
   predicate isSink(DataFlow::Node sink) {
-    exists(FunctionCall rtlFree |
-      rtlFree.getArgument(0).getAChild*() = sink.asExpr() and
-      rtlFree.getTarget().getName() = ("RtlFreeUnicodeString")
-    )
-  }
-
-  predicate isAdditionalFlowStep(DataFlow::Node pred, DataFlow::Node succ) {
-    exists(FunctionCall fc, DataFlow::VariableNode var |
-      fc.getArgument(0).getAChild*() = pred.asExpr() and
-      (
-        fc.getTarget().getName() = ("RtlFreeUnicodeString")
-        or
-        fc.getTarget().getName() = ("RtlCreateUnicodeString")
-      ) and
-      fc.getArgument(0).getAChild*() instanceof UnicodeStringAccess
-    |
-      succ = var and
-      var.asVariable() instanceof UnicodeString and
-      var.asVariable() instanceof GlobalVariable and
-      var.asVariable().getName() = fc.getArgument(0).(VariableAccess).getTarget().getName()
+    exists(Expr e |
+      e = sink.asExpr() and
+      e instanceof PointerFieldAccess
     )
   }
 }
 
-module Flow = DataFlow::Global<UnicodeStringDataFlowConfig>;
+module Flow = DataFlow::Global<MultithreadAccessViolationConfig>;
+
+// from DataFlow::Node source, DataFlow::Node sink
+// where Flow::flow(source, sink)
+// select source, "source $@ sink $@ loc $@", source, source.asExpr().getType(), sink,
+  // sink.asExpr().getType()
 
 from DataFlow::Node source
-where
-  not exists(DataFlow::Node sink | Flow::flow(source, sink)) and
-  UnicodeStringDataFlowConfig::isSource(source)
-select source,
-  "PUNICODE_STRING object $@ created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString",
-  source.asExpr(), source.asExpr().toString()
+where 
+exists(Dataflow::Node sink |  | )
+where p.getTarget().getName() = "m_cRef"
+select p

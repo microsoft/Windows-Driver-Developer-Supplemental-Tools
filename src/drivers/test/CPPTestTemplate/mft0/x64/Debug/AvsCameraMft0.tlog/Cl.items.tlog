@@ -1,0 +1,4 @@
+C:\codeql-home\Windows-driver-samples\avstream\avscamera\mft0\x64\Debug\Mft0_i.c;C:\codeql-home\Windows-driver-samples\avstream\avscamera\mft0\x64\Debug\Mft0_i.obj
+C:\codeql-home\Windows-driver-samples\avstream\avscamera\mft0\dllmain.cpp;C:\codeql-home\Windows-driver-samples\avstream\avscamera\mft0\x64\Debug\dllmain.obj
+C:\codeql-home\Windows-driver-samples\avstream\avscamera\mft0\Mft0Impl.cpp;C:\codeql-home\Windows-driver-samples\avstream\avscamera\mft0\x64\Debug\Mft0Impl.obj
+C:\codeql-home\Windows-driver-samples\avstream\avscamera\mft0\stdafxsrc.cpp;C:\codeql-home\Windows-driver-samples\avstream\avscamera\mft0\x64\Debug\stdafxsrc.obj

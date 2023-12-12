@@ -1,0 +1,15 @@
+﻿  Building 'package' with toolset 'WindowsKernelModeDriver10.0' and the 'Desktop' target platform.
+  .........................
+  Signability test complete.
+  
+  Errors:
+  None
+  
+  Warnings:
+  None
+  
+  Catalog generation complete.
+  C:\codeql-home\Windows-driver-samples\avstream\avscamera\x64\Debug\package\avscamera.cat
+  Done Adding Additional Store
+  Successfully signed: C:\codeql-home\Windows-driver-samples\avstream\avscamera\x64\Debug\package\avscamera.cat
+  
