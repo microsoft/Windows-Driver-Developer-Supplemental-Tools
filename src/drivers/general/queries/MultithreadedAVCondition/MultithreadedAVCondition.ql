@@ -21,36 +21,17 @@
  */
 
 import cpp
-import semmle.code.cpp.dataflow.new.DataFlow
 import semmle.code.cpp.ir.IR
-import semmle.code.cpp.ir.dataflow.MustFlow
-import PathGraph
 
-module MultithreadAccessViolationConfig implements DataFlow::ConfigSig {
-  predicate isSource(DataFlow::Node source) {
-    exists(DeleteExpr del |
-      del.getExpr() = source.asExpr() //and
-      //source.asExpr() instanceof ThisExpr
-    )
-  }
-
-  predicate isSink(DataFlow::Node sink) {
-    exists(Expr e |
-      e = sink.asExpr() and
-      e instanceof PointerFieldAccess
-    )
-  }
-}
-
-module Flow = DataFlow::Global<MultithreadAccessViolationConfig>;
-
-// from DataFlow::Node source, DataFlow::Node sink
-// where Flow::flow(source, sink)
-// select source, "source $@ sink $@ loc $@", source, source.asExpr().getType(), sink,
-  // sink.asExpr().getType()
-
-from DataFlow::Node source
-where 
-exists(Dataflow::Node sink |  | )
-where p.getTarget().getName() = "m_cRef"
-select p
+from BasicBlock delBlock, BasicBlock useBlock, ThisExpr t, PointerFieldAccess p
+where
+  exists(DeleteExpr del | del.getExpr() = t) and
+  t.getEnclosingDeclaration() = p.getQualifier().getEnclosingDeclaration() and
+  p.getEnclosingDeclaration() = t.getEnclosingDeclaration() and
+  delBlock = t.getBasicBlock() and
+  useBlock = p.getBasicBlock() and
+  not useBlock.contains(delBlock) and
+  not delBlock.contains(useBlock) and
+  not delBlock.getAPredecessor*() = useBlock and
+  delBlock.getAPredecessor*() = useBlock.getAPredecessor*()
+select t, " $@  $@  $@", t, delBlock, p, useBlock

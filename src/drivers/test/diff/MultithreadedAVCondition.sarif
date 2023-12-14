@@ -1,0 +1,27 @@
+{
+    "all": {
+        "+": 0,
+        "-": 1
+    },
+    "error": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    },
+    "warning": {
+        "+": 0,
+        "-": 1,
+        "codes": [
+            [
+                "cpp/drivers/unicode-string-not-freed PUNICODE_STRING object [unicodeStringNotFreed](1) created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString",
+                1,
+                0
+            ]
+        ]
+    },
+    "note": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    }
+}
