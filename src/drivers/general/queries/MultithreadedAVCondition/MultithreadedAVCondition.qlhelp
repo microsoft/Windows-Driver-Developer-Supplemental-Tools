@@ -2,12 +2,12 @@
 <qhelp>
 	<overview>
 		<p>
-			A UNICODE_STRING pointer that is allocated with RtlCreateUnicodeString is allocated from paged pool and must be freed by calling RtlFreeUnicodeString
+			This warning indicates that a thread has potential to access deleted objects if preempted.
 		</p>
 	</overview>
 	<recommendation>
 		<p>
-			Ensure that a UNICODE_STRING allocated with RtlCreateUnicodeString is freed using RtlFreeUnicodeString
+			There should be no access to a reference-counted object after the reference count is at zero
 		</p>
 	</recommendation>
 	<example>
@@ -15,8 +15,8 @@
 	</example>
 	<references>
 		<li>
-			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/ntifs/nf-ntifs-rtlcreateunicodestring">
-				RtlCreateUnicodeString function (MSDN)
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28616-multithreaded-av-condition">
+				Warning C28616
 			</a>
 		</li>
 	</references>
