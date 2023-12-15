@@ -1,3 +1,4 @@
+from multiprocessing.pool import ThreadPool
 import os
 import sys
 import subprocess
@@ -13,6 +14,8 @@ import time
 
 no_output = False
 override_template = ""
+
+print_mutex = threading.Lock()
 
 # Any attributes specific to a test should be added to this class
 # This also allows for things to be conditionally added to the test call, such as the UseNTIFS parameter
@@ -66,7 +69,7 @@ def usage():
     print("Options:")
     print("-h: help")
     print("-i <name>: run only the tests with <name> in the name")
-    print("-t: run multithreaded")
+    print("-t <num_threads>: run multithreaded with max <num_threads> threads")
     print("-o: output off")
 
 def check_use_ntifs(ds_file):
@@ -82,7 +85,7 @@ def check_use_ntifs(ds_file):
 # walk through files and look for .ql files
 def walk_files(directory, extension):
     ql_files_map = {}
-    print(directory)
+    # print(directory)
     for root, dirs, files in os.walk(directory):
         if "driver_snippet.c" in files:
             use_ntifs = check_use_ntifs(os.path.join(root, "driver_snippet.c"))
@@ -97,12 +100,13 @@ def walk_files(directory, extension):
 # Function to run a test using system calls
 def run_test(ql_test):
     # Print test attributes
+    print_mutex.acquire()
     print(ql_test.get_ql_name(), "\n",  
           "Template: ", ql_test.get_template(), "\n",  
           "Driver Framework: ", ql_test.get_ql_type(), "\n",  
           "Query location: ", ql_test.get_ql_location(), "\n",  
           "UseNTIFS flag: ", ql_test.get_use_ntifs(),"\n")
-    
+    print_mutex.release()
     # Remove existing working directory
     if os.path.exists(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/').strip()):
         shutil.rmtree(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/'))
@@ -137,6 +141,7 @@ def run_test(ql_test):
     
     # Check for errors
     if(no_output):
+        print_mutex.acquire()
         if(out1.returncode != 0 or out2.returncode != 0 or out3.returncode != 0 or out4.returncode != 0):
             print("Error in test: " + ql_test.get_ql_name())
 
@@ -154,12 +159,11 @@ def run_test(ql_test):
                 print(out4.stderr.decode())
         else:
             print("Test complete: " + ql_test.get_ql_name())
-
+        print_mutex.release()
 
 def parse_attributes(queries):
     query_objs = []
     for query in queries:
-        print(query)
         path = os.path.normpath(query)
         path = path.split(os.sep)
         ql_file = path[-1]
@@ -230,6 +234,7 @@ if __name__ == "__main__":
         ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
 
         if "-t" in sys.argv:
+            num_threads = int(sys.argv[sys.argv.index("-t")+1])
             print("Running multithreaded")
             print("Live output disabled for multithreaded run")
             print("\n\n\n !!! MULTITHREADED MODE IS NOT FULLY TESTED DO NOT USE FOR OFFICIAL TESTS !!! \n\n\n")
@@ -237,18 +242,17 @@ if __name__ == "__main__":
             thread_count = 0
             for q in ql_tests:
                 single_dict = {q:ql_tests[q]}
-                threads.append( threading.Thread(target=run_tests, args=((single_dict),), kwargs={}))
-
+                threads.append(single_dict)
+            pool = ThreadPool(processes=num_threads)
+            for result in pool.map(run_tests, threads):
+                print(result)
         if ql_tests == []:
             print("Invalid argument")
             usage()
             exit(1)
     
     if threads:
-        for thread in threads:
-            thread.start()
-        for thread in threads:
-            thread.join()
+       pass
     else:
         run_tests(ql_tests)
 
