@@ -34,4 +34,4 @@ where
   not delBlock.contains(useBlock) and
   not delBlock.getAPredecessor*() = useBlock and
   delBlock.getAPredecessor*() = useBlock.getAPredecessor*()
-select useBlock, "Possible Multithreaded Access Violation. Object deleted $@ but member referenced $@", t, "here", p, "here"
+select p, "Possible Multithreaded Access Violation. Object deleted but member $@ referenced", p, p.toString()
