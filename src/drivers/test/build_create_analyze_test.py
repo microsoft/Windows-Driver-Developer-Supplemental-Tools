@@ -12,6 +12,7 @@ import shutil
 import threading
 import time
 from multiprocessing.pool import ThreadPool
+import fnmatch
 
 no_output = False
 override_template = ""
@@ -21,7 +22,7 @@ print_mutex = threading.Lock()
 # Any attributes specific to a test should be added to this class
 # This also allows for things to be conditionally added to the test call, such as the UseNTIFS parameter
 class ql_test_attributes:
-    def __init__(self, use_ntifs=False, template="", path="", ql_file="", ql_name="", ql_type="", ql_location=""):
+    def __init__(self,use_cpp=False, use_ntifs=False, template="", path="", ql_file="", ql_name="", ql_type="", ql_location=""):
         self.use_ntifs = use_ntifs
         self.template = template
         self.path = path
@@ -29,6 +30,12 @@ class ql_test_attributes:
         self.ql_name = ql_name
         self.ql_type = ql_type
         self.ql_location = ql_location
+        self.use_cpp = use_cpp
+
+    def get_use_cpp(self):
+        return self.use_cpp
+    def set_use_cpp(self, use_cpp):
+        self.use_cpp = use_cpp
 
     def get_use_ntifs(self):
         return self.use_ntifs
@@ -88,12 +95,18 @@ def walk_files(directory, extension):
     ql_files_map = {}
     # print(directory)
     for root, dirs, files in os.walk(directory):
-        if "driver_snippet.c" in files:
-            use_ntifs = check_use_ntifs(os.path.join(root, "driver_snippet.c"))
+        if fnmatch.filter(files, "driver_snippet.c*"):
+            use_ntifs = check_use_ntifs(os.path.join(root, fnmatch.filter(files, "driver_snippet.c*")[0]))
             for file in files:
                 if file.endswith(extension):
+                    use_cpp = all([".cpp" in x for x in fnmatch.filter(files, "driver_snippet.c*")])
+                    if(use_cpp):
+                        print(root, dirs, files)
+                        print (use_cpp)
                     ql_obj = ql_test_attributes(use_ntifs)
+                    ql_obj.set_use_cpp(use_cpp)
                     ql_files_map[os.path.join(root, file)] = ql_obj
+
     return ql_files_map
 
 
@@ -172,7 +185,9 @@ def parse_attributes(queries):
         di = path.index("drivers")
         ql_type = path[di+1]
         template = ""
-        if(ql_type == "general"):
+        if queries[query].get_use_cpp():
+            template = "CppKMDFTestTemplate"
+        elif(ql_type == "general"):
             template = "WDMTestTemplate"
         elif(ql_type == "wdm"):
             template = "WDMTestTemplate"
