@@ -1,1 +1,0 @@
-C:\codeql-home\Windows-driver-samples\avstream\avscamera\sys\x64\Debug\AvsCamera.sys
