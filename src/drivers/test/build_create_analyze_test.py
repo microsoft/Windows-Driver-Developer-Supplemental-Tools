@@ -4,6 +4,7 @@ import subprocess
 import shutil
 import threading
 import time
+from multiprocessing.pool import ThreadPool
 
 no_output = False
 override_template = ""
@@ -95,10 +96,26 @@ def run_test(ql_test):
                     shell=True, capture_output=no_output  ) 
     
     if(no_output):
-        print(out1, out2, out3, out4)
+        if(out1.returncode != 0 or out2.returncode != 0 or out3.returncode != 0 or out4.returncode != 0):
+            print("Error in test: " + ql_test.get_ql_name())
+
+            if(out1.returncode != 0):
+                print("Error in msbuild: " + ql_test.get_ql_name())
+                print(out1.stderr.decode())
+            if(out2.returncode != 0):
+                print("Error in codeql database create: " + ql_test.get_ql_name())
+                print(out2.stderr.decode())
+            if(out3.returncode != 0):
+                print("Error in codeql database analyze: " + ql_test.get_ql_name())
+                print(out3.stderr.decode())
+            if(out4.returncode != 0):
+                print("Error in sarif diff: " + ql_test.get_ql_name())
+                print(out4.stderr.decode())
+        else:
+            print("Test complete: " + ql_test.get_ql_name())
 
 def parse_attributes(query):
-    
+    print(query)
     path = os.path.normpath(query)
     path = path.split(os.sep)
     ql_file = path[-1]
@@ -127,8 +144,9 @@ def parse_attributes(query):
     return ql_test_attributes(use_ntifs, template, path, ql_file, ql_name, ql_type, ql_location)
 
 def run_tests(ql_files):
-
+    print("Running tests")
     for query_path in ql_files:
+        print(query_path)
         ql_test = parse_attributes(query_path)
         # subprocess.run(["build_create_analyze_test.cmd", ql_name, template, ql_type,ql_location, "0"]) 
         run_test(ql_test)
@@ -163,22 +181,30 @@ if __name__ == "__main__":
         ql_files = {x:ql_files[x] for x in ql_files if x in ql_files_keys}
 
         if "-t" in sys.argv:
+            pool = ThreadPool(processes=10)
+
+            print("Running multithreaded")
+            print("Live output disabled for multithreaded run")
+            print("\n\n\n !!! MULTITHREADED MODE IS NOT FULLY TESTED DO NOT USE FOR OFFICIAL TESTS !!! \n\n\n")
             no_output = True
+            thread_count = 0
             for q in ql_files:
                 single_dict = {q:ql_files[q]}
-                threads.append(threading.Thread(target=run_tests, args=((single_dict),), kwargs={}))
+                # threads.append( threading.Thread(target=run_tests, args=((single_dict),), kwargs={}))
+                threads.append(single_dict)
+            for result in map(run_tests, ([single_dict],)):
+                print(result)
 
         if ql_files == []:
             print("Invalid argument")
             usage()
             exit(1)
-        
+    
     if threads:
         print("Running multithreaded")
         print("Live output disabled for multithreaded run")
 
         for thread in threads:
-            print('Start thread ' + thread.name )
             thread.start()
         for thread in threads:
             thread.join()
