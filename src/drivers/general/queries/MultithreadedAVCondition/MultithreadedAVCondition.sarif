@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.14.6",
+        "semanticVersion" : "2.15.4",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -24,13 +24,13 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/unicode-string-not-freed",
-          "name" : "cpp/drivers/unicode-string-not-freed",
+          "id" : "cpp/drivers/multithreaded-av-condition",
+          "name" : "cpp/drivers/multithreaded-av-condition",
           "shortDescription" : {
-            "text" : "Unicode String Not Freed"
+            "text" : "Multithreaded Access Violation Condition"
           },
           "fullDescription" : {
-            "text" : "UnicodeString objects created with RtlCreateUnicodeString must be freed with RtlFreeUnicodeString."
+            "text" : "This warning indicates that a thread has potential to access deleted objects if preempted."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -38,19 +38,19 @@
           },
           "properties" : {
             "tags" : [ "correctness", "wddst" ],
-            "description" : "UnicodeString objects created with RtlCreateUnicodeString must be freed with RtlFreeUnicodeString.",
+            "description" : "This warning indicates that a thread has potential to access deleted objects if preempted.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/unicode-string-not-freed",
+            "id" : "cpp/drivers/multithreaded-av-condition",
             "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "Unicode String Not Freed",
+            "name" : "Multithreaded Access Violation Condition",
             "opaqueid" : "CQLD-D0006",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "A UNICODE_STRING object is created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString.",
+            "repro.text" : "There should be no access to a reference-counted object after the reference count is at zero",
             "scope" : "domainspecific",
             "security.severity" : "Medium"
           }
@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+60b1cef4f56fea2f366724a51097b65da6b795b9",
+        "semanticVersion" : "0.2.0+3c5178444aaedbdbcfa4d8f5bdb03fa097064bee",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -77,30 +77,7 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
-              "uriBaseId" : "%SRCROOT%",
-              "index" : 0
-            }
-          }
-        } ],
-        "message" : {
-          "text" : ""
-        },
-        "level" : "none",
-        "descriptor" : {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "index" : 0
-        },
-        "properties" : {
-          "formattedMessage" : {
-            "text" : ""
-          }
-        }
-      }, {
-        "locations" : [ {
-          "physicalLocation" : {
-            "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "Driver.cpp",
               "uriBaseId" : "%SRCROOT%",
               "index" : 1
             }
@@ -123,9 +100,193 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.h",
+              "uri" : "Driver.h",
               "uriBaseId" : "%SRCROOT%",
               "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "Queue.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 3
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.cpp",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "Public.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 4
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "Trace.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 5
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "Device.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 6
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "Device.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 7
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "Queue.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 8
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.hpp",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 9
             }
           }
         } ],
@@ -147,67 +308,126 @@
     } ],
     "artifacts" : [ {
       "location" : {
-        "uri" : "driver/driver_snippet.c",
+        "uri" : "driver/driver_snippet.cpp",
         "uriBaseId" : "%SRCROOT%",
         "index" : 0
       }
     }, {
       "location" : {
-        "uri" : "driver/fail_driver1.c",
+        "uri" : "Driver.cpp",
         "uriBaseId" : "%SRCROOT%",
         "index" : 1
       }
     }, {
       "location" : {
-        "uri" : "driver/fail_driver1.h",
+        "uri" : "Driver.h",
         "uriBaseId" : "%SRCROOT%",
         "index" : 2
       }
+    }, {
+      "location" : {
+        "uri" : "Queue.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 3
+      }
+    }, {
+      "location" : {
+        "uri" : "Public.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 4
+      }
+    }, {
+      "location" : {
+        "uri" : "Trace.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 5
+      }
+    }, {
+      "location" : {
+        "uri" : "Device.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 6
+      }
+    }, {
+      "location" : {
+        "uri" : "Device.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 7
+      }
+    }, {
+      "location" : {
+        "uri" : "Queue.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 8
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/driver_snippet.hpp",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 9
+      }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/unicode-string-not-freed",
+      "ruleId" : "cpp/drivers/multithreaded-av-condition",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/unicode-string-not-freed",
+        "id" : "cpp/drivers/multithreaded-av-condition",
         "index" : 0
       },
       "message" : {
-        "text" : "PUNICODE_STRING object [unicodeStringNotFreed](1) created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString"
+        "text" : "Possible Multithreaded Access Violation. Object deleted [here](1) but member referenced [here](2)"
       },
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
+            "uri" : "driver/driver_snippet.cpp",
             "uriBaseId" : "%SRCROOT%",
             "index" : 0
           },
           "region" : {
-            "startLine" : 31,
-            "startColumn" : 28,
-            "endColumn" : 49
+            "startLine" : 65,
+            "startColumn" : 9,
+            "endColumn" : 22
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "e56c61209e3933d3:1",
-        "primaryLocationStartColumnFingerprint" : "23"
+        "primaryLocationLineHash" : "8ec2c4cea9befbf8:1",
+        "primaryLocationStartColumnFingerprint" : "0"
       },
       "relatedLocations" : [ {
         "id" : 1,
         "physicalLocation" : {
           "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
+            "uri" : "driver/driver_snippet.cpp",
             "uriBaseId" : "%SRCROOT%",
             "index" : 0
           },
           "region" : {
-            "startLine" : 31,
-            "startColumn" : 28,
-            "endColumn" : 49
+            "startLine" : 61,
+            "startColumn" : 20,
+            "endColumn" : 24
           }
         },
         "message" : {
-          "text" : "unicodeStringNotFreed"
+          "text" : "here"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.cpp",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 65,
+            "startColumn" : 16,
+            "endColumn" : 22
+          }
+        },
+        "message" : {
+          "text" : "here"
         }
       } ]
     } ],

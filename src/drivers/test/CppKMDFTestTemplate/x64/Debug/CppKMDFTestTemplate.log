@@ -1,20 +1,13 @@
 ﻿  Building 'CppKMDFTestTemplate' with toolset 'WindowsKernelModeDriver10.0' and the 'Universal' target platform.
   Stamping x64\Debug\CppKMDFTestTemplate.inf
-  Stamping [Version] section with DriverVer=12/15/2023,9.44.18.276
-  Device.c
-  Generating Code...
-  Compiling...
+  Stamping [Version] section with DriverVer=12/15/2023,11.16.9.494
   Driver.cpp
-  Generating Code...
-  Compiling...
-  Queue.c
-  Generating Code...
-  CppKMDFTestTemplate.vcxproj -> C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate.sys
+  CppKMDFTestTemplate.vcxproj -> C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate.sys
   Done Adding Additional Store
-  Successfully signed: C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate.sys
+  Successfully signed: C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate.sys
   
   Driver is 'Universal'.
-  ........................
+  .........................
   Signability test complete.
   
   Errors:
@@ -24,7 +17,7 @@
   None
   
   Catalog generation complete.
-  C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate\cppkmdftesttemplate.cat
+  C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate\cppkmdftesttemplate.cat
   Done Adding Additional Store
-  Successfully signed: C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate\cppkmdftesttemplate.cat
+  Successfully signed: C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate\cppkmdftesttemplate.cat
   

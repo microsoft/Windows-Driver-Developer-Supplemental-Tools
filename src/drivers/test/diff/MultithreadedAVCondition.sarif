@@ -1,6 +1,6 @@
 {
     "all": {
-        "+": 0,
+        "+": 1,
         "-": 1
     },
     "error": {
@@ -9,9 +9,14 @@
         "codes": []
     },
     "warning": {
-        "+": 0,
+        "+": 1,
         "-": 1,
         "codes": [
+            [
+                "cpp/drivers/multithreaded-av-condition Possible Multithreaded Access Violation. Object deleted [here](1) but member referenced [here](2)",
+                0,
+                1
+            ],
             [
                 "cpp/drivers/unicode-string-not-freed PUNICODE_STRING object [unicodeStringNotFreed](1) created with RtlCreateUnicodeString but not freed with RtlFreeUnicodeString",
                 1,

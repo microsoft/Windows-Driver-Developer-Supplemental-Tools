@@ -8,7 +8,7 @@ Class=USBDevice
 ClassGuid={88BAE032-5A81-49f0-BC3D-A4FF138216D6}
 Provider=%ManufacturerName%
 CatalogFile=CppKMDFTestTemplate.cat
-DriverVer = 12/15/2023,9.44.18.276
+DriverVer = 12/15/2023,11.16.9.494
 PnpLockDown=1
 
 [DestinationDirs]

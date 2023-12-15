@@ -1,3 +1,3 @@
-C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\Device.c;C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\x64\Debug\Device.obj
-C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\Driver.cpp;C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\x64\Debug\Driver.obj
-C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\Queue.c;C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\x64\Debug\Queue.obj
+C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\Device.c;C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\x64\Debug\Device.obj
+C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\Driver.cpp;C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\x64\Debug\Driver.obj
+C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\Queue.c;C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\x64\Debug\Queue.obj

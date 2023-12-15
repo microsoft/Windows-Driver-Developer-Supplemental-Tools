@@ -2,7 +2,7 @@
 <Project>
   <ProjectOutputs>
     <ProjectOutput>
-      <FullPath>C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\temp\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate.sys</FullPath>
+      <FullPath>C:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src\drivers\test\CppKMDFTestTemplate\x64\Debug\CppKMDFTestTemplate.sys</FullPath>
     </ProjectOutput>
   </ProjectOutputs>
   <ContentFiles />

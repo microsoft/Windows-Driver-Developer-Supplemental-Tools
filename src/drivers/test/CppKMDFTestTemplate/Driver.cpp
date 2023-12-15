@@ -25,22 +25,149 @@ Environment:
 #include "driver.h"
 #include "driver.tmh"
 
+PVOID operator new(
+    size_t iSize,
+    _When_((poolType & NonPagedPoolMustSucceed) != 0,
+           __drv_reportError("Must succeed pool allocations are forbidden. "
+                             "Allocation failures cause a system crash"))
+        POOL_TYPE poolType)
+{
+    return ExAllocatePoolZero(poolType, iSize, 'wNCK');
+}
+
+PVOID operator new(
+    size_t iSize,
+    _When_((poolType & NonPagedPoolMustSucceed) != 0,
+           __drv_reportError("Must succeed pool allocations are forbidden. "
+                             "Allocation failures cause a system crash"))
+        POOL_TYPE poolType,
+    ULONG tag)
+{
+    return ExAllocatePoolZero(poolType, iSize, tag);
+}
+
+PVOID
+operator new[](
+    size_t iSize,
+    _When_((poolType & NonPagedPoolMustSucceed) != 0,
+           __drv_reportError("Must succeed pool allocations are forbidden. "
+                             "Allocation failures cause a system crash"))
+        POOL_TYPE poolType,
+    ULONG tag)
+{
+    return ExAllocatePoolZero(poolType, iSize, tag);
+}
+
+/*++
+
+Routine Description:
+
+    Array delete() operator.
+
+Arguments:
+
+    pVoid -
+        The memory to free.
+
+Return Value:
+
+    None
+
+--*/
+void __cdecl
+operator delete[](
+    PVOID pVoid)
+{
+    if (pVoid)
+    {
+        ExFreePool(pVoid);
+    }
+}
+
+/*++
+
+Routine Description:
+
+    Sized delete() operator.
+
+Arguments:
+
+    pVoid -
+        The memory to free.
+
+    size -
+        The size of the memory to free.
+
+Return Value:
+
+    None
+
+--*/
+void __cdecl operator delete(
+    void *pVoid,
+    size_t /*size*/
+)
+{
+    if (pVoid)
+    {
+        ExFreePool(pVoid);
+    }
+}
+
+/*++
+
+Routine Description:
+
+    Sized delete[]() operator.
+
+Arguments:
+
+    pVoid -
+        The memory to free.
+
+    size -
+        The size of the memory to free.
+
+Return Value:
+
+    None
+
+--*/
+void __cdecl operator delete[](
+    void *pVoid,
+    size_t /*size*/
+)
+{
+    if (pVoid)
+    {
+        ExFreePool(pVoid);
+    }
+}
+
+void __cdecl operator delete(
+    PVOID pVoid)
+{
+    if (pVoid)
+    {
+        ExFreePool(pVoid);
+    }
+}
 #ifdef ALLOC_PRAGMA
-#pragma alloc_text (INIT, DriverEntry)
-#pragma alloc_text (PAGE, CppKMDFTestTemplateEvtDeviceAdd)
-#pragma alloc_text (PAGE, CppKMDFTestTemplateEvtDriverContextCleanup)
+#pragma alloc_text(INIT, DriverEntry)
+#pragma alloc_text(PAGE, CppKMDFTestTemplateEvtDeviceAdd)
+#pragma alloc_text(PAGE, CppKMDFTestTemplateEvtDriverContextCleanup)
 #endif
 
 #include "driver/driver_snippet.cpp"
 
+
+
 extern "C" DRIVER_INITIALIZE DriverEntry;
 
-extern "C"
-NTSTATUS
+extern "C" NTSTATUS
 DriverEntry(
-    _In_ PDRIVER_OBJECT  DriverObject,
-    _In_ PUNICODE_STRING RegistryPath
-)
+    _In_ PDRIVER_OBJECT DriverObject,
+    _In_ PUNICODE_STRING RegistryPath)
 /*++
 
 Routine Description:
@@ -86,17 +213,16 @@ Return Value:
     attributes.EvtCleanupCallback = CppKMDFTestTemplateEvtDriverContextCleanup;
 
     WDF_DRIVER_CONFIG_INIT(&config,
-        CppKMDFTestTemplateEvtDeviceAdd
-    );
+                           CppKMDFTestTemplateEvtDeviceAdd);
 
     status = WdfDriverCreate(DriverObject,
-        RegistryPath,
-        &attributes,
-        &config,
-        WDF_NO_HANDLE
-    );
+                             RegistryPath,
+                             &attributes,
+                             &config,
+                             WDF_NO_HANDLE);
 
-    if (!NT_SUCCESS(status)) {
+    if (!NT_SUCCESS(status))
+    {
         TraceEvents(TRACE_LEVEL_ERROR, TRACE_DRIVER, "WdfDriverCreate failed %!STATUS!", status);
         WPP_CLEANUP(DriverObject);
         return status;
@@ -109,9 +235,8 @@ Return Value:
 
 NTSTATUS
 CppKMDFTestTemplateEvtDeviceAdd(
-    _In_    WDFDRIVER       Driver,
-    _Inout_ PWDFDEVICE_INIT DeviceInit
-)
+    _In_ WDFDRIVER Driver,
+    _Inout_ PWDFDEVICE_INIT DeviceInit)
 /*++
 Routine Description:
 
@@ -146,10 +271,8 @@ Return Value:
     return status;
 }
 
-VOID
-CppKMDFTestTemplateEvtDriverContextCleanup(
-    _In_ WDFOBJECT DriverObject
-)
+VOID CppKMDFTestTemplateEvtDriverContextCleanup(
+    _In_ WDFOBJECT DriverObject)
 /*++
 Routine Description:
 
@@ -175,5 +298,4 @@ Return Value:
     // Stop WPP Tracing
     //
     WPP_CLEANUP(WdfDriverWdmGetDriverObject((WDFDRIVER)DriverObject));
-
 }
