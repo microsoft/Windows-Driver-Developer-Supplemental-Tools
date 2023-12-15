@@ -4,8 +4,8 @@
 name: microsoft/windows-drivers
 version: 0.2.0
 dependencies:
-    codeql/cpp-queries: 0.8.1
-    codeql/cpp-all: 0.10.1
+    codeql/cpp-queries: 0.9.0
+    codeql/cpp-all: 0.12.1
 suites: suites
 extractor: cpp
 licenses: MIT
