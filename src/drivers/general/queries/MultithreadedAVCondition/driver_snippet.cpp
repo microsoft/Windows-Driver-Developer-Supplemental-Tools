@@ -40,7 +40,7 @@ public:
         return hr;
     };
 
-    ULONG Release_bad()
+    ULONG Release_good()
     {
         ASSERT(0 != m_cRef);
         ULONG cRef = InterlockedDecrement(&m_cRef);
@@ -52,10 +52,8 @@ public:
         return cRef;
     }
 
-    ULONG
-    Release_good()
+    ULONG Release_bad()
     {
-
         if (0 == InterlockedDecrement(&m_cRef))
         {
             delete this;

@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+3c5178444aaedbdbcfa4d8f5bdb03fa097064bee",
+        "semanticVersion" : "0.2.0+c2f5944276110bb9658915fc065b11f82cc46573",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -280,29 +280,6 @@
             "text" : ""
           }
         }
-      }, {
-        "locations" : [ {
-          "physicalLocation" : {
-            "artifactLocation" : {
-              "uri" : "driver/driver_snippet.hpp",
-              "uriBaseId" : "%SRCROOT%",
-              "index" : 9
-            }
-          }
-        } ],
-        "message" : {
-          "text" : ""
-        },
-        "level" : "none",
-        "descriptor" : {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "index" : 0
-        },
-        "properties" : {
-          "formattedMessage" : {
-            "text" : ""
-          }
-        }
       } ],
       "executionSuccessful" : true
     } ],
@@ -360,12 +337,6 @@
         "uriBaseId" : "%SRCROOT%",
         "index" : 8
       }
-    }, {
-      "location" : {
-        "uri" : "driver/driver_snippet.hpp",
-        "uriBaseId" : "%SRCROOT%",
-        "index" : 9
-      }
     } ],
     "results" : [ {
       "ruleId" : "cpp/drivers/multithreaded-av-condition",
@@ -375,7 +346,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "Possible Multithreaded Access Violation. Object deleted [here](1) but member referenced [here](2)"
+        "text" : "Possible Multithreaded Access Violation. Object deleted [here](1) but member [m_cRef](2) referenced"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -385,15 +356,15 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 65,
-            "startColumn" : 9,
+            "startLine" : 63,
+            "startColumn" : 16,
             "endColumn" : 22
           }
         }
       } ],
       "partialFingerprints" : {
         "primaryLocationLineHash" : "8ec2c4cea9befbf8:1",
-        "primaryLocationStartColumnFingerprint" : "0"
+        "primaryLocationStartColumnFingerprint" : "7"
       },
       "relatedLocations" : [ {
         "id" : 1,
@@ -404,7 +375,7 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 61,
+            "startLine" : 59,
             "startColumn" : 20,
             "endColumn" : 24
           }
@@ -421,13 +392,13 @@
             "index" : 0
           },
           "region" : {
-            "startLine" : 65,
+            "startLine" : 63,
             "startColumn" : 16,
             "endColumn" : 22
           }
         },
         "message" : {
-          "text" : "here"
+          "text" : "m_cRef"
         }
       } ]
     } ],
