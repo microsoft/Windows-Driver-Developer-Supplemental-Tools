@@ -244,12 +244,15 @@ if __name__ == "__main__":
     else:
         if "-o" in sys.argv:
             no_output = True
+            sys.argv.remove("-o")
         if "--override_template" in sys.argv:
             override_template = sys.argv[sys.argv.index("--override_template")+1]
+            sys.argv.remove("--override_template")
+       
+            
         if "-i" in sys.argv:
             name = sys.argv[sys.argv.index("-i")+1]
             ql_files_keys = [x for x in ql_tests if name in x]
-
         elif "-t" in sys.argv:
             ql_files_keys = [x for x in ql_tests]
         elif len(sys.argv) == 1:
