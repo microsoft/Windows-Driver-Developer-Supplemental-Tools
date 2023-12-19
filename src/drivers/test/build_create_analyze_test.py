@@ -16,6 +16,7 @@ import fnmatch
 
 no_output = False
 override_template = ""
+database=""
 
 print_mutex = threading.Lock()
 
@@ -79,6 +80,8 @@ def usage():
     print("-i <name>: run only the tests with <name> in the name")
     print("-t <num_threads>: run multithreaded with max <num_threads> threads")
     print("-o: output off")
+    print("--override_template <template>: override the template used for the test")
+    print("-d <database>: use the specified database for all tests. Do not create individual databases for each test")
 
 def check_use_ntifs(ds_file):
     file = open(ds_file, "r")
@@ -136,20 +139,25 @@ def run_test(ql_test):
     if not no_output and out1.returncode != 0:
         print("Error in msbuild: " + ql_test.get_ql_name())
         return
-    # Create the CodeQL database
-    os.makedirs("TestDB", exist_ok=True) 
-    if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
-        shutil.rmtree("TestDB\\"+ql_test.get_ql_name())
-    out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", "..\\..\\TestDB\\"+ql_test.get_ql_name()],
-                    cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
-                    shell=True, capture_output=no_output  ) 
-    if not no_output and out2.returncode != 0:
-        print("Error in codeql database create: " + ql_test.get_ql_name())
-        return
+    if database == "":
+        database_loc = "TestDB\\"+ql_test.get_ql_name()
+        # Create the CodeQL database
+        os.makedirs(database_loc, exist_ok=True) 
+        if os.path.exists(database_loc ):
+            shutil.rmtree(database_loc )
+        out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", "..\\..\\"+ database_loc ],
+                        cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
+                        shell=True, capture_output=no_output  ) 
+        if not no_output and out2.returncode != 0:
+            print("Error in codeql database create: " + ql_test.get_ql_name())
+            return
+    else:        
+        database_loc = database
     # Analyze the CodeQL database
     if not os.path.exists("AnalysisFiles\Test Samples"):
         os.makedirs("AnalysisFiles\Test Samples", exist_ok=True) 
-    out3 = subprocess.run(["codeql", "database", "analyze", "TestDB\\"+ql_test.get_ql_name(), "--format=sarifv2.1.0", "--output=AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif", "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ], 
+    
+    out3 = subprocess.run(["codeql", "database", "analyze", database_loc , "--format=sarifv2.1.0", "--output=AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif", "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ], 
                     shell=True, capture_output=no_output  ) 
     if not no_output and out3.returncode != 0:
         print("Error in codeql database analyze: " + ql_test.get_ql_name())
@@ -164,23 +172,28 @@ def run_test(ql_test):
     # Check for errors
     if(no_output):
         print_mutex.acquire()
-        if(out1.returncode != 0 or out2.returncode != 0 or out3.returncode != 0 or out4.returncode != 0):
-            print("Error in test: " + ql_test.get_ql_name())
-
-            if(out1.returncode != 0):
-                print("Error in msbuild: " + ql_test.get_ql_name())
-                print(out1.stderr.decode())
-            if(out2.returncode != 0):
-                print("Error in codeql database create: " + ql_test.get_ql_name())
-                print(out2.stderr.decode())
-            if(out3.returncode != 0):
-                print("Error in codeql database analyze: " + ql_test.get_ql_name())
-                print(out3.stderr.decode())
-            if(out4.returncode != 0):
-                print("Error in sarif diff: " + ql_test.get_ql_name())
-                print(out4.stderr.decode())
-        else:
-            print("Test complete: " + ql_test.get_ql_name())
+      
+        if(out1.returncode != 0):
+            print("Error in msbuild: " + ql_test.get_ql_name())
+            print(out1.stderr.decode())
+            print_mutex.release()
+            return 
+        if(database == "" and out2.returncode != 0):
+            print("Error in codeql database create: " + ql_test.get_ql_name())
+            print(out2.stderr.decode())
+            print_mutex.release()
+            return
+        if(out3.returncode != 0):
+            print("Error in codeql database analyze: " + ql_test.get_ql_name())
+            print(out3.stderr.decode())
+            print_mutex.release()
+            return
+        if(out4.returncode != 0):
+            print("Error in sarif diff: " + ql_test.get_ql_name())
+            print(out4.stderr.decode())
+            print_mutex.release()
+            return
+        print("Test complete: " + ql_test.get_ql_name() + "\n")
         print_mutex.release()
 
 def parse_attributes(queries):
@@ -237,19 +250,26 @@ if __name__ == "__main__":
     dir_to_search ="/".join(path[0:path.index("Windows-Driver-Developer-Supplemental-Tools")+1])
 
     ql_tests = walk_files(dir_to_search, ".ql")
-
     threads = []    
     if "-h" in sys.argv:
         usage()
     else:
         if "-o" in sys.argv:
             no_output = True
+            sys.argv.remove("-o")
         if "--override_template" in sys.argv:
             override_template = sys.argv[sys.argv.index("--override_template")+1]
+            sys.argv.remove("--override_template")
+            sys.argv.remove(override_template)
+
+        if "-d" in sys.argv:
+            database = sys.argv[sys.argv.index("-d")+1]
+            sys.argv.remove("-d")
+            sys.argv.remove(database)
+        print(database)
         if "-i" in sys.argv:
             name = sys.argv[sys.argv.index("-i")+1]
             ql_files_keys = [x for x in ql_tests if name in x]
-
         elif "-t" in sys.argv:
             ql_files_keys = [x for x in ql_tests]
         elif len(sys.argv) == 1:
