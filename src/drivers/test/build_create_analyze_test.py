@@ -7,14 +7,17 @@ try:
     import threading
     import time
     import fnmatch
-    import sarif # Not directly used in the script but required for the sarif diff command. Importing it here checks for the module
+    from sarif import loader 
+    import pandas as pd
+    import openpyxl # Not directly used but this will make sure it is installed
 except ImportError as e:
     print("Import error: " + str(e) + "\nPlease install the required modules using pip install -r requirements.txt")
     exit(1)
 
 
-
 print_mutex = threading.Lock()
+
+result_df = pd.DataFrame(columns=["Test Name", "Template", "Driver Framework", "UseNTIFS flag", "Errors", "Warnings", "Notes", "Detailed Results"])
 
 # Any attributes specific to a test should be added to this class
 # This also allows for things to be conditionally added to the test call, such as the UseNTIFS parameter
@@ -273,7 +276,24 @@ def sarif_diff(ql_test):
         print("Error in sarif diff: " + ql_test.get_ql_name())
         return None
     return out4
+
+def sarif_results(ql_test):
+    """
+    Retrieves SARIF results for a given QL test.
+
+    Args:
+        ql_test (QLTest): The QL test object.
+
+    Returns:
+        None
+    """
+    sarif_file = os.getcwd()+ "\\AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif"
+    sarif_data = loader.load_sarif_file(sarif_file)
+    issue_count_by_sev = sarif_data.get_result_count_by_severity()
+
+    result_df.loc[len(result_df)] = [ql_test.get_ql_name(), ql_test.get_template(), ql_test.get_ql_type(), ql_test.get_use_ntifs(), issue_count_by_sev["error"], issue_count_by_sev["warning"], issue_count_by_sev["note"], sarif_data.get_records()]
     
+    print(result_df)
 
 # Function to run a test using system calls
 def run_test(ql_test):
@@ -314,6 +334,9 @@ def run_test(ql_test):
         sarif_diff_result = sarif_diff(ql_test)
         if sarif_diff_result is None: 
             return
+    
+    # TODO 
+    sarif_results(ql_test)
 
     # Check for errors
     if no_output and not existing_database:
@@ -341,7 +364,7 @@ def run_test(ql_test):
         if analyze_codeql_database_result.returncode != 0:
             print("Error in codeql database analyze: " + ql_test.get_ql_name())
             print(analyze_codeql_database_result.stderr.decode())
-      
+
 
 def parse_attributes(queries):
     """
@@ -406,7 +429,8 @@ def run_tests(ql_tests_dict):
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
     for ql_test in ql_tests_with_attributes:
         run_test(ql_test)
-        
+    with pd.ExcelWriter("results.xlsx") as writer:
+        result_df.to_excel(writer)  
 
 if __name__ == "__main__":
     # Sys input flags
