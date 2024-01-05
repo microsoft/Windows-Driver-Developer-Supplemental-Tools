@@ -19,7 +19,21 @@ print_mutex = threading.Lock()
 # Any attributes specific to a test should be added to this class
 # This also allows for things to be conditionally added to the test call, such as the UseNTIFS parameter
 class ql_test_attributes:
-    def __init__(self,use_cpp=False, use_ntifs=False, template="", path="", ql_file="", ql_name="", ql_type="", ql_location=""):
+    """
+    Represents the attributes for a CodeQL test.
+
+    Attributes:
+        use_cpp (bool): Indicates whether to use C++ for the test.
+        use_ntifs (bool): Indicates whether to use NTIFS for the test.
+        template (str): The template for the test.
+        path (str): The path for the test.
+        ql_file (str): The CodeQL file for the test.
+        ql_name (str): The name of the CodeQL test.
+        ql_type (str): The type of the CodeQL test.
+        ql_location (str): The location of the CodeQL test.
+    """
+
+    def __init__(self, use_cpp=False, use_ntifs=False, template="", path="", ql_file="", ql_name="", ql_type="", ql_location=""):
         self.use_ntifs = use_ntifs
         self.template = template
         self.path = path
@@ -31,41 +45,49 @@ class ql_test_attributes:
 
     def get_use_cpp(self):
         return self.use_cpp
+
     def set_use_cpp(self, use_cpp):
         self.use_cpp = use_cpp
 
     def get_use_ntifs(self):
         return self.use_ntifs
+
     def set_use_ntifs(self, use_ntifs):
         self.use_ntifs = use_ntifs
 
     def get_template(self):
         return self.template
+
     def set_template(self, template):
         self.template = template
 
     def get_path(self):
         return self.path
+
     def set_path(self, path):
         self.path = path
 
     def get_ql_file(self):
         return self.ql_file
+
     def set_ql_file(self, ql_file):
         self.ql_file = ql_file
 
     def get_ql_name(self):
         return self.ql_name
+
     def set_ql_name(self, ql_name):
         self.ql_name = ql_name
 
     def get_ql_type(self):
         return self.ql_type
+
     def set_ql_type(self, ql_type):
         self.ql_type = ql_type
 
     def get_ql_location(self):
         return self.ql_location
+
     def set_ql_location(self, ql_location):
         self.ql_location = ql_location
     
@@ -79,15 +101,32 @@ def usage():
     print("--override_template <template>: override the template used for the test")
     print("--use_codeql_repo <path>: use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager")
     print("--database <path>: Run all queries using the database at <path>")
+    print("--no_clean: Do not clean the working directory before running the tests")
 
 
+import subprocess
 
 def get_git_root():
+    """
+    Returns the root directory of the Git repository.
+
+    Returns:
+        str: The root directory of the Git repository.
+    """
     git_root = subprocess.Popen(['git', 'rev-parse', '--show-toplevel'], stdout=subprocess.PIPE).communicate()[0].rstrip().decode('utf-8')
-    git_root=git_root.split('/')[-1]
+    git_root = git_root.split('/')[-1]
     return git_root
 
 def check_use_ntifs(ds_file):
+    """
+    Check if the given ds_file uses the ntifs.h header file.
+
+    Args:
+        ds_file (str): The path to the file to be checked.
+
+    Returns:
+        bool: True if the ntifs.h header file is found, False otherwise.
+    """
     file = open(ds_file, "r")
     lines = file.readlines()
     for line in lines:
@@ -97,8 +136,18 @@ def check_use_ntifs(ds_file):
     file.close()
     return False
 
-# walk through files and look for .ql files
 def walk_files(directory, extension):
+    """
+    Walks through the specified directory and returns a dictionary mapping file paths to QL test attributes.
+
+    Args:
+        directory (str): The directory to walk through.
+        extension (str): The file extension to filter files by.
+
+    Returns:
+        dict: A dictionary mapping file paths to QL test attributes.
+    """
+    
     ql_files_map = {}
     for root, dirs, files in os.walk(directory):
         if fnmatch.filter(files, "driver_snippet.*"):
@@ -114,7 +163,20 @@ def walk_files(directory, extension):
 
     return ql_files_map
 
-def test_setup(ql_test):  
+def test_setup(ql_test):
+    """
+    Set up the test environment for CodeQL analysis.
+
+    Args:
+        ql_test (object): An instance of the QLTest class.
+
+    Returns:
+        object: The result of the msbuild command.
+
+    Raises:
+        None
+
+    """
     # Remove existing working directory
     if os.path.exists(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/').strip()):
         shutil.rmtree(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/'))
@@ -134,6 +196,19 @@ def test_setup(ql_test):
     return out1
 
 def create_codeql_database(ql_test):
+    """
+    Create a CodeQL database for the given ql_test.
+
+    Args:
+        ql_test (object): The ql_test object containing the necessary information.
+
+    Returns:
+        object: The output of the database creation process.
+
+    Raises:
+        None
+
+    """
     # Create the CodeQL database
     os.makedirs("TestDB", exist_ok=True) 
     if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
@@ -147,7 +222,19 @@ def create_codeql_database(ql_test):
     return out2
 
 def analyze_codeql_database(ql_test):
-      
+    """
+    Analyzes the CodeQL database.
+
+    Args:
+        ql_test (object): The CodeQL test object.
+
+    Returns:
+        object: The result of the analysis.
+
+    Raises:
+        None
+
+    """
     # Analyze the CodeQL database
     if not os.path.exists("AnalysisFiles\Test Samples"):
         os.makedirs("AnalysisFiles\Test Samples", exist_ok=True) 
@@ -171,7 +258,15 @@ def analyze_codeql_database(ql_test):
 
 
 def sarif_diff(ql_test):
-    # Perform SARIF diff
+    """
+    Perform SARIF diff between the generated SARIF file and the reference SARIF file.
+
+    Args:
+        ql_test: An instance of the QLTest class representing the test case.
+
+    Returns:
+        The output of the SARIF diff command if successful, None otherwise.
+    """
     out4 = subprocess.run(["sarif", "diff", "-o", "diff\\"+ql_test.get_ql_name()+".sarif", "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif", "AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif"], 
                     shell=True, capture_output=no_output  ) 
     if not no_output and out4.returncode != 0:
@@ -182,6 +277,16 @@ def sarif_diff(ql_test):
 
 # Function to run a test using system calls
 def run_test(ql_test):
+    """
+    Run a test for the given ql_test object.
+
+    Args:
+        ql_test: The ql_test object representing the test to be run.
+
+    Returns:
+        None
+    """
+
     # Print test attributes
     print_mutex.acquire()
     print(ql_test.get_ql_name(), "\n",  
@@ -239,6 +344,16 @@ def run_test(ql_test):
       
 
 def parse_attributes(queries):
+    """
+    Parses the attributes of the queries and returns a list of query objects.
+
+    Args:
+        queries (dict): A dictionary containing the queries.
+
+    Returns:
+        list: A list of query objects.
+
+    """
     query_objs = []
     for query in queries:
         path = os.path.normpath(query)
@@ -279,12 +394,21 @@ def parse_attributes(queries):
     return query_objs
 
 def run_tests(ql_tests_dict):
+    """
+    Run the given CodeQL tests.
+
+    Args:
+        ql_tests_dict (dict): A dictionary containing the CodeQL tests.
+
+    Returns:
+        None
+    """
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
     for ql_test in ql_tests_with_attributes:
         run_test(ql_test)
         
-if __name__ == "__main__":
 
+if __name__ == "__main__":
     # Sys input flags
     no_output = False
     override_template = ""
@@ -295,7 +419,15 @@ if __name__ == "__main__":
     existing_database = False
 
     start_time = time.time()
-    subprocess.run(["clean.cmd"]) 
+
+    if not "--no_clean" in sys.argv:
+        if os.path.exists("TestDB"):
+            shutil.rmtree("TestDB")
+        if os.path.exists("working"):
+            shutil.rmtree("working")
+        if os.path.exists("AnalysisFiles"):
+            shutil.rmtree("AnalysisFiles")
+
     cwd = os.getcwd()
     path = os.path.normpath(cwd)
     path = path.split(os.sep)
