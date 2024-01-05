@@ -11,6 +11,8 @@ import subprocess
 import shutil
 import threading
 import time
+from multiprocessing.pool import ThreadPool
+import fnmatch
 
 no_output = False
 override_template = ""
@@ -20,7 +22,7 @@ print_mutex = threading.Lock()
 # Any attributes specific to a test should be added to this class
 # This also allows for things to be conditionally added to the test call, such as the UseNTIFS parameter
 class ql_test_attributes:
-    def __init__(self, use_ntifs=False, template="", path="", ql_file="", ql_name="", ql_type="", ql_location=""):
+    def __init__(self,use_cpp=False, use_ntifs=False, template="", path="", ql_file="", ql_name="", ql_type="", ql_location=""):
         self.use_ntifs = use_ntifs
         self.template = template
         self.path = path
@@ -28,6 +30,12 @@ class ql_test_attributes:
         self.ql_name = ql_name
         self.ql_type = ql_type
         self.ql_location = ql_location
+        self.use_cpp = use_cpp
+
+    def get_use_cpp(self):
+        return self.use_cpp
+    def set_use_cpp(self, use_cpp):
+        self.use_cpp = use_cpp
 
     def get_use_ntifs(self):
         return self.use_ntifs
@@ -87,12 +95,17 @@ def walk_files(directory, extension):
     ql_files_map = {}
     # print(directory)
     for root, dirs, files in os.walk(directory):
-        if "driver_snippet.c" in files:
-            use_ntifs = check_use_ntifs(os.path.join(root, "driver_snippet.c"))
+        if fnmatch.filter(files, "driver_snippet.*"):
+            use_ntifs = check_use_ntifs(os.path.join(root, fnmatch.filter(files, "driver_snippet.*")[0]))
             for file in files:
                 if file.endswith(extension):
+                    use_cpp = all([".cpp" in x for x in fnmatch.filter(files, "driver_snippet.c*")] or 
+                                    [".hpp" in x for x in fnmatch.filter(files, "driver_snippet.c*")])
+                   
                     ql_obj = ql_test_attributes(use_ntifs)
+                    ql_obj.set_use_cpp(use_cpp)
                     ql_files_map[os.path.join(root, file)] = ql_obj
+
     return ql_files_map
 
 
@@ -120,7 +133,9 @@ def run_test(ql_test):
 
     # Rebuild the project using msbuild
     out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), shell=True, capture_output=no_output  ) 
-    
+    if not no_output and out1.returncode != 0:
+        print("Error in msbuild: " + ql_test.get_ql_name())
+        return
     # Create the CodeQL database
     os.makedirs("TestDB", exist_ok=True) 
     if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
@@ -128,16 +143,23 @@ def run_test(ql_test):
     out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", "..\\..\\TestDB\\"+ql_test.get_ql_name()],
                     cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
                     shell=True, capture_output=no_output  ) 
-
+    if not no_output and out2.returncode != 0:
+        print("Error in codeql database create: " + ql_test.get_ql_name())
+        return
     # Analyze the CodeQL database
     if not os.path.exists("AnalysisFiles\Test Samples"):
         os.makedirs("AnalysisFiles\Test Samples", exist_ok=True) 
     out3 = subprocess.run(["codeql", "database", "analyze", "TestDB\\"+ql_test.get_ql_name(), "--format=sarifv2.1.0", "--output=AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif", "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ], 
                     shell=True, capture_output=no_output  ) 
-    
+    if not no_output and out3.returncode != 0:
+        print("Error in codeql database analyze: " + ql_test.get_ql_name())
+        return
     # Perform SARIF diff
     out4 = subprocess.run(["sarif", "diff", "-o", "diff\\"+ql_test.get_ql_name()+".sarif", "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif", "AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif"], 
                     shell=True, capture_output=no_output  ) 
+    if not no_output and out4.returncode != 0:
+        print("Error in sarif diff: " + ql_test.get_ql_name())
+        return
     
     # Check for errors
     if(no_output):
@@ -171,7 +193,9 @@ def parse_attributes(queries):
         di = path.index("drivers")
         ql_type = path[di+1]
         template = ""
-        if(ql_type == "general"):
+        if queries[query].get_use_cpp():
+            template = "CppKMDFTestTemplate"
+        elif(ql_type == "general"):
             template = "WDMTestTemplate"
         elif(ql_type == "wdm"):
             template = "WDMTestTemplate"
