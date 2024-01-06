@@ -9,6 +9,7 @@ try:
     import fnmatch
     from sarif import loader 
     import pandas as pd
+    from datetime import datetime
     import openpyxl # Not directly used but this will make sure it is installed
 except ImportError as e:
     print("Import error: " + str(e) + "\nPlease install the required modules using pip install -r requirements.txt")
@@ -139,7 +140,7 @@ def check_use_ntifs(ds_file):
     file.close()
     return False
 
-def walk_files(directory, extension):
+def find_ql_test_paths(directory, extension):
     """
     Walks through the specified directory and returns a dictionary mapping file paths to QL test attributes.
 
@@ -295,7 +296,20 @@ def sarif_results(ql_test):
     
     print(result_df)
 
-# Function to run a test using system calls
+
+def format_excel_results():
+    """
+    Formats the results Excel file.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # TODO 
+    pass
+
 def run_test(ql_test):
     """
     Run a test for the given ql_test object.
@@ -426,14 +440,40 @@ def run_tests(ql_tests_dict):
     Returns:
         None
     """
+
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
+    exit(0)
     for ql_test in ql_tests_with_attributes:
         run_test(ql_test)
-    with pd.ExcelWriter("results.xlsx") as writer:
+    
+    format_excel_results()
+    with pd.ExcelWriter("results" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
         result_df.to_excel(writer)  
+
+def find_sln_file(path):
+    """
+    Finds the solution file for the project.
+
+    Args:
+        None
+
+    Returns:
+        str: The path to the solution file.
+    """
+    sln_paths = []
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith(".sln"):
+                sln_paths.append(os.path.join(root, file))
+    return list(set(sln_paths))
+
 
 if __name__ == "__main__":
     # Sys input flags
+    if "-h" in sys.argv:
+        usage()
+        exit(0)
+
     no_output = False
     override_template = ""
     name = ""
@@ -441,6 +481,8 @@ if __name__ == "__main__":
     codeql_repo_path = ""
     existing_database_path = ""
     existing_database = False
+    external_drivers_path = ""
+    external_drivers = False
 
     start_time = time.time()
 
@@ -457,56 +499,65 @@ if __name__ == "__main__":
     path = path.split(os.sep)
     root_dir = get_git_root()
     
-    dir_to_search ="/".join(path[0:path.index(root_dir)+1])
 
-    ql_tests = walk_files(dir_to_search, ".ql")
-    
-    threads = []    
-    if "-h" in sys.argv:
-        usage()
+    if "--external_drivers" in sys.argv:
+        external_drivers_path = sys.argv[sys.argv.index("--external_drivers")+1]
+        external_drivers = True
+        dir_to_search = external_drivers_path
+        extension_to_search = ".sln"
+        ql_tests = find_sln_file(dir_to_search)
     else:
-        if "-o" in sys.argv:
-            no_output = True
-        if "--override_template" in sys.argv:
-            override_template = sys.argv[sys.argv.index("--override_template")+1]
-        if "--use_codeql_repo" in sys.argv:
-            use_codeql_repo = True
-            codeql_repo_path = sys.argv[sys.argv.index("--use_codeql_repo")+1]
-        if "--database" in sys.argv:
-            existing_database_path = sys.argv[sys.argv.index("--database")+1]
-            existing_database = True
-            if not os.path.exists(existing_database):
-                print("Database path does not exist")
-                exit(1)
+        dir_to_search ="/".join(path[0:path.index(root_dir)+1])
+        extension_to_search = ".ql"
+        ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
 
-        if "-i" in sys.argv:
-            name = sys.argv[sys.argv.index("-i")+1]
-            ql_files_keys = [x for x in ql_tests if name in x]
-        elif "-t" in sys.argv:
-            ql_files_keys = [x for x in ql_tests]
-        elif len(sys.argv) == 1:
-            ql_files_keys = [x for x in ql_tests]
-        else:
-            ql_files_keys = [x for x in ql_tests]
-
-        ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
-        if "-t" in sys.argv:
-            num_threads = int(sys.argv[sys.argv.index("-t")+1])
-            print("Running multithreaded")
-            print("Live output disabled for multithreaded run")
-            print("\n\n\n !!! MULTITHREADED MODE IS NOT FULLY TESTED DO NOT USE FOR OFFICIAL TESTS !!! \n\n\n")
-            no_output = True
-            thread_count = 0
-            for q in ql_tests:
-                single_dict = {q:ql_tests[q]}
-                threads.append(single_dict)
-            pool = ThreadPool(processes=num_threads)
-            for result in pool.map(run_tests, threads):
-                print(result)
-        if ql_tests == []:
-            print("Invalid argument")
-            usage()
+    threads = []    
+   
+    if "-o" in sys.argv:
+        no_output = True
+    if "--override_template" in sys.argv:
+        override_template = sys.argv[sys.argv.index("--override_template")+1]
+    if "--use_codeql_repo" in sys.argv:
+        use_codeql_repo = True
+        codeql_repo_path = sys.argv[sys.argv.index("--use_codeql_repo")+1]
+    if "--database" in sys.argv:
+        existing_database_path = sys.argv[sys.argv.index("--database")+1]
+        existing_database = True
+        if not os.path.exists(existing_database):
+            print("Database path does not exist")
             exit(1)
+        # TODO doesn't work with --external_drivers
+
+    if "-i" in sys.argv:
+        name = sys.argv[sys.argv.index("-i")+1]
+        ql_files_keys = [x for x in ql_tests if name in x]
+        # TODO doesn't work with --external_drivers
+    elif "-t" in sys.argv:
+        ql_files_keys = [x for x in ql_tests]
+    elif len(sys.argv) == 1:
+        ql_files_keys = [x for x in ql_tests]
+    else:
+        ql_files_keys = [x for x in ql_tests]
+
+    print(ql_files_keys)
+    ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
+    if "-t" in sys.argv:
+        num_threads = int(sys.argv[sys.argv.index("-t")+1])
+        print("Running multithreaded")
+        print("Live output disabled for multithreaded run")
+        print("\n\n\n !!! MULTITHREADED MODE IS NOT FULLY TESTED DO NOT USE FOR OFFICIAL TESTS !!! \n\n\n")
+        no_output = True
+        thread_count = 0
+        for q in ql_tests:
+            single_dict = {q:ql_tests[q]}
+            threads.append(single_dict)
+        pool = ThreadPool(processes=num_threads)
+        for result in pool.map(run_tests, threads):
+            print(result)
+    if ql_tests == []:
+        print("Invalid argument")
+        usage()
+        exit(1)
     
     if threads:
        pass
