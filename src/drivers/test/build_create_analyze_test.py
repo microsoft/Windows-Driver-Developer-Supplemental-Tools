@@ -10,6 +10,9 @@ try:
     from sarif import loader 
     import pandas as pd
     from datetime import datetime
+    import re
+    import itertools
+    from itertools import permutations
     import openpyxl # Not directly used but this will make sure it is installed
 except ImportError as e:
     print("Import error: " + str(e) + "\nPlease install the required modules using pip install -r requirements.txt")
@@ -19,6 +22,19 @@ except ImportError as e:
 print_mutex = threading.Lock()
 
 result_df = pd.DataFrame(columns=["Test Name", "Template", "Driver Framework", "UseNTIFS flag", "Errors", "Warnings", "Notes", "Detailed Results"])
+
+def usage():
+    print("Usage: python build_create_analyze_test.py [-h] [-i <name>] [-t] [-o]")
+    print("Options:")
+    print("-h: help")
+    print("-i <name>: run only the tests with <name> in the name")
+    print("-t <num_threads>: run multithreaded with max <num_threads> threads")
+    print("-o: output off")
+    print("--override_template <template>: override the template used for the test")
+    print("--use_codeql_repo <path>: use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager")
+    print("--database <path>: Run all queries using the database at <path>")
+    print("--no_clean: Do not clean the working directory before running the tests")
+
 
 # Any attributes specific to a test should be added to this class
 # This also allows for things to be conditionally added to the test call, such as the UseNTIFS parameter
@@ -35,9 +51,10 @@ class ql_test_attributes:
         ql_name (str): The name of the CodeQL test.
         ql_type (str): The type of the CodeQL test.
         ql_location (str): The location of the CodeQL test.
+        no_attributes (bool): Indicates whether the test has attributes. External drivers do not have attributes.
     """
 
-    def __init__(self, use_cpp=False, use_ntifs=False, template="", path="", ql_file="", ql_name="", ql_type="", ql_location=""):
+    def __init__(self, external_drivers=[], no_attributes=False, use_cpp=False, use_ntifs=False, template="", path="", ql_file="", ql_name="", ql_type="", ql_location=""):
         self.use_ntifs = use_ntifs
         self.template = template
         self.path = path
@@ -46,7 +63,7 @@ class ql_test_attributes:
         self.ql_type = ql_type
         self.ql_location = ql_location
         self.use_cpp = use_cpp
-
+        self.no_attributes = no_attributes
     def get_use_cpp(self):
         return self.use_cpp
 
@@ -95,20 +112,19 @@ class ql_test_attributes:
     def set_ql_location(self, ql_location):
         self.ql_location = ql_location
     
-def usage():
-    print("Usage: python build_create_analyze_test.py [-h] [-i <name>] [-t] [-o]")
-    print("Options:")
-    print("-h: help")
-    print("-i <name>: run only the tests with <name> in the name")
-    print("-t <num_threads>: run multithreaded with max <num_threads> threads")
-    print("-o: output off")
-    print("--override_template <template>: override the template used for the test")
-    print("--use_codeql_repo <path>: use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager")
-    print("--database <path>: Run all queries using the database at <path>")
-    print("--no_clean: Do not clean the working directory before running the tests")
+    def get_no_attributes(self):
+        return self.no_attributes
+    
+    def set_no_attributes(self, no_attributes):
+        self.no_attributes = no_attributes
 
+    def get_external_drivers(self):
+        return self.external_drivers
 
-import subprocess
+    def set_external_drivers(self, external_drivers):
+        self.external_drivers = external_drivers
+    
+
 
 def get_git_root():
     """
@@ -167,6 +183,63 @@ def find_ql_test_paths(directory, extension):
 
     return ql_files_map
 
+
+def find_project_configs(sln_file):
+    configs = [(),]
+    with open(sln_file, "r") as file:
+        content = file.read()
+        match = re.search(r"\s*GlobalSection\(SolutionConfigurationPlatforms\).*", content)
+        if match:
+            lines = content[match.end():]
+            end_index = lines.find("EndGlobalSection")
+            if end_index != -1:
+                lines = lines[:end_index]
+                lines = lines.split("\n")
+                lines = [x for x in lines if x.strip() != ""]
+                print(lines)
+                for l in lines:
+                    print(l)
+                    print(l.split("=")[0].strip().split('|'))
+                    print()
+                    config = l.split("=")[0].strip().replace(" ", "").replace("\n", "").replace("\t", "").split('|')[0]
+                    platform = l.split("=")[0].strip().replace(" ", "").replace("\n", "").replace("\t", "").split('|')[1]
+                    configs.append((config,platform))
+            else:
+                print("No configurations or platforms foundfor " + sln_file)
+                return None
+        else:
+            print("No configurations or platforms foundfor " + sln_file)
+            return None
+        
+    #todo return SET
+    return list(set(configs))
+
+                
+def test_setup_external_drivers(sln_files):
+    # Rebuild the project using msbuild
+    out1=[]
+    for sln_file in sln_files:
+        print("Building: " + sln_file)
+        workdir = sln_file.split("\\")[:-1]
+        workdir = "\\".join(workdir)
+        # out = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64"],cwd=workdir, shell=True, capture_output=no_output) 
+        # TODO get actual configuration and platform from sln file
+        
+        configs = find_project_configs(sln_file)
+      
+        print("Building: " + sln_file + " " + configs[0] + " " + configs[1])
+        out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration="+config,  "-property:Platform="+platform, "-p:TargetVersion=Windows10",  
+                    "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
+        if not no_output and out.returncode != 0:
+            print("Error in msbuild: " + ql_test.get_ql_name())
+        out1.append(out)
+
+        out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration=Debug",  "-property:Platform=x64", "-p:TargetVersion=Windows10",  
+                        "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
+        if not no_output and out.returncode != 0:
+            print("Error in msbuild: " + ql_test.get_ql_name())
+        out1.append(out)
+
 def test_setup(ql_test):
     """
     Set up the test environment for CodeQL analysis.
@@ -181,13 +254,14 @@ def test_setup(ql_test):
         None
 
     """
+    
     # Remove existing working directory
     if os.path.exists(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/').strip()):
         shutil.rmtree(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/'))
-    
+
     # Copy template to working directory
     shutil.copytree(ql_test.get_template(), ".\\working\\"+ql_test.get_ql_name())
-    
+
     # Copy files to driver directory
     for file in os.listdir(os.path.join(os.getcwd(),"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())):
         shutil.copyfile(os.path.join(os.getcwd(),"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name(),file), os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()+"\\driver\\",file))
@@ -197,8 +271,24 @@ def test_setup(ql_test):
     if not no_output and out1.returncode != 0:
         print("Error in msbuild: " + ql_test.get_ql_name())
         return None
+
     return out1
 
+
+  
+def db_create_for_external_driver(sln_files):
+    out2 = []
+    
+    for sln_file in sln_files:
+        workdir = sln_file.split("\\")[:-1]
+        workdir = "\\".join(workdir)
+        db_loc = workdir + sln_file.split("\\")[-1].replace(".sln", "")
+        
+        out = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64" + " /t:rebuild", db_loc],
+                cwd=workdir, 
+                shell=True, capture_output=no_output  ) 
+        out2.append(out)
+    return out2
 def create_codeql_database(ql_test):
     """
     Create a CodeQL database for the given ql_test.
@@ -218,8 +308,9 @@ def create_codeql_database(ql_test):
     if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
         shutil.rmtree("TestDB\\"+ql_test.get_ql_name())
     out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", "..\\..\\TestDB\\"+ql_test.get_ql_name()],
-                    cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
-                    shell=True, capture_output=no_output  ) 
+            cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
+            shell=True, capture_output=no_output  ) 
+    
     if not no_output and out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
         return None
@@ -331,15 +422,31 @@ def run_test(ql_test):
     print_mutex.release()
 
     
-    if not existing_database:
+    if not existing_database and not external_drivers:
         test_setup_result = test_setup(ql_test)
         if test_setup_result is None:
             return 
-    
         create_codeql_database_result = create_codeql_database(ql_test)
         if create_codeql_database_result is None:
             return 
     
+    global external_driver_setup_done
+    global external_driver_database_created
+
+    # Only need to setup external drivers once
+    if external_drivers:
+        if not external_driver_setup_done:
+            test_setup_result = test_setup_external_drivers(driver_sln_files)
+            external_driver_setup_done = True
+            if test_setup_result is None:
+                return 
+    # Only need to create the database for external drivers once
+        if not external_driver_database_created:
+            create_codeql_database_result = db_create_for_external_driver(driver_sln_files)
+            external_driver_database_created = True
+            if create_codeql_database_result is None:
+                return 
+
     analyze_codeql_database_result = analyze_codeql_database(ql_test)
     if analyze_codeql_database_result is None:
         return
@@ -379,6 +486,8 @@ def run_test(ql_test):
             print("Error in codeql database analyze: " + ql_test.get_ql_name())
             print(analyze_codeql_database_result.stderr.decode())
 
+def run_test_external_drivers(ql_test):
+    pass
 
 def parse_attributes(queries):
     """
@@ -442,7 +551,8 @@ def run_tests(ql_tests_dict):
     """
 
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
-    exit(0)
+
+  
     for ql_test in ql_tests_with_attributes:
         run_test(ql_test)
     
@@ -483,6 +593,8 @@ if __name__ == "__main__":
     existing_database = False
     external_drivers_path = ""
     external_drivers = False
+    external_driver_database_created = False
+    external_driver_setup_done = False
 
     start_time = time.time()
 
@@ -499,18 +611,22 @@ if __name__ == "__main__":
     path = path.split(os.sep)
     root_dir = get_git_root()
     
+    dir_to_search ="/".join(path[0:path.index(root_dir)+1])
+    extension_to_search = ".ql"
+    ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
 
+    driver_sln_files = []
     if "--external_drivers" in sys.argv:
         external_drivers_path = sys.argv[sys.argv.index("--external_drivers")+1]
         external_drivers = True
         dir_to_search = external_drivers_path
         extension_to_search = ".sln"
-        ql_tests = find_sln_file(dir_to_search)
-    else:
-        dir_to_search ="/".join(path[0:path.index(root_dir)+1])
-        extension_to_search = ".ql"
-        ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
-
+        driver_sln_files = find_sln_file(dir_to_search)
+        print("Found " + str(len(driver_sln_files)) + " drivers")
+        for ql_file in ql_tests:
+            ql_tests[ql_file].set_external_drivers(driver_sln_files)
+    
+   
     threads = []    
    
     if "-o" in sys.argv:
@@ -538,9 +654,11 @@ if __name__ == "__main__":
         ql_files_keys = [x for x in ql_tests]
     else:
         ql_files_keys = [x for x in ql_tests]
+   
+    # TODO 
 
-    print(ql_files_keys)
     ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
+
     if "-t" in sys.argv:
         num_threads = int(sys.argv[sys.argv.index("-t")+1])
         print("Running multithreaded")
