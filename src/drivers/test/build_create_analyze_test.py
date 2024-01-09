@@ -537,8 +537,8 @@ def parse_attributes(queries):
 def run_tests_external_drivers(ql_tests_dict):
     df_column_names = []
     for ql_test in ql_tests_dict:
-        df_column_names.append(ql_test)
-
+        df_column_names.append(ql_test.split("\\")[-1].replace(".ql", ""))
+    
 
     global external_driver_setup_done
     global external_driver_database_created
