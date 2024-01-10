@@ -20,7 +20,7 @@ except ImportError as e:
 
 
 print_mutex = threading.Lock()
-
+health_df = pd.DataFrame()
 result_df = pd.DataFrame(columns=["Driver", "Errors", "Warnings", "Notes", "Detailed Results"])
 
 def usage():
@@ -29,7 +29,7 @@ def usage():
     print("-h: help")
     print("-i <name>: run only the tests with <name> in the name")
     print("-t <num_threads>: run multithreaded with max <num_threads> threads")
-    print("-o: output off")
+    print("-v: verbose output on")
     print("--override_template <template>: override the template used for the test")
     print("--use_codeql_repo <path>: use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager")
     print("--database <path>: Run all queries using the database at <path>")
@@ -218,7 +218,14 @@ def find_project_configs(sln_files):
                             l = l[l.find("Release"):]
                         config = l.split("=")[0].strip().replace(" ", "").replace("\n", "").replace("\t", "").split('|')[0]
                         platform = l.split("=")[0].strip().replace(" ", "").replace("\n", "").replace("\t", "").split('|')[1]
-                        configs.add((config,platform))
+
+                        
+                        if platform in allowed_platforms:
+                            if debug_only and "Debug" not in config:
+                                continue
+                            if release_only and "Release" not in config:
+                                continue
+                            configs.add((config,platform))
                 else:
                     print("No configurations or platforms found for " + sln_file)
                     return None
@@ -244,20 +251,21 @@ def test_setup_external_drivers(sln_files):
     """
     configs = find_project_configs(sln_files)
     out1 = []
-    for sln_file in configs.keys():
-        workdir = sln_file.split("\\")[:-1]
-        workdir = "\\".join(workdir)
-        
-        # TODO make this multi threaded
-        for config, platform in configs[sln_file]:
-            print("Building: " + sln_file + " " + str(config) + " " + str(platform))
-                
-            out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration="+config,  "-property:Platform="+platform, "-p:TargetVersion=Windows10",  
-                        "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
-            if not no_output and out.returncode != 0:
-                print("Error in msbuild: " + sln_file)
-            out1.append(out)
-            #TODO error checking
+    if not no_build:
+        for sln_file in configs.keys():
+            workdir = sln_file.split("\\")[:-1]
+            workdir = "\\".join(workdir)
+            
+            # TODO make this multi threaded
+            for config, platform in configs[sln_file]:
+                print("Building: " + sln_file + " " + str(config) + " " + str(platform))
+                    
+                out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration="+config,  "-property:Platform="+platform, "-p:TargetVersion=Windows10",  
+                            "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
+                if not no_output and out.returncode != 0:
+                    print("Error in msbuild: " + sln_file)
+                out1.append(out)
+                #TODO error checking
     return configs
 
 def test_setup(ql_test):
@@ -308,18 +316,20 @@ def db_create_for_external_driver(sln_file, config, platform):
     Returns:
         str: The path to the created CodeQL database, or None if an error occurred.
     """
+    # TODO add database output location option 
     workdir = sln_file.split("\\")[:-1]
     workdir = "\\".join(workdir)
-    db_loc = workdir + sln_file.split("\\")[-1].replace(".sln", "")+"_"+config # TODO +platform
-    
-    out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform="+platform + " /t:rebuild", db_loc], #"-property:Configuration="+config TODO?
+    db_loc = os.getcwd() + "\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
+    print("Creating database: ",  db_loc)
+    out2 = subprocess.run(["codeql", "database", "create","--overwrite", "-l", "cpp", "-c", "msbuild /p:Platform="+platform + " /t:rebuild", db_loc], #"-property:Configuration="+config TODO?
             cwd=workdir, 
             shell=True, capture_output=no_output  )
-    if not no_output and out2.returncode != 0:
+    if out2.returncode != 0:
         print("Error in codeql database create: " + db_loc)
+        print(out2.stderr.decode())
         return None
     else:
-        print("Created database: ",  db_loc)
+        print(".... done!")
     return db_loc
 
 
@@ -388,7 +398,8 @@ def analyze_codeql_database(ql_test, db_path=None):
     if not no_output and out3.returncode != 0:
         print("Error in codeql database analyze: " + ql_test.get_ql_name())
         return None
-    return out3
+
+    return output_file
 
 
 def sarif_diff(ql_test):
@@ -408,7 +419,7 @@ def sarif_diff(ql_test):
         return None
     return out4
 
-def sarif_results(ql_test):
+def sarif_results(ql_test, sarif_file):
     """
     Retrieves SARIF results for a given QL test.
 
@@ -418,13 +429,10 @@ def sarif_results(ql_test):
     Returns:
         None
     """
-    sarif_file = os.getcwd()+ "\\AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif"
     sarif_data = loader.load_sarif_file(sarif_file)
     issue_count_by_sev = sarif_data.get_result_count_by_severity()
 
-    result_df.loc[len(result_df)] = [ql_test.get_ql_name(), ql_test.get_template(), ql_test.get_ql_type(), ql_test.get_use_ntifs(), issue_count_by_sev["error"], issue_count_by_sev["warning"], issue_count_by_sev["note"], sarif_data.get_records()]
-    
-    print(result_df)
+    return issue_count_by_sev
 
 
 def format_excel_results():
@@ -480,34 +488,35 @@ def run_test(ql_test):
             return
     
     # TODO 
-    sarif_results(ql_test)
+   # sarif_results(ql_test)
 
+    # TODO move these to within their respective functions
     # Check for errors
-    if no_output and not existing_database:
-        print_mutex.acquire()
-        if (test_setup_result.returncode != 0 or create_codeql_database_result.returncode != 0 or
-            analyze_codeql_database_result.returncode != 0 or sarif_diff_result.returncode != 0):
-            print("Error in test: " + ql_test.get_ql_name())
+    # if no_output and not existing_database:
+    #     print_mutex.acquire()
+    #     if (test_setup_result.returncode != 0 or create_codeql_database_result.returncode != 0 or
+    #         analyze_codeql_database_result.returncode != 0 or sarif_diff_result.returncode != 0):
+    #         print("Error in test: " + ql_test.get_ql_name())
 
-            if test_setup_result.returncode != 0:
-                print("Error in msbuild: " + ql_test.get_ql_name())
-                print(test_setup_result.stderr.decode())
-            if create_codeql_database_result.returncode != 0:
-                print("Error in codeql database create: " + ql_test.get_ql_name())
-                print(create_codeql_database_result.stderr.decode())
-            if analyze_codeql_database_result.returncode != 0:
-                print("Error in codeql database analyze: " + ql_test.get_ql_name())
-                print(analyze_codeql_database_result.stderr.decode())
-            if sarif_diff_result.returncode != 0:
-                print("Error in sarif diff: " + ql_test.get_ql_name())
-                print(sarif_diff_result.stderr.decode())
-        else:
-            print("Test complete: " + ql_test.get_ql_name())
-        print_mutex.release()
-    else:
-        if analyze_codeql_database_result.returncode != 0:
-            print("Error in codeql database analyze: " + ql_test.get_ql_name())
-            print(analyze_codeql_database_result.stderr.decode())
+    #         if test_setup_result.returncode != 0:
+    #             print("Error in msbuild: " + ql_test.get_ql_name())
+    #             print(test_setup_result.stderr.decode())
+    #         if create_codeql_database_result.returncode != 0:
+    #             print("Error in codeql database create: " + ql_test.get_ql_name())
+    #             print(create_codeql_database_result.stderr.decode())
+    #         if analyze_codeql_database_result.returncode != 0:
+    #             print("Error in codeql database analyze: " + ql_test.get_ql_name())
+    #             print(analyze_codeql_database_result.stderr.decode())
+    #         if sarif_diff_result.returncode != 0:
+    #             print("Error in sarif diff: " + ql_test.get_ql_name())
+    #             print(sarif_diff_result.stderr.decode())
+    #     else:
+    #         print("Test complete: " + ql_test.get_ql_name())
+    #     print_mutex.release()
+    # else:
+    #     if analyze_codeql_database_result.returncode != 0:
+    #         print("Error in codeql database analyze: " + ql_test.get_ql_name())
+    #         print(analyze_codeql_database_result.stderr.decode())
 
 
 def parse_attributes(queries):
@@ -594,20 +603,32 @@ def run_tests_external_drivers(ql_tests_dict):
                     print("Database already created!  " + create_codeql_database_result)
                 created_databases.append(create_codeql_database_result)
     
-    newdb_df = pd.DataFrame('x', index=created_databases, columns=df_column_names)
-
     # Analyze created databses
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
     for ql_test in ql_tests_with_attributes:
         print("Run query: " + ql_test.get_ql_name())
         for db in created_databases:
             print("...... on database: " + db)
-            analyze_codeql_database(ql_test, db)
+            result_sarif = analyze_codeql_database(ql_test, db)
+            analysis_results = sarif_results(ql_test, result_sarif)
+            health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error']) + "|" + str(analysis_results['warning']) + "|" + str(analysis_results['note'])
 
     # save results
     with pd.ExcelWriter("results" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
-        newdb_df.to_excel(writer)
+        health_df.to_excel(writer)
 
+def compare_health_results():
+    """
+    Compares the health of test results to those from a previous run.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    # TODO 
+    pass
 
 def run_tests(ql_tests_dict):
     """
@@ -654,7 +675,11 @@ if __name__ == "__main__":
         usage()
         exit(0)
 
-    no_output = False
+    allowed_platforms = ["x64", "x86", "ARM", "ARM64"]
+    debug_only = True
+    release_only = False
+    
+    no_output = True
     override_template = ""
     name = ""
     use_codeql_repo = False
@@ -695,12 +720,20 @@ if __name__ == "__main__":
         print("Found " + str(len(driver_sln_files)) + " drivers")
         for ql_file in ql_tests:
             ql_tests[ql_file].set_external_drivers(driver_sln_files)
-    
+
+    if "--debug_only" in sys.argv:
+        debug_only = True
+
+    if "--release_only" in sys.argv:
+        release_only = True
+
+    if "--no_build" in sys.argv:
+        no_build = True
    
     threads = []    
    
-    if "-o" in sys.argv:
-        no_output = True
+    if "-v" in sys.argv:
+        no_output = False
     if "--override_template" in sys.argv:
         override_template = sys.argv[sys.argv.index("--override_template")+1]
     if "--use_codeql_repo" in sys.argv:
