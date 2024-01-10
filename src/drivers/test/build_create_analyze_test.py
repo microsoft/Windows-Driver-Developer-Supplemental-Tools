@@ -196,9 +196,8 @@ def find_project_configs(sln_files):
               If no configurations or platforms are found in a solution file, None is returned for that file.
     """
     configs_dict = {}
-    configs = set()
     for sln_file in sln_files:
-       
+        configs = set()
         with open(sln_file, "r") as file:
             content = file.read()
             match = re.search(r"\s*GlobalSection\(SolutionConfigurationPlatforms\).*", content)
@@ -220,7 +219,7 @@ def find_project_configs(sln_files):
 
                         
                         if platform in allowed_platforms:
-                            if debug_only and "Debug" not in config:
+                            if  debug_only and "Debug" not in config:
                                 continue
                             if release_only and "Release" not in config:
                                 continue
@@ -233,7 +232,6 @@ def find_project_configs(sln_files):
                 return None
         # Remove empty tuples from configs
         #configs = [c for c in configs if c]
-       
         configs_dict[sln_file] = configs
     return configs_dict
 
@@ -322,7 +320,7 @@ def db_create_for_external_driver(sln_file, config, platform):
     workdir = "\\".join(workdir)
     db_loc = os.getcwd() + "\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
     print("Creating database: ",  db_loc)
-    out2 = subprocess.run(["codeql", "database", "create","--overwrite", "-l", "cpp", "-c", "msbuild /p:Platform="+platform + " /t:rebuild", db_loc], #"-property:Configuration="+config TODO?
+    out2 = subprocess.run(["codeql", "database", "create", db_loc, "--overwrite", "-l", "cpp", "-c", "msbuild /p:Platform="+platform + " /t:rebuild " +sln_file ], #"-property:Configuration="+config TODO?
             cwd=workdir, 
             shell=True, capture_output=no_output  )
     if out2.returncode != 0:
@@ -436,7 +434,6 @@ def sarif_results(ql_test, sarif_file):
     """
     sarif_data = loader.load_sarif_file(sarif_file)
     issue_count_by_sev = sarif_data.get_result_count_by_severity()
-    print(issue_count_by_sev)
     return issue_count_by_sev
 
 
@@ -776,4 +773,4 @@ if __name__ == "__main__":
             run_tests(ql_tests)
 
     end_time = time.time()
-    print("Total run time: " + str(end_time - start_time) + " seconds")
+    print("Total run time: " + str((end_time - start_time)/60) + " minutes")
