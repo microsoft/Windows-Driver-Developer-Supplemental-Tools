@@ -176,8 +176,7 @@ def find_ql_test_paths(directory, extension):
                 if file.endswith(extension):
                     use_cpp = all([".cpp" in x for x in fnmatch.filter(files, "driver_snippet.c*")] or 
                                     [".hpp" in x for x in fnmatch.filter(files, "driver_snippet.c*")])
-                   
-                    ql_obj = ql_test_attributes(use_ntifs)
+                    ql_obj = ql_test_attributes(use_ntifs=use_ntifs, use_cpp=use_cpp)
                     ql_obj.set_use_cpp(use_cpp)
                     ql_files_map[os.path.join(root, file)] = ql_obj
 
@@ -262,8 +261,9 @@ def test_setup_external_drivers(sln_files):
                     
                 out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration="+config,  "-property:Platform="+platform, "-p:TargetVersion=Windows10",  
                             "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
-                if not no_output and out.returncode != 0:
+                if out.returncode != 0:
                     print("Error in msbuild: " + sln_file)
+                    print(out.stderr.decode())
                 out1.append(out)
                 #TODO error checking
     return configs
@@ -295,11 +295,12 @@ def test_setup(ql_test):
         shutil.copyfile(os.path.join(os.getcwd(),"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name(),file), os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()+"\\driver\\",file))
 
     # Rebuild the project using msbuild
-    out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), shell=True, capture_output=no_output  ) 
-    if not no_output and out1.returncode != 0:
-        print("Error in msbuild: " + ql_test.get_ql_name())
-        return None
-
+    if not no_build:
+        out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), shell=True, capture_output=no_output  ) 
+        if out1.returncode != 0:
+            print("Error in msbuild: " + ql_test.get_ql_name())
+            print(out1.stderr.decode())
+            return None
     return out1
 
 
@@ -351,14 +352,16 @@ def create_codeql_database(ql_test):
     os.makedirs("TestDB", exist_ok=True) 
     if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
         shutil.rmtree("TestDB\\"+ql_test.get_ql_name())
+    db_loc = "..\\..\\TestDB\\"+ql_test.get_ql_name()
     out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", "..\\..\\TestDB\\"+ql_test.get_ql_name()],
             cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
             shell=True, capture_output=no_output  ) 
     
-    if not no_output and out2.returncode != 0:
+    if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
+        print(out2.stderr.decode()  )
         return None
-    return out2
+    return db_loc
 
 
 def analyze_codeql_database(ql_test, db_path=None):
@@ -395,8 +398,9 @@ def analyze_codeql_database(ql_test, db_path=None):
         out3 = subprocess.run(["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ], 
                     shell=True, capture_output=no_output  ) 
         
-    if not no_output and out3.returncode != 0:
+    if out3.returncode != 0:
         print("Error in codeql database analyze: " + ql_test.get_ql_name())
+        print(out3.stderr.decode()  )
         return None
 
     return output_file
@@ -414,8 +418,9 @@ def sarif_diff(ql_test):
     """
     out4 = subprocess.run(["sarif", "diff", "-o", "diff\\"+ql_test.get_ql_name()+".sarif", "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif", "AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif"], 
                     shell=True, capture_output=no_output  ) 
-    if not no_output and out4.returncode != 0:
+    if out4.returncode != 0:
         print("Error in sarif diff: " + ql_test.get_ql_name())
+        print(out4.stderr.decode()  )
         return None
     return out4
 
@@ -431,7 +436,7 @@ def sarif_results(ql_test, sarif_file):
     """
     sarif_data = loader.load_sarif_file(sarif_file)
     issue_count_by_sev = sarif_data.get_result_count_by_severity()
-
+    print(issue_count_by_sev)
     return issue_count_by_sev
 
 
@@ -468,55 +473,26 @@ def run_test(ql_test):
           "UseNTIFS flag: ", ql_test.get_use_ntifs(),"\n")
     print_mutex.release()
 
-    
-    if not existing_database and not external_drivers:
+    create_codeql_database_result = None
+    if not existing_database:
         test_setup_result = test_setup(ql_test)
         if test_setup_result is None:
-            return 
+            return None
         create_codeql_database_result = create_codeql_database(ql_test)
         if create_codeql_database_result is None:
-            return 
-    
+            return None
 
     analyze_codeql_database_result = analyze_codeql_database(ql_test, existing_database_path)
     if analyze_codeql_database_result is None:
-        return
+        return None
 
     if not existing_database:   
         sarif_diff_result = sarif_diff(ql_test)
         if sarif_diff_result is None: 
-            return
+            return None
     
-    # TODO 
-   # sarif_results(ql_test)
-
-    # TODO move these to within their respective functions
-    # Check for errors
-    # if no_output and not existing_database:
-    #     print_mutex.acquire()
-    #     if (test_setup_result.returncode != 0 or create_codeql_database_result.returncode != 0 or
-    #         analyze_codeql_database_result.returncode != 0 or sarif_diff_result.returncode != 0):
-    #         print("Error in test: " + ql_test.get_ql_name())
-
-    #         if test_setup_result.returncode != 0:
-    #             print("Error in msbuild: " + ql_test.get_ql_name())
-    #             print(test_setup_result.stderr.decode())
-    #         if create_codeql_database_result.returncode != 0:
-    #             print("Error in codeql database create: " + ql_test.get_ql_name())
-    #             print(create_codeql_database_result.stderr.decode())
-    #         if analyze_codeql_database_result.returncode != 0:
-    #             print("Error in codeql database analyze: " + ql_test.get_ql_name())
-    #             print(analyze_codeql_database_result.stderr.decode())
-    #         if sarif_diff_result.returncode != 0:
-    #             print("Error in sarif diff: " + ql_test.get_ql_name())
-    #             print(sarif_diff_result.stderr.decode())
-    #     else:
-    #         print("Test complete: " + ql_test.get_ql_name())
-    #     print_mutex.release()
-    # else:
-    #     if analyze_codeql_database_result.returncode != 0:
-    #         print("Error in codeql database analyze: " + ql_test.get_ql_name())
-    #         print(analyze_codeql_database_result.stderr.decode())
+  
+    return analyze_codeql_database_result, create_codeql_database_result
 
 
 def parse_attributes(queries):
@@ -640,16 +616,21 @@ def run_tests(ql_tests_dict):
     Returns:
         None
     """
-
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
 
-  
     for ql_test in ql_tests_with_attributes:
-        run_test(ql_test)
-    
-    format_excel_results()
-    with pd.ExcelWriter("results" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
-        result_df.to_excel(writer)  
+        result_sarif, db = run_test(ql_test)
+        analysis_results = sarif_results(ql_test, result_sarif)
+        health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
+        health_df.at[ql_test.get_ql_name(), "Driver Framework"] = ql_test.get_ql_type()
+        health_df.at[ql_test.get_ql_name(), "error"] = str(analysis_results['error'])
+        health_df.at[ql_test.get_ql_name(), "warning"] = str(analysis_results['warning'])   
+        health_df.at[ql_test.get_ql_name(), "note"] = str(analysis_results['note'])
+
+    # save results
+    with pd.ExcelWriter("function_test_results" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
+        health_df.to_excel(writer)
+  
 
 def find_sln_file(path):
     """
@@ -690,6 +671,7 @@ if __name__ == "__main__":
     external_drivers = False
     external_driver_database_created = False
     external_driver_setup_done = False
+    no_build = False
 
     start_time = time.time()
 
