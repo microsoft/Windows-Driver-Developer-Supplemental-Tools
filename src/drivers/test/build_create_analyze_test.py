@@ -185,6 +185,17 @@ def find_ql_test_paths(directory, extension):
 
 
 def find_project_configs(sln_files):
+    """
+    Find project configurations and platforms from a list of solution files.
+
+    Args:
+        sln_files (list): List of solution file paths.
+
+    Returns:
+        dict: A dictionary where the keys are solution file paths and the values are sets of configuration-platform tuples.
+              Each tuple represents a project configuration and platform found in the solution file.
+              If no configurations or platforms are found in a solution file, None is returned for that file.
+    """
     configs_dict = {}
     configs = set()
     for sln_file in sln_files:
@@ -209,38 +220,44 @@ def find_project_configs(sln_files):
                         platform = l.split("=")[0].strip().replace(" ", "").replace("\n", "").replace("\t", "").split('|')[1]
                         configs.add((config,platform))
                 else:
-                    print("No configurations or platforms foundfor " + sln_file)
+                    print("No configurations or platforms found for " + sln_file)
                     return None
             else:
-                print("No configurations or platforms foundfor " + sln_file)
+                print("No configurations or platforms found for " + sln_file)
                 return None
         # Remove empty tuples from configs
         #configs = [c for c in configs if c]
        
         configs_dict[sln_file] = configs
-
-
     return configs_dict
 
                 
 def test_setup_external_drivers(sln_files):
-   
+    """
+    Builds and sets up external drivers for testing.
+
+    Args:
+        sln_files (list): List of solution files.
+
+    Returns:
+        dict: A dictionary containing the configurations for each solution file.
+    """
     configs = find_project_configs(sln_files)
     out1 = []
-    # for sln_file in configs.keys():
-    #     workdir = sln_file.split("\\")[:-1]
-    #     workdir = "\\".join(workdir)
+    for sln_file in configs.keys():
+        workdir = sln_file.split("\\")[:-1]
+        workdir = "\\".join(workdir)
         
-    #     # TODO make this multi threaded
-    #     for config, platform in configs[sln_file]:
-    #         print("Building: " + sln_file + " " + str(config) + " " + str(platform))
+        # TODO make this multi threaded
+        for config, platform in configs[sln_file]:
+            print("Building: " + sln_file + " " + str(config) + " " + str(platform))
                 
-    #         out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration="+config,  "-property:Platform="+platform, "-p:TargetVersion=Windows10",  
-    #                     "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
-    #         if not no_output and out.returncode != 0:
-    #             print("Error in msbuild: " + sln_file)
-    #         out1.append(out)
-    #         #TODO error checking
+            out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration="+config,  "-property:Platform="+platform, "-p:TargetVersion=Windows10",  
+                        "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
+            if not no_output and out.returncode != 0:
+                print("Error in msbuild: " + sln_file)
+            out1.append(out)
+            #TODO error checking
     return configs
 
 def test_setup(ql_test):
@@ -280,6 +297,17 @@ def test_setup(ql_test):
 
   
 def db_create_for_external_driver(sln_file, config, platform):
+    """
+    Create a CodeQL database for an external driver.
+
+    Args:
+        sln_file (str): The path to the solution file.
+        config (str): The configuration to build the driver with.
+        platform (str): The platform to build the driver for.
+
+    Returns:
+        str: The path to the created CodeQL database, or None if an error occurred.
+    """
     workdir = sln_file.split("\\")[:-1]
     workdir = "\\".join(workdir)
     db_loc = workdir + sln_file.split("\\")[-1].replace(".sln", "")+"_"+config # TODO +platform
@@ -322,8 +350,6 @@ def create_codeql_database(ql_test):
         return None
     return out2
 
-def analyze_existing_database(ql_test):
-    pass
 
 def analyze_codeql_database(ql_test, db_path=None):
     """
@@ -534,7 +560,17 @@ def parse_attributes(queries):
         query_objs.append(queries[query])
     return query_objs
 
+
 def run_tests_external_drivers(ql_tests_dict):
+    """
+    Runs tests on external drivers.
+
+    Args:
+        ql_tests_dict (dict): A dictionary containing the QL tests to be executed.
+
+    Returns:
+        None
+    """
     df_column_names = []
     for ql_test in ql_tests_dict:
         df_column_names.append(ql_test.split("\\")[-1].replace(".ql", ""))
@@ -570,7 +606,7 @@ def run_tests_external_drivers(ql_tests_dict):
 
     # save results
     with pd.ExcelWriter("results" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
-        newdb_df.to_excel(writer)  
+        newdb_df.to_excel(writer)
 
 
 def run_tests(ql_tests_dict):
