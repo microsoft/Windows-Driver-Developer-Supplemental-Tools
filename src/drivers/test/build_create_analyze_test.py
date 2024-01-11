@@ -261,7 +261,11 @@ def test_setup_external_drivers(sln_files):
                             "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
                 if out.returncode != 0:
                     print("Error in msbuild: " + sln_file)
-                    print(out.stderr.decode())
+                    try:
+                        print(out.stderr.decode())
+                    except:
+                        print(out.stderr)
+
                 out1.append(out)
                 #TODO error checking
     return configs
@@ -297,7 +301,11 @@ def test_setup(ql_test):
         out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), shell=True, capture_output=no_output  ) 
         if out1.returncode != 0:
             print("Error in msbuild: " + ql_test.get_ql_name())
-            print(out1.stderr.decode())
+            try:
+                print(out1.stderr.decode())
+            except:
+                print(out1.stderr)
+
             return None
     return out1
 
@@ -318,14 +326,22 @@ def db_create_for_external_driver(sln_file, config, platform):
     # TODO add database output location option 
     workdir = sln_file.split("\\")[:-1]
     workdir = "\\".join(workdir)
-    db_loc = os.getcwd() + "\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
+    if not os.path.exists(os.getcwd() + "\\working"):
+        os.makedirs(os.getcwd() + "\\working")
+
+    db_loc = os.getcwd() + "\\working\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
     print("Creating database: ",  db_loc)
-    out2 = subprocess.run(["codeql", "database", "create", db_loc, "--overwrite", "-l", "cpp", "-c", "msbuild /p:Platform="+platform + " /t:rebuild " +sln_file ], #"-property:Configuration="+config TODO?
+    out2 = subprocess.run(["codeql", "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
+                           "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
             cwd=workdir, 
             shell=True, capture_output=no_output  )
     if out2.returncode != 0:
         print("Error in codeql database create: " + db_loc)
-        print(out2.stderr.decode())
+        try:
+            print(out2.stderr.decode())
+        except:
+            print(out2.stderr)
+
         return None
     else:
         print(".... done!")
@@ -357,7 +373,11 @@ def create_codeql_database(ql_test):
     
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
-        print(out2.stderr.decode()  )
+        try:
+            print(out2.stderr.decode()  )
+        except:
+            print(out2.stderr)
+
         return None
     return db_loc
 
@@ -398,7 +418,10 @@ def analyze_codeql_database(ql_test, db_path=None):
         
     if out3.returncode != 0:
         print("Error in codeql database analyze: " + ql_test.get_ql_name())
-        print(out3.stderr.decode()  )
+        try:
+            print(out3.stderr.decode()  )
+        except:
+            print(out3.stderr)
         return None
 
     return output_file
@@ -418,7 +441,10 @@ def sarif_diff(ql_test):
                     shell=True, capture_output=no_output  ) 
     if out4.returncode != 0:
         print("Error in sarif diff: " + ql_test.get_ql_name())
-        print(out4.stderr.decode()  )
+        try:
+            print(out4.stderr.decode()  )
+        except:
+            print(out4.stderr)
         return None
     return out4
 
@@ -557,7 +583,6 @@ def run_tests_external_drivers(ql_tests_dict):
     for ql_test in ql_tests_dict:
         df_column_names.append(ql_test.split("\\")[-1].replace(".ql", ""))
     
-
     global external_driver_setup_done
     global external_driver_database_created
     # Only need to setup external drivers once
@@ -565,17 +590,20 @@ def run_tests_external_drivers(ql_tests_dict):
     created_databases = []
     if configs is None: # TODO check for other errors
         return    
+    total = len(configs.keys())
+    count = 0
     for sln_file in configs.keys():
-       
+        print("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
         for config, platform in configs[sln_file]:
             create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
             if create_codeql_database_result is None: # TODO check for other errors
-                return 
+                print("Error creating database for " + sln_file + " " + config + " " + platform + " skipping...")
+                continue 
             else:
                 if create_codeql_database_result in created_databases:
                     print("Database already created!  " + create_codeql_database_result)
                 created_databases.append(create_codeql_database_result)
-    
+        count += 1
     # Analyze created databses
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
     for ql_test in ql_tests_with_attributes:
