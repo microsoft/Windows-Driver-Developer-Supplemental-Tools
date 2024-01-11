@@ -247,7 +247,6 @@ def test_setup_external_drivers(sln_files):
         dict: A dictionary containing the configurations for each solution file.
     """
     configs = find_project_configs(sln_files)
-    out1 = []
     if not no_build:
         for sln_file in configs.keys():
             workdir = sln_file.split("\\")[:-1]
@@ -266,8 +265,6 @@ def test_setup_external_drivers(sln_files):
                     except:
                         print(out.stderr)
 
-                out1.append(out)
-                #TODO error checking
     return configs
 
 def test_setup(ql_test):
@@ -329,6 +326,7 @@ def db_create_for_external_driver(sln_file, config, platform):
     if not os.path.exists(os.getcwd() + "\\working"):
         os.makedirs(os.getcwd() + "\\working")
 
+    # TODO either clear these, ask for overwrite, or use a different name
     db_loc = os.getcwd() + "\\working\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
     print("Creating database: ",  db_loc)
     out2 = subprocess.run(["codeql", "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
@@ -588,7 +586,7 @@ def run_tests_external_drivers(ql_tests_dict):
     # Only need to setup external drivers once
     configs = test_setup_external_drivers(driver_sln_files)
     created_databases = []
-    if configs is None: # TODO check for other errors
+    if configs is None:
         return    
     total = len(configs.keys())
     count = 0
@@ -596,7 +594,7 @@ def run_tests_external_drivers(ql_tests_dict):
         print("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
         for config, platform in configs[sln_file]:
             create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
-            if create_codeql_database_result is None: # TODO check for other errors
+            if create_codeql_database_result is None: 
                 print("Error creating database for " + sln_file + " " + config + " " + platform + " skipping...")
                 continue 
             else:
@@ -757,7 +755,6 @@ if __name__ == "__main__":
     if "-i" in sys.argv:
         name = sys.argv[sys.argv.index("-i")+1]
         ql_files_keys = [x for x in ql_tests if name in x]
-        # TODO doesn't work with --external_drivers
     elif "-t" in sys.argv:
         ql_files_keys = [x for x in ql_tests]
     elif len(sys.argv) == 1:
@@ -765,8 +762,6 @@ if __name__ == "__main__":
     else:
         ql_files_keys = [x for x in ql_tests]
    
-    # TODO 
-
     ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
 
     if "-t" in sys.argv:
