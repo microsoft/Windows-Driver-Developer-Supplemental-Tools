@@ -34,6 +34,10 @@ def usage():
     print("--use_codeql_repo <path>: use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager")
     print("--database <path>: Run all queries using the database at <path>")
     print("--no_clean: Do not clean the working directory before running the tests")
+    print("--external_drivers <path>: Run tests on external drivers at <path>")
+    print("--debug_only: Only run tests with Debug configuration")
+    print("--release_only: Only run tests with Release configuration")
+    print("--no_build: Do not build the driver before running the test")
 
 
 # Any attributes specific to a test should be added to this class
@@ -398,7 +402,7 @@ def analyze_codeql_database(ql_test, db_path=None):
     if not os.path.exists("AnalysisFiles\Test Samples"):
         os.makedirs("AnalysisFiles\Test Samples", exist_ok=True) 
     
-    if db_path is not None:
+    if db_path is not None: # When using external drivers, save databases in current directory
         database_loc = db_path
         output_file = os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+ db_path.split('\\')[-1]+".sarif")
 
@@ -408,10 +412,13 @@ def analyze_codeql_database(ql_test, db_path=None):
 
     
     if use_codeql_repo:
-        out3 = subprocess.run(["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", codeql_repo_path], 
-                    shell=True, capture_output=no_output  ) 
+        proc_command = ["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", codeql_repo_path]
+      
     else:
-        out3 = subprocess.run(["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ], 
+        proc_command = ["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ]
+        
+      
+    out3 = subprocess.run(proc_command, 
                     shell=True, capture_output=no_output  ) 
         
     if out3.returncode != 0:
@@ -590,28 +597,40 @@ def run_tests_external_drivers(ql_tests_dict):
         return    
     total = len(configs.keys())
     count = 0
-    for sln_file in configs.keys():
-        print("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
-        for config, platform in configs[sln_file]:
-            create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
-            if create_codeql_database_result is None: 
-                print("Error creating database for " + sln_file + " " + config + " " + platform + " skipping...")
-                continue 
-            else:
-                if create_codeql_database_result in created_databases:
-                    print("Database already created!  " + create_codeql_database_result)
-                created_databases.append(create_codeql_database_result)
-        count += 1
+    if existing_database:
+            print("Using existing database: " + existing_database_path)
+            folder_names = [os.path.join(existing_database_path, name) for name in os.listdir(existing_database_path) if os.path.isdir(os.path.join(existing_database_path, name))]
+            created_databases = folder_names
+            total = len(folder_names)
+    else:
+        for sln_file in configs.keys():
+            print("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
+            for config, platform in configs[sln_file]:
+                create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
+                if create_codeql_database_result is None: 
+                    print("Error creating database for " + sln_file + " " + config + " " + platform + " skipping...")
+                    continue 
+                else:
+                    if create_codeql_database_result in created_databases:
+                        print("Database already created!  " + create_codeql_database_result)
+                    created_databases.append(create_codeql_database_result)
+            count += 1
     # Analyze created databses
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
+    count = 0
+    total = len(created_databases)*len(ql_tests_with_attributes)
     for ql_test in ql_tests_with_attributes:
         print("Run query: " + ql_test.get_ql_name())
         for db in created_databases:
-            print("...... on database: " + db)
-            result_sarif = analyze_codeql_database(ql_test, db)
-            analysis_results = sarif_results(ql_test, result_sarif)
+            print("...... on database " + str(count) + "/" + str(total)+ ": " + db)
+            count += 1
+            try:
+                result_sarif = analyze_codeql_database(ql_test, db)
+                analysis_results = sarif_results(ql_test, result_sarif)
+            except Exception as e:
+                print("Error analyzing database: " + db, e)
+                continue
             health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error']) + "|" + str(analysis_results['warning']) + "|" + str(analysis_results['note'])
-
     # save results
     with pd.ExcelWriter("results" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
         health_df.to_excel(writer)
@@ -683,6 +702,7 @@ if __name__ == "__main__":
     debug_only = True
     release_only = False
     
+
     no_output = True
     override_template = ""
     name = ""
@@ -697,14 +717,6 @@ if __name__ == "__main__":
     no_build = False
 
     start_time = time.time()
-
-    if not "--no_clean" in sys.argv:
-        if os.path.exists("TestDB"):
-            shutil.rmtree("TestDB")
-        if os.path.exists("working"):
-            shutil.rmtree("working")
-        if os.path.exists("AnalysisFiles"):
-            shutil.rmtree("AnalysisFiles")
 
     cwd = os.getcwd()
     path = os.path.normpath(cwd)
@@ -734,7 +746,8 @@ if __name__ == "__main__":
 
     if "--no_build" in sys.argv:
         no_build = True
-   
+    
+    
     threads = []    
    
     if "-v" in sys.argv:
@@ -763,6 +776,18 @@ if __name__ == "__main__":
         ql_files_keys = [x for x in ql_tests]
    
     ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
+
+
+
+    if not "--no_clean" in sys.argv and not existing_database:
+        print("Cleaning working directories: TestDB, working, AnalysisFiles")
+        if os.path.exists("TestDB"):
+            shutil.rmtree("TestDB")
+        if os.path.exists("working"):
+            shutil.rmtree("working")
+        if os.path.exists("AnalysisFiles"):
+            shutil.rmtree("AnalysisFiles")
+
 
     if "-t" in sys.argv:
         # TODO not set up for external drivers
