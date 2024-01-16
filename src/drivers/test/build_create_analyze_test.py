@@ -364,6 +364,7 @@ def create_codeql_database(ql_test):
         None
 
     """
+  
     # Create the CodeQL database
     os.makedirs("TestDB", exist_ok=True) 
     if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
@@ -723,6 +724,14 @@ if __name__ == "__main__":
     no_build = False
 
     start_time = time.time()
+    if not "--no_clean" in sys.argv and not "--database" in sys.argv:
+        print("Cleaning working directories: TestDB, working, AnalysisFiles")
+        if os.path.exists("TestDB"):
+            shutil.rmtree("TestDB")
+        if os.path.exists("working"):
+            shutil.rmtree("working")
+        if os.path.exists("AnalysisFiles"):
+            shutil.rmtree("AnalysisFiles")
 
     cwd = os.getcwd()
     path = os.path.normpath(cwd)
@@ -731,6 +740,8 @@ if __name__ == "__main__":
     
     dir_to_search ="/".join(path[0:path.index(root_dir)+1])
     extension_to_search = ".ql"
+
+    
     ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
 
     driver_sln_files = []
@@ -785,15 +796,7 @@ if __name__ == "__main__":
 
 
 
-    if not "--no_clean" in sys.argv and not existing_database:
-        print("Cleaning working directories: TestDB, working, AnalysisFiles")
-        if os.path.exists("TestDB"):
-            shutil.rmtree("TestDB")
-        if os.path.exists("working"):
-            shutil.rmtree("working")
-        if os.path.exists("AnalysisFiles"):
-            shutil.rmtree("AnalysisFiles")
-
+  
 
     if "-t" in sys.argv:
         # TODO not set up for external drivers
