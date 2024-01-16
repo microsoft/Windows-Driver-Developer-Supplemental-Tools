@@ -327,11 +327,11 @@ def db_create_for_external_driver(sln_file, config, platform):
     # TODO add database output location option 
     workdir = sln_file.split("\\")[:-1]
     workdir = "\\".join(workdir)
-    if not os.path.exists(os.getcwd() + "\\working"):
-        os.makedirs(os.getcwd() + "\\working")
+    if not os.path.exists(os.getcwd() + "\\dbs"):
+        os.makedirs(os.getcwd() + "\\dbs")
 
     # TODO either clear these, ask for overwrite, or use a different name
-    db_loc = os.getcwd() + "\\working\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
+    db_loc = os.getcwd() + "\\dbs\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
     print("Creating database: ",  db_loc)
     out2 = subprocess.run(["codeql", "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
@@ -626,9 +626,15 @@ def run_tests_external_drivers(ql_tests_dict):
             count += 1
             try:
                 result_sarif = analyze_codeql_database(ql_test, db)
-                analysis_results = sarif_results(ql_test, result_sarif)
             except Exception as e:
                 print("Error analyzing database: " + db, e)
+                continue
+            try:
+                if result_sarif is None:
+                    continue
+                analysis_results = sarif_results(ql_test, result_sarif)
+            except Exception as e:
+                print("Error getting sarif results: " + db, e)
                 continue
             health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error']) + "|" + str(analysis_results['warning']) + "|" + str(analysis_results['note'])
     # save results
