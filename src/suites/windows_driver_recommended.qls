@@ -32,3 +32,4 @@
       - microsoft/Likely Bugs/UninitializedPtrField.ql
       - microsoft/Security/Crytpography/HardcodedIVCNG.ql
       - drivers/general/queries/KeSetEventPaged/KeSetEventPageable.ql
+      - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
