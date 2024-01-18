@@ -5,6 +5,7 @@
 - import: suites/windows_driver_mustfix.qls
 - queries: . 
   from: codeql/cpp-queries
+  version: 0.9.0
 - include:
     query path: 
       - Best Practices/Likely Errors/OffsetUseBeforeRangeCheck.ql

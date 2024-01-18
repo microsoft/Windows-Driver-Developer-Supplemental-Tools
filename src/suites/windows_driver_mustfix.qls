@@ -4,6 +4,7 @@
 - description: Security queries required to fix when certifying Windows Drivers
 - queries: . 
   from: codeql/cpp-queries
+  version: 0.9.0
 - include:
     query path: 
       - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql
