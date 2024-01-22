@@ -48,17 +48,34 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     
     For WHCP_21H2 and WHCP_22H2 branches:
  
-    **NOTE** Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in the WHCP_21H2 and WHCP_22H2 branches. CodeQL 2.15.4 has been validated for use with WHCP 21H2 and WHCP 22H2. If using Visual Studio version 17.8+, follow the steps for ALL OTHER BRANCHES, below. **Make sure to remove the CodeQL submodule if it exists in your repo.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
+    **NOTE** Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in the WHCP_21H2 and WHCP_22H2 branches. CodeQL 2.15.4 has been validated for use with WHCP 21H2 and WHCP 22H2 when using Visual Studio 17.8 or greater. 
 
-    The WHCP branches WHCP_21H2 and WHCP_22H2 use the CodeQL repository as a submodule instead of using CodeQL packs. When using these branches, make sure to update submodules. 
+	If using Visual Studio version 17.7 or below
+    The WHCP branches WHCP_21H2 and WHCP_22H2 use the CodeQL repository as a submodule instead of using CodeQL packs. When using these branches with VS17.7 or below, make sure to update submodules. 
+	
+	If using Visual Studio version 17.8 or greater:
+	
+	Follow the steps for ALL OTHER BRANCHES, below. **Make sure to remove the CodeQL submodule if it exists in your repo.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
 
     For ALL OTHER BRANCHES run the following commands:
 
+	Download the latest version of the microsoft/windows-drivers pack:
     ```
-    codeql pack download microsoft/windows-drivers
-    codeql pack install <package install location>\<package name>\<package version>\
+    codeql pack download microsoft/windows-drivers@1.0.2
+	```
+	CodeQL will install the microsoft/windows-drivers pack to the default directory `C:\Users\<current user>\.codeql\packages\microsoft\windows-drivers\1.0.2\`. Do not change this directory or move the installed pack.
+	
+	Resolve dependencies for the pack:
+	```
+	codeql pack resolve-dependencies C:\Users\<current user>\.codeql\packages\microsoft\windows-drivers\1.0.2\ --no-strict-mode
+	```
+	
+	Install dependencies for the pack:
+	```
+    codeql pack install C:\Users\<current user>\.codeql\packages\microsoft\windows-drivers\1.0.2\
     ```
-
+	
+	
 1. Build your CodeQL database:
 
     ```
