@@ -2,7 +2,10 @@
 # Licensed under the MIT license.
 
 - description: Recommended and required queries for Windows Drivers.
-- import: suites/windows_driver_mustfix.qls
+- import: windows-suites/driver_mustfix.qls
+  from: microsoft/windows-drivers
+- import: windows-driver-suites/driver_recommended.qls
+  from: microsoft/windows-drivers
 - queries: . 
   from: codeql/cpp-queries
   version: 0.9.0
@@ -22,15 +25,8 @@
       - Security/CWE/CWE-468/SuspiciousAddWithSizeof.ql
       - Security/CWE/CWE-676/PotentiallyDangerousFunction.ql
       - Security/CWE/CWE-704/WcharCharConversion.ql
-- queries: .
-  from: microsoft/windows-drivers
-- include:
-    query path: 
-      - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
-      - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
-      - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
-      - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
-      - microsoft/Likely Bugs/UninitializedPtrField.ql
-      - microsoft/Security/Crytpography/HardcodedIVCNG.ql
-      - drivers/general/queries/KeSetEventPaged/KeSetEventPageable.ql
-      - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
+      - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql
+      - Likely Bugs/Memory Management/PointerOverflow.ql
+      - Likely Bugs/Underspecified Functions/TooFewArguments.ql
+      - Security/CWE/CWE-190/ComparisonWithWiderType.ql
+      - Security/CWE/CWE-253/HResultBooleanConversion.ql

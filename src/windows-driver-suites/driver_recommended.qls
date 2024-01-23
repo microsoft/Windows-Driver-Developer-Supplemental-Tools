@@ -1,0 +1,17 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+- description: Recommended and required queries for Windows Drivers.
+- import: windows-suites/driver_mustfix.qls
+- queries: .
+  from: microsoft/windows-drivers
+- include:
+    query path: 
+      - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
+      - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
+      - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
+      - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - microsoft/Likely Bugs/UninitializedPtrField.ql
+      - microsoft/Security/Crytpography/HardcodedIVCNG.ql
+      - drivers/general/queries/KeSetEventPaged/KeSetEventPageable.ql
+      - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql

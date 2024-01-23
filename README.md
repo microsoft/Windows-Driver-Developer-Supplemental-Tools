@@ -32,6 +32,7 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
 
     For general use with the `main` branch, use [CodeQL CLI version 2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4).
     
+  
 
 1. Verify CodeQL is installed correctly by checking the version:
     ```
@@ -49,23 +50,27 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     For WHCP_21H2 and WHCP_22H2 branches:
  
     **NOTE** Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in the WHCP_21H2 and WHCP_22H2 branches. CodeQL 2.15.4 has been validated for use with WHCP 21H2 and WHCP 22H2 when using Visual Studio 17.8 or greater. 
+    
+    1. If using visual studio 17.8 or greater with WHCP_21H2 or WHCP_22H2:
 
-	If using Visual Studio version 17.7 or below
-    The WHCP branches WHCP_21H2 and WHCP_22H2 use the CodeQL repository as a submodule instead of using CodeQL packs. When using these branches with VS17.7 or below, make sure to update submodules. 
-	
-	If using Visual Studio version 17.8 or greater:
-	
-	Follow the steps for ALL OTHER BRANCHES, below. **Make sure to remove the CodeQL submodule if it exists in your repo.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
+    Follow the steps for "ALL OTHER BRANCHES. **Make sure to remove the CodeQL submodule if you still have the repo cloned.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
 
-    For ALL OTHER BRANCHES run the following commands:
-
+    2. If using Visual Studio version 17.7 or below with WHCP_21H2 or WHCP_22H2:
+    
+    Follow special instructions for WHCP_21H2 and WHCP_22H2 using VS17.7 at the end of this readme
+ 
+    
+    **For ALL OTHER BRANCHES:**
+    
+    **Note** It is no longer necessary to clone the Windows-Driver-Developer-Supplemental-Tools repo
+    
 	Download the latest version of the microsoft/windows-drivers pack:
     ```
-    codeql pack download microsoft/windows-drivers@1.0.2
+    codeql pack download microsoft/windows-drivers
 	```
-	CodeQL will install the microsoft/windows-drivers pack to the default directory `C:\Users\<current user>\.codeql\packages\microsoft\windows-drivers\1.0.2\`. Do not change this directory or move the installed pack.
+	CodeQL will install the microsoft/windows-drivers pack to the default directory `C:\Users\<current user>\.codeql\packages\microsoft\windows-drivers\<downloaded version>\`. Do not change this directory or move the installed pack.
 	
-	Resolve dependencies for the pack:
+	<!-- Resolve dependencies for the pack:
 	```
 	codeql pack resolve-dependencies C:\Users\<current user>\.codeql\packages\microsoft\windows-drivers\1.0.2\ --no-strict-mode
 	```
@@ -74,8 +79,9 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
 	```
     codeql pack install C:\Users\<current user>\.codeql\packages\microsoft\windows-drivers\1.0.2\
     ```
-	
-	
+	 -->
+    
+
 1. Build your CodeQL database:
 
     ```
@@ -90,13 +96,19 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
 1. Analyze your CodeQL database:
     
     CodeQL's analysis output is provided in the form of a SARIF log file. For a human readable format, drop the SARIF file into [SARIF Viewer Website](https://microsoft.github.io/sarif-web-component/). (If there are violations, they will show up. If not, the page will not update.)
+
+    CodeQL query suites are provided in the suites directory and contain the sets of all recommended and mustfix queries. **NOTE** The desired query suite file should be downloaded/copied locally. Since the microsoft/windows-driver queries were downloaded as a codeql pack, the repo does not need to be cloned. 
+    
+    To analyze a CodeQL database run the following command:
     ```
-    codeql database analyze <path to database> microsoft/windows-drivers --format=sarifv2.1.0 --output=<"path to output file".sarif> 
+	codeql database analyze --download <path to databse> <path to quiery suite .qls file> --format=sarifv2.1.0 --output=out.sarif
     ```
-    By default, the `microsoft/windows-drivers` CodeQL pack will run the windows_driver_mustfix query suite. However, specific versions, queries, or suites can be specified using the format `codeql database analyze <database> <scope>/<pack>@x.x.x:<path>`. For futher information, see the [CodeQL documentation](https://docs.github.com/en/code-security/codeql-cli/using-the-advanced-functionality-of-the-codeql-cli/publishing-and-using-codeql-packs#using-a-codeql-pack-to-analyze-a-codeql-database)
+    **NOTE** The "--download" flag tells CodeQL to download dependencies before running the queries. 
+    
+    Specific versions, queries, or suites can be specified using the format `codeql database analyze <database> <scope>/<pack>@x.x.x:<path>`. For futher information, see the [CodeQL documentation](https://docs.github.com/en/code-security/codeql-cli/using-the-advanced-functionality-of-the-codeql-cli/publishing-and-using-codeql-packs#using-a-codeql-pack-to-analyze-a-codeql-database)
 
         
-    Example: `codeql database analyze D:\DriverDatabase microsoft/windows-drivers --format=sarifv2.1.0 --output=D:\DriverAnalysis1.sarif `
+    Example: `codeql database analyze --download D:\DriverDatabase microsoft/windows-drivers --format=sarifv2.1.0 --output=D:\DriverAnalysis1.sarif `
 
     _(Parameters: path to new database, query pack, format, output sarif file)_
 
@@ -162,3 +174,29 @@ trademarks or logos is subject to and must follow
 [Microsoft's Trademark & Brand Guidelines](https://www.microsoft.com/en-us/legal/intellectualproperty/trademarks/usage/general).
 Use of Microsoft trademarks or logos in modified versions of this project must not cause confusion or imply Microsoft sponsorship.
 Any use of third-party trademarks or logos are subject to those third-party's policies.
+
+
+## Special instructions for WHCP_21H2 and WHCP_22H2 using VS17.7 or below
+1. Install Codeql version as indicated in above steps.
+
+1. 
+    Clone and install the Windows Driver Developer Supplemental Tools repository which contains the CodeQL queries specific for drivers:
+
+    ```
+    git clone https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools.git --recurse-submodules
+    ```
+
+        Now you should have:
+
+        D:/codeql-home
+            |--- codeql
+            |--- Windows-Driver-Developer-Supplemental-Tools
+1. Analyze your CodeQL database
+    ```
+    codeql database analyze <path to database> --format=sarifv2.1.0 --output=<"path to output file".sarif> <path to query/suite to run>
+    ```
+    Example: `codeql database analyze D:\DriverDatabase --format=sarifv2.1.0 --output=D:\DriverAnalysis1.sarif D:\codeql-home\Windows-driver-developer-supplemental-tools\src\suites\windows_driver_mustfix.qls`
+
+    (Parameters: path to new database, format, output sarif file, path to CodeQL query or query suite to use in analysis.)
+
+    **Note:** Be sure to check the path to the suite or query you want to run, not every branch has the same file structure.
