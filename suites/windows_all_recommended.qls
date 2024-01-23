@@ -2,9 +2,9 @@
 # Licensed under the MIT license.
 
 - description: Recommended and required queries for Windows Drivers.
-- import: windows-driver-suites/driver_mustfix.qls
+- import: windows-driver-suites/windows_driver_mustfix.qls
   from: microsoft/windows-drivers
-- import: windows-driver-suites/driver_recommended.qls
+- import: windows-driver-suites/windows_driver_recommended.qls
   from: microsoft/windows-drivers
 - queries: . 
   from: codeql/cpp-queries

@@ -6,7 +6,7 @@ version: 1.0.10
 dependencies:
     codeql/cpp-all: 0.12.1
 suites: windows-driver-suites
-defaultSuiteFile: windows-driver-suites/driver_recommended.qls
+defaultSuiteFile: windows-driver-suites/windows_driver_recommended.qls
 extractor: cpp
 licenses: MIT
 description: CodeQL queries designed for Windows device driver development.
