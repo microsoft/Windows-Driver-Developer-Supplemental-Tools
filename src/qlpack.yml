@@ -5,7 +5,7 @@ name: microsoft/windows-drivers
 version: 1.0.10
 dependencies:
     codeql/cpp-all: 0.12.1
-suites: windows-drivers-suites
+suites: windows-driver-suites
 defaultSuiteFile: windows-driver-suites/driver_recommended.qls
 extractor: cpp
 licenses: MIT
