@@ -97,9 +97,14 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     
     CodeQL's analysis output is provided in the form of a SARIF log file. For a human readable format, drop the SARIF file into [SARIF Viewer Website](https://microsoft.github.io/sarif-web-component/). (If there are violations, they will show up. If not, the page will not update.)
 
-    CodeQL query suites are provided in the suites directory and contain the sets of all recommended and mustfix queries. **NOTE** The desired query suite file should be downloaded/copied locally. Since the microsoft/windows-driver queries were downloaded as a codeql pack, the repo does not need to be cloned. 
+    CodeQL query suites are provided in the suites directory and contain the sets of all recommended and mustfix queries. The desired query suite file should be downloaded/copied locally.
     
-    To analyze a CodeQL database run the following command:
+    1. Create a local copy of the desired query suite file:
+       
+        * windows_all_mustfix.qls 
+        * windows_all_recommended.qls
+
+    2. To analyze a CodeQL database run the following command:
     ```
 	codeql database analyze --download <path to databse> <path to quiery suite .qls file> --format=sarifv2.1.0 --output=out.sarif
     ```
@@ -112,18 +117,6 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
 
     _(Parameters: path to new database, query pack, format, output sarif file)_
 
-    **For WHCP_21H2 and WHCP_22H2 branches using Visual Studio version less than 17.8 only:**
-    
-    Because these branches use the CodeQL repo as a submodule instead of CodeQL packs, the queries must be specified when running analysis. 
-
-    ```
-    codeql database analyze <path to database> --format=sarifv2.1.0 --output=<"path to output file".sarif> <path to query/suite to run>
-    ```
-    Example: codeql database analyze D:\DriverDatabase --format=sarifv2.1.0 --output=D:\DriverAnalysis1.sarif D:\codeql-home\Windows-driver-developer-supplemental-tools\src\suites\windows_driver_mustfix.qls
-
-    (Parameters: path to new database, format, output sarif file, path to CodeQL query or query suite to use in analysis.)
-
-    **Note**: Be sure to check the path to the suite or query you want to run, not every branch has the same file structure.
 
 1. ***For WHCP Users Only***: Prepare to Create a Driver Verification Log (DVL):
 
@@ -139,7 +132,9 @@ Windows drivers queries are in the `src/drivers` directory.
 
 Non-driver Microsoft-specific queries provided by Microsoft are in the `src/microsoft` directory.
 
-Query suites are located in the `src/suites` directory and contain the Must-Fix and Recommended-Fix suites used by the WHCP Program.
+Query suites are located in the `suites` directory and contain the Must-Fix and Recommended-Fix suites used by the WHCP Program.
+
+
 
 ## Contributing
 This project welcomes contributions, feedback, and suggestions!
@@ -200,3 +195,6 @@ Any use of third-party trademarks or logos are subject to those third-party's po
     (Parameters: path to new database, format, output sarif file, path to CodeQL query or query suite to use in analysis.)
 
     **Note:** Be sure to check the path to the suite or query you want to run, not every branch has the same file structure.
+
+
+    
