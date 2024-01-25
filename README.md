@@ -62,7 +62,7 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     
     **For ALL OTHER BRANCHES:**
     
-    **Note** It is no longer necessary to clone the Windows-Driver-Developer-Supplemental-Tools repo
+    **Note:** It is no longer necessary to clone the Windows-Driver-Developer-Supplemental-Tools repo to use the queries for certification.
     
 	Download the latest version of the microsoft/windows-drivers pack:
     ```
