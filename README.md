@@ -53,11 +53,9 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     
     For WHCP_21H2 and WHCP_22H2 branches:
  
-    **NOTE** Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in the WHCP_21H2 and WHCP_22H2 branches. CodeQL 2.15.4 has been validated for use with WHCP 21H2 and WHCP 22H2 when using Visual Studio 17.8 or greater. 
-    
-    1. If using Visual Studio 2022 17.8 or greater with WHCP_21H2 or WHCP_22H2:
+    1. If using Visual Studio 2022 17.8 or greater with WHCP_21H2 or WHCP_22H2 and CodeQL CLI version 2.15.4:
 
-        Follow the steps for "ALL OTHER BRANCHES." **Make sure to remove the CodeQL submodule if you still have the repo cloned.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
+        Follow the steps for "ALL OTHER BRANCHES." **Make sure to remove the CodeQL submodule if you still have an old version of the repo cloned.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
 
     1. If using Visual Studio version 17.7 or below **AND** either WHCP_21H2 or WHCP_22H2 **AND** CodeQL VLI version 2.4.6 or 2.6.3:
     
