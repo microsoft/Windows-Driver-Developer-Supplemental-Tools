@@ -110,7 +110,7 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     ```
     **NOTE** The "--download" flag tells CodeQL to download dependencies before running the queries. 
     
-    Specific versions, queries, or suites can be specified using the format `codeql database analyze <database> <scope>/<pack>@x.x.x:<path>`. For futher information, see the [CodeQL documentation](https://docs.github.com/en/code-security/codeql-cli/using-the-advanced-functionality-of-the-codeql-cli/publishing-and-using-codeql-packs#using-a-codeql-pack-to-analyze-a-codeql-database)
+    Specific versions, queries, or suites can be specified using the format `codeql database analyze <database> <scope>/<pack>@x.x.x:<path>`. For futher information, see the [CodeQL documentation](https://docs.github.com/en/code-security/codeql-cli/using-the-advanced-functionality-of-the-codeql-cli/publishing-and-using-codeql-packs#using-a-codeql-pack-to-analyze-a-codeql-database).
 
         
     Example: `codeql database analyze --download D:\DriverDatabase suites/windows-all-recommended.qls --format=sarifv2.1.0 --output=D:\DriverAnalysis1.sarif `
