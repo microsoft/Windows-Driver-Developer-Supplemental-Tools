@@ -55,9 +55,9 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
  
     **NOTE** Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in the WHCP_21H2 and WHCP_22H2 branches. CodeQL 2.15.4 has been validated for use with WHCP 21H2 and WHCP 22H2 when using Visual Studio 17.8 or greater. 
     
-    1. If using visual studio 17.8 or greater with WHCP_21H2 or WHCP_22H2:
+    1. If using Visual Studio 2022 17.8 or greater with WHCP_21H2 or WHCP_22H2:
 
-        Follow the steps for "ALL OTHER BRANCHES. **Make sure to remove the CodeQL submodule if you still have the repo cloned.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
+        Follow the steps for "ALL OTHER BRANCHES." **Make sure to remove the CodeQL submodule if you still have the repo cloned.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
 
     1. If using Visual Studio version 17.7 or below **AND** either WHCP_21H2 or WHCP_22H2 **AND** CodeQL VLI version 2.4.6 or 2.6.3:
     
@@ -66,7 +66,7 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     
     **For ALL OTHER BRANCHES:**
     
-    **Note** It is no longer necessary to clone the Windows-Driver-Developer-Supplemental-Tools repo
+    **Note:** It is no longer necessary to clone the Windows-Driver-Developer-Supplemental-Tools repo to use the queries for certification.
     
 	Download the latest version of the microsoft/windows-drivers pack:
     ```
@@ -110,11 +110,11 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
 
     2. To analyze a CodeQL database run the following command:
     ```
-	codeql database analyze --download <path to databse> <path to quiery suite .qls file> --format=sarifv2.1.0 --output=out.sarif
+	codeql database analyze --download <path to database> <path to query suite .qls file> --format=sarifv2.1.0 --output=<outputname>.sarif
     ```
     **NOTE** The "--download" flag tells CodeQL to download dependencies before running the queries. 
     
-    Specific versions, queries, or suites can be specified using the format `codeql database analyze <database> <scope>/<pack>@x.x.x:<path>`. For futher information, see the [CodeQL documentation](https://docs.github.com/en/code-security/codeql-cli/using-the-advanced-functionality-of-the-codeql-cli/publishing-and-using-codeql-packs#using-a-codeql-pack-to-analyze-a-codeql-database)
+    Specific versions, queries, or suites can be specified using the format `codeql database analyze <database> <scope>/<pack>@x.x.x:<path>`. For futher information, see the [CodeQL documentation](https://docs.github.com/en/code-security/codeql-cli/using-the-advanced-functionality-of-the-codeql-cli/publishing-and-using-codeql-packs#using-a-codeql-pack-to-analyze-a-codeql-database).
 
         
     Example: `codeql database analyze --download D:\DriverDatabase suites/windows-all-recommended.qls --format=sarifv2.1.0 --output=D:\DriverAnalysis1.sarif `
