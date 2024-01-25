@@ -57,7 +57,7 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
 
     2. If using Visual Studio version 17.7 or below with WHCP_21H2 or WHCP_22H2:
     
-    Follow special instructions for WHCP_21H2 and WHCP_22H2 using VS17.7 at the end of this readme
+    Follow special instructions for WHCP_21H2 and WHCP_22H2 using VS17.7 at the end of this readme.
  
     
     **For ALL OTHER BRANCHES:**
