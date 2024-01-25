@@ -53,7 +53,7 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     
     1. If using visual studio 17.8 or greater with WHCP_21H2 or WHCP_22H2:
 
-    Follow the steps for "ALL OTHER BRANCHES. **Make sure to remove the CodeQL submodule if you still have the repo cloned.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
+    Follow the steps for "ALL OTHER BRANCHES." **Make sure to remove the CodeQL submodule if you still have the repo cloned.** CodeQL might try to use the queries in the submodule by default which will cause errors because of mismatched versions.
 
     2. If using Visual Studio version 17.7 or below with WHCP_21H2 or WHCP_22H2:
     
