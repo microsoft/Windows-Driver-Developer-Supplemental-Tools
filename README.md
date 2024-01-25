@@ -177,7 +177,7 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 These instructions only apply when using both Visual Studio 17.7 or below along with CodeQL 2.6.3 or 2.4.6
 
 
-1. Install Codeql version as indicated in above steps.
+1. Install CodeQL version as indicated in above steps.
 
 1. 
     Clone and install the Windows Driver Developer Supplemental Tools repository which contains the CodeQL queries specific for drivers:
