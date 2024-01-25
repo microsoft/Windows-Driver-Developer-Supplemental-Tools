@@ -119,6 +119,7 @@
     <ClCompile>
       <ExceptionHandling>
       </ExceptionHandling>
+      <PreprocessorDefinitions>USE_NTIFS=$(UseNTIFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
@@ -128,6 +129,7 @@
     <ClCompile>
       <ExceptionHandling>
       </ExceptionHandling>
+      <PreprocessorDefinitions>USE_NTIFS=$(UseNTIFS);%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <DriverSign>
       <FileDigestAlgorithm>sha256</FileDigestAlgorithm>
