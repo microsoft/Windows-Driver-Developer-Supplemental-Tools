@@ -106,7 +106,7 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
 
     2. To analyze a CodeQL database run the following command:
     ```
-	codeql database analyze --download <path to databse> <path to quiery suite .qls file> --format=sarifv2.1.0 --output=out.sarif
+	codeql database analyze --download <path to database> <path to query suite .qls file> --format=sarifv2.1.0 --output=<outputname>.sarif
     ```
     **NOTE** The "--download" flag tells CodeQL to download dependencies before running the queries. 
     
