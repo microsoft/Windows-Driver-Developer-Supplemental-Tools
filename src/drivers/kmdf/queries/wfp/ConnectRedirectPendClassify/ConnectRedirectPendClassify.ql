@@ -1,3 +1,21 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
+/**
+ * @name Connect Redirect Callout Pend Classify
+ * @description If a callout pends a classify by calling FwpsPendClassify0, the callout must set action to 
+ * FWP_ACTION_BLOCK and clear the FWPS_RIGHT_ACTION_WRITE right flag. This is to let other 
+ * (lower weight) callouts know that they shouldn’t take any action while the classify is pending
+ * @platform Desktop
+ * @feature.area Multiple
+ * @repro.text The following function does not FWP_ACTION_BLOCK and/or clear the FWPS_RIGHT_ACTION_WRITE flag before calling FwpsPendClassify0
+ * @kind problem
+ * @id cpp/windows/drivers/kmdf/queries/wfp/queries
+ * @problem.severity warning
+ * @precision low
+ * @tags correctness
+ * @query-version v1
+ */
+
 import cpp
 import drivers.libraries.wfp
 

@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 /**
  * @name Flow Layer Callouts
- * @description Checks that a Flow Layer Callout does not return FWP_ACTION-BLOCK
+ * @description Checks that a Flow Layer Callout does not return FWP_ACTION_BLOCK
  * @platform Desktop
  * @feature.area Multiple
  * @repro.text The following function sets FWP_ACTION_BLOCK on a callout registered to ALE_FLOW_ESTABLISHED_LAYERS
