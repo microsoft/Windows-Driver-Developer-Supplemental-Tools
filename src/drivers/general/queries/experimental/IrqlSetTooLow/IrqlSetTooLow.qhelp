@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The function has lowered the IRQL to a level below what is allowed.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			A function has been annotated as having a minimum IRQL, but the execution of that function lowers the IRQL below that minimum.  If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28124-call-below-minimum-irq-level">
+				C28124
+			</a>
+		</li>
+	</references>
+</qhelp>
