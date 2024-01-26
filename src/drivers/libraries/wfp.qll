@@ -125,7 +125,6 @@ class WfpAnnotatedFunction extends Function {
     WfpAnnotatedFunction() {
         exists(WFPTypeDefinition wfpa, FunctionDeclarationEntry fde |
             fde = this.getADeclarationEntry() and
-            wfpa.getDeclarationEntry() = fde and
             funcWfpAnnotationName = wfpa.getWfpMacroName())
     }
 
