@@ -1,0 +1,361 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.14.4",
+        "notifications" : [ {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "name" : "cpp/baseline/expected-extracted-files",
+          "shortDescription" : {
+            "text" : "Expected extracted files"
+          },
+          "fullDescription" : {
+            "text" : "Files appearing in the source archive that are expected to be extracted."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          },
+          "properties" : {
+            "tags" : [ "expected-extracted-files", "telemetry" ]
+          }
+        } ],
+        "rules" : [ {
+          "id" : "cpp/drivers/irql-too-high",
+          "name" : "cpp/drivers/irql-too-high",
+          "shortDescription" : {
+            "text" : "IRQL too high (C28120)"
+          },
+          "fullDescription" : {
+            "text" : "A function annotated with IRQL requirements was called at an IRQL too high for the requirements."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "A function annotated with IRQL requirements was called at an IRQL too high for the requirements.",
+            "feature.area" : "Multiple",
+            "id" : "cpp/drivers/irql-too-high",
+            "impact" : "Exploitable Design",
+            "kind" : "problem",
+            "name" : "IRQL too high (C28120)",
+            "opaqueid" : "CQLD-C28120",
+            "owner.email" : "sdat@microsoft.com",
+            "platform" : "Desktop",
+            "precision" : "medium",
+            "problem.severity" : "warning",
+            "query-version" : "v2",
+            "repro.text" : "The following function call is taking place at an IRQL too high for what the call target is annotated as.",
+            "scope" : "domainspecific",
+            "security.severity" : "Low"
+          }
+        } ]
+      },
+      "extensions" : [ {
+        "name" : "microsoft/windows-drivers",
+        "semanticVersion" : "0.2.0+4842fd4116871d3b47eede85c2c4497b43c34d57",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      } ]
+    },
+    "invocations" : [ {
+      "toolExecutionNotifications" : [ {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 1
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      } ],
+      "executionSuccessful" : true
+    } ],
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 1
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 2
+      }
+    } ],
+    "results" : [ {
+      "ruleId" : "cpp/drivers/irql-too-high",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/irql-too-high",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "[TestInner1](1): IRQL potentially too high at call to [TestInner2](2).  Maximum IRQL for this call: 1, IRQL at preceding node: 2"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 42,
+            "startColumn" : 12,
+            "endColumn" : 22
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "1defbc9e59f0310b:1",
+        "primaryLocationStartColumnFingerprint" : "7"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 41,
+            "startColumn" : 10,
+            "endColumn" : 20
+          }
+        },
+        "message" : {
+          "text" : "TestInner1"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 42,
+            "startColumn" : 12,
+            "endColumn" : 22
+          }
+        },
+        "message" : {
+          "text" : "TestInner2"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/irql-too-high",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/irql-too-high",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "[TestInner2](1): IRQL potentially too high at call to [TestInner4](2).  Maximum IRQL for this call: 0, IRQL at preceding node: 2"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 36,
+            "startColumn" : 14,
+            "endColumn" : 24
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "7ae2af586e0dd70a:1",
+        "primaryLocationStartColumnFingerprint" : "9"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 26,
+            "startColumn" : 10,
+            "endColumn" : 20
+          }
+        },
+        "message" : {
+          "text" : "TestInner2"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 36,
+            "startColumn" : 14,
+            "endColumn" : 24
+          }
+        },
+        "message" : {
+          "text" : "TestInner4"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/irql-too-high",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/irql-too-high",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "[DpcForIsrRoutine](1): IRQL potentially too high at call to [IoGetInitialStack](2).  Maximum IRQL for this call: 1, IRQL at preceding node: 2"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/fail_driver1.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 1
+          },
+          "region" : {
+            "startLine" : 366,
+            "startColumn" : 5,
+            "endColumn" : 22
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "48e9dbeaff18e9e7:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/fail_driver1.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 1
+          },
+          "region" : {
+            "startLine" : 347,
+            "endColumn" : 17
+          }
+        },
+        "message" : {
+          "text" : "DpcForIsrRoutine"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/fail_driver1.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 1
+          },
+          "region" : {
+            "startLine" : 366,
+            "startColumn" : 5,
+            "endColumn" : 22
+          }
+        },
+        "message" : {
+          "text" : "IoGetInitialStack"
+        }
+      } ]
+    } ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}

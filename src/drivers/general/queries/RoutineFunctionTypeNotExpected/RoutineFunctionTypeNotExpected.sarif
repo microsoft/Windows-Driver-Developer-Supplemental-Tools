@@ -1,0 +1,855 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.14.6",
+        "rules" : [ {
+          "id" : "cpp/drivers/routine-function-type-not-expected",
+          "name" : "cpp/drivers/routine-function-type-not-expected",
+          "shortDescription" : {
+            "text" : "Unexpected function return type for routine (C28127)"
+          },
+          "fullDescription" : {
+            "text" : "The function being used as a routine does not exactly match the type expected."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "The function being used as a routine does not exactly match the type expected.",
+            "feature.area" : "Multiple",
+            "id" : "cpp/drivers/routine-function-type-not-expected",
+            "impact" : "Attack Surface Reduction",
+            "kind" : "problem",
+            "name" : "Unexpected function return type for routine (C28127)",
+            "opaqueid" : "CQLD-C28127",
+            "owner.email" : "sdat@microsoft.com",
+            "platform" : "Desktop",
+            "precision" : "high",
+            "problem.severity" : "warning",
+            "query-version" : "v2",
+            "repro.text" : "The following code locations use a function pointer with a return type that does not match the expected type",
+            "scope" : "domainspecific",
+            "security.severity" : "Low"
+          }
+        } ]
+      }
+    },
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    } ],
+    "results" : [ {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function [call to functionCallThatUsesFunctionPointer](1) may use a function pointer [fun_ptr1](2) for parameter [functionPointer](3) with an unexpected return type or parameter type. Expected formal parameter is: [pointer to {{function returning {{void}} with arguments ()}}](4) (1 parameters). Actual argument: [pointer to {{function returning {{int}} with arguments ()}}](5) (1 arguments)."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 85,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "b6c3b797b0277bdd:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 85,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        },
+        "message" : {
+          "text" : "call to functionCallThatUsesFunctionPointer"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 85,
+            "startColumn" : 41,
+            "endColumn" : 49
+          }
+        },
+        "message" : {
+          "text" : "fun_ptr1"
+        }
+      }, {
+        "id" : 3,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 50,
+            "startColumn" : 51,
+            "endColumn" : 66
+          }
+        },
+        "message" : {
+          "text" : "functionPointer"
+        }
+      }, {
+        "id" : 4,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 50,
+            "startColumn" : 51,
+            "endColumn" : 66
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments ()}}"
+        }
+      }, {
+        "id" : 5,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 85,
+            "startColumn" : 41,
+            "endColumn" : 49
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{int}} with arguments ()}}"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function [call to functionCallThatUsesFunctionPointer](1) may use a function pointer [f3](2) for parameter [functionPointer](3) with an unexpected return type or parameter type. Expected formal parameter is: [pointer to {{function returning {{void}} with arguments ()}}](4) (1 parameters). Actual argument: [pointer to {{function returning {{int}} with arguments ()}}](5) (1 arguments)."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 87,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "789a3ee1dd677a33:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 87,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        },
+        "message" : {
+          "text" : "call to functionCallThatUsesFunctionPointer"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 87,
+            "startColumn" : 41,
+            "endColumn" : 43
+          }
+        },
+        "message" : {
+          "text" : "f3"
+        }
+      }, {
+        "id" : 3,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 50,
+            "startColumn" : 51,
+            "endColumn" : 66
+          }
+        },
+        "message" : {
+          "text" : "functionPointer"
+        }
+      }, {
+        "id" : 4,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 50,
+            "startColumn" : 51,
+            "endColumn" : 66
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments ()}}"
+        }
+      }, {
+        "id" : 5,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 87,
+            "startColumn" : 41,
+            "endColumn" : 43
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{int}} with arguments ()}}"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function [call to functionCallThatUsesFunctionPointer](1) may use a function pointer [& ...](2) for parameter [functionPointer](3) with an unexpected return type or parameter type. Expected formal parameter is: [pointer to {{function returning {{void}} with arguments ()}}](4) (1 parameters). Actual argument: [pointer to {{function returning {{int}} with arguments ()}}](5) (1 arguments)."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 89,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "b16f3331cfb3f2dd:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 89,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        },
+        "message" : {
+          "text" : "call to functionCallThatUsesFunctionPointer"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 89,
+            "startColumn" : 41,
+            "endColumn" : 59
+          }
+        },
+        "message" : {
+          "text" : "& ..."
+        }
+      }, {
+        "id" : 3,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 50,
+            "startColumn" : 51,
+            "endColumn" : 66
+          }
+        },
+        "message" : {
+          "text" : "functionPointer"
+        }
+      }, {
+        "id" : 4,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 50,
+            "startColumn" : 51,
+            "endColumn" : 66
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments ()}}"
+        }
+      }, {
+        "id" : 5,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 89,
+            "startColumn" : 41,
+            "endColumn" : 59
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{int}} with arguments ()}}"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function [call to functionCallThatUsesFunctionPointer](1) may use a function pointer [intFunctionToCall](2) for parameter [functionPointer](3) with an unexpected return type or parameter type. Expected formal parameter is: [pointer to {{function returning {{void}} with arguments ()}}](4) (1 parameters). Actual argument: [pointer to {{function returning {{int}} with arguments ()}}](5) (1 arguments)."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 92,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "3156b91ec348a1bb:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 92,
+            "startColumn" : 5,
+            "endColumn" : 40
+          }
+        },
+        "message" : {
+          "text" : "call to functionCallThatUsesFunctionPointer"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 92,
+            "startColumn" : 41,
+            "endColumn" : 58
+          }
+        },
+        "message" : {
+          "text" : "intFunctionToCall"
+        }
+      }, {
+        "id" : 3,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 50,
+            "startColumn" : 51,
+            "endColumn" : 66
+          }
+        },
+        "message" : {
+          "text" : "functionPointer"
+        }
+      }, {
+        "id" : 4,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 50,
+            "startColumn" : 51,
+            "endColumn" : 66
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments ()}}"
+        }
+      }, {
+        "id" : 5,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 92,
+            "startColumn" : 41,
+            "endColumn" : 58
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{int}} with arguments ()}}"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function [call to functionCallThatUsesFunctionPointer2](1) may use a function pointer [intFunctionToCall](2) for parameter [functionPointer](3) with an unexpected return type or parameter type. Expected formal parameter is: [pointer to {{function returning {{void}} with arguments ()}}](4) (3 parameters). Actual argument: [pointer to {{function returning {{int}} with arguments ()}}](5) (3 arguments)."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 96,
+            "startColumn" : 5,
+            "endColumn" : 41
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "b2e192116459028c:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 96,
+            "startColumn" : 5,
+            "endColumn" : 41
+          }
+        },
+        "message" : {
+          "text" : "call to functionCallThatUsesFunctionPointer2"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 96,
+            "startColumn" : 47,
+            "endColumn" : 64
+          }
+        },
+        "message" : {
+          "text" : "intFunctionToCall"
+        }
+      }, {
+        "id" : 3,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 55,
+            "startColumn" : 60,
+            "endColumn" : 75
+          }
+        },
+        "message" : {
+          "text" : "functionPointer"
+        }
+      }, {
+        "id" : 4,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 55,
+            "startColumn" : 60,
+            "endColumn" : 75
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments ()}}"
+        }
+      }, {
+        "id" : 5,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 96,
+            "startColumn" : 47,
+            "endColumn" : 64
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{int}} with arguments ()}}"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function [call to functionCallThatUsesFunctionPointer3](1) may use a function pointer [f1](2) for parameter [functionPointer](3) with an unexpected return type or parameter type. Expected formal parameter is: [pointer to {{function returning {{void}} with arguments (int,signed char,long)}}](4) (1 parameters). Actual argument: [pointer to {{function returning {{void}} with arguments ()}}](5) (1 arguments)."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 102,
+            "startColumn" : 5,
+            "endColumn" : 41
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "a136406d3848a7ab:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 102,
+            "startColumn" : 5,
+            "endColumn" : 41
+          }
+        },
+        "message" : {
+          "text" : "call to functionCallThatUsesFunctionPointer3"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 102,
+            "startColumn" : 42,
+            "endColumn" : 44
+          }
+        },
+        "message" : {
+          "text" : "f1"
+        }
+      }, {
+        "id" : 3,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 66,
+            "startColumn" : 53,
+            "endColumn" : 68
+          }
+        },
+        "message" : {
+          "text" : "functionPointer"
+        }
+      }, {
+        "id" : 4,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 66,
+            "startColumn" : 53,
+            "endColumn" : 68
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments (int,signed char,long)}}"
+        }
+      }, {
+        "id" : 5,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 102,
+            "startColumn" : 42,
+            "endColumn" : 44
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments ()}}"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/routine-function-type-not-expected",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/routine-function-type-not-expected",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function [call to functionCallThatUsesFunctionPointer3](1) may use a function pointer [voidFunctionToCall](2) for parameter [functionPointer](3) with an unexpected return type or parameter type. Expected formal parameter is: [pointer to {{function returning {{void}} with arguments (int,signed char,long)}}](4) (1 parameters). Actual argument: [pointer to {{function returning {{void}} with arguments ()}}](5) (1 arguments)."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 105,
+            "startColumn" : 5,
+            "endColumn" : 41
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "69e17f41c5580c20:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 105,
+            "startColumn" : 5,
+            "endColumn" : 41
+          }
+        },
+        "message" : {
+          "text" : "call to functionCallThatUsesFunctionPointer3"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 105,
+            "startColumn" : 42,
+            "endColumn" : 60
+          }
+        },
+        "message" : {
+          "text" : "voidFunctionToCall"
+        }
+      }, {
+        "id" : 3,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 66,
+            "startColumn" : 53,
+            "endColumn" : 68
+          }
+        },
+        "message" : {
+          "text" : "functionPointer"
+        }
+      }, {
+        "id" : 4,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 66,
+            "startColumn" : 53,
+            "endColumn" : 68
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments (int,signed char,long)}}"
+        }
+      }, {
+        "id" : 5,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 105,
+            "startColumn" : 42,
+            "endColumn" : 60
+          }
+        },
+        "message" : {
+          "text" : "pointer to {{function returning {{void}} with arguments ()}}"
+        }
+      } ]
+    } ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}

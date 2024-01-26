@@ -6,7 +6,23 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.5",
+        "semanticVersion" : "2.15.1",
+        "notifications" : [ {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "name" : "cpp/baseline/expected-extracted-files",
+          "shortDescription" : {
+            "text" : "Expected extracted files"
+          },
+          "fullDescription" : {
+            "text" : "Files appearing in the source archive that are expected to be extracted."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          },
+          "properties" : {
+            "tags" : [ "expected-extracted-files", "telemetry" ]
+          }
+        } ],
         "rules" : [ {
           "id" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
           "name" : "cpp/drivers/kewaitlocal-requires-kernel-mode",
@@ -42,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+c5706b97bc9d314a2dabbf2421005784dd3c1303",
+        "semanticVersion" : "0.2.0+143fe74d66f4093412a7b21390672217b557bba2",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -54,27 +70,98 @@
             "text" : "The QL pack definition file."
           }
         } ]
-      }, {
-        "name" : "legacy-upgrades",
-        "semanticVersion" : "0.0.0",
-        "locations" : [ {
-          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
       } ]
     },
+    "invocations" : [ {
+      "toolExecutionNotifications" : [ {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 1
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      } ],
+      "executionSuccessful" : true
+    } ],
     "artifacts" : [ {
       "location" : {
         "uri" : "driver/driver_snippet.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 0
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 1
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 2
       }
     } ],
     "results" : [ {
@@ -85,7 +172,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "KeWaitForSingleObject should have a KernelMode AccessMode when the first argument is local"
+        "text" : "[good_use](1): KeWaitForSingleObject should have a KernelMode AccessMode when the [first argument](2) is local"
       },
       "locations" : [ {
         "physicalLocation" : {
@@ -104,7 +191,42 @@
       "partialFingerprints" : {
         "primaryLocationLineHash" : "61bc3c7079348327:1",
         "primaryLocationStartColumnFingerprint" : "0"
-      }
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 7,
+            "startColumn" : 6,
+            "endColumn" : 14
+          }
+        },
+        "message" : {
+          "text" : "good_use"
+        }
+      }, {
+        "id" : 2,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 9,
+            "startColumn" : 12,
+            "endColumn" : 19
+          }
+        },
+        "message" : {
+          "text" : "first argument"
+        }
+      } ]
     } ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {

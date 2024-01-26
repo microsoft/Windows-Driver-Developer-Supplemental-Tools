@@ -2,11 +2,11 @@
 # Licensed under the MIT license.
 
 name: microsoft/windows-drivers
-version: 0.1.0
+version: 1.0.12
 dependencies:
-    codeql/cpp-queries: ^0.4.5
-    codeql/cpp-all: ^0.4.5
-suites: suites
+    codeql/cpp-all: 0.12.1
+suites: windows-driver-suites
+defaultSuiteFile: windows-driver-suites/windows_driver_recommended.qls
 extractor: cpp
 licenses: MIT
 description: CodeQL queries designed for Windows device driver development.

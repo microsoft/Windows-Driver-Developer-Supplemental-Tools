@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The function is not permitted to be called at the current IRQ level. The current level is too high.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The driver is executing at an IRQL that is too high for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called.  If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28121-irq-execution-too-high">
+				C28121
+			</a>
+		</li>
+	</references>
+</qhelp>
