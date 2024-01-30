@@ -14,6 +14,7 @@ try:
     import itertools
     from itertools import permutations
     import openpyxl # Not directly used but this will make sure it is installed
+    import argparse
 except ImportError as e:
     print("Import error: " + str(e) + "\nPlease install the required modules using pip install -r requirements.txt")
     exit(1)
@@ -22,22 +23,6 @@ except ImportError as e:
 print_mutex = threading.Lock()
 health_df = pd.DataFrame()
 result_df = pd.DataFrame(columns=["Driver", "Errors", "Warnings", "Notes", "Detailed Results"])
-
-def usage():
-    print("Usage: python build_create_analyze_test.py [-h] [-i <name>] [-t] [-o]")
-    print("Options:")
-    print("-h: help")
-    print("-i <name>: run only the tests with <name> in the name")
-    print("-t <num_threads>: run multithreaded with max <num_threads> threads")
-    print("-v: verbose output on")
-    print("--override_template <template>: override the template used for the test")
-    print("--use_codeql_repo <path>: use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager")
-    print("--database <path>: Run all queries using the database at <path>")
-    print("--no_clean: Do not clean the working directory before running the tests")
-    print("--external_drivers <path>: Run tests on external drivers at <path>")
-    print("--debug_only: Only run tests with Debug configuration")
-    print("--release_only: Only run tests with Release configuration")
-    print("--no_build: Do not build the driver before running the test")
 
 
 # Any attributes specific to a test should be added to this class
@@ -223,9 +208,9 @@ def find_project_configs(sln_files):
 
                         
                         if platform in allowed_platforms:
-                            if  debug_only and "Debug" not in config:
+                            if  args.debug_only and "Debug" not in config:
                                 continue
-                            if release_only and "Release" not in config:
+                            if args.release_only and "Release" not in config:
                                 continue
                             configs.add((config,platform))
                 else:
@@ -251,7 +236,7 @@ def test_setup_external_drivers(sln_files):
         dict: A dictionary containing the configurations for each solution file.
     """
     configs = find_project_configs(sln_files)
-    if not no_build:
+    if not args.no_build:
         for sln_file in configs.keys():
             workdir = sln_file.split("\\")[:-1]
             workdir = "\\".join(workdir)
@@ -298,7 +283,7 @@ def test_setup(ql_test):
         shutil.copyfile(os.path.join(os.getcwd(),"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name(),file), os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()+"\\driver\\",file))
 
     # Rebuild the project using msbuild
-    if not no_build:
+    if not args.no_build:
         out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), shell=True, capture_output=no_output  ) 
         if out1.returncode != 0:
             print("Error in msbuild: " + ql_test.get_ql_name())
@@ -350,7 +335,7 @@ def db_create_for_external_driver(sln_file, config, platform):
     return db_loc
 
 
-def create_codeql_database(ql_test):
+def create_codeql_test_database(ql_test):
     """
     Create a CodeQL database for the given ql_test.
 
@@ -364,16 +349,15 @@ def create_codeql_database(ql_test):
         None
 
     """
-  
     # Create the CodeQL database
     os.makedirs("TestDB", exist_ok=True) 
     if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
         shutil.rmtree("TestDB\\"+ql_test.get_ql_name())
-    db_loc = "..\\..\\TestDB\\"+ql_test.get_ql_name()
-    out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", "..\\..\\TestDB\\"+ql_test.get_ql_name()],
+    db_loc_rel = "..\\..\\TestDB\\"+ql_test.get_ql_name()
+    out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", db_loc_rel],
             cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
             shell=True, capture_output=no_output  ) 
-    
+    db_loc = os.path.join(os.getcwd(),"TestDB\\"+ql_test.get_ql_name())
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
         try:
@@ -412,8 +396,8 @@ def analyze_codeql_database(ql_test, db_path=None):
         output_file = "AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif"
 
     
-    if use_codeql_repo:
-        proc_command = ["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", codeql_repo_path]
+    if args.use_codeql_repo:
+        proc_command = ["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", args.use_codeql_repo]
       
     else:
         proc_command = ["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ]
@@ -502,26 +486,38 @@ def run_test(ql_test):
           "UseNTIFS flag: ", ql_test.get_use_ntifs(),"\n")
     print_mutex.release()
 
+    print("Running test: " + ql_test.get_ql_name())
     create_codeql_database_result = None
-    if not existing_database:
+    if not args.existing_database:
         test_setup_result = test_setup(ql_test)
         if test_setup_result is None:
+            print("Error setting up test: " + ql_test.get_ql_name(),"Skipping...")
             return None
-        create_codeql_database_result = create_codeql_database(ql_test)
+        
+        print("Creating test database")
+        create_codeql_database_result = create_codeql_test_database(ql_test)
         if create_codeql_database_result is None:
+            print("Error creating database: " + db_path,"Skipping...")
             return None
+        else:
+            db_path = create_codeql_database_result
+    else:
+        db_path=args.existing_database
+        print("Using existing database: " + db_path)
 
-    analyze_codeql_database_result = analyze_codeql_database(ql_test, existing_database_path)
+    print("Analyzing database: " + db_path)
+    analyze_codeql_database_result = analyze_codeql_database(ql_test, db_path) # result is path to sarif file if successful
     if analyze_codeql_database_result is None:
+        print("Error analyzing database: " + db_path,"Skipping...")
         return None
 
-    if not existing_database:   
+    if not args.existing_database:   
         sarif_diff_result = sarif_diff(ql_test)
         if sarif_diff_result is None: 
+            print("Error running sarif diff: " + db_path,"Skipping...")
             return None
     
-  
-    return analyze_codeql_database_result, create_codeql_database_result
+    return analyze_codeql_database_result
 
 
 def parse_attributes(queries):
@@ -555,8 +551,8 @@ def parse_attributes(queries):
         else:
             pass
             
-        if override_template:
-            template = override_template
+        if args.override_template:
+            template = args.override_template
 
         if queries[query].get_use_ntifs():
             use_ntifs = "1" 
@@ -589,8 +585,6 @@ def run_tests_external_drivers(ql_tests_dict):
     for ql_test in ql_tests_dict:
         df_column_names.append(ql_test.split("\\")[-1].replace(".ql", ""))
     
-    global external_driver_setup_done
-    global external_driver_database_created
     # Only need to setup external drivers once
     configs = test_setup_external_drivers(driver_sln_files)
     created_databases = []
@@ -598,9 +592,9 @@ def run_tests_external_drivers(ql_tests_dict):
         return    
     total = len(configs.keys())
     count = 0
-    if existing_database:
-            print("Using existing database: " + existing_database_path)
-            folder_names = [os.path.join(existing_database_path, name) for name in os.listdir(existing_database_path) if os.path.isdir(os.path.join(existing_database_path, name))]
+    if args.existing_database:
+            print("Using existing database: " + args.existing_database)
+            folder_names = [os.path.join(args.existing_database, name) for name in os.listdir(args.existing_database) if os.path.isdir(os.path.join(args.existing_database, name))]
             created_databases = folder_names
             total = len(folder_names)
     else:
@@ -668,7 +662,10 @@ def run_tests(ql_tests_dict):
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
 
     for ql_test in ql_tests_with_attributes:
-        result_sarif, db = run_test(ql_test)
+        result_sarif = run_test(ql_test)
+        if not result_sarif:
+            print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
+            continue
         analysis_results = sarif_results(ql_test, result_sarif)
         health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
         health_df.at[ql_test.get_ql_name(), "Driver Framework"] = ql_test.get_ql_type()
@@ -701,30 +698,74 @@ def find_sln_file(path):
 
 if __name__ == "__main__":
     # Sys input flags
-    if "-h" in sys.argv:
-        usage()
-        exit(0)
+    parser = argparse.ArgumentParser()
 
-    allowed_platforms = ["x64", "x86", "ARM", "ARM64"]
-    debug_only = True
-    release_only = False
+    parser.add_argument('-e', '--external_drivers',
+                    help='Use external drivers at <path> for testing instead of drivers in the repo',
+                    type=str,
+                    required=False,
+                    )
+    parser.add_argument('-l', '--no_clean',
+                    help='Do not clean the working directory before running tests',
+                    action='store_true',
+                    required=False,
+                    )
+    parser.add_argument('-b', '--existing_database',
+                    help='Use existing database at <path> for testing instead of creating a new one',
+                    type=str,
+                    required=False,
+                    )
+    parser.add_argument('-d', '--debug_only',
+                help='Debug only',
+                action='store_true',
+                required=False,
+                )
+    parser.add_argument('-r', '--release_only',
+                help='Release only',
+                action='store_true',
+                required=False,
+                )
+    parser.add_argument('-n', '--no_build',
+                help='Do not build the driver before running the test',
+                action='store_true',
+                required=False,
+                )
+    parser.add_argument('-o', '--override_template',
+                help='Override the template used for the test using <template>',
+                type=str,
+                required=False,
+                choices=["CppKMDFTestTemplate", "KMDFTestTemplate", "WDMTestTemplate"],
+                )
+
+    parser.add_argument('-v', '--verbose',
+                help='verbose output on',
+                action='store_true',
+                required=False,
+                )
+    parser.add_argument('-c', '--use_codeql_repo',
+                help='Use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager',
+                type=str,
+                required=False,
+                )
+    parser.add_argument('-i', '--individual_test',
+                help='Run only the tests with <name> in the name',
+                type=str,
+                required=False,
+                )
+    parser.add_argument('-t', '--threads',
+                help='Number of threads to use for multithreaded run',
+                type=int,
+                required=False,
+                )
+
+    args = parser.parse_args()
+
     
-
+    allowed_platforms = ["x64", "x86", "ARM", "ARM64"]
     no_output = True
-    override_template = ""
-    name = ""
-    use_codeql_repo = False
-    codeql_repo_path = ""
-    existing_database_path = None
-    existing_database = False
-    external_drivers_path = ""
-    external_drivers = False
-    external_driver_database_created = False
-    external_driver_setup_done = False
-    no_build = False
-
     start_time = time.time()
-    if not "--no_clean" in sys.argv and not "--database" in sys.argv:
+
+    if not args.no_clean and not args.existing_database:
         print("Cleaning working directories: TestDB, working, AnalysisFiles")
         if os.path.exists("TestDB"):
             shutil.rmtree("TestDB")
@@ -740,52 +781,32 @@ if __name__ == "__main__":
     
     dir_to_search ="/".join(path[0:path.index(root_dir)+1])
     extension_to_search = ".ql"
-
     
     ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
 
     driver_sln_files = []
-    if "--external_drivers" in sys.argv:
-        external_drivers_path = sys.argv[sys.argv.index("--external_drivers")+1]
-        external_drivers = True
-        dir_to_search = external_drivers_path
+    if args.external_drivers:
+        dir_to_search = args.external_drivers
         extension_to_search = ".sln"
         driver_sln_files = find_sln_file(dir_to_search)
         print("Found " + str(len(driver_sln_files)) + " drivers")
         for ql_file in ql_tests:
             ql_tests[ql_file].set_external_drivers(driver_sln_files)
-
-    if "--debug_only" in sys.argv:
-        debug_only = True
-
-    if "--release_only" in sys.argv:
-        release_only = True
-
-    if "--no_build" in sys.argv:
-        no_build = True
-    
     
     threads = []    
    
-    if "-v" in sys.argv:
+    if args.verbose:
         no_output = False
-    if "--override_template" in sys.argv:
-        override_template = sys.argv[sys.argv.index("--override_template")+1]
-    if "--use_codeql_repo" in sys.argv:
-        use_codeql_repo = True
-        codeql_repo_path = sys.argv[sys.argv.index("--use_codeql_repo")+1]
-    if "--database" in sys.argv:
-        existing_database_path = sys.argv[sys.argv.index("--database")+1]
-        existing_database = True
-        if not os.path.exists(existing_database):
+   
+    if args.existing_database:
+        if not os.path.exists(args.existing_database):
             print("Database path does not exist")
             exit(1)
         # TODO doesn't work with --external_drivers
 
-    if "-i" in sys.argv:
-        name = sys.argv[sys.argv.index("-i")+1]
-        ql_files_keys = [x for x in ql_tests if name in x]
-    elif "-t" in sys.argv:
+    if args.individual_test:
+        ql_files_keys = [x for x in ql_tests if args.individual_test in x]
+    elif args.threads:
         ql_files_keys = [x for x in ql_tests]
     elif len(sys.argv) == 1:
         ql_files_keys = [x for x in ql_tests]
@@ -794,37 +815,31 @@ if __name__ == "__main__":
    
     ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
 
-
-
-  
-
-    if "-t" in sys.argv:
+    if args.threads:
         # TODO not set up for external drivers
-        if "--external_drivers" in sys.argv:
+        if args.external_drivers:
             print("Cannot run multithreaded with external drivers") 
             exit(1)
-
-        num_threads = int(sys.argv[sys.argv.index("-t")+1])
         print("Running multithreaded")
         print("Live output disabled for multithreaded run")
         print("\n\n\n !!! MULTITHREADED MODE IS NOT FULLY TESTED DO NOT USE FOR OFFICIAL TESTS !!! \n\n\n")
-        no_output = True
+        print("Press enter to continue")
+        input()
         thread_count = 0
         for q in ql_tests:
             single_dict = {q:ql_tests[q]}
             threads.append(single_dict)
-        pool = ThreadPool(processes=num_threads)
+        pool = ThreadPool(processes=args.threads)
         for result in pool.map(run_tests, threads):
             print(result)
     if ql_tests == []:
         print("Invalid argument")
-        usage()
         exit(1)
     
     if threads:
        pass
     else:
-        if(external_drivers):
+        if(args.external_drivers):
             run_tests_external_drivers(ql_tests)
         else:
             run_tests(ql_tests)
