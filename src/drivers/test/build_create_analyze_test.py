@@ -145,7 +145,7 @@ def download_file_from_azure(share_name, connection_string, file_to_download, fi
     """
     file_service = FileService(connection_string=connection_string)
     file = file_service.get_file_to_path(share_name=share_name, file_name=file_name, directory_name=file_directory, file_path=file_to_download)
-    return file
+    return file.name
 
 def get_git_root():
     """
@@ -316,6 +316,7 @@ def test_setup(ql_test):
 
     # Rebuild the project using msbuild
     if not args.no_build:
+        print("Building: " + ql_test.get_ql_name())
         out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), shell=True, capture_output=no_output  ) 
         if out1.returncode != 0:
             print("Error in msbuild: " + ql_test.get_ql_name())
@@ -668,17 +669,21 @@ def run_tests_external_drivers(ql_tests_dict):
             health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error'] + analysis_results['warning'] + analysis_results['note'])
             detailed_health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(detailed_analysis_results)
     # save results
-    result_file = "results" + "--" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx"
+    result_file = "results.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer)
-    with pd.ExcelWriter("detailed_" + result_file) as writer:
+    with pd.ExcelWriter("detailed" + result_file) as writer:
         detailed_health_df.to_excel(writer)
-
+ 
+    if args.compare_results:
+        compare_health_results(result_file)
+        compare_health_results("detailed"+result_file)
+    
 
 def find_last_xlsx_file(curr_results_path):
     """
     Finds the most recent xlsx file in the current directory.
-
+    Used for local storage of results.
     Args:
         None
 
@@ -713,16 +718,47 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
-    # find most recent xlsx results file
-    prev_results = find_last_xlsx_file(curr_results_path)
+    # get most recent xlsx results file
+    if args.local_result_storage:
+        prev_results = find_last_xlsx_file(curr_results_path)
+    else:   
+        try:
+            
+            prev_results = download_file_from_azure(share_name=args.share_name, connection_string=args.connection_string,  
+                            file_to_download='azure-'+curr_results_path, 
+                            file_name=curr_results_path, file_directory="")
+            print("Downloaded previous results from Azure: " + prev_results)
+        except Exception as e:
+            if "ResourceNotFound" in str(e):
+                print("No previous results found. Uploading current results to Azure...")
+                upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
+                            file_to_upload=curr_results_path, 
+                            file_name=curr_results_path, file_directory="")
+                return
+            else:
+                print("Error downloading previous results: " + str(e))
+                return
+            
     prev_results_df = pd.read_excel(prev_results, index_col=0) 
     curr_results_df = pd.read_excel(curr_results_path, index_col=0)
     print("Comparing results", prev_results, curr_results_path)
     diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
-    with pd.ExcelWriter("diff" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
+    with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer)
-
-    # TODO delete old files
+    print("Saved diff results to: " + "diff" + curr_results_path)
+    # upload new results to Azure
+    if not args.local_result_storage:
+        print("Uploading results to Azure: " + curr_results_path)
+        upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
+                            file_to_upload=curr_results_path, 
+                            file_name=curr_results_path, file_directory="")
+        # upload diff to Azure
+        print("Uploading diff results to Azure: " + "diff" + curr_results_path)
+        upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
+                            file_to_upload="diff" + curr_results_path, 
+                            file_name="diff" + curr_results_path, file_directory="")
+    # delete downloaded file
+        #todo 
 
 def run_tests(ql_tests_dict):
     """
@@ -749,16 +785,16 @@ def run_tests(ql_tests_dict):
         detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
       
     # save results
-    result_file = "function_test_results" + "--" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx"
+    result_file = "functiontestresults.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer)
   
-    with pd.ExcelWriter("detailed_"+result_file) as writer:
+    with pd.ExcelWriter("detailed"+result_file) as writer:
         detailed_health_df.to_excel(writer)
   
     if args.compare_results:
         compare_health_results(result_file)
-        compare_health_results("detailed_"+result_file)
+        compare_health_results("detailed"+result_file)
     
 
 def find_sln_file(path):
@@ -870,17 +906,13 @@ if __name__ == "__main__":
                         help='Azure connection string',
                 type=str,
                 required=False,)
-
+    parser.add_argument('--local_result_storage',
+                help='Store results locally instead of in Azure',
+                action='store_true',
+                required=False,
+                )
     args = parser.parse_args()
-    print(args.storage_account_name, args.container_name)
-    # upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
-    #                         file_to_upload="functiontestresults.xlsx", 
-    #                         file_name="functiontestresults.xlsx", file_directory="")
-    download_file_from_azure(share_name=args.share_name, connection_string=args.connection_string,  
-                            file_to_download="functiontestresults.xlsx", 
-                            file_name="functiontestresults.xlsx", file_directory="")
-    exit(1)
-
+   
     if args.compare_results_no_build:
         compare_health_results(args.compare_results_no_build)
         exit(0)
