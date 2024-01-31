@@ -15,6 +15,11 @@ try:
     from itertools import permutations
     import openpyxl # Not directly used but this will make sure it is installed
     import argparse
+
+    from azure.storage.file import (
+        ContentSettings,
+        FileService,
+    )
 except ImportError as e:
     print("Import error: " + str(e) + "\nPlease install the required modules using pip install -r requirements.txt")
     exit(1)
@@ -115,6 +120,32 @@ class ql_test_attributes:
         self.external_drivers = external_drivers
     
 
+def upload_results_to_azure(share_name, connection_string, file_to_upload, file_name, file_directory):
+    """
+    Uploads the results to Azure.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    file_service = FileService(connection_string=connection_string)
+    file_service.create_file_from_path(share_name=share_name, file_name=file_name, directory_name=file_directory, local_file_path=file_to_upload, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
+
+def download_file_from_azure(share_name, connection_string, file_to_download, file_name, file_directory):
+    """
+    Downloads a file from Azure.
+
+    Args:
+        None
+
+    Returns:
+        None
+    """
+    file_service = FileService(connection_string=connection_string)
+    file = file_service.get_file_to_path(share_name=share_name, file_name=file_name, directory_name=file_directory, file_path=file_to_download)
+    return file
 
 def get_git_root():
     """
@@ -818,7 +849,37 @@ if __name__ == "__main__":
                 type=str,
                 required=False,
                 )
+
+    parser.add_argument('--container_name',
+                help='Azure container name',
+                type=str,
+                required=False, )
+    parser.add_argument('--storage_account_name',
+                help='Azure storage account name',
+                type=str,
+                required=False, )
+    parser.add_argument('--share_name', 
+                        help='Azure share name',
+                type=str,
+                required=False,)
+    parser.add_argument('--storage_account_key',
+                help='Azure storage account key',
+                type=str,
+                required=False, )
+    parser.add_argument('--connection_string', 
+                        help='Azure connection string',
+                type=str,
+                required=False,)
+
     args = parser.parse_args()
+    print(args.storage_account_name, args.container_name)
+    # upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
+    #                         file_to_upload="functiontestresults.xlsx", 
+    #                         file_name="functiontestresults.xlsx", file_directory="")
+    download_file_from_azure(share_name=args.share_name, connection_string=args.connection_string,  
+                            file_to_download="functiontestresults.xlsx", 
+                            file_name="functiontestresults.xlsx", file_directory="")
+    exit(1)
 
     if args.compare_results_no_build:
         compare_health_results(args.compare_results_no_build)
