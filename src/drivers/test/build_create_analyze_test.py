@@ -723,9 +723,9 @@ def compare_health_results(curr_results_path):
         prev_results = find_last_xlsx_file(curr_results_path)
     else:   
         try:
-            
-            prev_results = download_file_from_azure(share_name=args.share_name, connection_string=args.connection_string,  
-                            file_to_download='azure-'+curr_results_path, 
+            prev_results = 'azure-'+curr_results_path
+            _ = download_file_from_azure(share_name=args.share_name, connection_string=args.connection_string,  
+                            file_to_download=prev_results, 
                             file_name=curr_results_path, file_directory="")
             print("Downloaded previous results from Azure: " + prev_results)
         except Exception as e:
@@ -758,7 +758,10 @@ def compare_health_results(curr_results_path):
                             file_to_upload="diff" + curr_results_path, 
                             file_name="diff" + curr_results_path, file_directory="")
     # delete downloaded file
-        #todo 
+    
+    os.remove(prev_results)
+    print("Deleted previous results: " + prev_results)
+    
 
 def run_tests(ql_tests_dict):
     """
