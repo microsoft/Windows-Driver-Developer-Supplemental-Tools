@@ -22,7 +22,8 @@ except ImportError as e:
 
 print_mutex = threading.Lock()
 health_df = pd.DataFrame()
-result_df = pd.DataFrame(columns=["Driver", "Errors", "Warnings", "Notes", "Detailed Results"])
+detailed_health_df = pd.DataFrame()
+
 
 
 # Any attributes specific to a test should be added to this class
@@ -389,13 +390,16 @@ def analyze_codeql_database(ql_test, db_path=None):
     
     if db_path is not None: # When using external drivers, save databases in current directory
         database_loc = db_path
-        output_file = os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+ db_path.split('\\')[-1]+".sarif")
+        if args.existing_database:
+            output_file = os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+ "\\" + db_path.split('\\')[-1]+".sarif")
+        else:
+            output_file = os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif")
 
     else:
-        database_loc = "TestDB\\"+ql_test.get_ql_name()
-        output_file = "AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif"
+        print("No database path provided!")
+        return None
 
-    
+    print("Saving SARIF file to: " + output_file)
     if args.use_codeql_repo:
         proc_command = ["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", args.use_codeql_repo]
       
@@ -449,8 +453,7 @@ def sarif_results(ql_test, sarif_file):
         None
     """
     sarif_data = loader.load_sarif_file(sarif_file)
-    issue_count_by_sev = sarif_data.get_result_count_by_severity()
-    return issue_count_by_sev
+    return sarif_data.get_result_count_by_severity(), sarif_data.get_records()
 
 
 def format_excel_results():
@@ -627,16 +630,49 @@ def run_tests_external_drivers(ql_tests_dict):
             try:
                 if result_sarif is None:
                     continue
-                analysis_results = sarif_results(ql_test, result_sarif)
+                analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
             except Exception as e:
                 print("Error getting sarif results: " + db, e)
                 continue
-            health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error']) + "|" + str(analysis_results['warning']) + "|" + str(analysis_results['note'])
+            health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error'] + analysis_results['warning'] + analysis_results['note'])
+            detailed_health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(detailed_analysis_results)
     # save results
-    with pd.ExcelWriter("results" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
+    result_file = "results" + "--" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx"
+    with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer)
+    with pd.ExcelWriter("detailed_" + result_file) as writer:
+        detailed_health_df.to_excel(writer)
 
-def compare_health_results():
+
+def find_last_xlsx_file(curr_results_path):
+    """
+    Finds the most recent xlsx file in the current directory.
+
+    Args:
+        None
+
+    Returns:
+        str: The path to the most recent xlsx file.
+    """
+    if "detailed" in curr_results_path:
+        print("Comparing detailed results")
+        detailed = True
+    else:
+        detailed = False
+
+    curr_results_timestamp = curr_results_path.split("--")[-1].replace(".xlsx", "")
+    files = os.listdir()
+    files = [x for x in files if "diff" not in x]
+    if detailed:
+        files = [x for x in files if x.endswith(".xlsx") and "detailed" in x and curr_results_timestamp not in x]
+    else:
+        files = [x for x in files if x.endswith(".xlsx") and "detailed" not in x and curr_results_timestamp not in x]
+    files.sort(key=os.path.getmtime, reverse=True)
+    print("Using previous results file: " + files[0])
+    return files[0]
+
+
+def compare_health_results(curr_results_path):
     """
     Compares the health of test results to those from a previous run.
 
@@ -646,8 +682,16 @@ def compare_health_results():
     Returns:
         None
     """
-    # TODO 
-    pass
+    # find most recent xlsx results file
+    prev_results = find_last_xlsx_file(curr_results_path)
+    prev_results_df = pd.read_excel(prev_results, index_col=0) 
+    curr_results_df = pd.read_excel(curr_results_path, index_col=0)
+    print("Comparing results", prev_results, curr_results_path)
+    diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
+    with pd.ExcelWriter("diff" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
+        diff_results.to_excel(writer)
+
+    # TODO delete old files
 
 def run_tests(ql_tests_dict):
     """
@@ -660,23 +704,31 @@ def run_tests(ql_tests_dict):
         None
     """
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
-
+    
     for ql_test in ql_tests_with_attributes:
         result_sarif = run_test(ql_test)
         if not result_sarif:
             print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
             continue
-        analysis_results = sarif_results(ql_test, result_sarif)
+        analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
         health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
-        health_df.at[ql_test.get_ql_name(), "Driver Framework"] = ql_test.get_ql_type()
-        health_df.at[ql_test.get_ql_name(), "error"] = str(analysis_results['error'])
-        health_df.at[ql_test.get_ql_name(), "warning"] = str(analysis_results['warning'])   
-        health_df.at[ql_test.get_ql_name(), "note"] = str(analysis_results['note'])
-
+        health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
+        
+        detailed_health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
+        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
+      
     # save results
-    with pd.ExcelWriter("function_test_results" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx") as writer:
+    result_file = "function_test_results" + "--" + str(datetime.now()).replace(" ", "-").replace(":", "-").replace(".", "-") + ".xlsx"
+    with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer)
   
+    with pd.ExcelWriter("detailed_"+result_file) as writer:
+        detailed_health_df.to_excel(writer)
+  
+    if args.compare_results:
+        compare_health_results(result_file)
+        compare_health_results("detailed_"+result_file)
+    
 
 def find_sln_file(path):
     """
@@ -736,7 +788,6 @@ if __name__ == "__main__":
                 required=False,
                 choices=["CppKMDFTestTemplate", "KMDFTestTemplate", "WDMTestTemplate"],
                 )
-
     parser.add_argument('-v', '--verbose',
                 help='verbose output on',
                 action='store_true',
@@ -757,10 +808,22 @@ if __name__ == "__main__":
                 type=int,
                 required=False,
                 )
-
+    parser.add_argument('-m', '--compare_results',
+                help='Compare results to previous run',
+                action='store_true',
+                required=False,
+                )
+    parser.add_argument('--compare_results_no_build',
+                help='Compare results to previous run',
+                type=str,
+                required=False,
+                )
     args = parser.parse_args()
 
-    
+    if args.compare_results_no_build:
+        compare_health_results(args.compare_results_no_build)
+        exit(0)
+
     allowed_platforms = ["x64", "x86", "ARM", "ARM64"]
     no_output = True
     start_time = time.time()
@@ -805,7 +868,7 @@ if __name__ == "__main__":
         # TODO doesn't work with --external_drivers
 
     if args.individual_test:
-        ql_files_keys = [x for x in ql_tests if args.individual_test in x]
+        ql_files_keys = [x for x in ql_tests if args.individual_test == x.split("\\")[-1].replace(".ql", "")]
     elif args.threads:
         ql_files_keys = [x for x in ql_tests]
     elif len(sys.argv) == 1:
