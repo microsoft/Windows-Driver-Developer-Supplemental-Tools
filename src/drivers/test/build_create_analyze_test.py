@@ -20,6 +20,13 @@ try:
         ContentSettings,
         FileService,
     )
+    from azure.storage.blob import (
+        BlobServiceClient,
+        BlobClient,
+        ContainerClient 
+    )
+    from azure.identity import DefaultAzureCredential
+
 except ImportError as e:
     print("Import error: " + str(e) + "\nPlease install the required modules using pip install -r requirements.txt")
     exit(1)
@@ -119,6 +126,26 @@ class ql_test_attributes:
     def set_external_drivers(self, external_drivers):
         self.external_drivers = external_drivers
     
+def upload_blob_to_azure(container_name, storage_account_key, file_name,):
+    account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
+    if not args.storage_account_key:
+        print("No storage account key provided. Not uploading to Azure.")
+        return 
+
+    blob_service_client = BlobServiceClient(account_url, credential=storage_account_key)
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
+    with open(file=file_name, mode="rb") as data:
+        blob_client.upload_blob(data)
+
+def download_blob_from_azure(container_name, storage_account_key, file_name):
+    account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
+    if not args.storage_account_key:
+        print("No storage account key provided. Not downloading from Azure.")
+        return 
+    blob_service_client = BlobServiceClient(account_url, credential=storage_account_key)
+    blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
+    with open(file=file_name, mode="wb") as data:
+        data.write(blob_client.download_blob().readall())
 
 def upload_results_to_azure(share_name, connection_string, file_to_upload, file_name, file_directory):
     """
@@ -915,7 +942,8 @@ if __name__ == "__main__":
                 required=False,
                 )
     args = parser.parse_args()
-   
+
+
     if args.compare_results_no_build:
         compare_health_results(args.compare_results_no_build)
         exit(0)
