@@ -104,8 +104,8 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     
     1. Create a local copy of the desired query suite file:
        
-        * windows_all_mustfix.qls 
-        * windows_all_recommended.qls
+        * windows_driver_mustfix.qls 
+        * windows_driver_recommended.qls
 
     2. To analyze a CodeQL database run the following command:
     ```
