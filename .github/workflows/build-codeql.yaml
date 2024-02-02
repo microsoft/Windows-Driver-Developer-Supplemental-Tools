@@ -43,9 +43,6 @@ jobs:
       continue-on-error: true # Required because robocopy returns 1 on success
       run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\
 
-    - name: Add CodeQL to path
-      run: echo $env:GITHUB_PATH; echo ${GITHUB_WORKSPACE}\codeql-cli | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append 
-      
     - name: Install CodeQL pack dependencies
       shell: cmd
       run: |
