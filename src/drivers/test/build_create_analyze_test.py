@@ -1003,7 +1003,7 @@ if __name__ == "__main__":
     
     ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
     #template_dir = find_template_dir("WDMTestTemplate")
-    template_dir = os.path.join(os.getcwd(), "src/drivers/test")
+    template_dir = os.path.join(os.getcwd(), "src\\drivers\\test")
 
     print(template_dir)
     driver_sln_files = []
