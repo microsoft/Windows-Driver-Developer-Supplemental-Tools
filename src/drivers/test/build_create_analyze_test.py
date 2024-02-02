@@ -434,13 +434,14 @@ def create_codeql_test_database(ql_test):
         shutil.rmtree(os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()))
     
     source_dir=os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name())
-    db_loc_rel=os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name())
-    print("-- Database location: " + db_loc_rel)
+    db_loc =   os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name())
+
+    print("-- Database location: " + db_loc)
     print("-- Source directory: " + source_dir)
-    out2 = subprocess.run([codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + "\\" + ql_test.get_template().split("\\")[-1] + ".sln", db_loc_rel],
+    print("-- -- Command to run:", [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + "\\" + ql_test.get_template().split("\\")[-1] + ".sln", db_loc])
+    out2 = subprocess.run([codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + "\\" + ql_test.get_template().split("\\")[-1] + ".sln", db_loc],
             cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
             shell=True, capture_output=no_output  ) 
-    db_loc = os.path.join(os.getcwd(),"TestDB\\"+ql_test.get_ql_name())
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
         try:
