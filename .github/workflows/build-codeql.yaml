@@ -58,6 +58,9 @@ jobs:
       run: |
           python -m pip install --upgrade pip
           pip install -r .\src\drivers\test\requirements.txt
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
     - name: Run test script
       shell: cmd
       working-directory: .\src\drivers\test\
