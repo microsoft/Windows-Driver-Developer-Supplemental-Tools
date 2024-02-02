@@ -342,21 +342,7 @@ def test_setup(ql_test):
     # Copy files to driver directory
     for file in os.listdir(os.path.join(template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())):
         shutil.copyfile(os.path.join(template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name(),file), os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()+"\\driver\\",file))
-    #print all files in driver directory
-    working_directory = os.path.join(os.getcwd(), "working", ql_test.get_ql_name())
-    items = os.listdir(working_directory)
-    for item in items:
-        item_path = os.path.join(working_directory, item)
-        if os.path.isdir(item_path):
-            print("Directory:", item)
-
-        else:
-            print("File:", item)
-    driver_directory = os.path.join(os.getcwd(), "working", ql_test.get_ql_name(), "driver")
-    files = os.listdir(driver_directory)
-    print("Files in driver directory: " + driver_directory)
-    for file in files:
-        print("File:", file)
+   
     # Rebuild the project using msbuild
     if not args.no_build:
         print("Building: " + ql_test.get_ql_name())
@@ -429,7 +415,7 @@ def create_codeql_test_database(ql_test):
 
     """
     # Create the CodeQL database
-    print("current working directory: ", os.getcwd())
+   # print("current working directory: ", os.getcwd())
     
     os.makedirs(os.path.join(os.getcwd(), "TestDB"), exist_ok=True) 
     if os.path.exists(os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name())):
@@ -439,9 +425,9 @@ def create_codeql_test_database(ql_test):
     db_loc =   os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()+"\\")
     
     
-    print("-- Database location: " + db_loc)
-    print("-- Source directory: " + source_dir)
-    print("-- -- Command to run:", [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc])
+    #print("-- Database location: " + db_loc)
+    #print("-- Source directory: " + source_dir)
+    #print("-- -- Command to run:", [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc])
     out2 = subprocess.run([codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc],
             
             shell=True, capture_output=no_output  ) 
