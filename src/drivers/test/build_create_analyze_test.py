@@ -559,7 +559,7 @@ def run_test(ql_test):
         print("Creating test database")
         create_codeql_database_result = create_codeql_test_database(ql_test)
         if create_codeql_database_result is None:
-            print("Error creating database: " + ql_test.get_ql_name,"Skipping...")
+            print("Error creating database: " + ql_test.get_ql_name(),"Skipping...")
             return None
         else:
             db_path = create_codeql_database_result
