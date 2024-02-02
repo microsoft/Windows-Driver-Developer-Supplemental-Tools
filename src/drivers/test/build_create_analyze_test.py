@@ -379,7 +379,7 @@ def db_create_for_external_driver(sln_file, config, platform):
     # TODO either clear these, ask for overwrite, or use a different name
     db_loc = os.getcwd() + "\\dbs\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
     print("Creating database: ",  db_loc)
-    out2 = subprocess.run(["codeql", "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
+    out2 = subprocess.run([codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
             cwd=workdir, 
             shell=True, capture_output=no_output  )
@@ -415,7 +415,7 @@ def create_codeql_test_database(ql_test):
     if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
         shutil.rmtree("TestDB\\"+ql_test.get_ql_name())
     db_loc_rel = "..\\..\\TestDB\\"+ql_test.get_ql_name()
-    out2 = subprocess.run(["codeql", "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", db_loc_rel],
+    out2 = subprocess.run([codeql_path, "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", db_loc_rel],
             cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
             shell=True, capture_output=no_output  ) 
     db_loc = os.path.join(os.getcwd(),"TestDB\\"+ql_test.get_ql_name())
@@ -461,10 +461,10 @@ def analyze_codeql_database(ql_test, db_path=None):
 
     print("Saving SARIF file to: " + output_file)
     if args.use_codeql_repo:
-        proc_command = ["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", args.use_codeql_repo]
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", args.use_codeql_repo]
       
     else:
-        proc_command = ["codeql", "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ]
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ]
         
       
     out3 = subprocess.run(proc_command, 
@@ -946,9 +946,17 @@ if __name__ == "__main__":
                 action='store_true',
                 required=False,
                 )
+    parser.add_argument('--codeql_path', 
+                        help='Path to the codeql executable',
+                type=str,
+                required=False,)
     args = parser.parse_args()
 
-
+    if args.codeql_path:
+        codeql_path = args.codeql_path
+    else:
+        codeql_path = "codeql"
+        
     if args.compare_results_no_build:
         compare_health_results(args.compare_results_no_build)
         exit(0)
