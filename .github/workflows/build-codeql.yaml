@@ -6,7 +6,7 @@ name: Build Windows CodeQL queries
 on:
   # Triggers the workflow on push or pull request events but only for the main and development branches
   push:
-    branches: [ main, development ]
+    branches: [ main, development, jacob-ronstadt/script_updates ]
   pull_request:
     branches: [ main, development ]
 
@@ -42,7 +42,10 @@ jobs:
       shell: cmd
       continue-on-error: true # Required because robocopy returns 1 on success
       run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\
-    
+
+    - name: Add CodeQL to path
+      run: echo $env:GITHUB_PATH; echo ${GITHUB_WORKSPACE}\codeql-cli | Out-File -FilePath $env:GITHUB_PATH -Encoding utf8 -Append 
+      
     - name: Install CodeQL pack dependencies
       shell: cmd
       run: |
@@ -50,6 +53,23 @@ jobs:
         ..\codeql-cli\codeql.cmd pack install 
         popd
     
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+        
+    - name: Install Python Packages
+      run: |
+          python -m pip install --upgrade pip
+          pip install -r .\src\drivers\test\requirements.txt
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Run test script
+      shell: cmd
+      working-directory: .\src\drivers\test\
+      run: python build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.cmd
+      
     - name: Build must-fix driver suite
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only windows_driver_mustfix.qls
@@ -65,3 +85,5 @@ jobs:
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
+
+   
