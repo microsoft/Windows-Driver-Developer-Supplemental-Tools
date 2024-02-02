@@ -353,6 +353,9 @@ def test_setup(ql_test):
                 print(out1.stderr)
 
             return None
+    else:
+        out1 = True
+        
     return out1
 
 
@@ -420,7 +423,7 @@ def create_codeql_test_database(ql_test):
     print("-- Source directory: " + source_dir)
     out2 = subprocess.run([codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + "\\" + ql_test.get_template().split("\\")[-1] + ".sln", db_loc_rel],
             cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
-            shell=True, capture_output=False  ) 
+            shell=True, capture_output=no_output  ) 
     db_loc = os.path.join(os.getcwd(),"TestDB\\"+ql_test.get_ql_name())
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
