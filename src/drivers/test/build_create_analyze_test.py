@@ -560,7 +560,7 @@ def run_test(ql_test):
         print("Creating test database")
         create_codeql_database_result = create_codeql_test_database(ql_test)
         if create_codeql_database_result is None:
-            print("Error creating database: " + db_path,"Skipping...")
+            print("Error creating database: " + ql_test,"Skipping...")
             return None
         else:
             db_path = create_codeql_database_result
@@ -956,7 +956,7 @@ if __name__ == "__main__":
         codeql_path = args.codeql_path
     else:
         codeql_path = "codeql"
-        
+
     if args.compare_results_no_build:
         compare_health_results(args.compare_results_no_build)
         exit(0)
