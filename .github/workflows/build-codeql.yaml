@@ -64,7 +64,7 @@ jobs:
 
     - name: Run test script
       shell: cmd
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe -v
       
     - name: Build must-fix driver suite
       shell: cmd
