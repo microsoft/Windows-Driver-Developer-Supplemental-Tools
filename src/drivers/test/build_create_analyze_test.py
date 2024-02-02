@@ -429,6 +429,8 @@ def create_codeql_test_database(ql_test):
 
     """
     # Create the CodeQL database
+    print("current working directory: ", os.getcwd())
+    
     os.makedirs(os.path.join(os.getcwd(), "TestDB"), exist_ok=True) 
     if os.path.exists(os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name())):
         shutil.rmtree(os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()))
