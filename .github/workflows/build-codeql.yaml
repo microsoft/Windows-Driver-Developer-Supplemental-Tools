@@ -29,7 +29,7 @@ jobs:
    
     - name: dir
       run: dir
-      
+ 
     - name: Download CodeQL CLI
       uses: i3h/download-release-asset@v1.2.0
       with:
@@ -52,7 +52,9 @@ jobs:
         pushd .\src 
         ..\codeql-cli\codeql.cmd pack install 
         popd
-    
+    - name: codeql version test
+      run: .\codeql-cli\codeql.exe version
+      
     - name: Setup Python
       uses: actions/setup-python@v2
       with:
