@@ -411,10 +411,13 @@ def create_codeql_test_database(ql_test):
     """
     # Create the CodeQL database
     os.makedirs("TestDB", exist_ok=True) 
-    if os.path.exists("TestDB\\"+ql_test.get_ql_name()):
-        shutil.rmtree("TestDB\\"+ql_test.get_ql_name())
-    db_loc_rel = "..\\..\\TestDB\\"+ql_test.get_ql_name()
-    out2 = subprocess.run([codeql_path, "database", "create", "-l", "cpp", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild", db_loc_rel],
+    if os.path.exists(os.path.join(os.getcwd(), "TestDB/"+ql_test.get_ql_name())):
+        shutil.rmtree(os.path.join(os.getcwd(), "TestDB/"+ql_test.get_ql_name()))
+    
+    source_dir=os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name())
+    db_loc_rel=os.path.join(os.getcwd(), "TestDB/"+ql_test.get_ql_name())
+    print("Database location: " + db_loc_rel)
+    out2 = subprocess.run([codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + "\\" + ql_test.get_template().split("\\")[-1] + ".sln", db_loc_rel],
             cwd=os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()), 
             shell=True, capture_output=no_output  ) 
     db_loc = os.path.join(os.getcwd(),"TestDB\\"+ql_test.get_ql_name())
