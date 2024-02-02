@@ -60,6 +60,7 @@ jobs:
           pip install -r .\src\drivers\test\requirements.txt
     - name: Run test script
       shell: cmd
+      working-directory: .\src\drivers\test\
       run: python build_create_analyze_test.py
       
     - name: Build must-fix driver suite
