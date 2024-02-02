@@ -334,13 +334,12 @@ def test_setup(ql_test):
     # Remove existing working directory
     if os.path.exists(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/').strip()):
         shutil.rmtree(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/'))
-
     # Copy template to working directory
-    shutil.copytree(ql_test.get_template(), ".\\working\\"+ql_test.get_ql_name())
+    shutil.copytree(ql_test.get_template(), os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()))
 
     # Copy files to driver directory
-    for file in os.listdir(os.path.join(os.getcwd(),"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())):
-        shutil.copyfile(os.path.join(os.getcwd(),"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name(),file), os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()+"\\driver\\",file))
+    for file in os.listdir(os.path.join(template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())):
+        shutil.copyfile(os.path.join(template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name(),file), os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()+"\\driver\\",file))
 
     # Rebuild the project using msbuild
     if not args.no_build:
@@ -461,10 +460,10 @@ def analyze_codeql_database(ql_test, db_path=None):
 
     print("Saving SARIF file to: " + output_file)
     if args.use_codeql_repo:
-        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", args.use_codeql_repo]
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, template_dir + "\\..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql", "--additional-packs", args.use_codeql_repo]
       
     else:
-        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ]
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, template_dir + "\\..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql" ]
         
       
     out3 = subprocess.run(proc_command, 
@@ -491,7 +490,7 @@ def sarif_diff(ql_test):
     Returns:
         The output of the SARIF diff command if successful, None otherwise.
     """
-    out4 = subprocess.run(["sarif", "diff", "-o", "diff\\"+ql_test.get_ql_name()+".sarif", "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif", "AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif"], 
+    out4 = subprocess.run(["sarif", "diff", "-o", template_dir+"\\diff\\"+ql_test.get_ql_name()+".sarif", template_dir + "\\..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif", "AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif"], 
                     shell=True, capture_output=no_output  ) 
     if out4.returncode != 0:
         print("Error in sarif diff: " + ql_test.get_ql_name())
@@ -560,7 +559,7 @@ def run_test(ql_test):
         print("Creating test database")
         create_codeql_database_result = create_codeql_test_database(ql_test)
         if create_codeql_database_result is None:
-            print("Error creating database: " + ql_test,"Skipping...")
+            print("Error creating database: " + ql_test.get_ql_name,"Skipping...")
             return None
         else:
             db_path = create_codeql_database_result
@@ -602,15 +601,15 @@ def parse_attributes(queries):
         ql_name = path[-2]
         di = path.index("drivers")
         ql_type = path[di+1]
-        template = ""
+        template = template_dir
         if queries[query].get_use_cpp():
-            template = "CppKMDFTestTemplate"
+            template += "\CppKMDFTestTemplate"
         elif(ql_type == "general"):
-            template = "WDMTestTemplate"
+            template  += "\WDMTestTemplate"
         elif(ql_type == "wdm"):
-            template = "WDMTestTemplate"
+            template += "\WDMTestTemplate"
         elif(ql_type == "kmdf"):
-            template = "KMDFTestTemplate"
+            template += "\KMDFTestTemplate"
         else:
             pass
             
@@ -831,6 +830,21 @@ def run_tests(ql_tests_dict):
         compare_health_results(result_file)
         compare_health_results("detailed"+result_file)
     
+def find_template_dir(template):
+    """
+    Finds the directory of the given template.
+
+    Args:
+        template (str): The name of the template.
+
+    Returns:
+        str: The path to the template directory.
+    """
+    for root, dirs, files in os.walk("./"):
+        if template in dirs:
+            return root
+    return None
+
 
 def find_sln_file(path):
     """
@@ -983,7 +997,9 @@ if __name__ == "__main__":
     extension_to_search = ".ql"
     
     ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
-
+    template_dir = find_template_dir("WDMTestTemplate")
+    
+    print(template_dir)
     driver_sln_files = []
     if args.external_drivers:
         dir_to_search = args.external_drivers
