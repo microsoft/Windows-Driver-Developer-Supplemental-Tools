@@ -336,11 +336,27 @@ def test_setup(ql_test):
         shutil.rmtree(os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/'))
     # Copy template to working directory
     shutil.copytree(ql_test.get_template(), os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()))
+    print("Created working directory: " + os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/'))
+    print("Copying files to working directory: " + os.path.join(os.getcwd(), "working/"+ql_test.get_ql_name()+'/'))
 
     # Copy files to driver directory
     for file in os.listdir(os.path.join(template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())):
         shutil.copyfile(os.path.join(template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name(),file), os.path.join(os.getcwd(),"working\\"+ql_test.get_ql_name()+"\\driver\\",file))
+    #print all files in driver directory
+    working_directory = os.path.join(os.getcwd(), "working", ql_test.get_ql_name())
+    items = os.listdir(working_directory)
+    for item in items:
+        item_path = os.path.join(working_directory, item)
+        if os.path.isdir(item_path):
+            print("Directory:", item)
 
+        else:
+            print("File:", item)
+    driver_directory = os.path.join(os.getcwd(), "working", ql_test.get_ql_name(), "driver")
+    files = os.listdir(driver_directory)
+    print("Files in driver directory: " + driver_directory)
+    for file in files:
+        print("File:", file)
     # Rebuild the project using msbuild
     if not args.no_build:
         print("Building: " + ql_test.get_ql_name())
@@ -428,9 +444,9 @@ def create_codeql_test_database(ql_test):
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
         try:
-            print(out2.stderr.decode()  )
+            print("ERROR MESSAGE:", out2.stderr.decode()  )
         except:
-            print(out2.stderr)
+            print("ERROR MESSAGE:", out2.stderr)
 
         return None
     return db_loc
