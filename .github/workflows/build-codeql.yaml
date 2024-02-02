@@ -6,7 +6,7 @@ name: Build Windows CodeQL queries
 on:
   # Triggers the workflow on push or pull request events but only for the main and development branches
   push:
-    branches: [ main, development ]
+    branches: [ main, development, jacob-ronstadt/script_updates ]
   pull_request:
     branches: [ main, development ]
 
@@ -65,3 +65,15 @@ jobs:
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
+
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
+    - name: Install Python Packages
+      run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+    - name: Run test script
+      shell: cmd
+      run: python build_create_analyze_test.py
