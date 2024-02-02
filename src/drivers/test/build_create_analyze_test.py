@@ -26,6 +26,7 @@ try:
         ContainerClient 
     )
     from azure.identity import DefaultAzureCredential
+    from azure.data.tables import TableServiceClient
 
 except ImportError as e:
     print("Import error: " + str(e) + "\nPlease install the required modules using pip install -r requirements.txt")
@@ -754,6 +755,7 @@ def compare_health_results(curr_results_path):
             _ = download_file_from_azure(share_name=args.share_name, connection_string=args.connection_string,  
                             file_to_download=prev_results, 
                             file_name=curr_results_path, file_directory="")
+            
             print("Downloaded previous results from Azure: " + prev_results)
         except Exception as e:
             if "ResourceNotFound" in str(e):
@@ -761,6 +763,7 @@ def compare_health_results(curr_results_path):
                 upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
                             file_to_upload=curr_results_path, 
                             file_name=curr_results_path, file_directory="")
+                upload_blob_to_azure(args.container_name, args.storage_account_key, curr_results_path)
                 return
             else:
                 print("Error downloading previous results: " + str(e))
@@ -784,6 +787,8 @@ def compare_health_results(curr_results_path):
         upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
                             file_to_upload="diff" + curr_results_path, 
                             file_name="diff" + curr_results_path, file_directory="")
+        upload_blob_to_azure(args.container_name, args.storage_account_key, "diff"+curr_results_path)
+
     # delete downloaded file
     
     os.remove(prev_results)
