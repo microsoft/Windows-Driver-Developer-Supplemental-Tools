@@ -438,7 +438,6 @@ def create_codeql_test_database(ql_test):
     source_dir=os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name()+"\\")
     db_loc =   os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()+"\\")
     
-    subprocess.run([codeql_path, "version"]) # test codeql is working
     
     print("-- Database location: " + db_loc)
     print("-- Source directory: " + source_dir)
@@ -994,12 +993,15 @@ if __name__ == "__main__":
                 required=False,)
 
     args = parser.parse_args()
+    
 
     if args.codeql_path:
         codeql_path = args.codeql_path
     else:
         codeql_path = "codeql"
 
+    subprocess.run([codeql_path, "version"]) # test codeql is working
+    
     if args.compare_results_no_build:
         compare_health_results(args.compare_results_no_build)
         exit(0)
