@@ -437,7 +437,9 @@ def create_codeql_test_database(ql_test):
     
     source_dir=os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name()+"\\")
     db_loc =   os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()+"\\")
-
+    
+    subprocess.run([codeql_path, "version"]) # test codeql is working
+    
     print("-- Database location: " + db_loc)
     print("-- Source directory: " + source_dir)
     print("-- -- Command to run:", [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc])
