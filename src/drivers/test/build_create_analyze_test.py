@@ -127,24 +127,17 @@ class ql_test_attributes:
     def set_external_drivers(self, external_drivers):
         self.external_drivers = external_drivers
     
-def upload_blob_to_azure(container_name, storage_account_key, file_name,):
+def upload_blob_to_azure(file_name,):
     account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
-    if not args.storage_account_key:
-        print("No storage account key provided. Not uploading to Azure.")
-        return 
-
-    blob_service_client = BlobServiceClient(account_url, credential=storage_account_key)
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
+    blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
+    blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
     with open(file=file_name, mode="rb") as data:
         blob_client.upload_blob(data)
 
-def download_blob_from_azure(container_name, storage_account_key, file_name):
+def download_blob_from_azure(file_name):
     account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
-    if not args.storage_account_key:
-        print("No storage account key provided. Not downloading from Azure.")
-        return 
-    blob_service_client = BlobServiceClient(account_url, credential=storage_account_key)
-    blob_client = blob_service_client.get_blob_client(container=container_name, blob=file_name)
+    blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
+    blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
     with open(file=file_name, mode="wb") as data:
         data.write(blob_client.download_blob().readall())
 
@@ -769,8 +762,8 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
-    if not args.connection_string or not args.share_name and not args.local_result_storage:
-        raise Exception("No Azure connection string or share name provided. Cannot compare results.")
+    if not args.connection_string or not args.share_name or not args.storage_account_key or not args.storage_account_name and not args.local_result_storage:
+        raise Exception("Azure credentials not provided. Cannot compare results.")
     
     # get most recent xlsx results file
     if args.local_result_storage:
@@ -782,7 +775,6 @@ def compare_health_results(curr_results_path):
                             file_to_download=prev_results, 
                             file_name=curr_results_path, file_directory="")
             
-            print("Downloaded previous results from Azure: " + prev_results)
         except Exception as e:
             if "ResourceNotFound" in str(e):
                 print("No previous results found. Uploading current results to Azure...")
@@ -792,24 +784,24 @@ def compare_health_results(curr_results_path):
                 upload_blob_to_azure(args.container_name, args.storage_account_key, curr_results_path)
                 return
             else:
-                print("Error downloading previous results: " + str(e))
+                print("Error downloading previous results ")
                 return
             
     prev_results_df = pd.read_excel(prev_results, index_col=0) 
     curr_results_df = pd.read_excel(curr_results_path, index_col=0)
-    print("Comparing results", prev_results, curr_results_path)
+    print("Comparing results...")
     diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer)
-    print("Saved diff results to: " + "diff" + curr_results_path)
+    print("Saved diff results")
     # upload new results to Azure
     if not args.local_result_storage:
-        print("Uploading results to Azure: " + curr_results_path)
+        print("Uploading results")
         upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
                             file_to_upload=curr_results_path, 
                             file_name=curr_results_path, file_directory="")
         # upload diff to Azure
-        print("Uploading diff results to Azure: " + "diff" + curr_results_path)
+        print("Uploading diff results")
         upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
                             file_to_upload="diff" + curr_results_path, 
                             file_name="diff" + curr_results_path, file_directory="")
@@ -818,7 +810,7 @@ def compare_health_results(curr_results_path):
     # delete downloaded file
     
     os.remove(prev_results)
-    print("Deleted previous results: " + prev_results)
+    print("Deleted previous results")
     
 
 def run_tests(ql_tests_dict):
