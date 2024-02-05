@@ -12,5 +12,5 @@
       - Likely Bugs/Underspecified Functions/TooFewArguments.ql
       - Security/CWE/CWE-190/ComparisonWithWiderType.ql
       - Security/CWE/CWE-253/HResultBooleanConversion.ql
-- import: windows-driver-suites/windows_driver_mustfix.qls
+- import: windows-driver-suites/windows_mustfix_partial.qls
   from: microsoft/windows-drivers
