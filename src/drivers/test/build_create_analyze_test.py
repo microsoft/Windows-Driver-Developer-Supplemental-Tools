@@ -127,7 +127,16 @@ class ql_test_attributes:
     def set_external_drivers(self, external_drivers):
         self.external_drivers = external_drivers
     
-def upload_blob_to_azure(file_name,):
+def upload_blob_to_azure(file_name):
+    """
+    Uploads a file to Azure Blob Storage.
+
+    Args:
+        file_name (str): The name of the file to be uploaded.
+
+    Returns:
+        None
+    """
     account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
     blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
     blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
@@ -135,13 +144,22 @@ def upload_blob_to_azure(file_name,):
         blob_client.upload_blob(data)
 
 def download_blob_from_azure(file_name):
+    """
+    Downloads a blob from Azure Blob Storage.
+
+    Args:
+        file_name (str): The name of the blob file to download.
+
+    Returns:
+        None
+    """
     account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
     blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
     blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
     with open(file=file_name, mode="wb") as data:
         data.write(blob_client.download_blob().readall())
 
-def upload_results_to_azure(share_name, connection_string, file_to_upload, file_name, file_directory):
+def upload_results_to_azure(file_to_upload, file_name, file_directory):
     """
     Uploads the results to Azure.
 
@@ -152,10 +170,10 @@ def upload_results_to_azure(share_name, connection_string, file_to_upload, file_
         None
     """
 
-    file_service = FileService(connection_string=connection_string)
-    file_service.create_file_from_path(share_name=share_name, file_name=file_name, directory_name=file_directory, local_file_path=file_to_upload, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
+    file_service = FileService(connection_string=args.connection_string)
+    file_service.create_file_from_path(share_name=args.share_name, file_name=file_name, directory_name=file_directory, local_file_path=file_to_upload, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
-def download_file_from_azure(share_name, connection_string, file_to_download, file_name, file_directory):
+def download_file_from_azure(file_to_download, file_name, file_directory):
     """
     Downloads a file from Azure.
 
@@ -165,8 +183,8 @@ def download_file_from_azure(share_name, connection_string, file_to_download, fi
     Returns:
         None
     """
-    file_service = FileService(connection_string=connection_string)
-    file = file_service.get_file_to_path(share_name=share_name, file_name=file_name, directory_name=file_directory, file_path=file_to_download)
+    file_service = FileService(connection_string=args.connection_string)
+    file = file_service.get_file_to_path(share_name=args.share_name, file_name=file_name, directory_name=file_directory, file_path=file_to_download)
     return file.name
 
 def get_git_root():
@@ -778,10 +796,9 @@ def compare_health_results(curr_results_path):
         except Exception as e:
             if "ResourceNotFound" in str(e):
                 print("No previous results found. Uploading current results to Azure...")
-                upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
-                            file_to_upload=curr_results_path, 
+                upload_results_to_azure(file_to_upload=curr_results_path, 
                             file_name=curr_results_path, file_directory="")
-                upload_blob_to_azure(args.container_name, args.storage_account_key, curr_results_path)
+                upload_blob_to_azure(curr_results_path)
                 return
             else:
                 print("Error downloading previous results ")
@@ -797,15 +814,13 @@ def compare_health_results(curr_results_path):
     # upload new results to Azure
     if not args.local_result_storage:
         print("Uploading results")
-        upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
-                            file_to_upload=curr_results_path, 
+        upload_results_to_azure(file_to_upload=curr_results_path, 
                             file_name=curr_results_path, file_directory="")
         # upload diff to Azure
         print("Uploading diff results")
-        upload_results_to_azure(share_name=args.share_name, connection_string=args.connection_string,  
-                            file_to_upload="diff" + curr_results_path, 
+        upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
                             file_name="diff" + curr_results_path, file_directory="")
-        upload_blob_to_azure(args.container_name, args.storage_account_key, "diff"+curr_results_path)
+        upload_blob_to_azure( "diff"+curr_results_path)
 
     # delete downloaded file
     
@@ -885,8 +900,7 @@ def find_sln_file(path):
 
 if __name__ == "__main__":
     # Sys input flags
-    parser = argparse.ArgumentParser()
-
+    parser = argparse.ArgumentParser(description='Build, create, and analyze CodeQL databases for testing queries. Running this script without any flags will run all queries on their respective driver template project with injected tests from driver_snippet.c')
     parser.add_argument('-e', '--external_drivers',
                     help='Use external drivers at <path> for testing instead of drivers in the repo',
                     type=str,
