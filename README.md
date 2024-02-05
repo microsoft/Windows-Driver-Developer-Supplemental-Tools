@@ -2,6 +2,14 @@
 
 This repository contains open-source components for supplemental use in developing device drivers for Windows, as well as driver specific [CodeQL](https://codeql.github.com/) query suites used for the [Windows Hardware Compatibility Program](https://learn.microsoft.com/en-us/windows-hardware/design/compatibility/). The quickstart below will get you set up to build your database and analyze your driver using CodeQL. For the full documentation, troubleshooting, and more details about the Static Tools Logo test within the WHCP Program, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql).
 
+### For General Use
+
+| Branch to use            | CodeQL CLI version |
+|--------------------------|--------------------|
+| main                     | 2.15.4             |
+
+### For Windows Hardware Compatibility Program Use
+
 ### Windows Hardware Compatibility Program Release Version Matrix
 | Release                  | Branch to use | CodeQL CLI version |
 |--------------------------|---------------|--------------------|
@@ -9,27 +17,35 @@ This repository contains open-source components for supplemental use in developi
 | Windows 11               | WHCP_21H2     | 2.4.6              |
 | Windows 11, version 22H2 | WHCP_22H2     | 2.6.3              |
 
-For general use, use the `main` branch along with [version 2.6.3 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3).
+For general use, use the `main` branch along with [version 2.15.4 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4).
 
 ## Quickstart
-**Note**: If you are certifying with the [**WHCP program**](https://learn.microsoft.com/en-us/windows-hardware/design/compatibility/), please refer to the above table to determine which branch and CodeQL CLI version to use, otherwise use `main` and [version 2.6.3 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3).
 
 1. Create a directory where you can place the CodeQL CLI and the queries you want to use:
     ```
     D:\> mkdir codeql-home
     ```
 
-1. Download the CodeQL CLI zip by selecting the asset associated with your OS and architecture (codeql-win64.zip, codeql-linux64.zip, etc.), then extract it to the directory you created.
+1. Download the CodeQL CLI zip by selecting the asset associated with your OS and architecture (codeql-win64.zip, codeql-linux64.zip, etc.), then extract it to the directory you created in the previous step.
 
     For the WHCP Program, use the CodeQL CLI version in accordance with the table above and Windows release you are certifying for: [version 2.4.6](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6) or [version 2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3).
 
-    For general use with the `main` branch, use [CodeQL CLI version 2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3).
+    For general use with the `main` branch, use [CodeQL CLI version 2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4).
     
 
 1. Clone and install the Windows Driver Developer Supplemental Tools repository which contains the CodeQL queries specific for drivers:
+
+   For WHCP BRANCHES use:
+   ```
+    D:\codeql-home\>git clone https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools.git --recurse-submodules
     ```
-    D:\codeql-home\>git clone https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools.git --recursive -b <BRANCH>
+   
+   For MAIN AND DEVELOPMENT BRANCHES use:
+   
+   ```
+    D:\codeql-home\>git clone https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools.git
     ```
+   
     Now you should have:
     ```
         D:/codeql-home
@@ -37,25 +53,35 @@ For general use, use the `main` branch along with [version 2.6.3 of the CodeQL C
             |--- Windows-Driver-Developer-Supplemental-Tools
     ```
 
-1. Verify everything is installed correctly by checking the version:
+1. Verify CodeQL is installed correctly by checking the version:
     ```
     D:\codeql-home\codeql>codeql --version
-        CodeQL command-line toolchain release 2.6.3.
-        Copyright (C) 2019-2021 GitHub, Inc.
-        Unpacked in: D:\codeql-home\codeql
-            Analysis results depend critically on separately distributed query and
-            extractor modules. To list modules that are visible to the toolchain,
-            use 'codeql resolve qlpacks' and 'codeql resolve languages'.
+    CodeQL command-line toolchain release 2.15.4.
+    Copyright (C) 2019-2023 GitHub, Inc.
+    Unpacked in: D:\codeql-home\codeql
+        Analysis results depend critically on separately distributed query and
+        extractor modules. To list modules that are visible to the toolchain,
+        use 'codeql resolve qlpacks' and 'codeql resolve languages'.
+    ```
+
+1. Install CodeQL Packages using `codeql pack install`
+
+   For WHCP BRANCHES: Skip this step.
+
+   For MAIN AND DEVELOPMENT BRANCHES use:
+
+   ```
+    D:\codeql-home\codeql>codeql pack install D:\codeql-home\Windows-Driver-Developer-Supplemental-Tools\src
     ```
 
 1. Build your CodeQL database:
 
     ```
-    D:\codeql-home\codeql>codeql database create <path to new database> --language=cpp --source=<driver parent directory> --command=<build command or path to build file>
+    D:\codeql-home\codeql>codeql database create <path to new database> --language=cpp --source-root=<driver parent directory> --command=<build command or path to build file>
     ```
-    Single driver example: `codeql database create D:\DriverDatabase --language=cpp --source=D:\Drivers\SingleDriver --command="msbuild /t:rebuild D:\Drivers\SingleDriver\SingleDriver.sln"`
+    Single driver example: `codeql database create D:\DriverDatabase --language=cpp --source-root=D:\Drivers\SingleDriver --command="msbuild /t:rebuild D:\Drivers\SingleDriver\SingleDriver.sln"`
     
-    Multiple drivers example: `codeql database create D:\SampleDriversDatabase --language=cpp --source=D:\AllMyDrivers\SampleDrivers --command=D:\AllMyDrivers\SampleDrivers\BuildAllSampleDrivers.cmd`
+    Multiple drivers example: `codeql database create D:\SampleDriversDatabase --language=cpp --source-root=D:\AllMyDrivers\SampleDrivers --command=D:\AllMyDrivers\SampleDrivers\BuildAllSampleDrivers.cmd`
 
     _(Parameters: path for your new database, language, driver source directory, build command.)_
 
@@ -97,6 +123,9 @@ We are in the process of setting up pull request checks, but to ensure our requi
 1. Run all unit tests.
 1. Run `codeql database create` and `codeql database analyze` successfully on a valid driver before merging.
 1. Add a .qhelp file for any new queries or update the existing one if there is new functionality for the end user.
+
+#### Note
+All "Must-Fix" suite queries must have been run on the Windows Drivers Samples, and any bugs found as a result must be filed prior to being merged into the suite.
 
 Most contributions require you to agree to a
 Contributor License Agreement (CLA) declaring that you have the right to, and actually do, grant us
