@@ -71,7 +71,7 @@ jobs:
       run: dir
  
     - name: Run test script
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string ${{ secrets.CONNECTION_STRING }} --share_name ${{ secrets.SHARE_NAME }} --storage_account_key ${{ secrets.ACCOUNT_KEY}} --storage_account_name ${{ secrets.ACCOUNT_NAME}} 
       
     - name: Build must-fix driver suite
       shell: cmd
