@@ -762,7 +762,7 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
-    if not args.connection_string or not args.share_name or not args.storage_account_key or not args.storage_account_name and not args.local_result_storage:
+    if not args.connection_string or not args.share_name or not args.storage_account_key or not args.storage_account_name or not args.container_name and not args.local_result_storage:
         raise Exception("Azure credentials not provided. Cannot compare results.")
     
     # get most recent xlsx results file
