@@ -158,6 +158,7 @@ def upload_results_to_azure(share_name, connection_string, file_to_upload, file_
     Returns:
         None
     """
+
     file_service = FileService(connection_string=connection_string)
     file_service.create_file_from_path(share_name=share_name, file_name=file_name, directory_name=file_directory, local_file_path=file_to_upload, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
@@ -768,6 +769,9 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
+    if not args.connection_string or not args.share_name and not args.local_result_storage:
+        raise Exception("No Azure connection string or share name provided. Cannot compare results.")
+    
     # get most recent xlsx results file
     if args.local_result_storage:
         prev_results = find_last_xlsx_file(curr_results_path)
