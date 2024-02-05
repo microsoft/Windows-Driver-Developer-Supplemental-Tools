@@ -789,8 +789,7 @@ def compare_health_results(curr_results_path):
     else:   
         try:
             prev_results = 'azure-'+curr_results_path
-            _ = download_file_from_azure(share_name=args.share_name, connection_string=args.connection_string,  
-                            file_to_download=prev_results, 
+            _ = download_file_from_azure(file_to_download=prev_results, 
                             file_name=curr_results_path, file_directory="")
             
         except Exception as e:
@@ -801,7 +800,7 @@ def compare_health_results(curr_results_path):
                 upload_blob_to_azure(curr_results_path)
                 return
             else:
-                print("Error downloading previous results ")
+                print("Error downloading previous results ", e)
                 return
             
     prev_results_df = pd.read_excel(prev_results, index_col=0) 
@@ -1006,8 +1005,10 @@ if __name__ == "__main__":
     else:
         codeql_path = "codeql"
 
+    print()
     subprocess.run([codeql_path, "version"]) # test codeql is working
-    
+    print()
+
     if args.compare_results_no_build:
         compare_health_results(args.compare_results_no_build)
         exit(0)
