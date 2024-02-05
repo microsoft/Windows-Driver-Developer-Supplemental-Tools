@@ -797,10 +797,9 @@ def compare_health_results(curr_results_path):
                 print("No previous results found. Uploading current results to Azure...")
                 upload_results_to_azure(file_to_upload=curr_results_path, 
                             file_name=curr_results_path, file_directory="")
-                upload_blob_to_azure(curr_results_path)
                 return
             else:
-                print("Error downloading previous results ", e)
+                print("Error downloading previous results ")
                 return
             
     prev_results_df = pd.read_excel(prev_results, index_col=0) 
@@ -819,7 +818,7 @@ def compare_health_results(curr_results_path):
         print("Uploading diff results")
         upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
                             file_name="diff" + curr_results_path, file_directory="")
-        upload_blob_to_azure( "diff"+curr_results_path)
+        upload_blob_to_azure(curr_results_path)
 
     # delete downloaded file
     
