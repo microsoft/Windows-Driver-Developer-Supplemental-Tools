@@ -7,7 +7,7 @@
 	</overview>
 	<recommendation>
 		<p>
-			Clear the DO_DEVICE_INITIALIZING flag of the FDO with code like "FunctionalDeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;"
+			<![CDATA[Clear the DO_DEVICE_INITIALIZING flag of the FDO with code like "FunctionalDeviceObject->Flags &= ~DO_DEVICE_INITIALIZING;"]]>
 		</p>
 	</recommendation>
 	<example>
