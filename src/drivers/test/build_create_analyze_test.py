@@ -1011,10 +1011,7 @@ if __name__ == "__main__":
 
     if args.compare_results_no_build:
         prev_results = "functiontestresults.xlsx"
-        _ = download_file_from_azure(file_to_download=prev_results, 
-                        file_name="functiontestresults.xlsx", file_directory="")
-        upload_results_to_azure(file_to_upload="functiontestresults.xlsx", 
-                            file_name="functiontestresults.xlsx", file_directory="")
+        download_blob_from_azure(prev_results)
         upload_blob_to_azure(prev_results)
 
         #compare_health_results(args.compare_results_no_build)
