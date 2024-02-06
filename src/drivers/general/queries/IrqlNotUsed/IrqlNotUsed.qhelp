@@ -11,7 +11,22 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver has a parameter annotated to restore the IRQL, but it never uses this parameter:
+		</p>
+		<sample language="c"> <![CDATA[
+		VOID ReleaseMyLock(_IRQL_restores_ KIRQL inIrql, PKSPIN_LOCK myLock) {
+			KeReleaseSpinLock(myLock, PASSIVE_LEVEL);
+		}}]]>
+		</sample>
+		<p>
+			The driver should make sure to restore the IRQL from this parameter, or adjust its annotations:
+		</p>
+		<sample language="c"><![CDATA[
+		VOID ReleaseMyLock(_IRQL_restores_ KIRQL inIrql, PKSPIN_LOCK myLock) {
+		    KeReleaseSpinLock(myLock, inIrql);
+		}]]>
+		</sample>
 	</example>
 	<semmleNotes>
 		<p>
