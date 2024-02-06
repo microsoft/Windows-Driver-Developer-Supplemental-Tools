@@ -73,7 +73,7 @@ jobs:
         CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
         ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
         
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" --compare_results_no_build yes 
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
       
     - name: Build must-fix driver suite
       shell: cmd
