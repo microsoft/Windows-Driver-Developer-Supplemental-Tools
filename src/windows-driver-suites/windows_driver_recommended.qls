@@ -15,3 +15,4 @@
       - microsoft/Security/Crytpography/HardcodedIVCNG.ql
       - drivers/general/queries/KeSetEventPageable/KeSetEventPageable.ql
       - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
+      - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql

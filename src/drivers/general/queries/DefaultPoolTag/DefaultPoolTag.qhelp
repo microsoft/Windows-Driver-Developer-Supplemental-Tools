@@ -11,7 +11,22 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver allocates memory with the default tag:
+		</p>
+		<sample language="c"> 
+		PVOID InternalNonPagedAllocator(SIZE_T size) {
+			return ExAllocatePool3(POOL_FLAG_NON_PAGED, size, ' mdW');
+		}
+		</sample>
+		<p>
+			The driver should use a custom tag instead:
+		</p>
+		<sample language="c"> 
+		PVOID InternalNonPagedAllocator(SIZE_T size) {
+			return ExAllocatePool3(POOL_FLAG_NON_PAGED, size, 'vdxE');
+		}
+		</sample>
 	</example>
 	<references>
 		<li>
