@@ -11,7 +11,16 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver uses a string rather than a four-character integral as a pool tag:
+		</p>
+		<sample language="c"> <![CDATA[ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, "_gaT");]]>
+		</sample>
+		<p>
+			The driver should use a four-character integral as a tag.
+		</p>
+		<sample language="c"><![CDATA[ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, '_gaT');]]>
+		</sample>
 	</example>
 	<references>
 		<li>

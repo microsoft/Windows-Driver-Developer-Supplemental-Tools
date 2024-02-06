@@ -18,3 +18,4 @@
       - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
       - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
       - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
+      - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
