@@ -170,7 +170,7 @@ def upload_results_to_azure(file_to_upload, file_name, file_directory):
     Returns:
         None
     """
-
+    print("Upload results to file share: " + file_to_upload)
     file_service = FileService(connection_string=args.connection_string)
     file_service.create_file_from_path(share_name=args.share_name, file_name=file_name, directory_name=file_directory, local_file_path=file_to_upload, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
@@ -1013,6 +1013,8 @@ if __name__ == "__main__":
         prev_results = "functiontestresults.xlsx"
         _ = download_file_from_azure(file_to_download=prev_results, 
                         file_name="functiontestresults.xlsx", file_directory="")
+        upload_results_to_azure(file_to_upload="functiontestresults.xlsx", 
+                            file_name="functiontestresults.xlsx", file_directory="")
         upload_blob_to_azure(prev_results)
 
         #compare_health_results(args.compare_results_no_build)
