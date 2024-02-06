@@ -137,11 +137,12 @@ def upload_blob_to_azure(file_name):
     Returns:
         None
     """
+    print("Uploading file to Azure: " + file_name)
     account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
     blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
     blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
     with open(file=file_name, mode="rb") as data:
-        blob_client.upload_blob(data)
+        blob_client.upload_blob(data, overwrite=True)
 
 def download_blob_from_azure(file_name):
     """
@@ -818,7 +819,7 @@ def compare_health_results(curr_results_path):
         print("Uploading diff results")
         upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
                             file_name="diff" + curr_results_path, file_directory="")
-        upload_blob_to_azure(curr_results_path)
+        upload_blob_to_azure("diff"+curr_results_path)
 
     # delete downloaded file
     
@@ -844,10 +845,10 @@ def run_tests(ql_tests_dict):
             print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
             continue
         analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
-        health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
+       # health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
         health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
         
-        detailed_health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
+        #detailed_health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
         detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
       
     # save results
@@ -1009,7 +1010,12 @@ if __name__ == "__main__":
     print()
 
     if args.compare_results_no_build:
-        compare_health_results(args.compare_results_no_build)
+        prev_results = "functiontestresults.xlsx"
+        _ = download_file_from_azure(file_to_download=prev_results, 
+                        file_name="functiontestresults.xlsx", file_directory="")
+        upload_blob_to_azure(prev_results)
+
+        #compare_health_results(args.compare_results_no_build)
         exit(0)
 
     allowed_platforms = ["x64", "x86", "ARM", "ARM64"]
