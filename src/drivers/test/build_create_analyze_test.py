@@ -814,7 +814,7 @@ def compare_health_results(curr_results_path):
                             file_name=prev_results, file_directory="")
         upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
                             file_name="diff" + curr_results_path, file_directory="")
-        
+        return
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer)
     print("Saved diff results")
