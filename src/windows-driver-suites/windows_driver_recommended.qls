@@ -16,3 +16,4 @@
       - drivers/general/queries/KeSetEventPageable/KeSetEventPageable.ql
       - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
       - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
+      - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
