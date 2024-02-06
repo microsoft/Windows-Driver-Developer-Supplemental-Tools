@@ -13,7 +13,7 @@
       - drivers/general/queries/RoutineFunctionTypeNotExpected/RoutineFunctionTypeNotExpected.ql
       - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
       - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
-      - drivers/kmdf/queries/StrSafe/StrSafe.ql
+      - drivers/general/queries/StrSafe/StrSafe.ql
       - drivers/general/queries/experimental/IrqlTooHigh/IrqlTooHigh.ql
       - drivers/general/queries/experimental/IrqlTooLow/IrqlTooLow.ql
       - drivers/general/queries/experimental/IrqlSetTooHigh/IrqlSetTooHigh.ql

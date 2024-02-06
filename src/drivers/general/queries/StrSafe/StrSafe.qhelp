@@ -11,7 +11,23 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver incorrectly imports strsafe.h:
+		</p>
+		<sample language="c"> <![CDATA[
+		#include <ntddk.h>
+		#include <strsafe.h>
+		]]>
+		</sample>
+		<p>
+			The driver should import ntstrsafe.h:
+		</p>
+		<sample language="c"><![CDATA[
+		#include <ntddk.h>
+		#define NTSTRSAFE_LIB
+		#include <ntstrsafe.h>
+		]]>
+		</sample>
 	</example>
 	<references>
 		<li>
