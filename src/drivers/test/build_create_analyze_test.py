@@ -812,8 +812,8 @@ def compare_health_results(curr_results_path):
         print("Error comparing results: ", e, "Uploading previous results back to Azure as", prev_results, "and current results back to Azure as", curr_results_path)
         upload_results_to_azure(file_to_upload=prev_results, 
                             file_name=prev_results, file_directory="")
-        upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
-                            file_name="diff" + curr_results_path, file_directory="")
+        upload_results_to_azure(file_to_upload=curr_results_path, 
+                            file_name=curr_results_path, file_directory="")
         exit(1)
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer)
