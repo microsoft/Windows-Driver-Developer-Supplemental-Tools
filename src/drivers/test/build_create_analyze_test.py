@@ -806,7 +806,15 @@ def compare_health_results(curr_results_path):
     prev_results_df = pd.read_excel(prev_results, index_col=0) 
     curr_results_df = pd.read_excel(curr_results_path, index_col=0)
     print("Comparing results...")
-    diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
+    try:
+        diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
+    except Exception as e: 
+        print("Error comparing results: ", e, "Uploading previous results back to Azure as", prev_results, "and current results back to Azure as", curr_results_path)
+        upload_results_to_azure(file_to_upload=prev_results, 
+                            file_name=prev_results, file_directory="")
+        upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
+                            file_name="diff" + curr_results_path, file_directory="")
+        
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer)
     print("Saved diff results")
@@ -819,7 +827,8 @@ def compare_health_results(curr_results_path):
         print("Uploading diff results")
         upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
                             file_name="diff" + curr_results_path, file_directory="")
-        upload_blob_to_azure("diff"+curr_results_path)
+        
+        #upload_blob_to_azure("diff"+curr_results_path) # TODO this doesnt work in github actions
 
     # delete downloaded file
     
