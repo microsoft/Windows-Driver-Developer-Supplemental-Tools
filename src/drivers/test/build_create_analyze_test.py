@@ -809,6 +809,9 @@ def compare_health_results(curr_results_path):
                 exit(1)
             
     prev_results_df = pd.read_excel(prev_results, index_col=0, sheet_name=0) 
+    prev_results_codeql_version_df = pd.read_excel(prev_results, index_col=0, sheet_name=1)
+    prev_results_codeql_packs_df = pd.read_excel(prev_results, index_col=0, sheet_name=2)
+    prev_results_system_info_df = pd.read_excel(prev_results, index_col=0, sheet_name=3)
     curr_results_df = pd.read_excel(curr_results_path, index_col=0, sheet_name=0)
     print("Comparing results...")
     try:
@@ -822,9 +825,13 @@ def compare_health_results(curr_results_path):
         exit(1)
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer, sheet_name="Diff")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        codeql_version_df.to_excel(writer, sheet_name="Current CodeQL Version")
+        codeql_packs_df.to_excel(writer, sheet_name="Current CodeQL Packs")
+        system_info_df.to_excel(writer, sheet_name="Current System Info")
+        prev_results_codeql_version_df.to_excel(writer, sheet_name="Previous CodeQL Version")
+        prev_results_codeql_packs_df.to_excel(writer, sheet_name="Previous CodeQL Packs")
+        prev_results_system_info_df.to_excel(writer, sheet_name="Previous System Info")
+        
     print("Saved diff results")
     # upload new results to Azure
     if not args.local_result_storage:
