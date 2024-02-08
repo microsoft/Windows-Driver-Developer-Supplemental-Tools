@@ -344,7 +344,7 @@ def test_setup(ql_test):
 
     """
     
-    current_working_dir = os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name()+'/')
+    current_working_dir = os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name()+'\\')
    
     # if os.getcwd().split("\\")[-1] == "test":
     # else:
@@ -354,7 +354,7 @@ def test_setup(ql_test):
     print("Creating working directory: " + current_working_dir)
     shutil.copytree(ql_test.get_template(), current_working_dir)
     print("Copying files to working directory: " + current_working_dir)
-    test_file_loc = os.path.join(template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())
+    test_file_loc = os.path.join(g_template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())
     # Copy files to driver directory
     for file in os.listdir(test_file_loc):
         shutil.copyfile(os.path.join(test_file_loc,file), os.path.join(current_working_dir+"\\driver\\",file))
@@ -481,6 +481,9 @@ def analyze_codeql_database(ql_test, db_path=None):
     if db_path is not None: # When using external drivers, save databases in current directory
         database_loc = db_path
         if args.existing_database:
+            if not os.path.exists(os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name())): 
+                os.makedirs(os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()), exist_ok=True)
+                
             output_file = os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+ "\\" + db_path.split('\\')[-1]+".sarif")
         else:
             output_file = os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif")
@@ -489,8 +492,7 @@ def analyze_codeql_database(ql_test, db_path=None):
         print("No database path provided!")
         return None
 
-    print("Saving SARIF file to: " + output_file)
-    ql_file_path =  template_dir + "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql"
+    ql_file_path =  g_template_dir + "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql"
 
     if args.use_codeql_repo:
         proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file,ql_file_path, "--additional-packs", args.use_codeql_repo]
@@ -498,6 +500,7 @@ def analyze_codeql_database(ql_test, db_path=None):
     else:
         proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_file_path ]
         
+    print("Saving SARIF file to: " + output_file)
       
     out3 = subprocess.run(proc_command, 
                     shell=True, capture_output=no_output  ) 
@@ -523,7 +526,10 @@ def sarif_diff(ql_test):
     Returns:
         The output of the SARIF diff command if successful, None otherwise.
     """
-    out4 = subprocess.run(["sarif", "diff", "-o", template_dir+"diff\\"+ql_test.get_ql_name()+".sarif", template_dir + "\\..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif", "AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif"], 
+    sarif_prev = os.path.join(g_template_dir, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif")
+    sarif_new = os.path.join(g_template_dir, "AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif")
+    sarif_out = os.path.join(g_template_dir,  "diff\\"+ql_test.get_ql_name()+".sarif")
+    out4 = subprocess.run(["sarif", "diff", "-o", sarif_out ,sarif_prev, sarif_new], 
                     shell=True, capture_output=no_output  ) 
     if out4.returncode != 0:
         print("Error in sarif diff: " + ql_test.get_ql_name())
@@ -532,6 +538,8 @@ def sarif_diff(ql_test):
         except:
             print(out4.stderr)
         return None
+    print("Saving output to:", sarif_out)
+
     return out4
 
 def sarif_results(ql_test, sarif_file):
@@ -637,7 +645,7 @@ def parse_attributes(queries):
         di = path.index("drivers")
         ql_type = path[di+1]
 
-        template = template_dir
+        template = g_template_dir
         if queries[query].get_use_cpp():
             template += "CppKMDFTestTemplate"
         elif(ql_type == "general"):
@@ -891,7 +899,7 @@ def run_tests(ql_tests_dict):
         compare_health_results(result_file)
         compare_health_results("detailed"+result_file)
     
-def find_template_dir(template):
+def find_g_template_dir(template):
     """
     Finds the directory of the given template.
 
@@ -1071,14 +1079,14 @@ if __name__ == "__main__":
     extension_to_search = ".ql"
     
     ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
-    
+    g_template_dir = ''
     if os.path.exists(os.path.join(os.getcwd(), "WDMTestTemplate")):
-        template_dir = ''
+        g_template_dir = os.getcwd() + "\\"
     else:
         print("Template directory not found in current working directory, using default")    
-        template_dir = os.path.join(os.getcwd(), "src\\drivers\\test\\")
+        g_template_dir = os.path.join(os.getcwd(), "src\\drivers\\test\\")
 
-    print(template_dir)
+    print(g_template_dir)
     driver_sln_files = []
     if args.external_drivers:
         dir_to_search = args.external_drivers
