@@ -1,0 +1,30 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The function has lowered the IRQL to a level below what is allowed.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			A function has been annotated as having a minimum IRQL, but the execution of that function lowers the IRQL below that minimum.  If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.  If your function is a dispatch routine or callback, review the expected IRQL levels for that role.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			In this example, the driver tries to lower the IRQL to PASSIVE_LEVEL within a KEDEFERRED_ROUTINE callback, which must run at DISPATCH_LEVEL or higher.  This should be avoided.
+		</p>
+		<sample language="c"><![CDATA[
+			// Within a KDEFERRED_ROUTINE callback
+			KeLowerIrql(PASSIVE_LEVEL, &oldIRQL);
+			]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28124-call-below-minimum-irq-level">
+				C28124
+			</a>
+		</li>
+	</references>
+</qhelp>
