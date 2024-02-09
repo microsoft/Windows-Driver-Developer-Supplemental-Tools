@@ -39,6 +39,9 @@
 			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low">
 				 C28120
 			</a>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers">
+				IRQL annotations for drivers
+			</a>
 		</li>
 	</references>
 	<semmleNotes>
