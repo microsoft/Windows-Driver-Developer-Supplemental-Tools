@@ -27,3 +27,4 @@
       - drivers/general/queries/StrSafe/StrSafe.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
+      - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql

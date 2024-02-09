@@ -10,11 +10,27 @@
 	</overview>
 	<recommendation>
 		<p>
-			Driver writers should not make changes to these fields.
+			Driver writers should not make changes to these fields except in specific contexts.
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver directly edits a DriverObject's flags in a DriverUnload callback, which is not supported.
+		</p>
+		<sample language="c"><![CDATA[
+			VOID
+			DriverUnload (
+				PDRIVER_OBJECT DriverObject
+			)
+			{
+				DriverObject->Flags &= 0x100000;
+				return;
+			}
+			]]>
+		</sample>		
+		<p>
+			The driver should only adjust the Flags field in DriverEntry.
+		</p>
 	</example>
 	<references>
 		<li>
