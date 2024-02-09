@@ -14,7 +14,28 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			The driver attempts to call a deprecated string function:
+		</p>
+		<sample language="c"><![CDATA[
+			void example_func(PSTR src) 
+			{ 
+				char dst[100]; 
+				strcpy(dst, src);
+			}
+			]]>
+		</sample>
+		<p>
+			The driver should use a supported newer function:
+		</p>
+		<sample language="c"><![CDATA[
+			void example_func(PSTR src) 
+			{ 
+				char dst[100]; 
+				strcpy_s(dst, sizeof(dst), src); 
+			}
+			]]>
+		</sample>
 	</example>
 	<references>
 		<li>
