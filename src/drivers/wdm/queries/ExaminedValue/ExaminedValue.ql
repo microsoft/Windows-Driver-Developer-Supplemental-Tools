@@ -11,7 +11,7 @@
  * @impact Attack Surface Reduction
  * @repro.text The following code location calls a function annotated with _Check_return_ or _Must_inspect_result_ but does not check the returned value.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQLD-C28134
+ * @opaqueid CQLD-C28193
  * @problem.severity warning
  * @precision high
  * @tags correctness
@@ -48,21 +48,31 @@ predicate unUsed(Expr e) {
  */
 predicate callFrequency(ReturnMustBeCheckedFunction f, string message) {
   exists(Options opts, int used, int total, int percentage |
-    used =
-      count(ReturnMustBeCheckedFunctionCall fc |
-        fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc) and not unUsed(fc)
-      ) and
-    total =
-      count(ReturnMustBeCheckedFunctionCall fc |
-        fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc)
-      ) and
-    used != total and
-    percentage = used * 100 / total and
-    percentage >= 75 and
-    message =
-      percentage.toString() +
-        "% of calls to this function have their result checked. Checked return values = " +
-        used.toString() + " total calls = " + total.toString()
+    (
+      used =
+        count(ReturnMustBeCheckedFunctionCall fc |
+          fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc) and not unUsed(fc)
+        ) and
+      total =
+        count(ReturnMustBeCheckedFunctionCall fc |
+          fc.getTarget() = f and not opts.okToIgnoreReturnValue(fc)
+        )
+    ) and
+    (
+      used != total and
+      percentage = used * 100 / total and
+      percentage >= 75 and
+      message =
+        percentage.toString() +
+          "% of calls to this function have their result checked. Checked return values = " +
+          used.toString() + " total calls = " + total.toString()
+      or
+      // Also report if this is the only call to this function
+      used = 0 and
+      total = 1 and
+      percentage = 0 and
+      message = "this is the only call to this function."
+    )
   )
 }
 
