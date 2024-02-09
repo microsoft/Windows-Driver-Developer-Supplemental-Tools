@@ -26,3 +26,4 @@
       - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
       - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
       - drivers/general/queries/StrSafe/StrSafe.ql
+      - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
