@@ -30,4 +30,5 @@
       - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
       - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlUse.ql
       - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlWrite.ql
+      - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
 
