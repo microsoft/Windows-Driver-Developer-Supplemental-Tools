@@ -31,4 +31,5 @@
       - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlUse.ql
       - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlWrite.ql
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
+      - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
 
