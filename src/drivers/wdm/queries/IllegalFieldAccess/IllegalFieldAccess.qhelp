@@ -10,11 +10,24 @@
 	</overview>
 	<recommendation>
 		<p>
-			Instead of making direct assignments, driver developers should refer to the output of the rule and replace any calls to deprecated APIs with the recommended replacements.  These recommendations are based on the MSDN articles for Code Analysis rules C28719, C28726, and C28750, as linked in the references section below.  If no recommended replacement is provided, developers should investigate alternate code or APIs for attaining the same functionality.
+			Instead of making direct assignments, refer to MSDN and the output of running this query for the correct API to use.
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver directly edits an IRP's CancelRoutine, which is not supported.
+		</p>
+		<sample language="c"><![CDATA[
+			irp->CancelRoutine = myCancelRoutine;
+			]]>
+		</sample>		
+		<p>
+			The driver should instead call IoSetCancelRoutine:
+		</p>
+		<sample language="c"><![CDATA[
+			oldCancel = IoSetCancelRoutine(irp, myCancelRoutine);
+			]]>
+		</sample>
 	</example>
 	<references>
 		<li>
