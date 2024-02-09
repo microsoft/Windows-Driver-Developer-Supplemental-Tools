@@ -12,21 +12,25 @@
 	</recommendation>
 	<example>
 		<p>
-			In this example, the driver directly edits a DriverObject's flags in a DriverUnload callback, which is not supported.
+			In this example, the driver directly reads a DeviceObject's "Size" field.
 		</p>
 		<sample language="c"><![CDATA[
-			VOID
-			DriverUnload (
-				PDRIVER_OBJECT DriverObject
+			NTSTATUS CompletionRoutine(
+						PDEVICE_OBJECT DeviceObject,
+						PIRP Irp,
+						PVOID Context
 			)
 			{
-				DriverObject->Flags &= 0x100000;
+				if (DeviceObject->Size > 0x10)
+				{
+					// Do some logic
+				}
 				return;
 			}
 			]]>
 		</sample>		
 		<p>
-			The driver should only adjust the Flags field in DriverEntry.
+			The driver should not access this field.
 		</p>
 	</example>
 	<references>
@@ -37,6 +41,6 @@
 		</li>
 	</references>
 	<semmleNotes>
-		<p>It is legal for filesystem drivers to access a DeviceObject's Vpb and SecurityDescriptor fields, but this case is not accounted for in the rule at this time.</p>
+		<p>It is legal for filesystem drivers to access some fields that should not be accessed by other drivers; this case is not accounted for in the rule at this time.</p>
 	</semmleNotes>
 </qhelp>
