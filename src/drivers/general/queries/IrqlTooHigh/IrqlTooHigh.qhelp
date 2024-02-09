@@ -19,7 +19,7 @@
 			IrqlTooHigh(PKSPIN_LOCK myLock, PKIRQL oldIrql){
 				NTSTATUS status;
 				KIRQL lockIrql;
-				KeRaiseIrql(DPC_LEVEL, oldIrql);
+				KeRaiseIrql(HIGH_LEVEL, oldIrql);
 				KeAcquireSpinLock(myLock, &lockIrql);
 				KeReleaseSpinLock(myLock, &lockIrql);
 				KeLowerIrql(*oldIrql);
