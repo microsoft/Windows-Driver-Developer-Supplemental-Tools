@@ -28,3 +28,6 @@
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
       - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
+      - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlUse.ql
+      - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlWrite.ql
+
