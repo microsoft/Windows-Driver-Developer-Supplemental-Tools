@@ -66,12 +66,6 @@ predicate callFrequency(ReturnMustBeCheckedFunction f, string message) {
         percentage.toString() +
           "% of calls to this function have their result checked. Checked return values = " +
           used.toString() + " total calls = " + total.toString()
-      or
-      // Also report if this is the only call to this function
-      used = 0 and
-      total = 1 and
-      percentage = 0 and
-      message = "this is the only call to this function."
     )
   )
 }
