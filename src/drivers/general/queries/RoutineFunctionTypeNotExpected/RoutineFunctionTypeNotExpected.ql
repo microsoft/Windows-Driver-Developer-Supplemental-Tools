@@ -29,12 +29,28 @@ where
   p.getFunction() = fc.getTarget() and
   p.getUnspecifiedType() instanceof FunctionPointerType and
   p.getIndex() = n and
- 
-  fc.getArgument(n).hasImplicitConversion()
-    and not fc.getArgument(n).hasExplicitConversion()
+  fc.getArgument(n).hasImplicitConversion() and
+  not fc.getArgument(n).hasExplicitConversion() and
+  (
+    exists(Type expectedReturnType, Type actualReturnType |
+      expectedReturnType = p.getUnspecifiedType().(FunctionPointerType).getReturnType() and // and
+      actualReturnType =
+        fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType() and
+      expectedReturnType != actualReturnType and
+      not expectedReturnType instanceof VoidType
+    )
+    or
+    exists(Type expectedParamType, Type actualParamType, int i |
+      expectedParamType = p.getUnspecifiedType().(FunctionPointerType).getParameterType(i) and
+      not expectedParamType.getUnderlyingType() instanceof VoidPointerType and
+      actualParamType =
+        fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getParameterType(i) and
+      actualParamType != expectedParamType
+    )
+  )
+/// and p.getUnspecifiedType().(FunctionPointerType).getParameterType(i) !=  fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getParameterType(i)
+// and not p.getUnspecifiedType().(FunctionPointerType).getParameterType(i) instanceof VoidPointerType
+//actualReturnType = fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType()
 select fc,
-   "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type. Expected formal parameter is: $@ ("
-  + p.getFunction().getNumberOfParameters() + " parameters). Actual argument: $@ (" + fc.getTarget().getNumberOfParameters() + " arguments).",
-  fc, fc.toString(), fc.getArgument(n), fc.getArgument(n).toString(),p,p.getName(), 
-  p, p.getUnspecifiedType().(FunctionPointerType).explain(),
-  fc.getArgument(n),fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).explain()
+  "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type.",
+  fc, fc.toString(), fc.getArgument(n), fc.getArgument(n).toString(), p, p.getName()
