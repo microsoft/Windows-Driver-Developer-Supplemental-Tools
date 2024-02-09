@@ -17,7 +17,6 @@
       - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
       - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
       - drivers/general/queries/ExaminedValue/ExaminedValue.ql
-      - drivers/general/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
       - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
       - drivers/general/queries/IrqlTooHigh/IrqlTooHigh.ql
@@ -26,4 +25,5 @@
       - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
       - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
       - drivers/general/queries/StrSafe/StrSafe.ql
+      - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
