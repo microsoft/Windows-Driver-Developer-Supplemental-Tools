@@ -6,12 +6,28 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.11.5",
+        "semanticVersion" : "2.15.4",
+        "notifications" : [ {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "name" : "cpp/baseline/expected-extracted-files",
+          "shortDescription" : {
+            "text" : "Expected extracted files"
+          },
+          "fullDescription" : {
+            "text" : "Files appearing in the source archive that are expected to be extracted."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          },
+          "properties" : {
+            "tags" : [ "expected-extracted-files", "telemetry" ]
+          }
+        } ],
         "rules" : [ {
           "id" : "cpp/drivers/str-safe",
           "name" : "cpp/drivers/str-safe",
           "shortDescription" : {
-            "text" : "Unsafe string header"
+            "text" : "Unsafe string header (C28146)"
           },
           "fullDescription" : {
             "text" : "Kernel Mode drivers should use ntstrsafe.h, not strsafe.h. The header ntstrsafe.h contains versions of the functions found in strsafe.h that are suitable for use in kernel mode code. For more information please refer C28146 Code Analysis rule."
@@ -27,8 +43,8 @@
             "id" : "cpp/drivers/str-safe",
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "Unsafe string header",
-            "opaqueid" : "CQLD-C8146",
+            "name" : "Unsafe string header (C28146)",
+            "opaqueid" : "CQLD-C28146",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "high",
@@ -42,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
+        "semanticVersion" : "1.0.12+4ae20086eb035da3541593b097b8e501adfad91a",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
@@ -54,27 +70,98 @@
             "text" : "The QL pack definition file."
           }
         } ]
-      }, {
-        "name" : "legacy-upgrades",
-        "semanticVersion" : "0.0.0",
-        "locations" : [ {
-          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
       } ]
     },
+    "invocations" : [ {
+      "toolExecutionNotifications" : [ {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 1
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      } ],
+      "executionSuccessful" : true
+    } ],
     "artifacts" : [ {
       "location" : {
         "uri" : "driver/driver_snippet.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 0
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 1
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 2
       }
     } ],
     "results" : [ {
@@ -85,7 +172,7 @@
         "index" : 0
       },
       "message" : {
-        "text" : "Kernel Mode drivers should use ntstrsafe.h, not strsafe.h. Found in source file"
+        "text" : "Kernel-mode drivers should import ntstrsafe.h, not strsafe.h."
       },
       "locations" : [ {
         "physicalLocation" : {
