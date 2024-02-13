@@ -37,7 +37,7 @@
 	<references>
 		<li>
 			<a href="https://docs.microsoft.com/en-us/cpp/code-quality/c28193">
-				C28193
+				Warning C28193 | Microsoft Learn
 			</a>
 		</li>
 	</references>

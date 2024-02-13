@@ -32,12 +32,12 @@
 	<references>
 		<li>
 			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28168-dispatch-function-dispatch-annotation">
-				C28168
+				C28168 warning - Windows Drivers
 			</a>
 		</li>
 		<li>
 			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28169-dispatch-function-does-not-have-proper-annotation">
-				C28169
+				C28169 warning - Windows Drivers
 			</a>
 		</li>
 	</references>
