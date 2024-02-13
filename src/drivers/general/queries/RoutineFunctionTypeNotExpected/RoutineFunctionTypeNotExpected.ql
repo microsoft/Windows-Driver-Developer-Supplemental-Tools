@@ -62,6 +62,6 @@ where
   )
 
 select fc,
-  "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type.",
+  "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type $@",
   fc, fc.toString(), fc.getArgument(n).(FunctionAccess).getTarget().getADeclarationEntry(), fc.getArgument(n).toString(),
   fc.getTarget().getParameter(n), fc.getTarget().getParameter(n).toString()
