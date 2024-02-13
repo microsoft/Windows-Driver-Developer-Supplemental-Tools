@@ -23,20 +23,46 @@
 import cpp
 import semmle.code.cpp.exprs.Cast
 
-from DeclarationEntry func, FunctionCall fc, Parameter p, int n, int i // Type expectedParamParamType, Type actualParamParamType//, int paramIdxActual, int paramIdxExpected
+from FunctionCall fc, int n // Type expectedParamParamType, Type actualParamParamType//, int paramIdxActual, int paramIdxExpected
 where
   fc.getArgument(n).hasImplicitConversion() and
   not fc.getArgument(n).hasExplicitConversion() and
-  fc.getArgument(n) instanceof FunctionAccess and 
-  fc.getTarget().getAParameter().getAnAccess().getActualType().getUnspecifiedType().(FunctionPointerType).getParameterType(i) !=
-  fc.getArgument(n).(FunctionAccess).getTarget().getParameter(i).getType()
-
-  //TODO 
-  // or return type mismatch
-  // or num params mismatch
- 
-    
+  // function pointer parameter mismatch
+  (
+    exists(int i |
+      fc.getTarget()
+          .getParameter(n)
+          .getUnspecifiedType()
+          .(FunctionPointerType)
+          .getParameterType(i)
+          .getUnspecifiedType() !=
+        fc.getArgument(n)
+            .(FunctionAccess)
+            .getTarget()
+            .getParameter(i)
+            .getType()
+            .getUnspecifiedType()
+    ) or
+    // or return type mismatch
+    fc.getTarget()
+        .getParameter(n)
+        .getUnspecifiedType()
+        .(FunctionPointerType)
+        .getReturnType()
+        .getUnspecifiedType() !=
+      fc.getArgument(n).(Access).getType().getUnspecifiedType() or
+      // or num params mismatch
+    fc.getTarget()
+        .getParameter(n)
+        .getUnspecifiedType()
+        .(FunctionPointerType)
+        .getNumberOfParameters() !=
+      fc.getArgument(n).(FunctionAccess).getTarget().getNumberOfParameters()
+  )
+//TODO
+// or return type mismatch
+// or num params mismatch
 select fc,
-  "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type.$@ $@ $@",
-  fc, fc.toString()
-//fc.getArgument(n), fc.getArgument(n).(FunctionAccess).getTarget()
+  "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type.",
+  fc, fc.toString(), fc.getArgument(n), fc.getArgument(n).toString(),
+  fc.getTarget().getParameter(n), fc.getTarget().getParameter(n).toString()

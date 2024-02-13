@@ -44,6 +44,7 @@ int voidFunctionToCallWithParams3(int a, char b, long c)
 {
     long x = a + b + c;
     c = x; // do stuff to get rid of compiler warnings
+    return 0;
 }
 
 int intFunctionToCall(void)
