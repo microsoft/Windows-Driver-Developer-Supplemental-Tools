@@ -7,6 +7,7 @@
     query path: 
       - drivers/general/experimental/DefaultPoolTagExtended/DefaultPoolTagExtended.ql
       - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
+      - drivers/general/queries/ExaminedValue/ExaminedValue.ql
       - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
       - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
@@ -15,10 +16,9 @@
       - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
       - drivers/general/queries/StrSafe/StrSafe.ql
       - drivers/general/queries/IrqlTooHigh/IrqlTooHigh.ql
-      - drivers/general/queries/experimental/IrqlTooLow/IrqlTooLow.ql
-      - drivers/general/queries/experimental/IrqlSetTooHigh/IrqlSetTooHigh.ql
-      - drivers/general/queries/experimental/IrqlSetTooLow/IrqlSetTooLow.ql
-      - drivers/wdm/queries/ExaminedValue/ExaminedValue.ql
+      - drivers/general/queries/IrqlTooLow/IrqlTooLow.ql
+      - drivers/general/queries/IrqlSetTooHigh/IrqlSetTooHigh.ql
+      - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
       - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
