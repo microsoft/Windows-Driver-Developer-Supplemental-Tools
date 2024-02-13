@@ -50,7 +50,9 @@ where
         .(FunctionPointerType)
         .getReturnType()
         .getUnspecifiedType() !=
-      fc.getArgument(n).(Access).getType().getUnspecifiedType() or
+      fc.getArgument(n).getType().getUnspecifiedType() or
+
+
       // or num params mismatch
     fc.getTarget()
         .getParameter(n)
@@ -59,9 +61,7 @@ where
         .getNumberOfParameters() !=
       fc.getArgument(n).(FunctionAccess).getTarget().getNumberOfParameters()
   )
-//TODO
-// or return type mismatch
-// or num params mismatch
+
 select fc,
   "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type.",
   fc, fc.toString(), fc.getArgument(n), fc.getArgument(n).toString(),
