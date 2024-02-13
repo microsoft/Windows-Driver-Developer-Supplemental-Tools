@@ -23,34 +23,20 @@
 import cpp
 import semmle.code.cpp.exprs.Cast
 
-from FunctionCall fc, Parameter p, int n
+from DeclarationEntry func, FunctionCall fc, Parameter p, int n, int i // Type expectedParamParamType, Type actualParamParamType//, int paramIdxActual, int paramIdxExpected
 where
-  fc.getArgument(n).getUnspecifiedType() instanceof FunctionPointerType and
-  p.getFunction() = fc.getTarget() and
-  p.getUnspecifiedType() instanceof FunctionPointerType and
-  p.getIndex() = n and
   fc.getArgument(n).hasImplicitConversion() and
   not fc.getArgument(n).hasExplicitConversion() and
-  (
-    exists(Type expectedReturnType, Type actualReturnType |
-      expectedReturnType = p.getUnspecifiedType().(FunctionPointerType).getReturnType() and // and
-      actualReturnType =
-        fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType() and
-      expectedReturnType != actualReturnType and
-      not expectedReturnType instanceof VoidType
-    )
-    or
-    exists(Type expectedParamType, Type actualParamType, int i |
-      expectedParamType = p.getUnspecifiedType().(FunctionPointerType).getParameterType(i) and
-      not expectedParamType.getUnderlyingType() instanceof VoidPointerType and
-      actualParamType =
-        fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getParameterType(i) and
-      actualParamType != expectedParamType
-    )
-  )
-/// and p.getUnspecifiedType().(FunctionPointerType).getParameterType(i) !=  fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getParameterType(i)
-// and not p.getUnspecifiedType().(FunctionPointerType).getParameterType(i) instanceof VoidPointerType
-//actualReturnType = fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).getReturnType()
+  fc.getArgument(n) instanceof FunctionAccess and 
+  fc.getTarget().getAParameter().getAnAccess().getActualType().getUnspecifiedType().(FunctionPointerType).getParameterType(i) !=
+  fc.getArgument(n).(FunctionAccess).getTarget().getParameter(i).getType()
+
+  //TODO 
+  // or return type mismatch
+  // or num params mismatch
+ 
+    
 select fc,
-  "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type.",
-  fc, fc.toString(), fc.getArgument(n), fc.getArgument(n).toString(), p, p.getName()
+  "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type.$@ $@ $@",
+  fc, fc.toString()
+//fc.getArgument(n), fc.getArgument(n).(FunctionAccess).getTarget()

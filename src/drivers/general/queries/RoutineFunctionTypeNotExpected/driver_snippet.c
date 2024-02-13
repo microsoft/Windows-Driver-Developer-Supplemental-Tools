@@ -35,6 +35,17 @@ void voidFunctionToCallWithParams(int a, char b, long c)
     long x = a + b + c;
     c = x; // do stuff to get rid of compiler warnings
 }
+void voidFunctionToCallWithParams2(int a, long b, long c)
+{
+    long x = a + b + c;
+    c = x; // do stuff to get rid of compiler warnings
+}
+int voidFunctionToCallWithParams3(int a, char b, long c)
+{
+    long x = a + b + c;
+    c = x; // do stuff to get rid of compiler warnings
+}
+
 int intFunctionToCall(void)
 {
     return 0;
@@ -52,11 +63,7 @@ char functionCallThatUsesFunctionPointer(funcCall functionPointer)
     functionPointer();
     return 'a';
 }
-char functionCallThatUsesFunctionPointer2(char a, funcCall functionPointer, char b)
-{
-    functionPointer();
-    return a + b;
-}
+
 char functionCallThatUsesFunctionPointerLong(funcCallLong functionPointer)
 {
     functionPointer();
@@ -71,10 +78,8 @@ void functionCallThatUsesFunctionPointer3(funcCall2 functionPointer)
 void callFunctionCallThatUsesFunctionPointer(void)
 {
     funcCall f1 = &voidFunctionToCall;
-    funcCall2 f_with_params = &voidFunctionToCallWithParams;
 
     funcCall2 f_bad_params = &voidFunctionToCall; // NOTE the compiler warns about this because voidFunctionToCall has no parameters
-    funcCall2 f_bad_params2 = (funcCall2)voidFunctionToCall;
 
     funcCall f2 = &intFunctionToCall; // funcCall type specifies a void return type, but this is a function pointer to intFunctionToCall which returns an int
     funcCallInt f3 = &intFunctionToCall;
@@ -91,16 +96,15 @@ void callFunctionCallThatUsesFunctionPointer(void)
     functionCallThatUsesFunctionPointer(voidFunctionToCall); // pass
     functionCallThatUsesFunctionPointer(intFunctionToCall);  // fail because intFunctionToCall returns an int
 
-    functionCallThatUsesFunctionPointerLong((funcCallLong)intFunctionToCall); // should pass because the int type is cast to long type
-
-    functionCallThatUsesFunctionPointer2('a', intFunctionToCall, 'b'); // fail because this intFunctionToCall returns an int
-
     // Check both return values and parameters
-    functionCallThatUsesFunctionPointer3(f_with_params);                // pass because voidFunctionToCallWithParams matches the parameters expected by funcCall2
     functionCallThatUsesFunctionPointer3(voidFunctionToCallWithParams); // pass because voidFunctionToCallWithParams matches the parameters expected by funcCall2
+    functionCallThatUsesFunctionPointer3(voidFunctionToCallWithParams2); // fail because voidFunctionToCallWithParams2 does not match the parameters expected by funcCall2
+    functionCallThatUsesFunctionPointer3(voidFunctionToCallWithParams3); // fail because voidFunctionToCallWithParams3 does not match the return type  expected by funcCall2
+    
+    
+    
+    functionCallThatUsesFunctionPointer(voidFunctionToCallWithParams);  // fail because voidFunctionToCallWithParams does not match the parameters expected by funcCall2
 
     functionCallThatUsesFunctionPointer3(f1);                 // fail because voidFunctionToCall has no parameters. NOTE the compiler warns about this
     functionCallThatUsesFunctionPointer3(f_bad_params);       // pass because voidFunctionToCall f_bad_params is declared with funcCall2 type. The compiler warns about the initial assignemnt of f_bad_params
-    functionCallThatUsesFunctionPointer3(f_bad_params2);       // pass because voidFunctionToCall is cast to funcCall2 type. The compiler does not warn about this and does not warn about the initial assignment of f_bad_params2 because it is cast to a funcCall2 type
-    functionCallThatUsesFunctionPointer3(voidFunctionToCall); // fail because voidFunctionToCall has no parameters. NOTE the compiler warns about this
 }
