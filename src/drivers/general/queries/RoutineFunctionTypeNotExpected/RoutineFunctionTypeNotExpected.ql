@@ -27,6 +27,7 @@ from FunctionCall fc, int n // Type expectedParamParamType, Type actualParamPara
 where
   fc.getArgument(n).hasImplicitConversion() and
   not fc.getArgument(n).hasExplicitConversion() and
+  not fc.getTarget().getParameter(n).getType() instanceof VoidPointerType and // OK to pass something more precise than PVOID
   // function pointer parameter mismatch
   (
     exists(int i |
@@ -51,8 +52,6 @@ where
         .getReturnType()
         .getUnspecifiedType() !=
       fc.getArgument(n).getType().getUnspecifiedType() or
-
-
       // or num params mismatch
     fc.getTarget()
         .getParameter(n)
@@ -64,5 +63,5 @@ where
 
 select fc,
   "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type.",
-  fc, fc.toString(), fc.getArgument(n), fc.getArgument(n).toString(),
+  fc, fc.toString(), fc.getArgument(n).(FunctionAccess).getTarget().getADeclarationEntry(), fc.getArgument(n).toString(),
   fc.getTarget().getParameter(n), fc.getTarget().getParameter(n).toString()
