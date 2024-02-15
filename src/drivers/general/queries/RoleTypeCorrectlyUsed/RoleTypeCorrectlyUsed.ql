@@ -15,7 +15,7 @@
  * @precision medium
  * @tags correctness
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp

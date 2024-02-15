@@ -17,7 +17,7 @@
  * @tags correctness
  *       wddst
  * @scope domainspecific
- * @query-version v2
+ * @query-version v3
  */
 
 import cpp
