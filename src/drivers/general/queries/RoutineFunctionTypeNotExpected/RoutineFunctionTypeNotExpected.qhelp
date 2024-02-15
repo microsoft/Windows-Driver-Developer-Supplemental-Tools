@@ -11,7 +11,38 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver provides a pointer to a function that returns long where a function that returns int is expected:
+		</p>
+		<sample language="c"> <![CDATA[
+		typedef long
+		functionCallLong(void);
+		typedef functionCallLong *funcCallLong;
+		
+		int useFP(funcCallLong);
+
+		int badFunction(void);
+		
+		void doError() {
+			useFP(&badFunction);
+		}]]>
+		</sample>
+		<p>
+			Ensure your function definitions match what is expected, and use roletypes and typedefs to help reduce issues.
+		</p>
+		<sample language="c"> <![CDATA[
+		typedef long
+		functionCallLong(void);
+		typedef functionCallLong *funcCallLong;
+		
+		int useFP(funcCallLong);
+
+		functionCallLong goodFunction;
+		
+		void doCorrect() {
+			useFP(&goodFunction);
+		}]]>
+		</sample>
 	</example>
 	<references>
 		<li>
@@ -20,4 +51,7 @@
 			</a>
 		</li>
 	</references>
+	<semmleNotes>
+		<p>In some cases, this rule may report false positives where it claims two identical parameter types do not match.  This issue is under investigation.</p>
+	</semmleNotes>
 </qhelp>
