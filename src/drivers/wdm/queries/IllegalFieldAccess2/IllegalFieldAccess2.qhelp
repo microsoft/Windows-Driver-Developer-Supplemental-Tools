@@ -1,0 +1,46 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Drivers should not read inaccessible fields of driver structs.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Driver developers should avoid reading these fields in their drivers.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			In this example, the driver directly reads a DeviceObject's "Size" field.
+		</p>
+		<sample language="c"><![CDATA[
+			NTSTATUS CompletionRoutine(
+						PDEVICE_OBJECT DeviceObject,
+						PIRP Irp,
+						PVOID Context
+			)
+			{
+				if (DeviceObject->Size > 0x10)
+				{
+					// Do some logic
+				}
+				return;
+			}
+			]]>
+		</sample>		
+		<p>
+			The driver should not access this field.
+		</p>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28175struct-member-should-not-be-accessed-by-driver">
+				C28175 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+	<semmleNotes>
+		<p>It is legal for filesystem drivers to access some fields that should not be accessed by other drivers; this case is not accounted for in the rule at this time.</p>
+	</semmleNotes>
+</qhelp>
