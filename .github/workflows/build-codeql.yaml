@@ -77,11 +77,11 @@ jobs:
       
     - name: Build must-fix driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only windows_driver_mustfix.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
     
     - name: Build recommended driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only windows_driver_recommended.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
     
     - name: Build CA ported queries
       shell: cmd
