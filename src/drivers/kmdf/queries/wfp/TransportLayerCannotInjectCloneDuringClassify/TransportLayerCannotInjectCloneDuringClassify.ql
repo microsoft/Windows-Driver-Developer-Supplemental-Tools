@@ -67,6 +67,13 @@
     }
  }
 
+
+ class TransportInjectionClassifyFunction extends Function {
+   WfpTransportInspection scr;
+ 
+   TransportInjectionClassifyFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
+ }
+
  // Contract
  // Callouts at the transport layer cannot inject a new or cloned
  // TCP packet from the classifyFn callout function
@@ -75,9 +82,8 @@
  // Returns TRUE when a transport layer classify callout function tries to inject
  // a cloned TCP Packet
 
- from TransportInjection waf 
+ from TransportInjectionClassifyFunction waf 
 where
-    isWfpTransportInjectionClassifyCall(waf) and
     exists( TransportInjectCall injectCall, TransportCloneCall cloneCall | 
        cloneCall.getLocation().getStartLine() < injectCall.getLocation().getStartLine())
 select waf,

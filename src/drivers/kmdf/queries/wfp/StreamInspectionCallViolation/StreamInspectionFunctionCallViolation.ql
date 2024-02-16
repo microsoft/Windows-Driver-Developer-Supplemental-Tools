@@ -66,6 +66,12 @@ predicate matchesStreamInjectApi(string input) {
     }
  }
 
+ /** A function that is annotated with Wfp stream callout annotation. */
+class StreamCalloutFunction extends Function {
+   WfpStreamInspection scr;
+ 
+   StreamCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
+ }
 
 // Contract
 // For out-of-band stream inspection callouts, FwpsStreamContinue0 
@@ -78,9 +84,8 @@ predicate matchesStreamInjectApi(string input) {
 
 // Denote as out of band if possible
 // Stream Inspection
-from WfpAnnotatedFunction waf
+from StreamCalloutFunction waf
 where
-   isWfpStreamInspectionClassifyCall(waf) and
    exists(StreamContinueCall continue, StreamInjectCall inject)
 select waf,
     "WFP CodeQL found a Stream Inspection Function: " + waf.getName() + 

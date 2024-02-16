@@ -24,6 +24,6 @@ VOID ImproperConnectRedirectClassify() { // Fails
 
     handle = FwpsRedirectHandleCreate0(
                 providerGuid,
-                flags,
+                flags, 
                 redirectHandle);
 }

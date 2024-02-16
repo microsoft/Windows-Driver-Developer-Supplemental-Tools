@@ -30,7 +30,10 @@ import drivers.libraries.wfp
 
 // Return TRUE if a connect/redirect layer was tagged and FwpsPendClassify is called and
 // FWP_ACTION_BLOCK or FWPS_RIGHT_ACTION_WRITE right flag is NOT set. 
-
+class RedirectCalloutFunction extends Function {
+    WfpConnectRedirect scr;
+    RedirectCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry()}
+}
 predicate matchesPendClassifyApi(string input) {
     input = any(["FwpsPendClassify", "FwpsPendClassify0"])
  }
@@ -54,13 +57,10 @@ predicate matchesPendClassifyApi(string input) {
     }
  }
 
-
-from RedirectionClassify waf
+from RedirectCalloutFunction waf
 where
-    isWfpConnectRedirectClassifyCall(waf) and 
     exists(FwpsPendClassifyCall pend) and 
-    (not exists(ActionTypeExprBlock exp) or
+    (not exists(ActionTypeExpr exp | isBlockExpression(exp)) or
     not exists(WriteActionFlagSet flag))
-
 select waf,
     "A connect redirect callout " + waf.getName() + "called FwpsPendClassify0 and does not FWP_ACTION BLOCK or  FWPS_RIGHT_ACTION_WRITE flag."
