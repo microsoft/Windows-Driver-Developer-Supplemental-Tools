@@ -18,7 +18,16 @@ void bad_irp_copy(
     RtlCopyMemory(nextIrpSp, irpSp, 0x24);
     nextIrpSp->Control = 0;
 }
-
+void bad_irp_copy2(
+    PIRP irp)
+{
+    PIO_STACK_LOCATION irpSp;
+    PIO_STACK_LOCATION nextIrpSp;
+    irpSp = IoGetCurrentIrpStackLocation(irp);
+    nextIrpSp = IoGetNextIrpStackLocation(irp);
+    RtlCopyMemory(nextIrpSp+4, irpSp+4, FIELD_OFFSET(IO_STACK_LOCATION, DeviceObject)-4);
+    nextIrpSp->Control = 0;
+}
 void good_irp_copy(
     PIRP irp)
 {
