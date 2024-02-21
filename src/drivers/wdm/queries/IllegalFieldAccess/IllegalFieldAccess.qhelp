@@ -1,0 +1,39 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Assignments to private fields of DeviceObjects, DPCs, and IRPs should not be made directly.
+		</p>
+		<p>
+			The MSDN documentation for the Code Analysis version of this check is not consistent with the behavior of the check; it states that the check looks for incorrect assignments to an IRP's CancelRoutine field, while the check actually looks for incorrect assignments to DPCs or DPC fields.  This verison of the check implements both these behaviors.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Instead of making direct assignments, refer to MSDN and the output of running this query for the correct API to use.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			In this example, the driver directly edits an IRP's CancelRoutine, which is not supported.
+		</p>
+		<sample language="c"><![CDATA[
+			irp->CancelRoutine = myCancelRoutine;
+			]]>
+		</sample>		
+		<p>
+			The driver should instead call IoSetCancelRoutine:
+		</p>
+		<sample language="c"><![CDATA[
+			oldCancel = IoSetCancelRoutine(irp, myCancelRoutine);
+			]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28128-structure-member-directly-accessed">
+				C28128 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>
