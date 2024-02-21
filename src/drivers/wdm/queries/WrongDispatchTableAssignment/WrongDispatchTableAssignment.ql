@@ -12,7 +12,7 @@
  * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-D0003
  * @kind problem
- * @problem.severity warning
+ * @problem.severity recommendation
  * @precision Low
  * @tags correctness
  *       wddst
@@ -79,16 +79,13 @@ class WrongDispatchFunctionAssignments extends AssignExpr {
     this instanceof NonDispatchFunction and
     message =
       "Dispatch table assignment should have a DRIVER_DISPATCH type routine as its right-hand side value."
-
     or
     dispatchAnnotationMissing(this) and
     message = "The dispatch function does not have a dispatch type annotation."
-
     or
     dispatchAnnotationMismatched(this) and
     message =
       "The dispatch function does not have a dispatch type annotation matching this dispatch table entry."
-
   }
 
   string getMessage() { result = message }

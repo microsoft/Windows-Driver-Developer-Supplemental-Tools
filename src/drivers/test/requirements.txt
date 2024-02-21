@@ -1,0 +1,12 @@
+sarif-tools==1.0.0
+pandas==2.1.4
+openpyxl==3.1.2
+azure-common==1.1.28
+azure-core==1.29.7
+azure-data-tables==12.5.0
+azure-identity==1.15.0
+azure-storage-blob==12.19.0
+azure-storage-common==2.1.0
+azure-storage-file==2.1.0
+azure-storage-file-share==12.15.0
+azure-storage-queue==12.9.0

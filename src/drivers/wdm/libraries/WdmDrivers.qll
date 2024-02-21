@@ -38,28 +38,29 @@ class DriverExtension extends Struct {
   }
 }
 
-/** A typedef for the standard WDM callback routines. */
-class WdmCallbackRoutineTypedef extends TypedefType {
-  WdmCallbackRoutineTypedef() {
+/** A typedef for Role Types */
+class WdmRoleTypeType extends TypedefType {
+  WdmRoleTypeType() {
     (
-      this.getName().matches("DRIVER_UNLOAD")
-      or
-      this.getName().matches("DRIVER_DISPATCH")
-      or
-      this.getName().matches("DRIVER_INITIALIZE")
-      or
-      this.getName().matches("DRIVER_CANCEL")
-      or
-      this.getName().matches("IO_COMPLETION_ROUTINE")
-      or
-      this.getName().matches("KSERVICE_ROUTINE")
-      or
-      this.getName().matches("IO_DPC_ROUTINE")
-      or
-      this.getName().matches("DRIVER_ADD_DEVICE")
-    ) and
-    this.getFile().getBaseName().matches("wdm.h")
+      this.getName().matches("DRIVER_INITIALIZE") or
+      this.getName().matches("DRIVER_STARTIO") or
+      this.getName().matches("DRIVER_UNLOAD") or
+      this.getName().matches("DRIVER_ADD_DEVICE") or
+      this.getName().matches("DRIVER_DISPATCH") or
+      this.getName().matches("IO_COMPLETION_ROUTINE") or
+      this.getName().matches("DRIVER_CANCEL") or
+      this.getName().matches("IO_DPC_ROUTINE") or
+      this.getName().matches("KDEFERRED_ROUTINE") or
+      this.getName().matches("KSERVICE_ROUTINE") or
+      this.getName().matches("REQUEST_POWER_COMPLETE") or
+      this.getName().matches("WORKER_THREAD_ROUTINE")
+    )
   }
+}
+
+/** A typedef for the standard WDM callback routines. Aka Role Types */
+class WdmCallbackRoutineTypedef extends WdmRoleTypeType {
+  WdmCallbackRoutineTypedef() { this.getFile().getBaseName().matches("wdm.h") }
 }
 
 /**
@@ -80,24 +81,137 @@ class WdmCallbackRoutine extends Function {
   }
 }
 
+
+/** A WDM DriverEntry callback routine. */
+class WdmDriverEntry extends WdmCallbackRoutine {
+  WdmDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
+
+  string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
+}
+
+/** A WDM DrierStartIo callback routine */
+class WdmDriverStartIo extends WdmCallbackRoutine {
+  WdmDriverStartIo() { callbackType.getName().matches("DRIVER_STARTIO") }
+
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
+}
+
+/**
+ * A WDM DriverUnload callback routine.
+ */
+class WdmDriverUnload extends WdmCallbackRoutine {
+  WdmDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
+
+  string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
+}
+
+// NOTE duplicate for backward compatibility with other query. Remove when other query is updated.
 /** A WDM AddDevice callback routine. */
 class WdmAddDevice extends WdmCallbackRoutine {
   WdmAddDevice() { callbackType.getName().matches("DRIVER_ADD_DEVICE") }
 }
 
-/** A WDM DriverUnload callback routine. */
-class WdmDriverUnload extends WdmCallbackRoutine {
-  WdmDriverUnload() { callbackType.getName().matches("DRIVER_UNLOAD") }
+/**
+ * A WDM DriverAddDevice callback routine.
+ */
+class WdmDriverAddDevice extends WdmCallbackRoutine {
+  WdmDriverAddDevice() { callbackType.getName().matches("DRIVER_ADD_DEVICE") }
+
+  string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
-/** A WDM DriverEntry callback routine. */
-class WdmDriverEntry extends WdmCallbackRoutine {
-  WdmDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
+/**
+ * A WDM DriverDispatch callback routine.
+ */
+class WdmDriverDispatch extends WdmCallbackRoutine {
+  WdmDriverDispatch() { callbackType.getName().matches("DRIVER_DISPATCH") }
+
+  string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
-/** A WDM DriverCancel callback routine. */
+/**
+ * A WDM IO completion routine.
+ */
+class WdmDriverCompletionRoutine extends WdmCallbackRoutine {
+  WdmDriverCompletionRoutine() { callbackType.getName().matches("IO_COMPLETION_ROUTINE") }
+
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
+}
+
+/**
+ * A WDM DriverCancel callback routine.
+ */
 class WdmDriverCancel extends WdmCallbackRoutine {
-  WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL")}
+  WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL") }
+
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
+}
+
+/**
+ * A WDM DriverDpcRoutine callback routine.
+ */
+class WdmDriverDpcRoutine extends WdmCallbackRoutine {
+  WdmDriverDpcRoutine() { callbackType.getName().matches("IO_DPC_ROUTINE") }
+
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "DISPATCH_LEVEL" }
+}
+
+/**
+ * A WDM DriverDeferredRoutine callback routine.
+ */
+class WdmDriverDeferredRoutine extends WdmCallbackRoutine {
+  WdmDriverDeferredRoutine() { callbackType.getName().matches("KDEFERRED_ROUTINE") }
+
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "DISPATCH_LEVEL" }
+}
+
+/**
+ * A WDM DriverServiceRoutine callback routine.
+ */
+class WdmDriverServiceRoutine extends WdmCallbackRoutine {
+  WdmDriverServiceRoutine() { callbackType.getName().matches("KSERVICE_ROUTINE") }
+
+  string getExpectedMaxIrqlLevelString() { result = "DIRQL" }
+
+  string getExpectedMinIrqlLevelString() { result = "DIRQL" }
+}
+
+/**
+ * A WDM DriverPowerComplete callback routine.
+ */
+class WdmDriverPowerComplete extends WdmCallbackRoutine {
+  WdmDriverPowerComplete() { callbackType.getName().matches("REQUEST_POWER_COMPLETE") }
+
+  string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
+}
+
+/**
+ * A WDM DriverWorkerThreadRoutine callback routine.
+ */
+class WdmDriverWorkerThreadRoutine extends WdmCallbackRoutine {
+  WdmDriverWorkerThreadRoutine() { callbackType.getName().matches("WORKER_THREAD_ROUTINE") }
+
+  string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
+
+  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
 }
 
 /**
