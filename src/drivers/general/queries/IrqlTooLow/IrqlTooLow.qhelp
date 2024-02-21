@@ -1,0 +1,54 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The function is not permitted to be called at the current IRQ level. The current level is too low.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			In this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:
+		</p>
+		<sample language="c"><![CDATA[
+			// Within a standard thread running at APC_LEVEL:
+			if (KeShouldYieldProcessor())
+			{
+				KeLowerIrql(PASSIVE_LEVEL);
+			}
+			]]>
+		</sample>
+		<p>
+			The driver should be careful to only call from a DISPATCH_LEVEL context:
+		</p>
+		<sample language="c"><![CDATA[
+			// Within a work loop running at DISPATCH_LEVEL
+			if (KeShouldYieldProcessor())
+			{
+				KeLowerIrql(PASSIVE_LEVEL);
+			}
+			]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low">
+				 C28120 warning - Windows Drivers
+			</a>
+		</li>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers">
+				IRQL annotations for drivers
+			</a>
+		</li>
+	</references>
+	<semmleNotes>
+		<p>This query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.</p>
+		<p>This query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.</p>
+		<p>For information on how to annotate your functions with information about how they adjust the IRQL, see "IRQL annotations for drivers" in the references section.</p>
+	</semmleNotes>
+</qhelp>

@@ -13,6 +13,22 @@
 <p>If you are building a driver that targets versions of Windows prior to Windows 10, version 2004, use ExAllocatePoolZero, ExAllocatePoolUninitialized, ExAllocatePoolQuotaZero, or ExAllocatePoolQuotaUninitialized.</p>
 <p>NOTE: Do not use <code>POOL_FLAG_UNINITIALIZED</code>.</p>
 </recommendation>
+	<example>
+		<p>
+			In this example, the driver attempts to call the now-deprecated ExAllocatePool:
+		</p>
+		<sample language="c"><![CDATA[
+			PVOID myMemory = ExAllocatePool(NonPagedPool, sizeof(int));
+			]]>
+		</sample>		
+		<p>
+			The driver should instead call ExAllocatePool2 or ExAllocatePool3.
+		</p>
+		<sample language="c"><![CDATA[
+			PVOID myMemory = ExAllocatePool2(NonPagedPool, sizeof(int), 'gaTM');
+			]]>
+		</sample>
+	</example>
 
 <references>
 <li><a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2">ExAllocatePool2 function (wdm.h)</a></li>
