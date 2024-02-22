@@ -22,13 +22,13 @@
 
 import cpp
 
-from Function driverEntry, Parameter p, VariableAccess va, GlobalVariable gv
+from VariableAccess va
 where
-  driverEntry.getName().matches("DriverEntry%") and
-  p.getFunction() = driverEntry and
-  va.getTarget() = p and
-  va.getParent() instanceof AssignExpr and 
-  gv = va.getParent().(AssignExpr).getLValue().(VariableAccess).getTarget()
-
-select va, "The DriverEntry routine should save a copy of the argument $@, not the pointer, because the I/O Manager frees the buffer", 
-va, va.toString()
+  va.getParent() instanceof AssignExpr and
+  exists(Parameter p | p.getAnAccess() = va and p.getFunction().getName() = "DriverEntry") and
+  exists(GlobalVariable gv |
+    gv = va.getParent().(AssignExpr).getLValue().(VariableAccess).getTarget()
+  )
+select va,
+  "The DriverEntry routine should save a copy of the argument $@, not the pointer, because the I/O Manager frees the buffer",
+  va, va.toString()
