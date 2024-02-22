@@ -22,16 +22,6 @@
 
 import cpp
 
-class DEVICE_OBJECT_TYPE extends Variable {
-  DEVICE_OBJECT_TYPE() {
-    this.getUnspecifiedType() instanceof TypedefType and
-    (
-      this.getName() = "DEVICE_OBJECT" or
-      this.getName() = "PDEVICE_OBJECT"
-    )
-  } 
-}
-
 from FieldAccess fa, Field f
 where 
   f = fa.getTarget() and
