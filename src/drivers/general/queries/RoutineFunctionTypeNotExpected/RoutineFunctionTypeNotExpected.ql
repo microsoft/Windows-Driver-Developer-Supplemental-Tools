@@ -17,24 +17,66 @@
  * @tags correctness
  *       wddst
  * @scope domainspecific
- * @query-version v2
+ * @query-version v3
  */
 
 import cpp
 import semmle.code.cpp.exprs.Cast
 
-from FunctionCall fc, Parameter p, int n
+from FunctionCall fc, int n, string rationale
 where
-  fc.getArgument(n).getUnspecifiedType() instanceof FunctionPointerType and
-  p.getFunction() = fc.getTarget() and
-  p.getUnspecifiedType() instanceof FunctionPointerType and
-  p.getIndex() = n and
- 
-  fc.getArgument(n).hasImplicitConversion()
-    and not fc.getArgument(n).hasExplicitConversion()
+  fc.getArgument(n).hasImplicitConversion() and
+  not fc.getArgument(n).hasExplicitConversion() and
+  not fc.getTarget().getParameter(n).getType() instanceof VoidPointerType and // OK to pass something more precise than PVOID
+  // function pointer parameter mismatch
+  (
+    exists(int i, Type expectedType, Type actualType |
+      fc.getTarget()
+          .getParameter(n)
+          .getUnspecifiedType()
+          .(FunctionPointerType)
+          .getParameterType(i)
+          .getUnspecifiedType() = expectedType and
+      fc.getArgument(n).(FunctionAccess).getTarget().getParameter(i).getType().getUnspecifiedType() =
+        actualType and
+      expectedType != actualType and
+      rationale =
+        "parameter type mismatch.  expected: " + expectedType + " in argument " + i + ", actual: " +
+          actualType and
+      not expectedType instanceof VoidPointerType
+    )
+    or
+    // or return type mismatch
+    exists(Type expectedType, Type actualType |
+      fc.getTarget()
+          .getParameter(n)
+          .getUnspecifiedType()
+          .(FunctionPointerType)
+          .getReturnType()
+          .getUnspecifiedType() = expectedType and
+      fc.getArgument(n).getType().(FunctionPointerType).getReturnType().getUnspecifiedType() =
+        actualType and
+      expectedType != actualType and
+      rationale = "return type mismatch: expected: " + expectedType + ", actual: " + actualType
+    )
+    or
+    // or num params mismatch
+    exists(int expectedParamCount, int actualParamCount |
+      fc.getTarget()
+          .getParameter(n)
+          .getUnspecifiedType()
+          .(FunctionPointerType)
+          .getNumberOfParameters() = expectedParamCount and
+      fc.getArgument(n).(FunctionAccess).getTarget().getNumberOfParameters() = actualParamCount and
+      expectedParamCount != actualParamCount and
+      rationale =
+        "parameter count mismatch: expected: " + expectedParamCount + " parameters, actual: " +
+          actualParamCount + " parameters"
+    )
+  )
 select fc,
-   "Function $@ may use a function pointer $@ for parameter $@ with an unexpected return type or parameter type. Expected formal parameter is: $@ ("
-  + p.getFunction().getNumberOfParameters() + " parameters). Actual argument: $@ (" + fc.getTarget().getNumberOfParameters() + " arguments).",
-  fc, fc.toString(), fc.getArgument(n), fc.getArgument(n).toString(),p,p.getName(), 
-  p, p.getUnspecifiedType().(FunctionPointerType).explain(),
-  fc.getArgument(n),fc.getArgument(n).getUnspecifiedType().(FunctionPointerType).explain()
+  "Function call $@ passes in a function pointer $@ for parameter $@, but the function signature of the provided function does not match what is expected: "
+    + rationale, fc, fc.toString(),
+  fc.getArgument(n).(FunctionAccess).getTarget().getADeclarationEntry(),
+  fc.getArgument(n).toString(), fc.getTarget().getParameter(n),
+  fc.getTarget().getParameter(n).toString()

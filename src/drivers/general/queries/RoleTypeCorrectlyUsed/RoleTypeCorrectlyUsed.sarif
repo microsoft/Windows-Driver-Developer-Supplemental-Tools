@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.14.6",
+        "semanticVersion" : "2.15.4",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -44,7 +44,7 @@
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Incorrect Role Type Use",
-            "opaqueid" : "CQLD-C28147e",
+            "opaqueid" : "CQLD-C28158",
             "owner.email:" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
@@ -57,14 +57,14 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+688db58415e76d66f8b04a2bb6931f3d56028174",
+        "semanticVersion" : "1.0.12+54db165bcee31f7827c56bf2bb9a408d8a4db4fe",
         "locations" : [ {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+          "uri" : "file:///C:/codeql-home/WDDST/src/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+          "uri" : "file:///C:/codeql-home/WDDST/src/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -76,7 +76,7 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
               "index" : 0
             }
@@ -99,7 +99,7 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
+              "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
               "index" : 1
             }
@@ -146,13 +146,13 @@
     } ],
     "artifacts" : [ {
       "location" : {
-        "uri" : "driver/fail_driver1.c",
+        "uri" : "driver/driver_snippet.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 0
       }
     }, {
       "location" : {
-        "uri" : "driver/driver_snippet.c",
+        "uri" : "driver/fail_driver1.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 1
       }
@@ -163,7 +163,35 @@
         "index" : 2
       }
     } ],
-    "results" : [ ],
+    "results" : [ {
+      "ruleId" : "cpp/drivers/role-type-correctly-used",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/role-type-correctly-used",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "Function BadUnload declared with role type <NO_ROLE_TYPE> but role type DRIVER_UNLOAD is expected."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 38,
+            "startColumn" : 34,
+            "endColumn" : 43
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "9b23495b84787ea7:1",
+        "primaryLocationStartColumnFingerprint" : "29"
+      }
+    } ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {
       "semmle.formatSpecifier" : "sarifv2.1.0"
