@@ -2,8 +2,8 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/operand-assignment
- * @name 
- * @description C28114: Copying a whole IRP stack entry leaves certain fields initialized that should be cleared or updated.
+ * @name Operand Assignment
+ * @description C28129: An assignment has been made to an operand, which should only be modified using bit sets and clears
  * @platform Desktop
  * @security.severity Medium
  * @feature.area Multiple
@@ -22,8 +22,21 @@
 
 import cpp
 
+class DEVICE_OBJECT_TYPE extends Variable {
+  DEVICE_OBJECT_TYPE() {
+    this.getUnspecifiedType() instanceof TypedefType and
+    (
+      this.getName() = "DEVICE_OBJECT" or
+      this.getName() = "PDEVICE_OBJECT"
+    )
+  } 
+}
 
-from AssignExpr a
+from FieldAccess fa, Field f
 where 
-  a.getLValue() instanceof FieldAccess
-select a, "$@", a, a.toString()
+  f = fa.getTarget() and
+  exists(Struct v | fa.getTarget() = v.getAMember() | v.getName() = "_DEVICE_OBJECT") and
+  f.getName() = "Flags" and 
+  fa.getParent() instanceof AssignExpr
+
+select fa, "An assignment has been made to an operand $@, which should only be modified using bit sets and clears.", fa, fa.toString()
