@@ -10,7 +10,7 @@
  * @impact Exploitable Design
  * @repro.text
  * @owner.email sdat@microsoft.com
- * @opaqueid CQLD-D0006
+ * @opaqueid CQLD-C28129
  * @kind problem
  * @problem.severity warning
  * @precision medium
