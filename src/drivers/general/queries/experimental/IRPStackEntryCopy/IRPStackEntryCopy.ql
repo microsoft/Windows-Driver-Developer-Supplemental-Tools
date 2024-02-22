@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/irp-stack-entry-copy
- * @name Unicode String Not Freed
+ * @name Irp stack entry copy
  * @description C28114: Copying a whole IRP stack entry leaves certain fields initialized that should be cleared or updated.
  * @platform Desktop
  * @security.severity Medium
