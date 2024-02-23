@@ -1,0 +1,21 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			  This function appears to be an unannotated DriverEntry function
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			 DriverEntry functions should be declared using the DRIVER_INITIALIZE function typedef.
+		</p>
+	</recommendation>
+	
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28101-wrong-function-type">
+				C28101
+			</a>
+		</li>
+	</references>
+</qhelp>
