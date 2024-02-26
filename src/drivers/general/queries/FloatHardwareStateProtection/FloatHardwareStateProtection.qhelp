@@ -1,0 +1,41 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		Drivers must protect floating-point hardware state.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			This warning is only applicable in kernel mode. The driver is attempting to use a variable or constant of a float type when the code is not protected by KeSaveFloatingPointState and KeRestoreFloatingPointState, or EngSaveFloatingPointState and EngRestoreFloatingPointState. Display drivers should use EngSaveFloatingPointState and EngRestoreFloatingPointState.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			TODO example
+		</p>
+		<sample language="c"> <![CDATA[
+		// Example code
+		}]]>
+		</sample>
+		<p>
+			TODO example 2
+		</p>
+		<sample language="c"> <![CDATA[
+				// Example code
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+			TODO notes
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="example.com">
+				Example link
+			</a>
+		</li>
+	</references>
+</qhelp>
