@@ -121,8 +121,8 @@ jobs:
         if ($rev_list_mf1[0] -lt $rev_list_mf1[1]) { "Mustfix query suite file modified without updating version"; exit 1 }; 
         if ($rev_list_rec1[0] -lt $rev_list_rec1[1]) {"Recommended query suite file modified without updating version"; exit 1 };
 
-        if ($rev_list_mf2[0] -gt $rev_list_mf2[1]) { exit 1 }; 
-        if ($rev_list_rec2[0] -gt $rev_list_rec2[1]) { exit 1 };
+        if ($rev_list_mf2[0] -gt $rev_list_mf2[1]) { "Mustfix query suite file modified without updating version2"; exit 1 }; 
+        if ($rev_list_rec2[0] -gt $rev_list_rec2[1]) {"Recommended query suite file modified without updating version2"; exit 1 };
 
         $old_qlpack_version = [version]($qlpack_changes -match "-version").Substring(10);
         $new_qlpack_version = [version]($qlpack_changes -match "\+version").Substring(10);
