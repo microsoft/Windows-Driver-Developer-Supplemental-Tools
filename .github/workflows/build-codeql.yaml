@@ -94,10 +94,16 @@ jobs:
 
     - name: Check for changes to qlpack
       shell: pwsh
-      run: $qlpack_diff = git diff HEAD~1:src/qlpack.yml src/qlpack.yml;
-        $rec_diff = git diff HEAD~1:src/windows-driver-suites/windows_recommended_partial.qls src/windows-driver-suites/windows_recommended_partial.qls;
-        $mf_diff = git diff HEAD~1:src/windows-driver-suites/windows_mustfix_partial.qls src/windows-driver-suites/windows_mustfix_partial.qls;
-        if (!$qlpack_diff -and ($rec_diff -or $mf_diff)) { exit 1 }
+      run: 
+        $last_qlpack_commit = git log -n 1 --pretty=format:%H -- src/qlpack.yml;
+        $last_mf_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/windows_mustfix_partial.qls;
+        $last_rec_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/windows_recommended_partial.qls;
+        $rev_list_mf = -split(git rev-list --left-right --count $last_qlpack_commit...$last_mf_commit);
+        $rev_list_rec = -split(git rev-list --left-right --count $last_qlpack_commit...$last_rec_commit);
+
+        if ($rev_list_mf[0] -lt $rev_list_mf[1]) { exit 1 } # qlpack must have been updated later or on same commit as qls
+        if ($rev_list_rec[0] -lt $rev_list_rec[1]) { exit 1 } # qlpack must have been updated later or on same commit as qls
+ 
 
     - name: Publish New CodeQL Pack
       shell: pwsh
