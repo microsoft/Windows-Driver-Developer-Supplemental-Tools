@@ -101,8 +101,8 @@ jobs:
         $rev_list_mf = -split(git rev-list --left-right --count $last_qlpack_commit...$last_mf_commit);
         $rev_list_rec = -split(git rev-list --left-right --count $last_qlpack_commit...$last_rec_commit);
 
-        if ($rev_list_mf[0] -lt $rev_list_mf[1]) { exit 1 }; # qlpack must have been updated later or on same commit as qls
-        if ($rev_list_rec[0] -lt $rev_list_rec[1]) { exit 1 } # qlpack must have been updated later or on same commit as qls
+        if ($rev_list_mf[0] -lt $rev_list_mf[1]) { exit 1 }; 
+        if ($rev_list_rec[0] -lt $rev_list_rec[1]) { exit 1 }
  
 
     - name: Publish New CodeQL Pack
