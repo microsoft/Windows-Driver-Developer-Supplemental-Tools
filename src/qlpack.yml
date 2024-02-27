@@ -2,7 +2,7 @@
 # Licensed under the MIT license.
 
 name: microsoft/windows-drivers
-version: 0.0.17
+version: 0.0.18
 dependencies:
     codeql/cpp-all: 0.12.1
 suites: windows-driver-suites
