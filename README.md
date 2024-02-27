@@ -18,7 +18,7 @@ This repository contains open-source components for supplemental use in developi
 | Windows 11, version 22H2 | [2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)|WHCP_22H2|
 | Windows 11, version 23H2 | [2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)|WHCP_22H2|
 | Windows 11, version 24H2 | [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)		        |  1.1.0 |  WHCP_24H2 |
-| General use              | [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)             |  latest| main |
+
 
 
 
