@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  all:
+  build-publish:
     runs-on: windows-latest
 
     steps:
