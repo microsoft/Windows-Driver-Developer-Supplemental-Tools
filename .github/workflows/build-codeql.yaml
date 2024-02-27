@@ -94,13 +94,13 @@ jobs:
 
     - name: Check for changes to qlpack
       shell: pwsh
-      run: $qlpack_diff = git diff HEAD~1:src/qlpack.yml src/qlpack.yml\
-        $rec_diff = git diff HEAD~1:src/windows-driver-suites/windows_recommended_partial.qls src/windows-driver-suites/windows_recommended_partial.qls\
-        $mf_diff = git diff HEAD~1:src/windows-driver-suites/windows_mustfix_partial.qls src/windows-driver-suites/windows_mustfix_partial.qls\
+      run: $qlpack_diff = git diff HEAD~1:src/qlpack.yml src/qlpack.yml;\
+        $rec_diff = git diff HEAD~1:src/windows-driver-suites/windows_recommended_partial.qls src/windows-driver-suites/windows_recommended_partial.qls;\
+        $mf_diff = git diff HEAD~1:src/windows-driver-suites/windows_mustfix_partial.qls src/windows-driver-suites/windows_mustfix_partial.qls;\
         if (!$qlpack_diff -and $rec_diff -and $mf_diff) { exit 1 }
 
     - name: Publish New CodeQL Pack
       shell: pwsh
-      run: $qlpack_diff = git diff HEAD~1:src/qlpack.yml src/qlpack.yml\
+      run: $qlpack_diff = git diff HEAD~1:src/qlpack.yml src/qlpack.yml;\
         if($qlpack_diff) { "TODO publish qlpack" }
    
