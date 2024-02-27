@@ -110,6 +110,14 @@ jobs:
         $rev_list_mf2 = -split(git rev-list --left-right --count $last_mf_commit...$last_qlpack_commit);
         $rev_list_rec2 = -split(git rev-list --left-right --count $last_rec_commit...$last_qlpack_commit);
 
+        $last_qlpack_commit;
+        $last_mf_commit;
+        $last_rec_commit;
+        $rev_list_mf1;
+        $rev_list_rec1;
+        $rev_list_mf2;
+        $rev_list_rec2;
+
         if ($rev_list_mf[0] -lt $rev_list_mf[1]) { exit 1 }; 
         if ($rev_list_rec[0] -lt $rev_list_rec[1]) { exit 1 };
 
