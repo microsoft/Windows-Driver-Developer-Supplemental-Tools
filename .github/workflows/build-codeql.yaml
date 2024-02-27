@@ -98,7 +98,7 @@ jobs:
         $qlpack_diff = git diff HEAD~1:src/qlpack.yml src/qlpack.yml;
         $rec_diff = git diff HEAD~1:src/windows-driver-suites/windows_recommended_partial.qls src/windows-driver-suites/windows_recommended_partial.qls;
         $mf_diff = git diff HEAD~1:src/windows-driver-suites/windows_mustfix_partial.qls src/windows-driver-suites/windows_mustfix_partial.qls;
-        if (!$qlpack_diff -and ($rec_diff -or $mf_diff)) { exit 1 }
+        if (!$qlpack_diff -and ($rec_diff -or $mf_diff)) { "Query suite file updated without updating qlpack version" exit 1 }
 
         $last_qlpack_commit = git log -n 1 --pretty=format:%H -- src/qlpack.yml;
         $qlpack_changes =git show $last_qlpack_commit -- .\src\qlpack.yml;
