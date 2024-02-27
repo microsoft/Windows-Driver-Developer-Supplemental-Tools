@@ -105,32 +105,15 @@ jobs:
       
         $last_mf_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/windows_mustfix_partial.qls;
         $last_rec_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/windows_recommended_partial.qls;
-        $rev_list_mf1 = -split(git rev-list --left-right --count $last_qlpack_commit...$last_mf_commit);
-        $rev_list_rec1 = -split(git rev-list --left-right --count $last_qlpack_commit...$last_rec_commit);
-        $rev_list_mf2 = -split(git rev-list --left-right --count $last_mf_commit...$last_qlpack_commit);
-        $rev_list_rec2 = -split(git rev-list --left-right --count $last_rec_commit...$last_qlpack_commit);
+        $rev_list_mf = -split(git rev-list --left-right --count $last_mf_commit...$last_qlpack_commit);
+        $rev_list_rec = -split(git rev-list --left-right --count $last_rec_commit...$last_qlpack_commit);
 
-        $last_qlpack_commit;
-        $last_mf_commit;
-        $last_rec_commit;
-        $rev_list_mf1;
-        $rev_list_rec1;
-        $rev_list_mf2;
-        $rev_list_rec2;
-
-        if ($rev_list_mf1[0] -lt $rev_list_mf1[1]) { "Mustfix query suite file modified without updating version"; exit 1 }; 
-        if ($rev_list_rec1[0] -lt $rev_list_rec1[1]) {"Recommended query suite file modified without updating version"; exit 1 };
-
-        if ($rev_list_mf2[0] -gt $rev_list_mf2[1]) { "Mustfix query suite file modified without updating version2"; exit 1 }; 
-        if ($rev_list_rec2[0] -gt $rev_list_rec2[1]) {"Recommended query suite file modified without updating version2"; exit 1 };
+        if ($rev_list_mf[0] -lt $rev_list_mf[1]) { "Mustfix query suite file modified without updating version"; exit 1 }; 
+        if ($rev_list_rec[0] -lt $rev_list_rec[1]) {"Recommended query suite file modified without updating version"; exit 1 };
 
         $old_qlpack_version = [version]($qlpack_changes -match "-version").Substring(10);
         $new_qlpack_version = [version]($qlpack_changes -match "\+version").Substring(10);
-        if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { exit 1 }
-        
-
-      
-       
+        if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { "qlpack.yml modified without updating verson"; exit 1 }
 
     - name: Publish New CodeQL Pack
       shell: pwsh
