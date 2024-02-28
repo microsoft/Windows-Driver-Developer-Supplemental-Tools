@@ -6,7 +6,7 @@ name: Build and Publish Windows CodeQL queries
 on:
   # Triggers the workflow on push or pull request events but only for the main and development branches
   push:
-    branches: [ main, development, jacob-ronstadt/github_actions ]
+    branches: [ main, development ]
   pull_request:
     branches: [ main, development ]
 
