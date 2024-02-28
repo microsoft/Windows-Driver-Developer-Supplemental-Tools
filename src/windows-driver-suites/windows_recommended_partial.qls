@@ -34,4 +34,3 @@
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
       - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
 
-#test
