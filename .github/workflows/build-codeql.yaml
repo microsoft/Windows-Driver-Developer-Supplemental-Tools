@@ -53,44 +53,44 @@ jobs:
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
       
-    # - name: Setup Python
-    #   uses: actions/setup-python@v2
-    #   with:
-    #     python-version: 3.11
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.11
         
-    # - name: Install Python Packages
-    #   run: |
-    #       python -m pip install --upgrade pip
-    #       pip install -r .\src\drivers\test\requirements.txt
-    # - name: Add msbuild to PATH
-    #   uses: microsoft/setup-msbuild@v2
+    - name: Install Python Packages
+      run: |
+          python -m pip install --upgrade pip
+          pip install -r .\src\drivers\test\requirements.txt
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
  
-    # - name: Run test script
-    #   shell: pwsh
-    #   env:
-    #     CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
-    #     ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
-    #     SHARE_NAME: ${{ secrets.SHARE_NAME }}
-    #     CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-    #     ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
+    - name: Run test script
+      shell: pwsh
+      env:
+        CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+        ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
+        SHARE_NAME: ${{ secrets.SHARE_NAME }}
+        CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+        ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
         
-    #   run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
       
-    # - name: Build must-fix driver suite
-    #   shell: cmd
-    #   run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
+    - name: Build must-fix driver suite
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
     
-    # - name: Build recommended driver suite
-    #   shell: cmd
-    #   run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
+    - name: Build recommended driver suite
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
     
-    # - name: Build CA ported queries
-    #   shell: cmd
-    #   run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
+    - name: Build CA ported queries
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
     
-    # - name: Build all Windows queries
-    #   shell: cmd
-    #   run: .\codeql-cli\codeql.cmd query compile --check-only .\src
+    - name: Build all Windows queries
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only .\src
 
     - name: Check for changes to qlpack
       shell: pwsh
