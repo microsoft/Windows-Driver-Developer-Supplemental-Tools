@@ -105,9 +105,9 @@ jobs:
       
         $last_mf_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/windows_mustfix_partial.qls;
         $last_rec_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/windows_recommended_partial.qls;
-        $commits_since_qlpack_change = git rev-list --count HEAD...$last_qlpack_commit;
-        $commits_since_mf_change = git rev-list --count HEAD...$last_mf_commit;
-        $commits_since_rec_change = git rev-list --count HEAD...$last_rec_commit;
+        $commits_since_qlpack_change = [int](git rev-list --count HEAD...$last_qlpack_commit);
+        $commits_since_mf_change = [int](git rev-list --count HEAD...$last_mf_commit);
+        $commits_since_rec_change = [int](git rev-list --count HEAD...$last_rec_commit);
 
         if ($commits_since_qlpack_change -gt $commits_since_mf_change) { "Mustfix query suite file modified without updating version"; exit 1 }; 
         if ($commits_since_qlpack_change -gt $commits_since_rec_change) {"Recommended query suite file modified without updating version"; exit 1 };
