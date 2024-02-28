@@ -16,7 +16,9 @@ on:
 jobs:
   build-publish:
     runs-on: windows-latest
-
+    permissions:
+      contents: read
+      packages: write
     steps:
     - name: Enable long git paths
       shell: cmd
