@@ -123,5 +123,5 @@ jobs:
         $version =( Select-String .\src\qlpack.yml -Pattern "version").line;
         $new_ver = "$version-alpha+$build";
         (Get-Content .\src\qlpack.yml).Replace($version, $new_ver) | Set-Content .\src\qlpack.yml;
-        .\codeql-cli\codeql.cmd pack publish ./src;
+        .\codeql-cli\codeql.cmd pack publish --allow-prerelease ./src;
     
