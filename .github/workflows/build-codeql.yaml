@@ -118,6 +118,9 @@ jobs:
 
     - name: Publish New CodeQL Pack
       shell: pwsh
+      env:
+        GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
+
       run: 
         $build = git rev-parse --short HEAD;
         $version =( Select-String .\src\qlpack.yml -Pattern "version").line;
