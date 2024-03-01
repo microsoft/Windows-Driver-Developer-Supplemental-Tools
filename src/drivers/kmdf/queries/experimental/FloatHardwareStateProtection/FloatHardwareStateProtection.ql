@@ -21,6 +21,8 @@
 import cpp
 import semmle.code.cpp.dataflow.new.DataFlow
 import drivers.libraries.SAL
+import drivers.kmdf.libraries.KmdfDrivers
+import semmle.code.cpp.Specifier
 
 class KernelFloatFunctionAnnotation extends SALAnnotation {
   KernelFloatFunctionAnnotation() { this.getMacroName().matches(["_Kernel_float_used_"]) }
@@ -40,11 +42,12 @@ class KernelFloatAnnotatedFunction extends Function {
   cached
   KernelFloatAnnotatedFunction() {
     (
-      this.hasCLinkage() and
+      // this.hasCLinkage() and
       exists(
         FunctionDeclarationEntry fde // actual function declarations
       |
         fde = this.getADeclarationEntry() and
+        fde.getFile().getAnIncludedFile().getBaseName().matches("%wdf.h") and
         kernelFloatAnnotation.getDeclarationEntry() = fde
       )
       or
@@ -59,16 +62,54 @@ class KernelFloatAnnotatedFunction extends Function {
   }
 }
 
-from Expr floatAccess, ControlFlowNode source, FunctionCall saveFloat 
+class FuncWithSafeFloatAccess extends Function {
+  FuncWithSafeFloatAccess() {
+    exists(FunctionCall funcCallThatUsesFloat, FunctionCall saveFloat, ControlFlowNode saveFloatBB, Function funcThatUsesFloat, VariableAccess floatAccess|
+      (
+        saveFloat.getTarget().getName() = ("KeSaveFloatingPointState") or
+        saveFloat.getTarget().getName() = ("EngSaveFloatingPointState")
+      )
+      and saveFloatBB = saveFloat.getBasicBlock()
+      and floatAccess.getTarget().getType() instanceof FloatingPointType
+      and funcThatUsesFloat = floatAccess.getEnclosingFunction()
+      and funcCallThatUsesFloat.getTarget() = funcThatUsesFloat
+      and funcCallThatUsesFloat.getBasicBlock().getAPredecessor*() = saveFloatBB
+      and this.calls*(funcThatUsesFloat)
+      // this function can call a function that uses float
+    )
+  }
+  // exists(Function fOuter |
+  //   fOuter.calls*(this.getEnclosingFunction())
+  // )
+}
+
+class SafeFloatAccess extends VariableAccess {
+  SafeFloatAccess() {
+    this.getType() instanceof FloatingPointType and
+    exists(FunctionCall saveFloat, ControlFlowNode saveFloatBB |
+      (
+        saveFloat.getTarget().getName() = ("KeSaveFloatingPointState") or
+        saveFloat.getTarget().getName() = ("EngSaveFloatingPointState")
+      ) and
+      saveFloatBB = saveFloat.getBasicBlock() and
+      (
+        this.getBasicBlock().getAPredecessor*() = saveFloatBB or
+        saveFloatBB.getASuccessor*() = this.getBasicBlock() or
+        this.getBasicBlock() = saveFloatBB
+      )
+    )
+    or
+    this.getTarget().getEnclosingElement() instanceof KernelFloatAnnotatedFunction
+  }
+}
+
+from VariableAccess floatAccess
 where
-  floatAccess.(VariableAccess).getType() instanceof FloatType and
-  floatAccess.(VariableAccess).getBasicBlock() = source and
-  (
-    saveFloat.getTarget().getName() = ("KeSaveFloatingPointState") or
-    saveFloat.getTarget().getName() = ("EngSaveFloatingPointState")
-  ) and
-  not source.getAPredecessor*() = saveFloat.getBasicBlock() and
-  not floatAccess.(VariableAccess).getTarget().getEnclosingElement() instanceof
-  KernelFloatAnnotatedFunction
-select floatAccess, "Use of float detected without protecting floating-point hardware state. $@", floatAccess, floatAccess.toString()
-     
+  floatAccess.getTarget().getType() instanceof FloatingPointType and
+  not floatAccess instanceof SafeFloatAccess and
+  not exists(FuncWithSafeFloatAccess safeFunc |
+    safeFunc = floatAccess.getEnclosingFunction())
+ 
+select floatAccess,
+  "Use of float detected without protecting floating-point hardware state. $@, $@", floatAccess,
+  floatAccess.toString()
