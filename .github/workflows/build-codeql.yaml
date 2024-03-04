@@ -37,12 +37,14 @@ jobs:
       with:
         path: .
         fetch-depth: 0
+        
     - name: Initialize CodeQL
       uses: github/codeql-action/init@codeql-bundle-v2.15.4
       with:
         languages: ${{ matrix.language }}
-        query: ${{ matrix.suites }}
+        queries: ${{ matrix.suites }}
         packs: microsoft/windows-drivers
+        
     - name: Perform CodeQL analysis
       uses: github/codeql-action/analyze@codeql-bundle-v2.15.4
       with:
