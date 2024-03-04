@@ -40,12 +40,13 @@ jobs:
     - name: Initialize CodeQL
       uses: github/codeql-action/init@codeql-bundle-v2.15.4
       with:
-        languages: ${{ matrix.suites }}
+        languages: ${{ matrix.language }}
+        query: ${{ matrix.suites }}
         packs: microsoft/windows-drivers
     - name: Perform CodeQL analysis
       uses: github/codeql-action/analyze@codeql-bundle-v2.15.4
       with:
-        category: "/language:${{matrix.suites}}"
+        category: "/suites:${{matrix.suites}}"
         
     - name: Setup Python
       uses: actions/setup-python@v5
