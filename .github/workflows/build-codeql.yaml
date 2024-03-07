@@ -53,15 +53,15 @@ jobs:
         cd \;
         $path_obj = Get-ChildItem -Recurse -Filter "codeql.exe";
         echo $path_obj;
-        # $p = $path_obj[0].ToString();
-        # "{codeql_path}="+$p | Out-File -FilePath $env:GITHUB_OUTPUT -Append;
+        $p = $path_obj[0].ToString();
+        "{codeql_path}="+$p | Out-File -FilePath $env:GITHUB_OUTPUT -Append;
         
       
     - name: Test codeql
       env: 
         CODEQL_LOC: ${{ steps.codeql_loc.outputs.codeql_path }}
 
-      run: CODEQL_LOC version
+      run: $env:CODEQL_LOC version
       
     - name: Perform CodeQL analysis
       uses: github/codeql-action/analyze@codeql-bundle-v2.15.4
