@@ -47,33 +47,11 @@ jobs:
         languages: ${{ matrix.language }}
         #queries: ${{ matrix.suites }}
         #packs: microsoft/windows-drivers
-       
-    
-    - name: find codeql exe
-      id: codeql_loc
-      env: 
-        CODEQL_LOC: ${{ steps.init.outputs.codeql-path }}
-      shell: pwsh
-      run: echo "$env:CODEQL_LOC"
-      # run: 
-      #   cd \;
-      #   $path_obj = Get-ChildItem -Recurse -Filter "codeql.exe";
-      #   echo $path_obj;
-      #   $p = $path_obj[0].ToString();
-      #   "{codeql_path}="+$p | Out-File -FilePath $env:GITHUB_OUTPUT -Append;
-        
-      
-    - name: Test codeql
-      env: 
-        CODEQL_LOC: ${{ steps.init.outputs.codeql-path }}
-
-      run: $env:CODEQL_LOC version
-        
-      
-    - name: Perform CodeQL analysis
-      uses: github/codeql-action/analyze@codeql-bundle-v2.15.4
-      with:
-        category: "/suites:${{matrix.suites}}"
+   
+    # - name: Perform CodeQL analysis
+    #   uses: github/codeql-action/analyze@codeql-bundle-v2.15.4
+    #   with:
+    #     category: "/suites:${{matrix.suites}}"
         
     - name: Setup Python
       uses: actions/setup-python@v5
@@ -96,8 +74,10 @@ jobs:
         SHARE_NAME: ${{ secrets.SHARE_NAME }}
         CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
         ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
+        CODEQL_LOC: ${{ steps.init.outputs.codeql-path }}
+
         
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path "$env:CODEQL_LOC" --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
  
     - name: Check for changes to qlpack
       shell: pwsh
