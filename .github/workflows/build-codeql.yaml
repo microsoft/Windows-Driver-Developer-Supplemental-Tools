@@ -54,7 +54,7 @@ jobs:
       env: 
         CODEQL_LOC: ${{ steps.init.outputs.codeql-path }}
       shell: pwsh
-      run: $env:CODEQL_LOC version
+      run: echo "$env:CODEQL_LOC"
       # run: 
       #   cd \;
       #   $path_obj = Get-ChildItem -Recurse -Filter "codeql.exe";
@@ -67,7 +67,7 @@ jobs:
       env: 
         CODEQL_LOC: ${{ steps.codeql_loc.outputs.codeql-path }}
 
-      run: $env:CODEQL_LOC version
+      run: $env:CODEQL_LOC + "/codeql.exe " version
       
     - name: Perform CodeQL analysis
       uses: github/codeql-action/analyze@codeql-bundle-v2.15.4
