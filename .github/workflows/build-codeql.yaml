@@ -25,7 +25,7 @@ jobs:
       run: git config --global core.longpaths true
     
     - name: Clone self (windows-driver-developer-supplemental-tools)
-      uses: actions/checkout@v2
+      uses: actions/checkout@v4
       with:
         path: .
         fetch-depth: 0
