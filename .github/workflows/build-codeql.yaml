@@ -46,6 +46,8 @@ jobs:
         languages: ${{ matrix.language }}
         #queries: ${{ matrix.suites }}
         #packs: microsoft/windows-drivers
+        run: codeql version
+    
     - name: find codeql exe
       id: codeql_loc
       shell: pwsh
