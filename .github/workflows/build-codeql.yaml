@@ -48,8 +48,9 @@ jobs:
         #packs: microsoft/windows-drivers
     - name: find codeql exe
       id: codeql_loc
+      shell: pwsh
       run: 
-        cd \;
+        # cd \;
         Get-ChildItem -Recurse -Filter "codeql.exe";
         # $path_pbj;
         # $p = $path_obj[0].ToString();
