@@ -52,7 +52,7 @@ jobs:
     - name: find codeql exe
       id: codeql_loc
       env: 
-        CODEQL_LOC: ${{ steps.init.outputs.codeql_path }}
+        CODEQL_LOC: ${{ steps.init.outputs.codeql-path }}
       shell: pwsh
       run: $env:CODEQL_LOC version
       # run: 
@@ -65,7 +65,7 @@ jobs:
       
     - name: Test codeql
       env: 
-        CODEQL_LOC: ${{ steps.codeql_loc.outputs.codeql_path }}
+        CODEQL_LOC: ${{ steps.codeql_loc.outputs.codeql-path }}
 
       run: $env:CODEQL_LOC version
       
