@@ -77,7 +77,7 @@ jobs:
         CODEQL_LOC: ${{ steps.init.outputs.codeql-path }}
 
         
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path "$env:CODEQL_LOC" --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
+      run: python src\drivers\test\build_create_analyze_test.py -v --codeql_path "$env:CODEQL_LOC" --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
  
     - name: Check for changes to qlpack
       shell: pwsh
