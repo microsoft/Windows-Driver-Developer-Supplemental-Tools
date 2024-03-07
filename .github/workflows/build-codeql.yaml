@@ -41,22 +41,26 @@ jobs:
         fetch-depth: 0
         
     - name: Initialize CodeQL
+      id: init
       uses: github/codeql-action/init@codeql-bundle-v2.15.4
       with:
         languages: ${{ matrix.language }}
         #queries: ${{ matrix.suites }}
         #packs: microsoft/windows-drivers
-        run: codeql version
+       
     
     - name: find codeql exe
       id: codeql_loc
+      env: 
+        CODEQL_LOC: ${{ steps.init.outputs.codeql_path }}
       shell: pwsh
-      run: 
-        cd \;
-        $path_obj = Get-ChildItem -Recurse -Filter "codeql.exe";
-        echo $path_obj;
-        $p = $path_obj[0].ToString();
-        "{codeql_path}="+$p | Out-File -FilePath $env:GITHUB_OUTPUT -Append;
+      run: $env:CODEQL_LOC version
+      # run: 
+      #   cd \;
+      #   $path_obj = Get-ChildItem -Recurse -Filter "codeql.exe";
+      #   echo $path_obj;
+      #   $p = $path_obj[0].ToString();
+      #   "{codeql_path}="+$p | Out-File -FilePath $env:GITHUB_OUTPUT -Append;
         
       
     - name: Test codeql
