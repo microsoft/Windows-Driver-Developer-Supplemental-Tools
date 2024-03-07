@@ -67,7 +67,7 @@ jobs:
       env: 
         CODEQL_LOC: ${{ steps.codeql_loc.outputs.codeql-path }}
 
-      run: $env:CODEQL_LOC + "/codeql.exe " version
+      run: $env:CODEQL_LOC + " version"
       
     - name: Perform CodeQL analysis
       uses: github/codeql-action/analyze@codeql-bundle-v2.15.4
