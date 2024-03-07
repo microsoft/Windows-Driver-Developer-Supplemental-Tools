@@ -50,8 +50,8 @@ jobs:
       id: codeql_loc
       run: 
         cd \;
-        $path_obj = dir -s codeql.exe;
-        $p = $path_obj.ToString();
+        $path_obj = Get-ChildItem -Recurse -Filter "codeql.exe";
+        $p = $path_obj[0].ToString();
         "{codeql_path}="+$p | Out-File -FilePath $env:GITHUB_OUTPUT -Append;
         
       
