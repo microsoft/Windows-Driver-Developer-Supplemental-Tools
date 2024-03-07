@@ -67,7 +67,7 @@ jobs:
       env: 
         CODEQL_LOC: ${{ steps.init.outputs.codeql-path }}
 
-      run: $env:CODEQL_LOC + " version"
+      run: $env:CODEQL_LOC version
         
       
     - name: Perform CodeQL analysis
