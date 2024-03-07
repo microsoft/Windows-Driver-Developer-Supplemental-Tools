@@ -51,6 +51,7 @@ jobs:
       run: 
         cd \;
         $path_obj = Get-ChildItem -Recurse -Filter "codeql.exe";
+        $path_pbj;
         $p = $path_obj[0].ToString();
         "{codeql_path}="+$p | Out-File -FilePath $env:GITHUB_OUTPUT -Append;
         
