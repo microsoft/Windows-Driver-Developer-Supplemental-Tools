@@ -11,7 +11,26 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver directly edits the ByteCount field of the MDL.  This should not be directly edited.
+		</p>
+		<sample language="c"><![CDATA[
+			VOID DummyMdlFunction(PMDL Mdl)
+			{
+				PMDL currentMdl, nextMdl;
+
+				for (currentMdl = Mdl; currentMdl != NULL; currentMdl = nextMdl)
+				{
+					nextMdl = currentMdl->Next;
+					if (currentMdl->MdlFlags & MDL_PAGES_LOCKED && currentMdl->ByteCount > 0)
+					{
+						MmUnlockPages(currentMdl);
+					}
+					IoFreeMdl(currentMdl);
+				}
+			}
+			]]>
+		</sample>	
 	</example>
 	<references>
 		<li>

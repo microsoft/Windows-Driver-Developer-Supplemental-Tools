@@ -1,0 +1,32 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The type of a pool tag should be integral, not a string or string pointer.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Instead of using strings or string pointers, pool tags should be four-character integrals.  For example, '_gaT'.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			In this example, the driver uses a string rather than a four-character integral as a pool tag:
+		</p>
+		<sample language="c"> <![CDATA[ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, "_gaT");]]>
+		</sample>
+		<p>
+			The driver should use a four-character integral as a tag.
+		</p>
+		<sample language="c"><![CDATA[ExAllocatePool2(POOL_FLAG_NON_PAGED, 30, '_gaT');]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28134-pool-tag-type-should-be-integral">
+				C28134 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

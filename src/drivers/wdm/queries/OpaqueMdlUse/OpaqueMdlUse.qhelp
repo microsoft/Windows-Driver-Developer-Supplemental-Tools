@@ -11,7 +11,46 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver directly accesses the ByteCount field of an MDL.
+		</p>
+		<sample language="c"><![CDATA[
+			VOID DummyMdlFunction(PMDL Mdl)
+			{
+				PMDL currentMdl, nextMdl;
+
+				for (currentMdl = Mdl; currentMdl != NULL; currentMdl = nextMdl)
+				{
+					nextMdl = currentMdl->Next;
+					if (currentMdl->MdlFlags & MDL_PAGES_LOCKED && currentMdl->ByteCount > 0)
+					{
+						MmUnlockPages(currentMdl);
+					}
+					IoFreeMdl(currentMdl);
+				}
+			}
+			]]>
+		</sample>		
+		<p>
+			The driver should instead use the MmGetMdlByteCount function.
+		</p>
+		<sample language="c"><![CDATA[
+			VOID DummyMdlFunction(PMDL Mdl)
+			{
+				PMDL currentMdl, nextMdl;
+
+				for (currentMdl = Mdl; currentMdl != NULL; currentMdl = nextMdl)
+				{
+					nextMdl = currentMdl->Next;
+					if (currentMdl->MdlFlags & MDL_PAGES_LOCKED && MmGetMdlByteCount(currentMdl) > 0)
+					{
+						MmUnlockPages(currentMdl);
+					}
+					IoFreeMdl(currentMdl);
+				}
+			}
+			]]>
+		</sample>		
 	</example>
 	<references>
 		<li>

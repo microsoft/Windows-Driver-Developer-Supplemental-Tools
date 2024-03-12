@@ -1,0 +1,57 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The driver is passing or assigning a function (pointer) of an unexpected type (that is, function signature)
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Verify function pointer is correct
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			In this example, the driver provides a pointer to a function that returns long where a function that returns int is expected:
+		</p>
+		<sample language="c"> <![CDATA[
+		typedef long
+		functionCallLong(void);
+		typedef functionCallLong *funcCallLong;
+		
+		int useFP(funcCallLong);
+
+		int badFunction(void);
+		
+		void doError() {
+			useFP(&badFunction);
+		}]]>
+		</sample>
+		<p>
+			Ensure your function definitions match what is expected, and use roletypes and typedefs to help reduce issues.
+		</p>
+		<sample language="c"> <![CDATA[
+		typedef long
+		functionCallLong(void);
+		typedef functionCallLong *funcCallLong;
+		
+		int useFP(funcCallLong);
+
+		functionCallLong goodFunction;
+		
+		void doCorrect() {
+			useFP(&goodFunction);
+		}]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28127-function-routine-mismatch">
+				C28127 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+	<semmleNotes>
+		<p>In some cases, this rule may report false positives where it claims two identical parameter types do not match.  This issue is under investigation.</p>
+	</semmleNotes>
+</qhelp>
