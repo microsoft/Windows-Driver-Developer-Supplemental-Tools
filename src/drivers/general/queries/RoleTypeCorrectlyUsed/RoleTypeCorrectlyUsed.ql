@@ -10,12 +10,12 @@
  * @impact Insecure Coding Practice
  * @repro.text
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-C28147e
+ * @opaqueid CQLD-C28158
  * @problem.severity warning
  * @precision medium
  * @tags correctness
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -32,8 +32,12 @@ where
     else rtActual = "<NO_ROLE_TYPE>"
   ) and
   rtExpected = irtf.getExpectedRoleTypeString() and
-  not isEqualRoleTypes(rtExpected, rtActual)
+  not isEqualRoleTypes(rtExpected, rtActual) and
+  // Account for case where one function covers multiple role types
+  not exists(string otherRoleType |
+    otherRoleType = f.(RoleTypeFunction).getRoleTypeString() and
+    isEqualRoleTypes(rtExpected, otherRoleType)
+  )
 select irtf.getFunctionUse(),
-  "Function " + f.toString() + " declared with role type " + rtActual + " but role type " + rtExpected +
-    " is expected."
-
+  "Function " + f.toString() + " declared with role type " + rtActual + " but role type " +
+    rtExpected + " is expected."

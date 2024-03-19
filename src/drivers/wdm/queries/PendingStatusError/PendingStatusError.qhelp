@@ -11,12 +11,29 @@
 		</p>
 	</recommendation>
 	<example>
-		<sample src="driver_snippet.c" />
+		<p>
+			In this example, the driver marks an IRP pending but returns STATUS_SUCCESS.
+		</p>
+		<sample language="c"><![CDATA[
+			IoMarkIrpPending(Irp);
+			...
+			return STATUS_SUCCESS;
+			]]>
+		</sample>		
+		<p>
+			The driver should instead ensure that it returns STATUS_PENDING.
+		</p>
+		<sample language="c"><![CDATA[
+			IoMarkIrpPending(Irp);
+			...
+			return STATUS_PENDING;
+			]]>
+		</sample>		
 	</example>
 	<references>
 		<li>
 			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28143-iomarkirppending-must-return-statuspending">
-				C28143
+				C28143 warning - Windows Drivers
 			</a>
 		</li>
 	</references>

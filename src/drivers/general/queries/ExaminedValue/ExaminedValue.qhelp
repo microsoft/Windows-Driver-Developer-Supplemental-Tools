@@ -1,0 +1,48 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			This warning indicates that the calling function is not checking the value of the specified variable, which was supplied by a function.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Make sure to check the result of the function that is annotated with _Check_result_ or _Must_check_result.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			In this example, the driver tries to acquire a mutex but does not check the return value.  This can cause a concurrency bug.
+		</p>
+		<sample language="c"><![CDATA[
+			KeTryToAcquireGuardedMutex(&sharedMutex);
+			DoDriverWork();
+			]]>
+		</sample>		
+		<p>
+			The driver should check if the mutex was successfully acquired before using it:
+		</p>
+		<sample language="c"><![CDATA[
+			if(KeTryToAcquireGuardedMutex(&sharedMutex))
+			{
+				DoDriverWork();
+			}
+			else
+			{
+				// ...
+			}
+			]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/cpp/code-quality/c28193">
+				Warning C28193 | Microsoft Learn
+			</a>
+		</li>
+	</references>
+	<semmleNotes>
+		<p>To reduce noise, this rule only reports violations if more than 75% of the other calls to this function have their return values checked.</p>
+		<p>Note that this will still report issues if the value is only checked via ASSERTs that are compiled away at release time.</p>
+	</semmleNotes>
+</qhelp>

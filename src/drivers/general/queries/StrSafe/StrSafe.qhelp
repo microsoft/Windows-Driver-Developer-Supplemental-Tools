@@ -1,0 +1,39 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Kernel Mode drivers should use ntstrsafe.h, not strsafe.h.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The header ntstrsafe.h contains versions of the functions found in strsafe.h that are suitable for use in kernel mode code. The header ntstrsafe.h contains versions of the functions found in strsafe.h that are suitable for use in kernel mode code.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			In this example, the driver incorrectly imports strsafe.h:
+		</p>
+		<sample language="c"> <![CDATA[
+		#include <ntddk.h>
+		#include <strsafe.h>
+		]]>
+		</sample>
+		<p>
+			The driver should import ntstrsafe.h:
+		</p>
+		<sample language="c"><![CDATA[
+		#include <ntddk.h>
+		#define NTSTRSAFE_LIB
+		#include <ntstrsafe.h>
+		]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28146-kernel-mode-drivers-should-use-ntstrsafe">
+				C28146 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

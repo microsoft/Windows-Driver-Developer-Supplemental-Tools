@@ -17,6 +17,7 @@ This repository contains open-source components for supplemental use in developi
 | Windows 11               | WHCP_21H2     | 2.4.6 or 2.15.4    |
 | Windows 11, version 22H2 | WHCP_22H2     | 2.6.3 or 2.15.4    |
 | Windows 11, version 23H2 | WHCP_22H2     | 2.6.3 or 2.15.4    |
+| Windows 11, version 24H2 | WHCP_24H2     | 2.15.4		|
 
 For general use, use the `main` branch along with [version 2.15.4 of the CodeQL CLI](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4).
 
@@ -104,8 +105,8 @@ For general use, use the `main` branch along with [version 2.15.4 of the CodeQL 
     
     1. Create a local copy of the desired query suite file:
        
-        * windows_all_mustfix.qls 
-        * windows_all_recommended.qls
+        * windows_driver_mustfix.qls 
+        * windows_driver_recommended.qls
 
     2. To analyze a CodeQL database run the following command:
     ```

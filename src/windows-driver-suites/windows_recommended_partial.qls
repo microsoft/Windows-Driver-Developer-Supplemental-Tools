@@ -1,35 +1,36 @@
-# Query Suite for ported CA checks
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
 
-- description: Ported CA checks
+- description: Recommended and required queries for Windows Drivers.
+- import: windows-driver-suites/windows_mustfix_partial.qls
 - queries: .
   from: microsoft/windows-drivers
 - include:
     query path: 
-      - drivers/general/experimental/DefaultPoolTagExtended/DefaultPoolTagExtended.ql
+      - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
+      - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
+      - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
+      - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - microsoft/Likely Bugs/UninitializedPtrField.ql
+      - microsoft/Security/Crytpography/HardcodedIVCNG.ql
+      - drivers/general/queries/KeSetEventPageable/KeSetEventPageable.ql
+      - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
       - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
       - drivers/general/queries/ExaminedValue/ExaminedValue.ql
       - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
       - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
-      - drivers/general/queries/RoutineFunctionTypeNotExpected/RoutineFunctionTypeNotExpected.ql
-      - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
-      - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
-      - drivers/general/queries/StrSafe/StrSafe.ql
       - drivers/general/queries/IrqlTooHigh/IrqlTooHigh.ql
       - drivers/general/queries/IrqlTooLow/IrqlTooLow.ql
-      - drivers/general/queries/IrqlSetTooHigh/IrqlSetTooHigh.ql
+      - drivers/general/queries/IrqlSetTooHigh/IrqlTooHigh.ql
       - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
+      - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
+      - drivers/general/queries/StrSafe/StrSafe.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
       - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
-      - drivers/wdm/queries/InitNotCleared/InitNotCleared.ql
-      - drivers/wdm/queries/KeWaitLocal/KeWaitLocal.ql
-      - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
-      - drivers/wdm/queries/NoPagedCode/NoPagedCode.ql
-      - drivers/wdm/queries/NoPagingSegment/NoPagingSegment.ql
-      - drivers/wdm/queries/ObReferenceMode/ObReferenceMode.ql
       - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlUse.ql
-      - drivers/wdm/queries/OpaqueMdlWrite/OpaqueMdlWrite.ql
+      - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlWrite.ql
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
       - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
-      
+
