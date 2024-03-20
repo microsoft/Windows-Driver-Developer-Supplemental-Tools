@@ -20,6 +20,7 @@
       - drivers/general/queries/IrqlSetTooHigh/IrqlSetTooHigh.ql
       - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
       - drivers/general/queries/IRPStackEntryCopy/IRPStackEntryCopy.ql
+      - drivers/general/queries/MultithreadedAVCondition/MultithreadedAVCondition.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
       - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
