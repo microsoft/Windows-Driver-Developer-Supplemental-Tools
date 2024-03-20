@@ -2,7 +2,7 @@
 <qhelp>
 	<overview>
 		<p>
-			This warning indicates that a thread has potential to access deleted objects if preempted.
+			This warning indicates that a thread has potential to access deleted objects if preempted. This query does not currently verify the use of any synchronization mechanisms, so it may produce false positives.
 		</p>
 	</overview>
 	<recommendation>
