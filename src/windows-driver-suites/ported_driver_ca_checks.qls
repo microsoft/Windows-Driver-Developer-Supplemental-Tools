@@ -32,4 +32,4 @@
       - drivers/wdm/queries/OpaqueMdlWrite/OpaqueMdlWrite.ql
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
       - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
-      
+      - drivers/kmdf/queries/experimental/FloatHardwareStateProtection/FloatHardwareStateProtection.ql
