@@ -75,37 +75,31 @@ class ql_test_attributes:
 
     def get_use_ntifs(self):
         return self.use_ntifs
-
     def set_use_ntifs(self, use_ntifs):
         self.use_ntifs = use_ntifs
 
     def get_template(self):
         return self.template
-
     def set_template(self, template):
         self.template = template
 
     def get_path(self):
         return self.path
-
     def set_path(self, path):
         self.path = path
 
     def get_ql_file(self):
         return self.ql_file
-
     def set_ql_file(self, ql_file):
         self.ql_file = ql_file
 
     def get_ql_name(self):
         return self.ql_name
-
     def set_ql_name(self, ql_name):
         self.ql_name = ql_name
 
     def get_ql_type(self):
         return self.ql_type
-
     def set_ql_type(self, ql_type):
         self.ql_type = ql_type
 
