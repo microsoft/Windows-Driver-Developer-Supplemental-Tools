@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Copying a whole IRP stack entry leaves certain fields initialized that should be cleared or updated
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The driver is copying an IRP improperly. Improperly copying an IRP can cause serious problems with a driver, including loss of data and system crashes. If an IRP must be copied and IoCopyCurrentIrpStackLocationToNext does not suffice, then certain members of the IRP should not be copied or should be zeroed after copying.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28114-improper-irp-stack-copy">
+				C28114
+			</a>
+		</li>
+	</references>
+</qhelp>
