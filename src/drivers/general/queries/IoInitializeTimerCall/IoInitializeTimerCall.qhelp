@@ -1,0 +1,20 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			IoInitializeTimer is best called from AddDevice
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			IoInitializeTimer can only be called once per device object. Calling it from the AddDevice routine helps assure that it is not unexpectedly called more than once.
+		</p>
+	</recommendation>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28133-ioinitializetimer-is-best-called-from-add-device">
+				C28133
+			</a>
+		</li>
+	</references>
+</qhelp>
