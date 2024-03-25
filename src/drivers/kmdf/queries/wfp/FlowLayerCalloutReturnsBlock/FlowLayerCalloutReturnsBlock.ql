@@ -7,7 +7,7 @@
  * @feature.area Multiple
  * @repro.text The following function sets FWP_ACTION_BLOCK on a callout registered to ALE_FLOW_ESTABLISHED_LAYERS
  * @kind problem
- * @id cpp/windows/drivers/kmdf/queries/wfp/queries
+ * @id cpp/windows/drivers/kmdf/queries/wfp/FlowLayerReturnsBlock
  * @problem.severity warning
  * @precision low
  * @tags correctness

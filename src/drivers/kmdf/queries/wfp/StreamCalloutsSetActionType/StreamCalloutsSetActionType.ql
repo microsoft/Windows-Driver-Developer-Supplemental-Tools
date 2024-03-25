@@ -7,7 +7,7 @@
  * @feature.area Multiple
  * @repro.text The following function does not correctly set an action type for non-inspection Stream callouts
  * @kind problem
- * @id cpp/windows/drivers/kmdf/queries/wfp/queries
+ * @id cpp/windows/drivers/kmdf/queries/wfp/StreamCalloutSetActionType
  * @problem.severity warning
  * @precision medium
  * @tags correctness

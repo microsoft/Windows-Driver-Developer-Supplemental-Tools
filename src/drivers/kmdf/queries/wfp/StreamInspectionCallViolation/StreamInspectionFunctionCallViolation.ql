@@ -7,7 +7,7 @@
  * @feature.area Multiple
  * @repro.text The following function calls both FwpsStreamContinue and FwpsStreamInjectAsync
  * @kind problem
- * @id cpp/windows/drivers/kmdf/queries/wfp/queries
+ * @id cpp/windows/drivers/kmdf/queries/wfp/StreamInspectionCallViolation
  * @problem.severity warning
  * @precision medium
  * @tags correctness
