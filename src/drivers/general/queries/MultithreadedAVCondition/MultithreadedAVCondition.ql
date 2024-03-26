@@ -10,7 +10,7 @@
  * @impact Exploitable Design
  * @repro.text There should be no access to a reference-counted object after the reference count is at zero
  * @owner.email sdat@microsoft.com
- * @opaqueid CQLD-D0006
+ * @opaqueid CQLD-C28616
  * @kind problem
  * @problem.severity warning
  * @precision medium
