@@ -34,13 +34,13 @@ abstract class CASuppression extends PreprocessorPragma {
             "__WARNING_BANNED_API_USAGE_LSTRLEN", "28750"
           ]
       ) and
-    result = "lgtm[cpp/windows/drivers/queries/extended-deprecated-apis]"
+    result = "lgtm[cpp/drivers/extended-deprecated-apis]"
     or
     this.getRuleName() = any(["__WARNING_UNHELPFUL_TAG", "28147"]) and
     result =
       any([
-            "lgtm[cpp/windows/drivers/queries/default-pool-tag]",
-            "lgtm[cpp/windows/drivers/queries/default-pool-tag-extended]"
+            "lgtm[cpp/drivers/default-pool-tag]",
+            "lgtm[cpp/drivers/default-pool-tag-extended]"
           ]
       )
     or
@@ -57,7 +57,7 @@ abstract class CASuppression extends PreprocessorPragma {
     result = "lgtm[cpp/portedqueries/str-safe]"
     or
     this.getRuleName() = any(["__WARNING_MUST_USE", "28193"]) and
-    result = "lgtm[cpp/portedqueries/examined-value]"
+    result = "lgtm[cpp/drivers/examined-value]"
     or
     this.getRuleName() = any(["__WARNING_IRQ_TOO_LOW", "28120"]) and
     result = "lgtm[cpp/portedqueries/irq-too-low]"
@@ -101,6 +101,15 @@ abstract class CASuppression extends PreprocessorPragma {
     this.getRuleName() =
       any(["__WARNING_DISPATCH_MISMATCH", "28168", "__WARNING_DISPATCH_MISSING", "28169"]) and
     result = "lgtm[cpp/portedqueries/wrong-dispatch-table-assignment]"
+    or
+    this.getRuleName() = any(["__WARNING_IRQ_SET_TOO_HIGH", "28150"]) and
+    result = "lgtm[cpp/drivers/irql-set-too-high]"
+    or
+    this.getRuleName() = any(["__WARNING_IRQ_SET_TOO_LOW", "28124"]) and
+    result = "lgtm[cpp/drivers/irql-set-too-low]"
+    or
+    this.getRuleName() = any(["__WARNING_IRQ_SET_TOO_HIGH", "28121"]) and
+    result = "lgtm[cpp/drivers/irql-too-high]" //TODO fix opaqueid for this query
     or
     result = "lgtm[" + this.getRuleName() + "]"
   }
