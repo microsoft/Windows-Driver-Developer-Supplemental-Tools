@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/irql-too-low
- * @name IRQL too low (C28121)
+ * @name IRQL too low (C28120)
  * @description A function annotated with IRQL requirements was called at an IRQL too low for the requirements.
  * @platform Desktop
  * @security.severity Low
@@ -10,7 +10,7 @@
  * @impact Exploitable Design
  * @repro.text The following function call is taking place at an IRQL too low for what the call target is annotated as.
  * @owner.email sdat@microsoft.com
- * @opaqueid CQLD-C28121
+ * @opaqueid CQLD-C28120
  * @kind problem
  * @problem.severity warning
  * @precision medium
