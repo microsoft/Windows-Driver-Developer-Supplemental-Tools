@@ -1,17 +1,17 @@
 import cpp
 
 // Reference: https://learn.microsoft.com/en-us/cpp/preprocessor/warning?view=msvc-170
-
-/** Represents a Code Analysis-style suppression using #pragma commands. 
- * 
+/**
+ * Represents a Code Analysis-style suppression using #pragma commands.
+ *
  * In this library we support two styles:
  * #pragma prefast (suppress:XXXX) which suppresses rule XXXX on the following line of code, and
  * #pragma prefast (disable:XXXX) which suppresses rule XXXX until the pragma stack is adjusted using #pragma (push/pop).
- * 
+ *
  * More details can be found at https://learn.microsoft.com/en-us/cpp/preprocessor/warning?view=msvc-170.
  * Please note that at present, pragma commands combining disable and suppress commands in a single line are
  * not supported.
-*/
+ */
 abstract class CASuppression extends PreprocessorPragma {
   abstract predicate matchesRuleName(string name);
 
@@ -38,11 +38,7 @@ abstract class CASuppression extends PreprocessorPragma {
     or
     this.getRuleName() = any(["__WARNING_UNHELPFUL_TAG", "28147"]) and
     result =
-      any([
-            "lgtm[cpp/drivers/default-pool-tag]",
-            "lgtm[cpp/drivers/default-pool-tag-extended]"
-          ]
-      )
+      any(["lgtm[cpp/drivers/default-pool-tag]", "lgtm[cpp/drivers/default-pool-tag-extended]"])
     or
     this.getRuleName() = any(["__WARNING_IRQL_NOT_SET", "28158"]) and
     result = "lgtm[cpp/drivers/irql-not-saved]"
@@ -66,37 +62,37 @@ abstract class CASuppression extends PreprocessorPragma {
     result = "lgtm[cpp/portedqueries/irq-too-high]"
     or
     this.getRuleName() = any(["__WARNING_FUNCTION_ASSIGNMENT", "28128"]) and
-    result = "lgtm[cpp/windows/drivers/queries/illegal-field-access]"
+    result = "lgtm[cpp/drivers/illegal-field-access]"
     or
     this.getRuleName() = any(["__WARNING_INACCESSIBLE_MEMBER", "28175"]) and
-    result = "lgtm[cpp/windows/drivers/queries/illegal-field-access-2]"
+    result = "lgtm[cpp/drivers/illegal-field-access-2]"
     or
     this.getRuleName() = any(["__WARNING_READ_ONLY_MEMBER", "28176"]) and
-    result = "lgtm[cpp/windows/drivers/queries/illegal-field-write]"
+    result = "lgtm[cpp/drivers/illegal-field-write]"
     or
     this.getRuleName() = any(["__WARNING_INIT_NOT_CLEARED", "28152"]) and
-    result = "lgtm[cpp/windows/drivers/queries/init-not-cleared]"
+    result = "lgtm[cpp/drivers/init-not-cleared]"
     or
     this.getRuleName() = any(["__WARNING_KE_WAIT_LOCAL", "28135"]) and
     result = "lgtm[cpp/drivers/kewaitlocal-requires-kernel-mode]"
     or
     this.getRuleName() = any(["__WARNING_MULTIPLE_PAGED_CODE", "28171"]) and
-    result = "lgtm[cpp/portedqueries/multiple-paged-code]"
+    result = "lgtm[cpp/drivers/multiple-paged-code]"
     or
     this.getRuleName() = any(["__WARNING_NO_PAGED_CODE", "28170"]) and
-    result = "lgtm[cpp/portedqueries/no-paged-code]"
+    result = "lgtm[cpp/drivers/no-paged-code]"
     or
     this.getRuleName() = any(["__WARNING_NO_PAGING_SEGMENT", "28172"]) and
-    result = "lgtm[cpp/portedqueries/no-paging-segment]"
+    result = "lgtm[cpp/drivers/no-paging-segment]"
     or
     this.getRuleName() = any(["__WARNING_OBJ_REFERENCE_MODE", "28126"]) and
-    result = "lgtm[cpp/windows/drivers/queries/ob-reference-mode]"
+    result = "lgtm[cpp/drivers/ob-reference-mode]"
     or
     this.getRuleName() = any(["__WARNING_MODIFYING_MDL", "28145"]) and
-    result = "lgtm[cpp/windows/drivers/queries/opaquemdlwrite]"
+    result = "lgtm[cpp/drivers/opaque-mdl-write]"
     or
     this.getRuleName() = any(["__WARNING_PENDING_STATUS_ERROR", "28143"]) and
-    result = "lgtm[cpp/portedqueries/pending-status-error]"
+    result = "lgtm[cpp/drivers/pending-status-error]"
     or
     this.getRuleName() =
       any(["__WARNING_DISPATCH_MISMATCH", "28168", "__WARNING_DISPATCH_MISSING", "28169"]) and
@@ -108,8 +104,23 @@ abstract class CASuppression extends PreprocessorPragma {
     this.getRuleName() = any(["__WARNING_IRQ_SET_TOO_LOW", "28124"]) and
     result = "lgtm[cpp/drivers/irql-set-too-low]"
     or
-    this.getRuleName() = any(["__WARNING_IRQ_SET_TOO_HIGH", "28121"]) and
-    result = "lgtm[cpp/drivers/irql-too-high]" //TODO fix opaqueid for this query
+    this.getRuleName() = any(["__WARNING_IRQ_TOO_HIGH", "28121"]) and
+    result = "lgtm[cpp/drivers/irql-too-high]"
+    or
+    this.getRuleName() = any(["__WARNING_IRQ_TOO_LOW", "28120"]) and
+    result = "lgtm[cpp/drivers/irql-too-low]"
+    or
+    this.getRuleName() = any(["__WARNING_INTERLOCKEDDECREMENT_MISUSE1", "28616"]) and
+    result = "lgtm[cpp/drivers/multithreaded-av-condition]"
+    or
+    this.getRuleName() = any(["__WARNING_POOL_TAG", "28134"]) and
+    result = "lgtm[cpp/drivers/pool-tag-integral]"
+    or
+    this.getRuleName() = any(["__WARNING_PROTOTYPE_MISMATCH", "28127"]) and
+    result = "lgtm[cpp/drivers/routine-function-type-not-expected]"
+    or
+    this.getRuleName() = any(["__WARNING_STRSAFE_H", "28146"]) and
+    result = "lgtm[cpp/drivers/str-safe]"
     or
     result = "lgtm[" + this.getRuleName() + "]"
   }
