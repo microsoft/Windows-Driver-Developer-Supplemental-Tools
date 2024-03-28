@@ -47,19 +47,19 @@ abstract class CASuppression extends PreprocessorPragma {
     result = "lgtm[cpp/drivers/irql-not-used]"
     or
     this.getRuleName() = any(["__WARNING_POOL_TAG", "28134"]) and
-    result = "lgtm[cpp/windows/drivers/queries/pool-tag-integral]"
+    result = "lgtm[cpp/drivers/pool-tag-integral]"
     or
     this.getRuleName() = any(["__WARNING_STRSAFE_H", "28146"]) and
-    result = "lgtm[cpp/portedqueries/str-safe]"
+    result = "lgtm[cpp/drivers/str-safe]"
     or
     this.getRuleName() = any(["__WARNING_MUST_USE", "28193"]) and
     result = "lgtm[cpp/drivers/examined-value]"
     or
-    this.getRuleName() = any(["__WARNING_IRQ_TOO_LOW", "28120"]) and
-    result = "lgtm[cpp/portedqueries/irq-too-low]"
-    or
     this.getRuleName() = any(["__WARNING_IRQ_TOO_HIGH", "28121"]) and
-    result = "lgtm[cpp/portedqueries/irq-too-high]"
+    result = "lgtm[cpp/drivers/irql-too-high]"
+    or
+    this.getRuleName() = any(["__WARNING_IRQ_TOO_LOW", "28120"]) and
+    result = "lgtm[cpp/drivers/irql-too-low]"
     or
     this.getRuleName() = any(["__WARNING_FUNCTION_ASSIGNMENT", "28128"]) and
     result = "lgtm[cpp/drivers/illegal-field-access]"
@@ -96,7 +96,7 @@ abstract class CASuppression extends PreprocessorPragma {
     or
     this.getRuleName() =
       any(["__WARNING_DISPATCH_MISMATCH", "28168", "__WARNING_DISPATCH_MISSING", "28169"]) and
-    result = "lgtm[cpp/portedqueries/wrong-dispatch-table-assignment]"
+    result = "lgtm[cpp/drivers/wrong-dispatch-table-assignment]"
     or
     this.getRuleName() = any(["__WARNING_IRQ_SET_TOO_HIGH", "28150"]) and
     result = "lgtm[cpp/drivers/irql-set-too-high]"
@@ -104,23 +104,11 @@ abstract class CASuppression extends PreprocessorPragma {
     this.getRuleName() = any(["__WARNING_IRQ_SET_TOO_LOW", "28124"]) and
     result = "lgtm[cpp/drivers/irql-set-too-low]"
     or
-    this.getRuleName() = any(["__WARNING_IRQ_TOO_HIGH", "28121"]) and
-    result = "lgtm[cpp/drivers/irql-too-high]"
-    or
-    this.getRuleName() = any(["__WARNING_IRQ_TOO_LOW", "28120"]) and
-    result = "lgtm[cpp/drivers/irql-too-low]"
-    or
     this.getRuleName() = any(["__WARNING_INTERLOCKEDDECREMENT_MISUSE1", "28616"]) and
     result = "lgtm[cpp/drivers/multithreaded-av-condition]"
     or
-    this.getRuleName() = any(["__WARNING_POOL_TAG", "28134"]) and
-    result = "lgtm[cpp/drivers/pool-tag-integral]"
-    or
     this.getRuleName() = any(["__WARNING_PROTOTYPE_MISMATCH", "28127"]) and
     result = "lgtm[cpp/drivers/routine-function-type-not-expected]"
-    or
-    this.getRuleName() = any(["__WARNING_STRSAFE_H", "28146"]) and
-    result = "lgtm[cpp/drivers/str-safe]"
     or
     result = "lgtm[" + this.getRuleName() + "]"
   }
