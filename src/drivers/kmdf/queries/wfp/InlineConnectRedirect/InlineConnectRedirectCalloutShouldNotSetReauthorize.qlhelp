@@ -1,0 +1,22 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Checks that an Inline Connect Redirect Callout does not ask for reauthorization.
+	</overview>
+	<recommendation>
+		<p>
+			The following function asks for reauthorization and is an inline callout this is a contract violation.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/network/callout-driver-programming-considerations">
+				Callout Drivers - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>
