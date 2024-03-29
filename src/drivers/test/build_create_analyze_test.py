@@ -75,37 +75,31 @@ class ql_test_attributes:
 
     def get_use_ntifs(self):
         return self.use_ntifs
-
     def set_use_ntifs(self, use_ntifs):
         self.use_ntifs = use_ntifs
 
     def get_template(self):
         return self.template
-
     def set_template(self, template):
         self.template = template
 
     def get_path(self):
         return self.path
-
     def set_path(self, path):
         self.path = path
 
     def get_ql_file(self):
         return self.ql_file
-
     def set_ql_file(self, ql_file):
         self.ql_file = ql_file
 
     def get_ql_name(self):
         return self.ql_name
-
     def set_ql_name(self, ql_name):
         self.ql_name = ql_name
 
     def get_ql_type(self):
         return self.ql_type
-
     def set_ql_type(self, ql_type):
         self.ql_type = ql_type
 
@@ -780,7 +774,7 @@ def find_last_xlsx_file(curr_results_path):
     else:
         files = [x for x in files if x.endswith(".xlsx") and "detailed" not in x and curr_results_timestamp not in x]
     files.sort(key=os.path.getmtime, reverse=True)
-    print("Using previous results file: " + files[0])
+  
     return files[0]
 
 
@@ -794,12 +788,15 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
-    if not args.connection_string or not args.share_name or not args.storage_account_key or not args.storage_account_name or not args.container_name and not args.local_result_storage:
+    if not args.connection_string or not args.share_name and not args.local_result_storage:
         raise Exception("Azure credentials not provided. Cannot compare results.")
     
     # get most recent xlsx results file
     if args.local_result_storage:
         prev_results = find_last_xlsx_file(curr_results_path)
+        if prev_results == None:
+            print("No previous results found.")
+            return None
     else:   
         try:
             prev_results = 'azure-'+curr_results_path
@@ -823,6 +820,16 @@ def compare_health_results(curr_results_path):
     curr_results_df = pd.read_excel(curr_results_path, index_col=0, sheet_name=0)
     print("Comparing results...")
     try:
+        for row in prev_results_df.index:
+            if row not in curr_results_df.index:
+                curr_results_df.loc[row] = None
+                print("Adding row to current results: ", row)
+        for row in curr_results_df.index:
+            if row not in prev_results_df.index:
+                prev_results_df.loc[row] = None
+                print("Adding row to previous results: ", row)
+        prev_results_df = prev_results_df.sort_index()
+        curr_results_df = curr_results_df.sort_index()
         diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
     except Exception as e: 
         print("Error comparing results: ", e, "Uploading previous results back to Azure as", prev_results, "and current results back to Azure as", curr_results_path)
@@ -843,6 +850,7 @@ def compare_health_results(curr_results_path):
     print("Saved diff results")
     # upload new results to Azure
     if not args.local_result_storage:
+        
         print("Uploading results")
         upload_results_to_azure(file_to_upload=curr_results_path, 
                             file_name=curr_results_path, file_directory="")
@@ -1052,7 +1060,7 @@ if __name__ == "__main__":
     if args.compare_results_no_build:
         prev_results = "functiontestresults.xlsx"
         download_blob_from_azure(prev_results)
-        upload_blob_to_azure(prev_results)
+        #upload_blob_to_azure(prev_results)
 
         #compare_health_results(args.compare_results_no_build)
         exit(0)
