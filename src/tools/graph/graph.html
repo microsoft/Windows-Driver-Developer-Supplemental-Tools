@@ -1,0 +1,536 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="lib/vis-9.1.2/vis-network.min.js"></script>
+            
+            
+                <link href="lib/tom-select/tom-select.css" rel="stylesheet">
+                <script src="lib/tom-select/tom-select.complete.min.js"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 1500px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+                <div id="select-menu" class="card-header">
+                    <div class="row no-gutters">
+                        <div class="col-10 pb-2">
+                            <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="selectNode([value]);"
+                            id="select-node"
+                            placeholder="Select node..."
+                            >
+                                <option selected>Select a Node by ID</option>
+                                
+                                    <option value="ExInitializeDriverRuntime">ExInitializeDriverRuntime</option>
+                                
+                                    <option value="_RTL_CONSTANT_STRING_type_check">_RTL_CONSTANT_STRING_type_check</option>
+                                
+                                    <option value="ntoskrnl.libRtlGetVersion">ntoskrnl.libRtlGetVersion</option>
+                                
+                                    <option value="RtlGetVersion">RtlGetVersion</option>
+                                
+                                    <option value="ntoskrnl.libMmGetSystemRoutineAddress">ntoskrnl.libMmGetSystemRoutineAddress</option>
+                                
+                                    <option value="MmGetSystemRoutineAddress">MmGetSystemRoutineAddress</option>
+                                
+                                    <option value="IoSetCancelRoutine">IoSetCancelRoutine</option>
+                                
+                                    <option value="_InterlockedExchangePointer">_InterlockedExchangePointer</option>
+                                
+                                    <option value="IoMarkIrpPending">IoMarkIrpPending</option>
+                                
+                                    <option value="IoGetCurrentIrpStackLocation">IoGetCurrentIrpStackLocation</option>
+                                
+                                    <option value="ExAllocatePoolQuotaZero">ExAllocatePoolQuotaZero</option>
+                                
+                                    <option value="memset">memset</option>
+                                
+                                    <option value="ntoskrnl.libExAllocatePoolWithQuotaTag">ntoskrnl.libExAllocatePoolWithQuotaTag</option>
+                                
+                                    <option value="ExAllocatePoolWithQuotaTag">ExAllocatePoolWithQuotaTag</option>
+                                
+                                    <option value="FatalListEntryError">FatalListEntryError</option>
+                                
+                                    <option value="RtlFailFast">RtlFailFast</option>
+                                
+                                    <option value="InsertTailList">InsertTailList</option>
+                                
+                                    <option value="RemoveHeadList">RemoveHeadList</option>
+                                
+                                    <option value="RemoveEntryList">RemoveEntryList</option>
+                                
+                                    <option value="__fastfail">__fastfail</option>
+                                
+                                    <option value="RegisterIrpBasedNotification">RegisterIrpBasedNotification</option>
+                                
+                                    <option value="ntoskrnl.libKeInitializeDpc">ntoskrnl.libKeInitializeDpc</option>
+                                
+                                    <option value="KeInitializeDpc">KeInitializeDpc</option>
+                                
+                                    <option value="ntoskrnl.libExFreePoolWithTag">ntoskrnl.libExFreePoolWithTag</option>
+                                
+                                    <option value="ExFreePoolWithTag">ExFreePoolWithTag</option>
+                                
+                                    <option value="ntoskrnl.libKeReleaseSpinLock">ntoskrnl.libKeReleaseSpinLock</option>
+                                
+                                    <option value="KeReleaseSpinLock">KeReleaseSpinLock</option>
+                                
+                                    <option value="ntoskrnl.libKeAcquireSpinLockRaiseToDpc">ntoskrnl.libKeAcquireSpinLockRaiseToDpc</option>
+                                
+                                    <option value="KeAcquireSpinLockRaiseToDpc">KeAcquireSpinLockRaiseToDpc</option>
+                                
+                                    <option value="ntoskrnl.libKeSetTimer">ntoskrnl.libKeSetTimer</option>
+                                
+                                    <option value="KeSetTimer">KeSetTimer</option>
+                                
+                                    <option value="ntoskrnl.libKeInitializeTimer">ntoskrnl.libKeInitializeTimer</option>
+                                
+                                    <option value="KeInitializeTimer">KeInitializeTimer</option>
+                                
+                                    <option value="InitializeListHead">InitializeListHead</option>
+                                
+                                    <option value="RegisterEventBasedNotification">RegisterEventBasedNotification</option>
+                                
+                                    <option value="ntoskrnl.libObReferenceObjectByHandle">ntoskrnl.libObReferenceObjectByHandle</option>
+                                
+                                    <option value="ObReferenceObjectByHandle">ObReferenceObjectByHandle</option>
+                                
+                                    <option value="CustomTimerDPC">CustomTimerDPC</option>
+                                
+                                    <option value="ntoskrnl.libObfDereferenceObject">ntoskrnl.libObfDereferenceObject</option>
+                                
+                                    <option value="ObfDereferenceObject">ObfDereferenceObject</option>
+                                
+                                    <option value="ntoskrnl.libIofCompleteRequest">ntoskrnl.libIofCompleteRequest</option>
+                                
+                                    <option value="IofCompleteRequest">IofCompleteRequest</option>
+                                
+                                    <option value="ntoskrnl.libKeReleaseSpinLockFromDpcLevel">ntoskrnl.libKeReleaseSpinLockFromDpcLevel</option>
+                                
+                                    <option value="KeReleaseSpinLockFromDpcLevel">KeReleaseSpinLockFromDpcLevel</option>
+                                
+                                    <option value="ntoskrnl.libKeAcquireSpinLockAtDpcLevel">ntoskrnl.libKeAcquireSpinLockAtDpcLevel</option>
+                                
+                                    <option value="KeAcquireSpinLockAtDpcLevel">KeAcquireSpinLockAtDpcLevel</option>
+                                
+                                    <option value="ntoskrnl.libKeSetEvent">ntoskrnl.libKeSetEvent</option>
+                                
+                                    <option value="KeSetEvent">KeSetEvent</option>
+                                
+                                    <option value="EventCancelRoutine">EventCancelRoutine</option>
+                                
+                                    <option value="ntoskrnl.libIoReleaseCancelSpinLock">ntoskrnl.libIoReleaseCancelSpinLock</option>
+                                
+                                    <option value="IoReleaseCancelSpinLock">IoReleaseCancelSpinLock</option>
+                                
+                                    <option value="ntoskrnl.libKeCancelTimer">ntoskrnl.libKeCancelTimer</option>
+                                
+                                    <option value="KeCancelTimer">KeCancelTimer</option>
+                                
+                                    <option value="EventUnload">EventUnload</option>
+                                
+                                    <option value="ntoskrnl.libIoDeleteSymbolicLink">ntoskrnl.libIoDeleteSymbolicLink</option>
+                                
+                                    <option value="IoDeleteSymbolicLink">IoDeleteSymbolicLink</option>
+                                
+                                    <option value="ntoskrnl.libIoDeleteDevice">ntoskrnl.libIoDeleteDevice</option>
+                                
+                                    <option value="IoDeleteDevice">IoDeleteDevice</option>
+                                
+                                    <option value="ntoskrnl.libRtlInitUnicodeString">ntoskrnl.libRtlInitUnicodeString</option>
+                                
+                                    <option value="RtlInitUnicodeString">RtlInitUnicodeString</option>
+                                
+                                    <option value="IsListEmpty">IsListEmpty</option>
+                                
+                                    <option value="EventDispatchIoControl">EventDispatchIoControl</option>
+                                
+                                    <option value="ntoskrnl.libIoReleaseRemoveLockEx">ntoskrnl.libIoReleaseRemoveLockEx</option>
+                                
+                                    <option value="IoReleaseRemoveLockEx">IoReleaseRemoveLockEx</option>
+                                
+                                    <option value="ntoskrnl.libIoAcquireRemoveLockEx">ntoskrnl.libIoAcquireRemoveLockEx</option>
+                                
+                                    <option value="IoAcquireRemoveLockEx">IoAcquireRemoveLockEx</option>
+                                
+                                    <option value="EventCleanup">EventCleanup</option>
+                                
+                                    <option value="ntoskrnl.libIoReleaseRemoveLockAndWaitEx">ntoskrnl.libIoReleaseRemoveLockAndWaitEx</option>
+                                
+                                    <option value="IoReleaseRemoveLockAndWaitEx">IoReleaseRemoveLockAndWaitEx</option>
+                                
+                                    <option value="EventCreateClose">EventCreateClose</option>
+                                
+                                    <option value="ntoskrnl.libIoInitializeRemoveLockEx">ntoskrnl.libIoInitializeRemoveLockEx</option>
+                                
+                                    <option value="IoInitializeRemoveLockEx">IoInitializeRemoveLockEx</option>
+                                
+                                    <option value="DriverEntry">DriverEntry</option>
+                                
+                                    <option value="ntoskrnl.libIoCreateSymbolicLink">ntoskrnl.libIoCreateSymbolicLink</option>
+                                
+                                    <option value="IoCreateSymbolicLink">IoCreateSymbolicLink</option>
+                                
+                                    <option value="ntoskrnl.libIoCreateDevice">ntoskrnl.libIoCreateDevice</option>
+                                
+                                    <option value="IoCreateDevice">IoCreateDevice</option>
+                                
+                                    <option value="ntoskrnl.libKeInitializeSpinLock">ntoskrnl.libKeInitializeSpinLock</option>
+                                
+                                    <option value="KeInitializeSpinLock">KeInitializeSpinLock</option>
+                                
+                                    <option value="__debugbreak">__debugbreak</option>
+                                
+                                    <option value="IRP_MJ_CLOSE">IRP_MJ_CLOSE</option>
+                                
+                                    <option value="IRP_MJ_CREATE">IRP_MJ_CREATE</option>
+                                
+                            </select>
+                        </div>
+                        <div class="col-2 pb-2">
+                            <button type="button" class="btn btn-primary btn-block" onclick="neighbourhoodHighlight({nodes: []});">Reset Selection</button>
+                        </div>
+                    </div>
+                </div>
+            
+            
+              <div id="filter-menu" class="card-header">
+                <div class="row no-gutters">
+                  <div class="col-3 pb-2">
+                    <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="updateFilter(value, 'item')"
+                            id="select-item"
+                        >
+                        <option value="">Select a network item</option>
+                        <option value="edge">edge</option>
+                        <option value="node">node</option>
+                    </select>
+                  </div>
+                  <div class="col-3 pb-2">
+                    <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="updateFilter(value, 'property')"
+                            id="select-property"
+                        >
+                        <option value="">Select a property...</option>
+                    </select>
+                  </div>
+                  <div class="col-3 pb-2">
+                    <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            id="select-value"
+                        >
+                        <option value="">Select value(s)...</option>
+                    </select>
+                  </div>
+                  <div class="col-1 pb-2">
+                    <button type="button" class="btn btn-primary btn-block" onclick="highlightFilter(filter);">Filter</button>
+                  </div>
+                  <div class="col-2 pb-2">
+                    <button type="button" class="btn btn-primary btn-block" onclick="clearFilter(true)">Reset Selection</button>
+                  </div>
+                </div>
+              </div>
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+                  new TomSelect("#select-node",{
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      }
+                  });
+              
+
+              
+                  // explicitly using onItemAdd and this function as we need to save multiple values
+                  let updateValueFilter = function() {
+                      return function () {
+                      filter['value'].push(arguments[0])
+                      }
+                  }
+
+                  let valueControl = new TomSelect("#select-value",{
+                      maxItems: null,
+                      valueField: 'id',
+                      labelField: 'title',
+                      searchField: 'title',
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      },
+                      onItemAdd: updateValueFilter()
+                  });
+
+                  let addValues = function() {
+                      return function () {
+                          // clear the current value options and add the selected attribute values
+                          // tom-select handles duplicates
+                          let selectedProperty = arguments[0];
+                          valueControl.clear();
+                          valueControl.clearOptions();
+                          filter['value'] = []
+                          if (filter['item'] === 'node') {
+                              for (let each in allNodes) {
+                                  valueControl.addOption({
+                                      id:allNodes[each][selectedProperty],
+                                      title:allNodes[each][selectedProperty]
+                                  })
+                              }
+                          }
+                          else if (filter['item'] === 'edge') {
+                              for (let each in allEdges) {
+                                  valueControl.addOption({
+                                      id:allEdges[each][selectedProperty],
+                                      title:allEdges[each][selectedProperty]
+                                  })
+                              }
+                          }
+                      }
+                  };
+
+                  let propControl = new TomSelect("#select-property",{
+                      valueField: 'id',
+                      labelField: 'title',
+                      searchField: 'title',
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      },
+                      onItemAdd: addValues()
+                  });
+
+                  let addProperties = function() {
+                      return function () {
+                          // loops through the selected network item and adds the attributes to dropdown
+                          // tom-select handles duplicates
+                          clearFilter(false)
+                          if (arguments[0] === 'edge') {
+                              for (let each in allEdges) {
+                                  if (allEdges.hasOwnProperty(each)) {
+                                      for (let eachProp in allEdges[each]) {
+                                          if (allEdges[each].hasOwnProperty(eachProp)) {
+                                              propControl.addOption({id: eachProp, title: eachProp})
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                          else if (arguments[0] === 'node') {
+                              for (let each in allNodes) {
+                                  if (allNodes.hasOwnProperty(each)) {
+                                      for (let eachProp in allNodes[each]) {
+                                          if (allNodes[each].hasOwnProperty(eachProp)
+                                              && (eachProp !== 'hidden' && eachProp !== 'savedLabel'
+                                                  && eachProp !== 'hiddenLabel')) {
+                                              propControl.addOption({id: eachProp, title: eachProp})
+
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  };
+
+                  let itemControl = new TomSelect("#select-item",{
+                      create: false,
+                      sortField:{
+                          field: "text",
+                          direction: "asc"
+                      },
+                      onItemAdd: addProperties()
+                  });
+
+                  function clearFilter(reset) {
+                      // utility function to clear all the selected filter options
+                      // if reset is set to true, the existing filter will be removed
+                      // else, only the dropdown options are cleared
+                      propControl.clear();
+                      propControl.clearOptions();
+                      valueControl.clear();
+                      valueControl.clearOptions();
+                      filter = {
+                          item : '',
+                          property : '',
+                          value : []
+                      }
+                      if (reset) {
+                          itemControl.clear();
+                          filterHighlight({nodes: []})
+                      }
+                  }
+
+                  function updateFilter(value, key) {
+                      // key could be 'item' or 'property' and value is as selected in dropdown
+                      filter[key] = value
+                  }
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"group": "other", "hidden": false, "id": "ExInitializeDriverRuntime", "label": "ExInitializeDriverRuntime", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "_RTL_CONSTANT_STRING_type_check", "label": "_RTL_CONSTANT_STRING_type_check", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libRtlGetVersion", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "RtlGetVersion", "label": "RtlGetVersion", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libMmGetSystemRoutineAddress", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "MmGetSystemRoutineAddress", "label": "MmGetSystemRoutineAddress", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "IoSetCancelRoutine", "label": "IoSetCancelRoutine", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "_InterlockedExchangePointer", "label": "_InterlockedExchangePointer", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "IoMarkIrpPending", "label": "IoMarkIrpPending", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "IoGetCurrentIrpStackLocation", "label": "IoGetCurrentIrpStackLocation", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "ExAllocatePoolQuotaZero", "label": "ExAllocatePoolQuotaZero", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "memset", "label": "memset", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libExAllocatePoolWithQuotaTag", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "ExAllocatePoolWithQuotaTag", "label": "ExAllocatePoolWithQuotaTag", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "FatalListEntryError", "label": "FatalListEntryError", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "RtlFailFast", "label": "RtlFailFast", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "InsertTailList", "label": "InsertTailList", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "RemoveHeadList", "label": "RemoveHeadList", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "RemoveEntryList", "label": "RemoveEntryList", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "__fastfail", "label": "__fastfail", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "RegisterIrpBasedNotification", "label": "RegisterIrpBasedNotification", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeInitializeDpc", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeInitializeDpc", "label": "KeInitializeDpc", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libExFreePoolWithTag", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "ExFreePoolWithTag", "label": "ExFreePoolWithTag", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeReleaseSpinLock", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeReleaseSpinLock", "label": "KeReleaseSpinLock", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeAcquireSpinLockRaiseToDpc", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeAcquireSpinLockRaiseToDpc", "label": "KeAcquireSpinLockRaiseToDpc", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeSetTimer", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeSetTimer", "label": "KeSetTimer", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeInitializeTimer", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeInitializeTimer", "label": "KeInitializeTimer", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "InitializeListHead", "label": "InitializeListHead", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "RegisterEventBasedNotification", "label": "RegisterEventBasedNotification", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libObReferenceObjectByHandle", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "ObReferenceObjectByHandle", "label": "ObReferenceObjectByHandle", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "CustomTimerDPC", "label": "CustomTimerDPC", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libObfDereferenceObject", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "ObfDereferenceObject", "label": "ObfDereferenceObject", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIofCompleteRequest", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IofCompleteRequest", "label": "IofCompleteRequest", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeReleaseSpinLockFromDpcLevel", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeReleaseSpinLockFromDpcLevel", "label": "KeReleaseSpinLockFromDpcLevel", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeAcquireSpinLockAtDpcLevel", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeAcquireSpinLockAtDpcLevel", "label": "KeAcquireSpinLockAtDpcLevel", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeSetEvent", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeSetEvent", "label": "KeSetEvent", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "EventCancelRoutine", "label": "EventCancelRoutine", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoReleaseCancelSpinLock", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoReleaseCancelSpinLock", "label": "IoReleaseCancelSpinLock", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeCancelTimer", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeCancelTimer", "label": "KeCancelTimer", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "EventUnload", "label": "EventUnload", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoDeleteSymbolicLink", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoDeleteSymbolicLink", "label": "IoDeleteSymbolicLink", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoDeleteDevice", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoDeleteDevice", "label": "IoDeleteDevice", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libRtlInitUnicodeString", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "RtlInitUnicodeString", "label": "RtlInitUnicodeString", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "IsListEmpty", "label": "IsListEmpty", "level": 2, "shape": "dot"}, {"group": "other", "hidden": false, "id": "EventDispatchIoControl", "label": "EventDispatchIoControl", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoReleaseRemoveLockEx", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoReleaseRemoveLockEx", "label": "IoReleaseRemoveLockEx", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoAcquireRemoveLockEx", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoAcquireRemoveLockEx", "label": "IoAcquireRemoveLockEx", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "EventCleanup", "label": "EventCleanup", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoReleaseRemoveLockAndWaitEx", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoReleaseRemoveLockAndWaitEx", "label": "IoReleaseRemoveLockAndWaitEx", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "EventCreateClose", "label": "EventCreateClose", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoInitializeRemoveLockEx", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoInitializeRemoveLockEx", "label": "IoInitializeRemoveLockEx", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "DriverEntry", "label": "DriverEntry", "level": 2, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoCreateSymbolicLink", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoCreateSymbolicLink", "label": "IoCreateSymbolicLink", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libIoCreateDevice", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "IoCreateDevice", "label": "IoCreateDevice", "level": 6, "shape": "dot"}, {"group": "libs", "hidden": false, "id": "ntoskrnl.libKeInitializeSpinLock", "label": "ntoskrnl.lib", "level": 5, "shape": "dot"}, {"group": "ddis", "hidden": false, "id": "KeInitializeSpinLock", "label": "KeInitializeSpinLock", "level": 6, "shape": "dot"}, {"group": "other", "hidden": false, "id": "__debugbreak", "label": "__debugbreak", "level": 2, "shape": "dot"}, {"group": "irps", "hidden": false, "id": "IRP_MJ_CLOSE", "label": "IRP_MJ_CLOSE", "level": 4, "shape": "dot"}, {"group": "irps", "hidden": false, "id": "IRP_MJ_CREATE", "label": "IRP_MJ_CREATE", "level": 4, "shape": "dot"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "ExInitializeDriverRuntime", "to": "_RTL_CONSTANT_STRING_type_check"}, {"arrows": "to", "from": "ExInitializeDriverRuntime", "to": "RtlGetVersion"}, {"arrows": "to", "from": "ExInitializeDriverRuntime", "to": "MmGetSystemRoutineAddress"}, {"arrows": "to", "from": "IoSetCancelRoutine", "to": "_InterlockedExchangePointer"}, {"arrows": "to", "from": "IoMarkIrpPending", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "ExAllocatePoolQuotaZero", "to": "memset"}, {"arrows": "to", "from": "ExAllocatePoolQuotaZero", "to": "ExAllocatePoolWithQuotaTag"}, {"arrows": "to", "from": "FatalListEntryError", "to": "RtlFailFast"}, {"arrows": "to", "from": "RtlFailFast", "to": "__fastfail"}, {"arrows": "to", "from": "InsertTailList", "to": "FatalListEntryError"}, {"arrows": "to", "from": "RemoveHeadList", "to": "FatalListEntryError"}, {"arrows": "to", "from": "RemoveEntryList", "to": "FatalListEntryError"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "IoSetCancelRoutine"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "IoMarkIrpPending"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "KeInitializeDpc"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "ExFreePoolWithTag"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "ExAllocatePoolQuotaZero"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "KeReleaseSpinLock"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "KeAcquireSpinLockRaiseToDpc"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "KeSetTimer"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "KeInitializeTimer"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "InsertTailList"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "InitializeListHead"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "ObReferenceObjectByHandle"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "KeInitializeDpc"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "ExFreePoolWithTag"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "ExAllocatePoolQuotaZero"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "KeReleaseSpinLock"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "KeAcquireSpinLockRaiseToDpc"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "KeSetTimer"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "KeInitializeTimer"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "InsertTailList"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "InitializeListHead"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "ObfDereferenceObject"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "IoSetCancelRoutine"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "IofCompleteRequest"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "ExFreePoolWithTag"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "KeReleaseSpinLockFromDpcLevel"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "KeAcquireSpinLockAtDpcLevel"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "KeSetEvent"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "RemoveEntryList"}, {"arrows": "to", "from": "CustomTimerDPC", "to": "InitializeListHead"}, {"arrows": "to", "from": "EventCancelRoutine", "to": "IoReleaseCancelSpinLock"}, {"arrows": "to", "from": "EventCancelRoutine", "to": "IofCompleteRequest"}, {"arrows": "to", "from": "EventCancelRoutine", "to": "ExFreePoolWithTag"}, {"arrows": "to", "from": "EventCancelRoutine", "to": "KeReleaseSpinLock"}, {"arrows": "to", "from": "EventCancelRoutine", "to": "KeAcquireSpinLockRaiseToDpc"}, {"arrows": "to", "from": "EventCancelRoutine", "to": "KeCancelTimer"}, {"arrows": "to", "from": "EventCancelRoutine", "to": "RemoveEntryList"}, {"arrows": "to", "from": "EventCancelRoutine", "to": "InitializeListHead"}, {"arrows": "to", "from": "EventUnload", "to": "IoDeleteSymbolicLink"}, {"arrows": "to", "from": "EventUnload", "to": "IoDeleteDevice"}, {"arrows": "to", "from": "EventUnload", "to": "RtlInitUnicodeString"}, {"arrows": "to", "from": "EventUnload", "to": "IsListEmpty"}, {"arrows": "to", "from": "EventDispatchIoControl", "to": "IoReleaseRemoveLockEx"}, {"arrows": "to", "from": "EventDispatchIoControl", "to": "IoAcquireRemoveLockEx"}, {"arrows": "to", "from": "EventDispatchIoControl", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "EventDispatchIoControl", "to": "IofCompleteRequest"}, {"arrows": "to", "from": "EventDispatchIoControl", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "EventDispatchIoControl", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "EventCleanup", "to": "ObfDereferenceObject"}, {"arrows": "to", "from": "EventCleanup", "to": "IoReleaseRemoveLockAndWaitEx"}, {"arrows": "to", "from": "EventCleanup", "to": "IoAcquireRemoveLockEx"}, {"arrows": "to", "from": "EventCleanup", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "EventCleanup", "to": "IoSetCancelRoutine"}, {"arrows": "to", "from": "EventCleanup", "to": "IofCompleteRequest"}, {"arrows": "to", "from": "EventCleanup", "to": "ExFreePoolWithTag"}, {"arrows": "to", "from": "EventCleanup", "to": "KeReleaseSpinLock"}, {"arrows": "to", "from": "EventCleanup", "to": "KeAcquireSpinLockRaiseToDpc"}, {"arrows": "to", "from": "EventCleanup", "to": "KeCancelTimer"}, {"arrows": "to", "from": "EventCleanup", "to": "InsertTailList"}, {"arrows": "to", "from": "EventCleanup", "to": "RemoveHeadList"}, {"arrows": "to", "from": "EventCleanup", "to": "RemoveEntryList"}, {"arrows": "to", "from": "EventCleanup", "to": "IsListEmpty"}, {"arrows": "to", "from": "EventCleanup", "to": "InitializeListHead"}, {"arrows": "to", "from": "EventCreateClose", "to": "IoInitializeRemoveLockEx"}, {"arrows": "to", "from": "EventCreateClose", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "EventCreateClose", "to": "IofCompleteRequest"}, {"arrows": "to", "from": "EventCreateClose", "to": "ExFreePoolWithTag"}, {"arrows": "to", "from": "EventCreateClose", "to": "ExAllocatePoolQuotaZero"}, {"arrows": "to", "from": "DriverEntry", "to": "ExInitializeDriverRuntime"}, {"arrows": "to", "from": "DriverEntry", "to": "IoDeleteDevice"}, {"arrows": "to", "from": "DriverEntry", "to": "IoCreateSymbolicLink"}, {"arrows": "to", "from": "DriverEntry", "to": "IoCreateDevice"}, {"arrows": "to", "from": "DriverEntry", "to": "KeInitializeSpinLock"}, {"arrows": "to", "from": "DriverEntry", "to": "RtlInitUnicodeString"}, {"arrows": "to", "from": "DriverEntry", "to": "InitializeListHead"}, {"arrows": "to", "from": "DriverEntry", "to": "__debugbreak"}, {"arrows": "to", "from": "IRP_MJ_CLOSE", "to": "EventCreateClose"}, {"arrows": "to", "from": "IRP_MJ_CREATE", "to": "EventCreateClose"}, {"arrows": "to", "from": "RtlGetVersion", "to": "ntoskrnl.libRtlGetVersion"}, {"arrows": "to", "from": "MmGetSystemRoutineAddress", "to": "ntoskrnl.libMmGetSystemRoutineAddress"}, {"arrows": "to", "from": "MmGetSystemRoutineAddress", "to": "ntoskrnl.libMmGetSystemRoutineAddress"}, {"arrows": "to", "from": "ExAllocatePoolWithQuotaTag", "to": "ntoskrnl.libExAllocatePoolWithQuotaTag"}, {"arrows": "to", "from": "KeInitializeDpc", "to": "ntoskrnl.libKeInitializeDpc"}, {"arrows": "to", "from": "ExFreePoolWithTag", "to": "ntoskrnl.libExFreePoolWithTag"}, {"arrows": "to", "from": "KeReleaseSpinLock", "to": "ntoskrnl.libKeReleaseSpinLock"}, {"arrows": "to", "from": "KeAcquireSpinLockRaiseToDpc", "to": "ntoskrnl.libKeAcquireSpinLockRaiseToDpc"}, {"arrows": "to", "from": "KeSetTimer", "to": "ntoskrnl.libKeSetTimer"}, {"arrows": "to", "from": "KeInitializeTimer", "to": "ntoskrnl.libKeInitializeTimer"}, {"arrows": "to", "from": "ObReferenceObjectByHandle", "to": "ntoskrnl.libObReferenceObjectByHandle"}, {"arrows": "to", "from": "ObfDereferenceObject", "to": "ntoskrnl.libObfDereferenceObject"}, {"arrows": "to", "from": "IofCompleteRequest", "to": "ntoskrnl.libIofCompleteRequest"}, {"arrows": "to", "from": "KeReleaseSpinLockFromDpcLevel", "to": "ntoskrnl.libKeReleaseSpinLockFromDpcLevel"}, {"arrows": "to", "from": "KeAcquireSpinLockAtDpcLevel", "to": "ntoskrnl.libKeAcquireSpinLockAtDpcLevel"}, {"arrows": "to", "from": "KeSetEvent", "to": "ntoskrnl.libKeSetEvent"}, {"arrows": "to", "from": "IoReleaseCancelSpinLock", "to": "ntoskrnl.libIoReleaseCancelSpinLock"}, {"arrows": "to", "from": "KeCancelTimer", "to": "ntoskrnl.libKeCancelTimer"}, {"arrows": "to", "from": "IoDeleteSymbolicLink", "to": "ntoskrnl.libIoDeleteSymbolicLink"}, {"arrows": "to", "from": "IoDeleteDevice", "to": "ntoskrnl.libIoDeleteDevice"}, {"arrows": "to", "from": "RtlInitUnicodeString", "to": "ntoskrnl.libRtlInitUnicodeString"}, {"arrows": "to", "from": "IoReleaseRemoveLockEx", "to": "ntoskrnl.libIoReleaseRemoveLockEx"}, {"arrows": "to", "from": "IoAcquireRemoveLockEx", "to": "ntoskrnl.libIoAcquireRemoveLockEx"}, {"arrows": "to", "from": "IoReleaseRemoveLockAndWaitEx", "to": "ntoskrnl.libIoReleaseRemoveLockAndWaitEx"}, {"arrows": "to", "from": "IoInitializeRemoveLockEx", "to": "ntoskrnl.libIoInitializeRemoveLockEx"}, {"arrows": "to", "from": "IoCreateSymbolicLink", "to": "ntoskrnl.libIoCreateSymbolicLink"}, {"arrows": "to", "from": "IoCreateDevice", "to": "ntoskrnl.libIoCreateDevice"}, {"arrows": "to", "from": "KeInitializeSpinLock", "to": "ntoskrnl.libKeInitializeSpinLock"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": true
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+                    network.on("click", neighbourhoodHighlight);
+                  
+
+                  
+                    network.on("selectNode", neighbourhoodHighlight);
+                  
+
+                  
+
+
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>

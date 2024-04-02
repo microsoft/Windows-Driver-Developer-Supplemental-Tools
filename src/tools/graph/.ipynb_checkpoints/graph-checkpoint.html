@@ -1,0 +1,436 @@
+<html>
+    <head>
+        <meta charset="utf-8">
+        
+            <script src="lib/bindings/utils.js"></script>
+            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/dist/vis-network.min.css" integrity="sha512-WgxfT5LWjfszlPHXRmBWHkV2eceiWTOBvrKCNbdgDYTHrT2AeLCGbF4sZlZw3UMN3WtL0tGUoIAKsu8mllg/XA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+            <script src="https://cdnjs.cloudflare.com/ajax/libs/vis-network/9.1.2/dist/vis-network.min.js" integrity="sha512-LnvoEWDFrqGHlHmDD2101OrLcbsfkrzoSpvtSQtxK3RMnRV0eOkhhBN2dXHKRrUU8p2DGRTk35n4O8nWSVe1mQ==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+            
+                <link href="lib/tom-select/tom-select.css" rel="stylesheet">
+                <script src="lib/tom-select/tom-select.complete.min.js"></script>
+            
+        
+<center>
+<h1></h1>
+</center>
+
+<!-- <link rel="stylesheet" href="../node_modules/vis/dist/vis.min.css" type="text/css" />
+<script type="text/javascript" src="../node_modules/vis/dist/vis.js"> </script>-->
+        <link
+          href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/css/bootstrap.min.css"
+          rel="stylesheet"
+          integrity="sha384-eOJMYsd53ii+scO/bJGFsiCZc+5NDVN2yr8+0RDqr0Ql0h+rP48ckxlpbzKgwra6"
+          crossorigin="anonymous"
+        />
+        <script
+          src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf"
+          crossorigin="anonymous"
+        ></script>
+
+
+        <center>
+          <h1></h1>
+        </center>
+        <style type="text/css">
+
+             #mynetwork {
+                 width: 100%;
+                 height: 1500px;
+                 background-color: #ffffff;
+                 border: 1px solid lightgray;
+                 position: relative;
+                 float: left;
+             }
+
+             
+             #loadingBar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width: 100%;
+                 height: 1500px;
+                 background-color:rgba(200,200,200,0.8);
+                 -webkit-transition: all 0.5s ease;
+                 -moz-transition: all 0.5s ease;
+                 -ms-transition: all 0.5s ease;
+                 -o-transition: all 0.5s ease;
+                 transition: all 0.5s ease;
+                 opacity:1;
+             }
+
+             #bar {
+                 position:absolute;
+                 top:0px;
+                 left:0px;
+                 width:20px;
+                 height:20px;
+                 margin:auto auto auto auto;
+                 border-radius:11px;
+                 border:2px solid rgba(30,30,30,0.05);
+                 background: rgb(0, 173, 246); /* Old browsers */
+                 box-shadow: 2px 0px 4px rgba(0,0,0,0.4);
+             }
+
+             #border {
+                 position:absolute;
+                 top:10px;
+                 left:10px;
+                 width:500px;
+                 height:23px;
+                 margin:auto auto auto auto;
+                 box-shadow: 0px 0px 4px rgba(0,0,0,0.2);
+                 border-radius:10px;
+             }
+
+             #text {
+                 position:absolute;
+                 top:8px;
+                 left:530px;
+                 width:30px;
+                 height:50px;
+                 margin:auto auto auto auto;
+                 font-size:22px;
+                 color: #000000;
+             }
+
+             div.outerBorder {
+                 position:relative;
+                 top:400px;
+                 width:600px;
+                 height:44px;
+                 margin:auto auto auto auto;
+                 border:8px solid rgba(0,0,0,0.1);
+                 background: rgb(252,252,252); /* Old browsers */
+                 background: -moz-linear-gradient(top,  rgba(252,252,252,1) 0%, rgba(237,237,237,1) 100%); /* FF3.6+ */
+                 background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(252,252,252,1)), color-stop(100%,rgba(237,237,237,1))); /* Chrome,Safari4+ */
+                 background: -webkit-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Chrome10+,Safari5.1+ */
+                 background: -o-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* Opera 11.10+ */
+                 background: -ms-linear-gradient(top,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* IE10+ */
+                 background: linear-gradient(to bottom,  rgba(252,252,252,1) 0%,rgba(237,237,237,1) 100%); /* W3C */
+                 filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#fcfcfc', endColorstr='#ededed',GradientType=0 ); /* IE6-9 */
+                 border-radius:72px;
+                 box-shadow: 0px 0px 10px rgba(0,0,0,0.2);
+             }
+             
+
+             
+             #config {
+                 float: left;
+                 width: 400px;
+                 height: 600px;
+             }
+             
+
+             
+        </style>
+    </head>
+
+
+    <body>
+        <div class="card" style="width: 100%">
+            
+            
+              <div id="filter-menu" class="card-header">
+                <div class="row no-gutters">
+                  <div class="col-3 pb-2">
+                    <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="updateFilter(value, 'item')"
+                            id="select-item"
+                        >
+                        <option value="">Select a network item</option>
+                        <option value="edge">edge</option>
+                        <option value="node">node</option>
+                    </select>
+                  </div>
+                  <div class="col-3 pb-2">
+                    <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            onchange="updateFilter(value, 'property')"
+                            id="select-property"
+                        >
+                        <option value="">Select a property...</option>
+                    </select>
+                  </div>
+                  <div class="col-3 pb-2">
+                    <select
+                            class="form-select"
+                            aria-label="Default select example"
+                            id="select-value"
+                        >
+                        <option value="">Select value(s)...</option>
+                    </select>
+                  </div>
+                  <div class="col-1 pb-2">
+                    <button type="button" class="btn btn-primary btn-block" onclick="highlightFilter(filter);">Filter</button>
+                  </div>
+                  <div class="col-2 pb-2">
+                    <button type="button" class="btn btn-primary btn-block" onclick="clearFilter(true)">Reset Selection</button>
+                  </div>
+                </div>
+              </div>
+            
+            <div id="mynetwork" class="card-body"></div>
+        </div>
+
+        
+            <div id="loadingBar">
+              <div class="outerBorder">
+                <div id="text">0%</div>
+                <div id="border">
+                  <div id="bar"></div>
+                </div>
+              </div>
+            </div>
+        
+        
+            <div id="config"></div>
+        
+
+        <script type="text/javascript">
+
+              // initialize global variables.
+              var edges;
+              var nodes;
+              var allNodes;
+              var allEdges;
+              var nodeColors;
+              var originalNodes;
+              var network;
+              var container;
+              var options, data;
+              var filter = {
+                  item : '',
+                  property : '',
+                  value : []
+              };
+
+              
+
+              
+                  // explicitly using onItemAdd and this function as we need to save multiple values
+                  let updateValueFilter = function() {
+                      return function () {
+                      filter['value'].push(arguments[0])
+                      }
+                  }
+
+                  let valueControl = new TomSelect("#select-value",{
+                      maxItems: null,
+                      valueField: 'id',
+                      labelField: 'title',
+                      searchField: 'title',
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      },
+                      onItemAdd: updateValueFilter()
+                  });
+
+                  let addValues = function() {
+                      return function () {
+                          // clear the current value options and add the selected attribute values
+                          // tom-select handles duplicates
+                          let selectedProperty = arguments[0];
+                          valueControl.clear();
+                          valueControl.clearOptions();
+                          filter['value'] = []
+                          if (filter['item'] === 'node') {
+                              for (let each in allNodes) {
+                                  valueControl.addOption({
+                                      id:allNodes[each][selectedProperty],
+                                      title:allNodes[each][selectedProperty]
+                                  })
+                              }
+                          }
+                          else if (filter['item'] === 'edge') {
+                              for (let each in allEdges) {
+                                  valueControl.addOption({
+                                      id:allEdges[each][selectedProperty],
+                                      title:allEdges[each][selectedProperty]
+                                  })
+                              }
+                          }
+                      }
+                  };
+
+                  let propControl = new TomSelect("#select-property",{
+                      valueField: 'id',
+                      labelField: 'title',
+                      searchField: 'title',
+                      create: false,
+                      sortField: {
+                          field: "text",
+                          direction: "asc"
+                      },
+                      onItemAdd: addValues()
+                  });
+
+                  let addProperties = function() {
+                      return function () {
+                          // loops through the selected network item and adds the attributes to dropdown
+                          // tom-select handles duplicates
+                          clearFilter(false)
+                          if (arguments[0] === 'edge') {
+                              for (let each in allEdges) {
+                                  if (allEdges.hasOwnProperty(each)) {
+                                      for (let eachProp in allEdges[each]) {
+                                          if (allEdges[each].hasOwnProperty(eachProp)) {
+                                              propControl.addOption({id: eachProp, title: eachProp})
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                          else if (arguments[0] === 'node') {
+                              for (let each in allNodes) {
+                                  if (allNodes.hasOwnProperty(each)) {
+                                      for (let eachProp in allNodes[each]) {
+                                          if (allNodes[each].hasOwnProperty(eachProp)
+                                              && (eachProp !== 'hidden' && eachProp !== 'savedLabel'
+                                                  && eachProp !== 'hiddenLabel')) {
+                                              propControl.addOption({id: eachProp, title: eachProp})
+
+                                          }
+                                      }
+                                  }
+                              }
+                          }
+                      }
+                  };
+
+                  let itemControl = new TomSelect("#select-item",{
+                      create: false,
+                      sortField:{
+                          field: "text",
+                          direction: "asc"
+                      },
+                      onItemAdd: addProperties()
+                  });
+
+                  function clearFilter(reset) {
+                      // utility function to clear all the selected filter options
+                      // if reset is set to true, the existing filter will be removed
+                      // else, only the dropdown options are cleared
+                      propControl.clear();
+                      propControl.clearOptions();
+                      valueControl.clear();
+                      valueControl.clearOptions();
+                      filter = {
+                          item : '',
+                          property : '',
+                          value : []
+                      }
+                      if (reset) {
+                          itemControl.clear();
+                          filterHighlight({nodes: []})
+                      }
+                  }
+
+                  function updateFilter(value, key) {
+                      // key could be 'item' or 'property' and value is as selected in dropdown
+                      filter[key] = value
+                  }
+
+              
+
+              // This method is responsible for drawing the graph, returns the drawn network
+              function drawGraph() {
+                  var container = document.getElementById('mynetwork');
+
+                  
+
+                  // parsing and collecting nodes and edges from the python
+                  nodes = new vis.DataSet([{"group": "functions", "id": "wcsnlen_s", "label": "wcsnlen_s", "level": 2, "shape": "dot"}, {"group": "functions", "id": "wcsnlen", "label": "wcsnlen", "level": 2, "shape": "dot"}, {"group": "functions", "id": "strnlen_s", "label": "strnlen_s", "level": 2, "shape": "dot"}, {"group": "functions", "id": "strnlen", "label": "strnlen", "level": 2, "shape": "dot"}, {"group": "functions", "id": "EventDescZero", "label": "EventDescZero", "level": 2, "shape": "dot"}, {"group": "functions", "id": "memset", "label": "memset", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlxQueryRegistryValues", "label": "RtlxQueryRegistryValues", "level": 2, "shape": "dot"}, {"group": "functions", "id": "MmGetSystemRoutineAddress", "label": "MmGetSystemRoutineAddress", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlInitUnicodeString", "label": "RtlInitUnicodeString", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExInitializeDriverRuntime", "label": "ExInitializeDriverRuntime", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_RTL_CONSTANT_STRING_type_check", "label": "_RTL_CONSTANT_STRING_type_check", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlGetVersion", "label": "RtlGetVersion", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__annotation", "label": "__annotation", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__int2c", "label": "__int2c", "level": 2, "shape": "dot"}, {"group": "functions", "id": "HalReadDmaCounter", "label": "HalReadDmaCounter", "level": 2, "shape": "dot"}, {"group": "functions", "id": "HalGetDmaAlignment", "label": "HalGetDmaAlignment", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoMapTransfer", "label": "IoMapTransfer", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoFreeMapRegisters", "label": "IoFreeMapRegisters", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoFreeAdapterChannel", "label": "IoFreeAdapterChannel", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoFlushAdapterBuffers", "label": "IoFlushAdapterBuffers", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoAllocateAdapterChannel", "label": "IoAllocateAdapterChannel", "level": 2, "shape": "dot"}, {"group": "functions", "id": "HalFreeCommonBuffer", "label": "HalFreeCommonBuffer", "level": 2, "shape": "dot"}, {"group": "functions", "id": "HalAllocateCommonBuffer", "label": "HalAllocateCommonBuffer", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoSkipCurrentIrpStackLocation", "label": "IoSkipCurrentIrpStackLocation", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoCopyCurrentIrpStackLocationToNext", "label": "IoCopyCurrentIrpStackLocationToNext", "level": 2, "shape": "dot"}, {"group": "functions", "id": "memcpy", "label": "memcpy", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoGetCurrentIrpStackLocation", "label": "IoGetCurrentIrpStackLocation", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoGetNextIrpStackLocation", "label": "IoGetNextIrpStackLocation", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoSetNextIrpStackLocation", "label": "IoSetNextIrpStackLocation", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoSetCompletionRoutine", "label": "IoSetCompletionRoutine", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoSetCancelRoutine", "label": "IoSetCancelRoutine", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_InterlockedExchangePointer", "label": "_InterlockedExchangePointer", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoRequestDpc", "label": "IoRequestDpc", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeInsertQueueDpc", "label": "KeInsertQueueDpc", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoMarkIrpPending", "label": "IoMarkIrpPending", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoInitializeThreadedDpcRequest", "label": "IoInitializeThreadedDpcRequest", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeInitializeThreadedDpc", "label": "KeInitializeThreadedDpc", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoInitializeDpcRequest", "label": "IoInitializeDpcRequest", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeInitializeDpc", "label": "KeInitializeDpc", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoGetRemainingStackSize", "label": "IoGetRemainingStackSize", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoGetStackLimits", "label": "IoGetStackLimits", "level": 2, "shape": "dot"}, {"group": "functions", "id": "PsGetCurrentThread", "label": "PsGetCurrentThread", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeGetCurrentThread", "label": "KeGetCurrentThread", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__readgsqword", "label": "__readgsqword", "level": 2, "shape": "dot"}, {"group": "functions", "id": "MmPrepareMdlForReuse", "label": "MmPrepareMdlForReuse", "level": 2, "shape": "dot"}, {"group": "functions", "id": "MmUnmapLockedPages", "label": "MmUnmapLockedPages", "level": 2, "shape": "dot"}, {"group": "functions", "id": "MmGetSystemAddressForMdlSafe", "label": "MmGetSystemAddressForMdlSafe", "level": 2, "shape": "dot"}, {"group": "functions", "id": "MmMapLockedPagesSpecifyCache_NXOptIn", "label": "MmMapLockedPagesSpecifyCache_NXOptIn", "level": 2, "shape": "dot"}, {"group": "functions", "id": "MmMapLockedPagesSpecifyCache", "label": "MmMapLockedPagesSpecifyCache", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExInitializeDeleteTimerParameters", "label": "ExInitializeDeleteTimerParameters", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExInitializeSetTimerParameters", "label": "ExInitializeSetTimerParameters", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeInitializeTimer2SetParameters", "label": "KeInitializeTimer2SetParameters", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExInitializeNPagedLookasideList_NXPoolOptIn", "label": "ExInitializeNPagedLookasideList_NXPoolOptIn", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExInitializeNPagedLookasideList", "label": "ExInitializeNPagedLookasideList", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExInitializeFastMutex", "label": "ExInitializeFastMutex", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteRaw", "label": "WriteRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeInitializeEvent", "label": "KeInitializeEvent", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolPriorityUninitialized", "label": "ExAllocatePoolPriorityUninitialized", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolWithTagPriority", "label": "ExAllocatePoolWithTagPriority", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolPriorityZero", "label": "ExAllocatePoolPriorityZero", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolQuotaUninitialized", "label": "ExAllocatePoolQuotaUninitialized", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolWithQuotaTag", "label": "ExAllocatePoolWithQuotaTag", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolQuotaZero", "label": "ExAllocatePoolQuotaZero", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolUninitialized", "label": "ExAllocatePoolUninitialized", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolWithTag", "label": "ExAllocatePoolWithTag", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExAllocatePoolZero", "label": "ExAllocatePoolZero", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeMemoryBarrier", "label": "KeMemoryBarrier", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__faststorefence", "label": "__faststorefence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeGetCurrentProcessorIndex", "label": "KeGetCurrentProcessorIndex", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__readgsdword", "label": "__readgsdword", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_PORT_BUFFER_ULONG", "label": "WRITE_PORT_BUFFER_ULONG", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_ReadWriteBarrier", "label": "_ReadWriteBarrier", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__outdwordstring", "label": "__outdwordstring", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_PORT_BUFFER_USHORT", "label": "WRITE_PORT_BUFFER_USHORT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__outwordstring", "label": "__outwordstring", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_PORT_BUFFER_UCHAR", "label": "WRITE_PORT_BUFFER_UCHAR", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__outbytestring", "label": "__outbytestring", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_PORT_ULONG", "label": "WRITE_PORT_ULONG", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__outdword", "label": "__outdword", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_PORT_USHORT", "label": "WRITE_PORT_USHORT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__outword", "label": "__outword", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_PORT_UCHAR", "label": "WRITE_PORT_UCHAR", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__outbyte", "label": "__outbyte", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_PORT_BUFFER_ULONG", "label": "READ_PORT_BUFFER_ULONG", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__indwordstring", "label": "__indwordstring", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_PORT_BUFFER_USHORT", "label": "READ_PORT_BUFFER_USHORT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__inwordstring", "label": "__inwordstring", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_PORT_BUFFER_UCHAR", "label": "READ_PORT_BUFFER_UCHAR", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__inbytestring", "label": "__inbytestring", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_PORT_ULONG", "label": "READ_PORT_ULONG", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__indword", "label": "__indword", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_PORT_USHORT", "label": "READ_PORT_USHORT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__inword", "label": "__inword", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_PORT_UCHAR", "label": "READ_PORT_UCHAR", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__inbyte", "label": "__inbyte", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_REGISTER_BUFFER_ULONG64", "label": "WRITE_REGISTER_BUFFER_ULONG64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__movsq", "label": "__movsq", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_REGISTER_BUFFER_ULONG", "label": "WRITE_REGISTER_BUFFER_ULONG", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__movsd", "label": "__movsd", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_REGISTER_BUFFER_USHORT", "label": "WRITE_REGISTER_BUFFER_USHORT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__movsw", "label": "__movsw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_REGISTER_BUFFER_UCHAR", "label": "WRITE_REGISTER_BUFFER_UCHAR", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__movsb", "label": "__movsb", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_REGISTER_ULONG64", "label": "WRITE_REGISTER_ULONG64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_REGISTER_ULONG", "label": "WRITE_REGISTER_ULONG", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_REGISTER_USHORT", "label": "WRITE_REGISTER_USHORT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WRITE_REGISTER_UCHAR", "label": "WRITE_REGISTER_UCHAR", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_REGISTER_BUFFER_ULONG64", "label": "READ_REGISTER_BUFFER_ULONG64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_REGISTER_BUFFER_ULONG", "label": "READ_REGISTER_BUFFER_ULONG", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_REGISTER_BUFFER_USHORT", "label": "READ_REGISTER_BUFFER_USHORT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_REGISTER_BUFFER_UCHAR", "label": "READ_REGISTER_BUFFER_UCHAR", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_REGISTER_ULONG64", "label": "READ_REGISTER_ULONG64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_REGISTER_ULONG", "label": "READ_REGISTER_ULONG", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_REGISTER_USHORT", "label": "READ_REGISTER_USHORT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "READ_REGISTER_UCHAR", "label": "READ_REGISTER_UCHAR", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlCheckBit", "label": "RtlCheckBit", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_bittest64", "label": "_bittest64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlExtendedMagicDivide", "label": "RtlExtendedMagicDivide", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__umulh", "label": "__umulh", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlSecureZeroMemory", "label": "RtlSecureZeroMemory", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__stosb", "label": "__stosb", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlInitEmptyAnsiString", "label": "RtlInitEmptyAnsiString", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlInitEmptyUnicodeString", "label": "RtlInitEmptyUnicodeString", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlSanitizeUnicodeStringPadding", "label": "RtlSanitizeUnicodeStringPadding", "level": 2, "shape": "dot"}, {"group": "functions", "id": "AppendTailList", "label": "AppendTailList", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlpCheckListEntry", "label": "RtlpCheckListEntry", "level": 2, "shape": "dot"}, {"group": "functions", "id": "FatalListEntryError", "label": "FatalListEntryError", "level": 2, "shape": "dot"}, {"group": "functions", "id": "InsertHeadList", "label": "InsertHeadList", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlFailFast", "label": "RtlFailFast", "level": 2, "shape": "dot"}, {"group": "functions", "id": "InsertTailList", "label": "InsertTailList", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RemoveTailList", "label": "RemoveTailList", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RemoveHeadList", "label": "RemoveHeadList", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RemoveEntryList", "label": "RemoveEntryList", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__fastfail", "label": "__fastfail", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WritePointerRaw", "label": "WritePointerRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteRaw64", "label": "WriteRaw64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WritePointerNoFence", "label": "WritePointerNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteNoFence64", "label": "WriteNoFence64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WritePointerRelease", "label": "WritePointerRelease", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteRelease64", "label": "WriteRelease64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadPointerRaw", "label": "ReadPointerRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadRaw64", "label": "ReadRaw64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadPointerNoFence", "label": "ReadPointerNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadNoFence64", "label": "ReadNoFence64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadPointerAcquire", "label": "ReadPointerAcquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadAcquire64", "label": "ReadAcquire64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteULong64Raw", "label": "WriteULong64Raw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteULong64NoFence", "label": "WriteULong64NoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteULong64Release", "label": "WriteULong64Release", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadULong64Raw", "label": "ReadULong64Raw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadULong64NoFence", "label": "ReadULong64NoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadULong64Acquire", "label": "ReadULong64Acquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUInt32Raw", "label": "WriteUInt32Raw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUInt32NoFence", "label": "WriteUInt32NoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteNoFence", "label": "WriteNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUInt32Release", "label": "WriteUInt32Release", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteRelease", "label": "WriteRelease", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUInt32Raw", "label": "ReadUInt32Raw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadRaw", "label": "ReadRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUInt32NoFence", "label": "ReadUInt32NoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadNoFence", "label": "ReadNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUInt32Acquire", "label": "ReadUInt32Acquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadAcquire", "label": "ReadAcquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteInt32Raw", "label": "WriteInt32Raw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteInt32NoFence", "label": "WriteInt32NoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteInt32Release", "label": "WriteInt32Release", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadInt32Raw", "label": "ReadInt32Raw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadInt32NoFence", "label": "ReadInt32NoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadInt32Acquire", "label": "ReadInt32Acquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteULongRaw", "label": "WriteULongRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteULongNoFence", "label": "WriteULongNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteULongRelease", "label": "WriteULongRelease", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadULongRaw", "label": "ReadULongRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadULongNoFence", "label": "ReadULongNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadULongAcquire", "label": "ReadULongAcquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUShortRaw", "label": "WriteUShortRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteRaw16", "label": "WriteRaw16", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUShortNoFence", "label": "WriteUShortNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteNoFence16", "label": "WriteNoFence16", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUShortRelease", "label": "WriteUShortRelease", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteRelease16", "label": "WriteRelease16", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUShortRaw", "label": "ReadUShortRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadRaw16", "label": "ReadRaw16", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUShortNoFence", "label": "ReadUShortNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadNoFence16", "label": "ReadNoFence16", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUShortAcquire", "label": "ReadUShortAcquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadAcquire16", "label": "ReadAcquire16", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUCharRaw", "label": "WriteUCharRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteRaw8", "label": "WriteRaw8", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteBooleanNoFence", "label": "WriteBooleanNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteNoFence8", "label": "WriteNoFence8", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteBooleanRelease", "label": "WriteBooleanRelease", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteRelease8", "label": "WriteRelease8", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUCharNoFence", "label": "WriteUCharNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WriteUCharRelease", "label": "WriteUCharRelease", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUCharRaw", "label": "ReadUCharRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadRaw8", "label": "ReadRaw8", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadBooleanRaw", "label": "ReadBooleanRaw", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadBooleanNoFence", "label": "ReadBooleanNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadNoFence8", "label": "ReadNoFence8", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadBooleanAcquire", "label": "ReadBooleanAcquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadAcquire8", "label": "ReadAcquire8", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUCharNoFence", "label": "ReadUCharNoFence", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ReadUCharAcquire", "label": "ReadUCharAcquire", "level": 2, "shape": "dot"}, {"group": "functions", "id": "BarrierAfterRead", "label": "BarrierAfterRead", "level": 2, "shape": "dot"}, {"group": "functions", "id": "UnsignedMultiplyExtract128", "label": "UnsignedMultiplyExtract128", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_umul128", "label": "_umul128", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__shiftright128", "label": "__shiftright128", "level": 2, "shape": "dot"}, {"group": "functions", "id": "MultiplyExtract128", "label": "MultiplyExtract128", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_mul128", "label": "_mul128", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_InlineInterlockedAdd64", "label": "_InlineInterlockedAdd64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_InterlockedExchangeAdd64", "label": "_InterlockedExchangeAdd64", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_InlineInterlockedAdd", "label": "_InlineInterlockedAdd", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_InterlockedExchangeAdd", "label": "_InterlockedExchangeAdd", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WheaErrorRecordBuilderAddPacket", "label": "WheaErrorRecordBuilderAddPacket", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WheaErrorRecordBuilderAddSection", "label": "WheaErrorRecordBuilderAddSection", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlAssert", "label": "RtlAssert", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WheaErrorRecordBuilderInit", "label": "WheaErrorRecordBuilderInit", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WheaInitializeRecordHeader", "label": "WheaInitializeRecordHeader", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WheaFindNextErrorRecordSection", "label": "WheaFindNextErrorRecordSection", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WheaIsValidErrorRecordSignature", "label": "WheaIsValidErrorRecordSignature", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WheaFindErrorRecordSection", "label": "WheaFindErrorRecordSection", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RtlCompareMemory", "label": "RtlCompareMemory", "level": 2, "shape": "dot"}, {"group": "functions", "id": "WheaGetErrPacketFromErrRecord", "label": "WheaGetErrPacketFromErrRecord", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoInitializeDriverCreateContext", "label": "IoInitializeDriverCreateContext", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeRaiseIrqlToSynchLevel", "label": "KeRaiseIrqlToSynchLevel", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KfRaiseIrql", "label": "KfRaiseIrql", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeRaiseIrqlToDpcLevel", "label": "KeRaiseIrqlToDpcLevel", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeGetCurrentProcessorNumber", "label": "KeGetCurrentProcessorNumber", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__readgsbyte", "label": "__readgsbyte", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeGetPcr", "label": "KeGetPcr", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_ExInterlockedExchangeUlong", "label": "_ExInterlockedExchangeUlong", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_InterlockedExchange", "label": "_InterlockedExchange", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_ExInterlockedIncrementLong", "label": "_ExInterlockedIncrementLong", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_InterlockedIncrement", "label": "_InterlockedIncrement", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_ExInterlockedDecrementLong", "label": "_ExInterlockedDecrementLong", "level": 2, "shape": "dot"}, {"group": "functions", "id": "_InterlockedDecrement", "label": "_InterlockedDecrement", "level": 2, "shape": "dot"}, {"group": "functions", "id": "CUSTOM_SYSTEM_EVENT_TRIGGER_INIT", "label": "CUSTOM_SYSTEM_EVENT_TRIGGER_INIT", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RegisterIrpBasedNotification", "label": "RegisterIrpBasedNotification", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ExFreePoolWithTag", "label": "ExFreePoolWithTag", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeReleaseSpinLock", "label": "KeReleaseSpinLock", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeAcquireSpinLockRaiseToDpc", "label": "KeAcquireSpinLockRaiseToDpc", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeSetTimer", "label": "KeSetTimer", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeInitializeTimer", "label": "KeInitializeTimer", "level": 2, "shape": "dot"}, {"group": "functions", "id": "DbgPrint", "label": "DbgPrint", "level": 2, "shape": "dot"}, {"group": "functions", "id": "InitializeListHead", "label": "InitializeListHead", "level": 2, "shape": "dot"}, {"group": "functions", "id": "RegisterEventBasedNotification", "label": "RegisterEventBasedNotification", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ObReferenceObjectByHandle", "label": "ObReferenceObjectByHandle", "level": 2, "shape": "dot"}, {"group": "functions", "id": "CustomTimerDPC", "label": "CustomTimerDPC", "level": 2, "shape": "dot"}, {"group": "functions", "id": "ObfDereferenceObject", "label": "ObfDereferenceObject", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IofCompleteRequest", "label": "IofCompleteRequest", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeReleaseSpinLockFromDpcLevel", "label": "KeReleaseSpinLockFromDpcLevel", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeAcquireSpinLockAtDpcLevel", "label": "KeAcquireSpinLockAtDpcLevel", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeSetEvent", "label": "KeSetEvent", "level": 2, "shape": "dot"}, {"group": "functions", "id": "EventCancelRoutine", "label": "EventCancelRoutine", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoReleaseCancelSpinLock", "label": "IoReleaseCancelSpinLock", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeCancelTimer", "label": "KeCancelTimer", "level": 2, "shape": "dot"}, {"group": "functions", "id": "EventUnload", "label": "EventUnload", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoDeleteSymbolicLink", "label": "IoDeleteSymbolicLink", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoDeleteDevice", "label": "IoDeleteDevice", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeGetCurrentIrql", "label": "KeGetCurrentIrql", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IsListEmpty", "label": "IsListEmpty", "level": 2, "shape": "dot"}, {"group": "functions", "id": "EventDispatchIoControl", "label": "EventDispatchIoControl", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoReleaseRemoveLockEx", "label": "IoReleaseRemoveLockEx", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoAcquireRemoveLockEx", "label": "IoAcquireRemoveLockEx", "level": 2, "shape": "dot"}, {"group": "functions", "id": "EventCleanup", "label": "EventCleanup", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoReleaseRemoveLockAndWaitEx", "label": "IoReleaseRemoveLockAndWaitEx", "level": 2, "shape": "dot"}, {"group": "functions", "id": "EventCreateClose", "label": "EventCreateClose", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoInitializeRemoveLockEx", "label": "IoInitializeRemoveLockEx", "level": 2, "shape": "dot"}, {"group": "functions", "id": "DriverEntry", "label": "DriverEntry", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoCreateSymbolicLink", "label": "IoCreateSymbolicLink", "level": 2, "shape": "dot"}, {"group": "functions", "id": "IoCreateDevice", "label": "IoCreateDevice", "level": 2, "shape": "dot"}, {"group": "functions", "id": "KeInitializeSpinLock", "label": "KeInitializeSpinLock", "level": 2, "shape": "dot"}, {"group": "functions", "id": "__debugbreak", "label": "__debugbreak", "level": 2, "shape": "dot"}, {"group": "files", "id": "string.h", "label": "string.h", "level": 1, "shape": "dot"}, {"group": "files", "id": "ntdef.h", "label": "ntdef.h", "level": 1, "shape": "dot"}, {"group": "files", "id": "wdm.h", "label": "wdm.h", "level": 1, "shape": "dot"}, {"group": "functions", "id": "RtlQueryRegistryValues", "label": "RtlQueryRegistryValues", "level": 2, "shape": "dot"}, {"group": "files", "id": "ntddk.h", "label": "ntddk.h", "level": 1, "shape": "dot"}, {"group": "files", "id": "event.h", "label": "event.h", "level": 1, "shape": "dot"}, {"group": "files", "id": "event.c", "label": "event.c", "level": 1, "shape": "dot"}, {"group": "irps", "id": "IRP_MJ_CLOSE", "label": "IRP_MJ_CLOSE", "level": 3, "shape": "dot"}, {"group": "irps", "id": "IRP_MJ_CREATE", "label": "IRP_MJ_CREATE", "level": 3, "shape": "dot"}]);
+                  edges = new vis.DataSet([{"arrows": "to", "from": "wcsnlen", "to": "wcsnlen_s"}, {"arrows": "to", "from": "strnlen", "to": "strnlen_s"}, {"arrows": "to", "from": "memset", "to": "EventDescZero"}, {"arrows": "to", "from": "MmGetSystemRoutineAddress", "to": "RtlxQueryRegistryValues"}, {"arrows": "to", "from": "RtlInitUnicodeString", "to": "RtlxQueryRegistryValues"}, {"arrows": "to", "from": "_RTL_CONSTANT_STRING_type_check", "to": "ExInitializeDriverRuntime"}, {"arrows": "to", "from": "RtlGetVersion", "to": "ExInitializeDriverRuntime"}, {"arrows": "to", "from": "__annotation", "to": "ExInitializeDriverRuntime"}, {"arrows": "to", "from": "__int2c", "to": "ExInitializeDriverRuntime"}, {"arrows": "to", "from": "MmGetSystemRoutineAddress", "to": "ExInitializeDriverRuntime"}, {"arrows": "to", "from": "__annotation", "to": "HalReadDmaCounter"}, {"arrows": "to", "from": "__int2c", "to": "HalReadDmaCounter"}, {"arrows": "to", "from": "__annotation", "to": "HalGetDmaAlignment"}, {"arrows": "to", "from": "__int2c", "to": "HalGetDmaAlignment"}, {"arrows": "to", "from": "__annotation", "to": "IoMapTransfer"}, {"arrows": "to", "from": "__int2c", "to": "IoMapTransfer"}, {"arrows": "to", "from": "__annotation", "to": "IoFreeMapRegisters"}, {"arrows": "to", "from": "__int2c", "to": "IoFreeMapRegisters"}, {"arrows": "to", "from": "__annotation", "to": "IoFreeAdapterChannel"}, {"arrows": "to", "from": "__int2c", "to": "IoFreeAdapterChannel"}, {"arrows": "to", "from": "__annotation", "to": "IoFlushAdapterBuffers"}, {"arrows": "to", "from": "__int2c", "to": "IoFlushAdapterBuffers"}, {"arrows": "to", "from": "__annotation", "to": "IoAllocateAdapterChannel"}, {"arrows": "to", "from": "__int2c", "to": "IoAllocateAdapterChannel"}, {"arrows": "to", "from": "__annotation", "to": "HalFreeCommonBuffer"}, {"arrows": "to", "from": "__int2c", "to": "HalFreeCommonBuffer"}, {"arrows": "to", "from": "__annotation", "to": "HalAllocateCommonBuffer"}, {"arrows": "to", "from": "__int2c", "to": "HalAllocateCommonBuffer"}, {"arrows": "to", "from": "__annotation", "to": "IoSkipCurrentIrpStackLocation"}, {"arrows": "to", "from": "__int2c", "to": "IoSkipCurrentIrpStackLocation"}, {"arrows": "to", "from": "memcpy", "to": "IoCopyCurrentIrpStackLocationToNext"}, {"arrows": "to", "from": "IoGetCurrentIrpStackLocation", "to": "IoCopyCurrentIrpStackLocationToNext"}, {"arrows": "to", "from": "IoGetNextIrpStackLocation", "to": "IoCopyCurrentIrpStackLocationToNext"}, {"arrows": "to", "from": "__annotation", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "__int2c", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "__annotation", "to": "IoGetNextIrpStackLocation"}, {"arrows": "to", "from": "__int2c", "to": "IoGetNextIrpStackLocation"}, {"arrows": "to", "from": "__annotation", "to": "IoSetNextIrpStackLocation"}, {"arrows": "to", "from": "__int2c", "to": "IoSetNextIrpStackLocation"}, {"arrows": "to", "from": "__annotation", "to": "IoSetCompletionRoutine"}, {"arrows": "to", "from": "__int2c", "to": "IoSetCompletionRoutine"}, {"arrows": "to", "from": "IoGetNextIrpStackLocation", "to": "IoSetCompletionRoutine"}, {"arrows": "to", "from": "_InterlockedExchangePointer", "to": "IoSetCancelRoutine"}, {"arrows": "to", "from": "KeInsertQueueDpc", "to": "IoRequestDpc"}, {"arrows": "to", "from": "IoGetCurrentIrpStackLocation", "to": "IoMarkIrpPending"}, {"arrows": "to", "from": "KeInitializeThreadedDpc", "to": "IoInitializeThreadedDpcRequest"}, {"arrows": "to", "from": "KeInitializeDpc", "to": "IoInitializeDpcRequest"}, {"arrows": "to", "from": "IoGetStackLimits", "to": "IoGetRemainingStackSize"}, {"arrows": "to", "from": "KeGetCurrentThread", "to": "PsGetCurrentThread"}, {"arrows": "to", "from": "__readgsqword", "to": "KeGetCurrentThread"}, {"arrows": "to", "from": "__annotation", "to": "MmPrepareMdlForReuse"}, {"arrows": "to", "from": "__int2c", "to": "MmPrepareMdlForReuse"}, {"arrows": "to", "from": "MmUnmapLockedPages", "to": "MmPrepareMdlForReuse"}, {"arrows": "to", "from": "MmMapLockedPagesSpecifyCache_NXOptIn", "to": "MmGetSystemAddressForMdlSafe"}, {"arrows": "to", "from": "MmMapLockedPagesSpecifyCache", "to": "MmMapLockedPagesSpecifyCache_NXOptIn"}, {"arrows": "to", "from": "memset", "to": "ExInitializeDeleteTimerParameters"}, {"arrows": "to", "from": "__annotation", "to": "ExInitializeDeleteTimerParameters"}, {"arrows": "to", "from": "__int2c", "to": "ExInitializeDeleteTimerParameters"}, {"arrows": "to", "from": "KeInitializeTimer2SetParameters", "to": "ExInitializeSetTimerParameters"}, {"arrows": "to", "from": "memset", "to": "KeInitializeTimer2SetParameters"}, {"arrows": "to", "from": "__annotation", "to": "KeInitializeTimer2SetParameters"}, {"arrows": "to", "from": "__int2c", "to": "KeInitializeTimer2SetParameters"}, {"arrows": "to", "from": "ExInitializeNPagedLookasideList", "to": "ExInitializeNPagedLookasideList_NXPoolOptIn"}, {"arrows": "to", "from": "WriteRaw", "to": "ExInitializeFastMutex"}, {"arrows": "to", "from": "KeInitializeEvent", "to": "ExInitializeFastMutex"}, {"arrows": "to", "from": "ExAllocatePoolWithTagPriority", "to": "ExAllocatePoolPriorityUninitialized"}, {"arrows": "to", "from": "memset", "to": "ExAllocatePoolPriorityZero"}, {"arrows": "to", "from": "ExAllocatePoolWithTagPriority", "to": "ExAllocatePoolPriorityZero"}, {"arrows": "to", "from": "ExAllocatePoolWithQuotaTag", "to": "ExAllocatePoolQuotaUninitialized"}, {"arrows": "to", "from": "memset", "to": "ExAllocatePoolQuotaZero"}, {"arrows": "to", "from": "ExAllocatePoolWithQuotaTag", "to": "ExAllocatePoolQuotaZero"}, {"arrows": "to", "from": "ExAllocatePoolWithTag", "to": "ExAllocatePoolUninitialized"}, {"arrows": "to", "from": "memset", "to": "ExAllocatePoolZero"}, {"arrows": "to", "from": "ExAllocatePoolWithTag", "to": "ExAllocatePoolZero"}, {"arrows": "to", "from": "__faststorefence", "to": "KeMemoryBarrier"}, {"arrows": "to", "from": "__readgsdword", "to": "KeGetCurrentProcessorIndex"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "WRITE_PORT_BUFFER_ULONG"}, {"arrows": "to", "from": "__outdwordstring", "to": "WRITE_PORT_BUFFER_ULONG"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "WRITE_PORT_BUFFER_USHORT"}, {"arrows": "to", "from": "__outwordstring", "to": "WRITE_PORT_BUFFER_USHORT"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "WRITE_PORT_BUFFER_UCHAR"}, {"arrows": "to", "from": "__outbytestring", "to": "WRITE_PORT_BUFFER_UCHAR"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "WRITE_PORT_ULONG"}, {"arrows": "to", "from": "__outdword", "to": "WRITE_PORT_ULONG"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "WRITE_PORT_USHORT"}, {"arrows": "to", "from": "__outword", "to": "WRITE_PORT_USHORT"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "WRITE_PORT_UCHAR"}, {"arrows": "to", "from": "__outbyte", "to": "WRITE_PORT_UCHAR"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_PORT_BUFFER_ULONG"}, {"arrows": "to", "from": "__indwordstring", "to": "READ_PORT_BUFFER_ULONG"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_PORT_BUFFER_USHORT"}, {"arrows": "to", "from": "__inwordstring", "to": "READ_PORT_BUFFER_USHORT"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_PORT_BUFFER_UCHAR"}, {"arrows": "to", "from": "__inbytestring", "to": "READ_PORT_BUFFER_UCHAR"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_PORT_ULONG"}, {"arrows": "to", "from": "__indword", "to": "READ_PORT_ULONG"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_PORT_USHORT"}, {"arrows": "to", "from": "__inword", "to": "READ_PORT_USHORT"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_PORT_UCHAR"}, {"arrows": "to", "from": "__inbyte", "to": "READ_PORT_UCHAR"}, {"arrows": "to", "from": "__faststorefence", "to": "WRITE_REGISTER_BUFFER_ULONG64"}, {"arrows": "to", "from": "__movsq", "to": "WRITE_REGISTER_BUFFER_ULONG64"}, {"arrows": "to", "from": "__faststorefence", "to": "WRITE_REGISTER_BUFFER_ULONG"}, {"arrows": "to", "from": "__movsd", "to": "WRITE_REGISTER_BUFFER_ULONG"}, {"arrows": "to", "from": "__faststorefence", "to": "WRITE_REGISTER_BUFFER_USHORT"}, {"arrows": "to", "from": "__movsw", "to": "WRITE_REGISTER_BUFFER_USHORT"}, {"arrows": "to", "from": "__faststorefence", "to": "WRITE_REGISTER_BUFFER_UCHAR"}, {"arrows": "to", "from": "__movsb", "to": "WRITE_REGISTER_BUFFER_UCHAR"}, {"arrows": "to", "from": "__faststorefence", "to": "WRITE_REGISTER_ULONG64"}, {"arrows": "to", "from": "__faststorefence", "to": "WRITE_REGISTER_ULONG"}, {"arrows": "to", "from": "__faststorefence", "to": "WRITE_REGISTER_USHORT"}, {"arrows": "to", "from": "__faststorefence", "to": "WRITE_REGISTER_UCHAR"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_REGISTER_BUFFER_ULONG64"}, {"arrows": "to", "from": "__movsq", "to": "READ_REGISTER_BUFFER_ULONG64"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_REGISTER_BUFFER_ULONG"}, {"arrows": "to", "from": "__movsd", "to": "READ_REGISTER_BUFFER_ULONG"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_REGISTER_BUFFER_USHORT"}, {"arrows": "to", "from": "__movsw", "to": "READ_REGISTER_BUFFER_USHORT"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_REGISTER_BUFFER_UCHAR"}, {"arrows": "to", "from": "__movsb", "to": "READ_REGISTER_BUFFER_UCHAR"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_REGISTER_ULONG64"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_REGISTER_ULONG"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_REGISTER_USHORT"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "READ_REGISTER_UCHAR"}, {"arrows": "to", "from": "_bittest64", "to": "RtlCheckBit"}, {"arrows": "to", "from": "__umulh", "to": "RtlExtendedMagicDivide"}, {"arrows": "to", "from": "__stosb", "to": "RtlSecureZeroMemory"}, {"arrows": "to", "from": "memset", "to": "RtlInitEmptyAnsiString"}, {"arrows": "to", "from": "memset", "to": "RtlInitEmptyUnicodeString"}, {"arrows": "to", "from": "memset", "to": "RtlSanitizeUnicodeStringPadding"}, {"arrows": "to", "from": "RtlpCheckListEntry", "to": "AppendTailList"}, {"arrows": "to", "from": "FatalListEntryError", "to": "RtlpCheckListEntry"}, {"arrows": "to", "from": "RtlFailFast", "to": "FatalListEntryError"}, {"arrows": "to", "from": "RtlpCheckListEntry", "to": "InsertHeadList"}, {"arrows": "to", "from": "FatalListEntryError", "to": "InsertHeadList"}, {"arrows": "to", "from": "__fastfail", "to": "RtlFailFast"}, {"arrows": "to", "from": "RtlpCheckListEntry", "to": "InsertTailList"}, {"arrows": "to", "from": "FatalListEntryError", "to": "InsertTailList"}, {"arrows": "to", "from": "RtlpCheckListEntry", "to": "RemoveTailList"}, {"arrows": "to", "from": "FatalListEntryError", "to": "RemoveTailList"}, {"arrows": "to", "from": "RtlpCheckListEntry", "to": "RemoveHeadList"}, {"arrows": "to", "from": "FatalListEntryError", "to": "RemoveHeadList"}, {"arrows": "to", "from": "FatalListEntryError", "to": "RemoveEntryList"}, {"arrows": "to", "from": "WriteRaw64", "to": "WritePointerRaw"}, {"arrows": "to", "from": "WriteNoFence64", "to": "WritePointerNoFence"}, {"arrows": "to", "from": "WriteRelease64", "to": "WritePointerRelease"}, {"arrows": "to", "from": "ReadRaw64", "to": "ReadPointerRaw"}, {"arrows": "to", "from": "ReadNoFence64", "to": "ReadPointerNoFence"}, {"arrows": "to", "from": "ReadAcquire64", "to": "ReadPointerAcquire"}, {"arrows": "to", "from": "WriteRaw64", "to": "WriteULong64Raw"}, {"arrows": "to", "from": "WriteNoFence64", "to": "WriteULong64NoFence"}, {"arrows": "to", "from": "WriteRelease64", "to": "WriteULong64Release"}, {"arrows": "to", "from": "ReadRaw64", "to": "ReadULong64Raw"}, {"arrows": "to", "from": "ReadNoFence64", "to": "ReadULong64NoFence"}, {"arrows": "to", "from": "ReadAcquire64", "to": "ReadULong64Acquire"}, {"arrows": "to", "from": "WriteRaw", "to": "WriteUInt32Raw"}, {"arrows": "to", "from": "WriteNoFence", "to": "WriteUInt32NoFence"}, {"arrows": "to", "from": "WriteRelease", "to": "WriteUInt32Release"}, {"arrows": "to", "from": "ReadRaw", "to": "ReadUInt32Raw"}, {"arrows": "to", "from": "ReadNoFence", "to": "ReadUInt32NoFence"}, {"arrows": "to", "from": "ReadAcquire", "to": "ReadUInt32Acquire"}, {"arrows": "to", "from": "WriteRaw", "to": "WriteInt32Raw"}, {"arrows": "to", "from": "WriteNoFence", "to": "WriteInt32NoFence"}, {"arrows": "to", "from": "WriteRelease", "to": "WriteInt32Release"}, {"arrows": "to", "from": "ReadRaw", "to": "ReadInt32Raw"}, {"arrows": "to", "from": "ReadNoFence", "to": "ReadInt32NoFence"}, {"arrows": "to", "from": "ReadAcquire", "to": "ReadInt32Acquire"}, {"arrows": "to", "from": "WriteRaw", "to": "WriteULongRaw"}, {"arrows": "to", "from": "WriteNoFence", "to": "WriteULongNoFence"}, {"arrows": "to", "from": "WriteRelease", "to": "WriteULongRelease"}, {"arrows": "to", "from": "ReadRaw", "to": "ReadULongRaw"}, {"arrows": "to", "from": "ReadNoFence", "to": "ReadULongNoFence"}, {"arrows": "to", "from": "ReadAcquire", "to": "ReadULongAcquire"}, {"arrows": "to", "from": "WriteRaw16", "to": "WriteUShortRaw"}, {"arrows": "to", "from": "WriteNoFence16", "to": "WriteUShortNoFence"}, {"arrows": "to", "from": "WriteRelease16", "to": "WriteUShortRelease"}, {"arrows": "to", "from": "ReadRaw16", "to": "ReadUShortRaw"}, {"arrows": "to", "from": "ReadNoFence16", "to": "ReadUShortNoFence"}, {"arrows": "to", "from": "ReadAcquire16", "to": "ReadUShortAcquire"}, {"arrows": "to", "from": "WriteRaw8", "to": "WriteUCharRaw"}, {"arrows": "to", "from": "WriteNoFence8", "to": "WriteBooleanNoFence"}, {"arrows": "to", "from": "WriteRelease8", "to": "WriteBooleanRelease"}, {"arrows": "to", "from": "WriteNoFence8", "to": "WriteUCharNoFence"}, {"arrows": "to", "from": "WriteRelease8", "to": "WriteUCharRelease"}, {"arrows": "to", "from": "ReadRaw8", "to": "ReadUCharRaw"}, {"arrows": "to", "from": "ReadRaw8", "to": "ReadBooleanRaw"}, {"arrows": "to", "from": "ReadNoFence8", "to": "ReadBooleanNoFence"}, {"arrows": "to", "from": "ReadAcquire8", "to": "ReadBooleanAcquire"}, {"arrows": "to", "from": "ReadNoFence8", "to": "ReadUCharNoFence"}, {"arrows": "to", "from": "ReadAcquire8", "to": "ReadUCharAcquire"}, {"arrows": "to", "from": "_ReadWriteBarrier", "to": "BarrierAfterRead"}, {"arrows": "to", "from": "_umul128", "to": "UnsignedMultiplyExtract128"}, {"arrows": "to", "from": "__shiftright128", "to": "UnsignedMultiplyExtract128"}, {"arrows": "to", "from": "__shiftright128", "to": "MultiplyExtract128"}, {"arrows": "to", "from": "_mul128", "to": "MultiplyExtract128"}, {"arrows": "to", "from": "_InterlockedExchangeAdd64", "to": "_InlineInterlockedAdd64"}, {"arrows": "to", "from": "_InterlockedExchangeAdd", "to": "_InlineInterlockedAdd"}, {"arrows": "to", "from": "memcpy", "to": "WheaErrorRecordBuilderAddPacket"}, {"arrows": "to", "from": "WheaErrorRecordBuilderAddSection", "to": "WheaErrorRecordBuilderAddPacket"}, {"arrows": "to", "from": "memcpy", "to": "WheaErrorRecordBuilderAddSection"}, {"arrows": "to", "from": "RtlAssert", "to": "WheaErrorRecordBuilderAddSection"}, {"arrows": "to", "from": "WheaInitializeRecordHeader", "to": "WheaErrorRecordBuilderInit"}, {"arrows": "to", "from": "WheaIsValidErrorRecordSignature", "to": "WheaFindNextErrorRecordSection"}, {"arrows": "to", "from": "RtlCompareMemory", "to": "WheaFindErrorRecordSection"}, {"arrows": "to", "from": "WheaIsValidErrorRecordSignature", "to": "WheaFindErrorRecordSection"}, {"arrows": "to", "from": "RtlCompareMemory", "to": "WheaGetErrPacketFromErrRecord"}, {"arrows": "to", "from": "memset", "to": "IoInitializeDriverCreateContext"}, {"arrows": "to", "from": "KfRaiseIrql", "to": "KeRaiseIrqlToSynchLevel"}, {"arrows": "to", "from": "KfRaiseIrql", "to": "KeRaiseIrqlToDpcLevel"}, {"arrows": "to", "from": "__readgsbyte", "to": "KeGetCurrentProcessorNumber"}, {"arrows": "to", "from": "__readgsqword", "to": "KeGetPcr"}, {"arrows": "to", "from": "_InterlockedExchange", "to": "_ExInterlockedExchangeUlong"}, {"arrows": "to", "from": "_InterlockedIncrement", "to": "_ExInterlockedIncrementLong"}, {"arrows": "to", "from": "_InterlockedDecrement", "to": "_ExInterlockedDecrementLong"}, {"arrows": "to", "from": "memset", "to": "CUSTOM_SYSTEM_EVENT_TRIGGER_INIT"}, {"arrows": "to", "from": "IoGetCurrentIrpStackLocation", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "IoSetCancelRoutine", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "IoMarkIrpPending", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "KeInitializeDpc", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "ExFreePoolWithTag", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "ExAllocatePoolQuotaZero", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "KeReleaseSpinLock", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "KeAcquireSpinLockRaiseToDpc", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "KeSetTimer", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "KeInitializeTimer", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "DbgPrint", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "InsertTailList", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "InitializeListHead", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "ObReferenceObjectByHandle", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "IoGetCurrentIrpStackLocation", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "KeInitializeDpc", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "ExFreePoolWithTag", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "ExAllocatePoolQuotaZero", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "KeReleaseSpinLock", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "KeAcquireSpinLockRaiseToDpc", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "KeSetTimer", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "KeInitializeTimer", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "DbgPrint", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "InsertTailList", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "InitializeListHead", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "ObfDereferenceObject", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "IoSetCancelRoutine", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "IofCompleteRequest", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "ExFreePoolWithTag", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "KeReleaseSpinLockFromDpcLevel", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "KeAcquireSpinLockAtDpcLevel", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "KeSetEvent", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "DbgPrint", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "RemoveEntryList", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "InitializeListHead", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "RtlAssert", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "IoReleaseCancelSpinLock", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "IofCompleteRequest", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "ExFreePoolWithTag", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "KeReleaseSpinLock", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "KeAcquireSpinLockRaiseToDpc", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "KeCancelTimer", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "DbgPrint", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "RemoveEntryList", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "InitializeListHead", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "RtlAssert", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "__annotation", "to": "EventUnload"}, {"arrows": "to", "from": "__int2c", "to": "EventUnload"}, {"arrows": "to", "from": "IoDeleteSymbolicLink", "to": "EventUnload"}, {"arrows": "to", "from": "IoDeleteDevice", "to": "EventUnload"}, {"arrows": "to", "from": "KeGetCurrentIrql", "to": "EventUnload"}, {"arrows": "to", "from": "DbgPrint", "to": "EventUnload"}, {"arrows": "to", "from": "RtlInitUnicodeString", "to": "EventUnload"}, {"arrows": "to", "from": "IsListEmpty", "to": "EventUnload"}, {"arrows": "to", "from": "RtlAssert", "to": "EventUnload"}, {"arrows": "to", "from": "IoReleaseRemoveLockEx", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "IoAcquireRemoveLockEx", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "IoGetCurrentIrpStackLocation", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "IofCompleteRequest", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "DbgPrint", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "RtlAssert", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "RegisterIrpBasedNotification", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "RegisterEventBasedNotification", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "ObfDereferenceObject", "to": "EventCleanup"}, {"arrows": "to", "from": "IoReleaseRemoveLockAndWaitEx", "to": "EventCleanup"}, {"arrows": "to", "from": "IoAcquireRemoveLockEx", "to": "EventCleanup"}, {"arrows": "to", "from": "IoGetCurrentIrpStackLocation", "to": "EventCleanup"}, {"arrows": "to", "from": "IoSetCancelRoutine", "to": "EventCleanup"}, {"arrows": "to", "from": "IofCompleteRequest", "to": "EventCleanup"}, {"arrows": "to", "from": "ExFreePoolWithTag", "to": "EventCleanup"}, {"arrows": "to", "from": "KeReleaseSpinLock", "to": "EventCleanup"}, {"arrows": "to", "from": "KeAcquireSpinLockRaiseToDpc", "to": "EventCleanup"}, {"arrows": "to", "from": "KeCancelTimer", "to": "EventCleanup"}, {"arrows": "to", "from": "DbgPrint", "to": "EventCleanup"}, {"arrows": "to", "from": "InsertTailList", "to": "EventCleanup"}, {"arrows": "to", "from": "RemoveHeadList", "to": "EventCleanup"}, {"arrows": "to", "from": "RemoveEntryList", "to": "EventCleanup"}, {"arrows": "to", "from": "IsListEmpty", "to": "EventCleanup"}, {"arrows": "to", "from": "InitializeListHead", "to": "EventCleanup"}, {"arrows": "to", "from": "RtlAssert", "to": "EventCleanup"}, {"arrows": "to", "from": "__annotation", "to": "EventCreateClose"}, {"arrows": "to", "from": "__int2c", "to": "EventCreateClose"}, {"arrows": "to", "from": "IoInitializeRemoveLockEx", "to": "EventCreateClose"}, {"arrows": "to", "from": "IoGetCurrentIrpStackLocation", "to": "EventCreateClose"}, {"arrows": "to", "from": "IofCompleteRequest", "to": "EventCreateClose"}, {"arrows": "to", "from": "ExFreePoolWithTag", "to": "EventCreateClose"}, {"arrows": "to", "from": "ExAllocatePoolQuotaZero", "to": "EventCreateClose"}, {"arrows": "to", "from": "KeGetCurrentIrql", "to": "EventCreateClose"}, {"arrows": "to", "from": "DbgPrint", "to": "EventCreateClose"}, {"arrows": "to", "from": "RtlAssert", "to": "EventCreateClose"}, {"arrows": "to", "from": "ExInitializeDriverRuntime", "to": "DriverEntry"}, {"arrows": "to", "from": "IoDeleteDevice", "to": "DriverEntry"}, {"arrows": "to", "from": "IoCreateSymbolicLink", "to": "DriverEntry"}, {"arrows": "to", "from": "IoCreateDevice", "to": "DriverEntry"}, {"arrows": "to", "from": "KeInitializeSpinLock", "to": "DriverEntry"}, {"arrows": "to", "from": "DbgPrint", "to": "DriverEntry"}, {"arrows": "to", "from": "RtlInitUnicodeString", "to": "DriverEntry"}, {"arrows": "to", "from": "InitializeListHead", "to": "DriverEntry"}, {"arrows": "to", "from": "RtlAssert", "to": "DriverEntry"}, {"arrows": "to", "from": "__debugbreak", "to": "DriverEntry"}, {"arrows": "to", "from": "string.h", "to": "wcsnlen"}, {"arrows": "to", "from": "string.h", "to": "strnlen"}, {"arrows": "to", "from": "string.h", "to": "memset"}, {"arrows": "to", "from": "string.h", "to": "memcpy"}, {"arrows": "to", "from": "ntdef.h", "to": "_RTL_CONSTANT_STRING_type_check"}, {"arrows": "to", "from": "wdm.h", "to": "ExInitializeDriverRuntime"}, {"arrows": "to", "from": "wdm.h", "to": "IoSetCancelRoutine"}, {"arrows": "to", "from": "wdm.h", "to": "IoMarkIrpPending"}, {"arrows": "to", "from": "wdm.h", "to": "IoGetNextIrpStackLocation"}, {"arrows": "to", "from": "wdm.h", "to": "IoGetCurrentIrpStackLocation"}, {"arrows": "to", "from": "wdm.h", "to": "MmMapLockedPagesSpecifyCache_NXOptIn"}, {"arrows": "to", "from": "wdm.h", "to": "ExAllocatePoolQuotaZero"}, {"arrows": "to", "from": "wdm.h", "to": "KeInitializeTimer2SetParameters"}, {"arrows": "to", "from": "wdm.h", "to": "InsertTailList"}, {"arrows": "to", "from": "wdm.h", "to": "RemoveHeadList"}, {"arrows": "to", "from": "wdm.h", "to": "RemoveEntryList"}, {"arrows": "to", "from": "wdm.h", "to": "RtlpCheckListEntry"}, {"arrows": "to", "from": "wdm.h", "to": "FatalListEntryError"}, {"arrows": "to", "from": "wdm.h", "to": "IsListEmpty"}, {"arrows": "to", "from": "wdm.h", "to": "InitializeListHead"}, {"arrows": "to", "from": "wdm.h", "to": "RtlFailFast"}, {"arrows": "to", "from": "wdm.h", "to": "WriteRaw64"}, {"arrows": "to", "from": "wdm.h", "to": "ReadRaw64"}, {"arrows": "to", "from": "wdm.h", "to": "WriteRaw"}, {"arrows": "to", "from": "wdm.h", "to": "ReadRaw"}, {"arrows": "to", "from": "wdm.h", "to": "WriteRaw16"}, {"arrows": "to", "from": "wdm.h", "to": "ReadRaw16"}, {"arrows": "to", "from": "wdm.h", "to": "WriteRaw8"}, {"arrows": "to", "from": "wdm.h", "to": "ReadRaw8"}, {"arrows": "to", "from": "wdm.h", "to": "WriteNoFence64"}, {"arrows": "to", "from": "wdm.h", "to": "WriteRelease64"}, {"arrows": "to", "from": "wdm.h", "to": "ReadNoFence64"}, {"arrows": "to", "from": "wdm.h", "to": "ReadAcquire64"}, {"arrows": "to", "from": "wdm.h", "to": "WriteNoFence"}, {"arrows": "to", "from": "wdm.h", "to": "WriteRelease"}, {"arrows": "to", "from": "wdm.h", "to": "ReadNoFence"}, {"arrows": "to", "from": "wdm.h", "to": "ReadAcquire"}, {"arrows": "to", "from": "wdm.h", "to": "WriteNoFence16"}, {"arrows": "to", "from": "wdm.h", "to": "WriteRelease16"}, {"arrows": "to", "from": "wdm.h", "to": "ReadNoFence16"}, {"arrows": "to", "from": "wdm.h", "to": "ReadAcquire16"}, {"arrows": "to", "from": "wdm.h", "to": "WriteNoFence8"}, {"arrows": "to", "from": "wdm.h", "to": "WriteRelease8"}, {"arrows": "to", "from": "wdm.h", "to": "ReadNoFence8"}, {"arrows": "to", "from": "wdm.h", "to": "ReadAcquire8"}, {"arrows": "to", "from": "wdm.h", "to": "KeGetCurrentThread"}, {"arrows": "to", "from": "wdm.h", "to": "ObfDereferenceObject"}, {"arrows": "to", "from": "wdm.h", "to": "ObReferenceObjectByHandle"}, {"arrows": "to", "from": "wdm.h", "to": "IoReleaseRemoveLockAndWaitEx"}, {"arrows": "to", "from": "wdm.h", "to": "IoReleaseRemoveLockEx"}, {"arrows": "to", "from": "wdm.h", "to": "IoAcquireRemoveLockEx"}, {"arrows": "to", "from": "wdm.h", "to": "IoInitializeRemoveLockEx"}, {"arrows": "to", "from": "wdm.h", "to": "IoReleaseCancelSpinLock"}, {"arrows": "to", "from": "wdm.h", "to": "IoGetStackLimits"}, {"arrows": "to", "from": "wdm.h", "to": "IoDeleteSymbolicLink"}, {"arrows": "to", "from": "wdm.h", "to": "IoDeleteDevice"}, {"arrows": "to", "from": "wdm.h", "to": "IoCreateSymbolicLink"}, {"arrows": "to", "from": "wdm.h", "to": "IoCreateDevice"}, {"arrows": "to", "from": "wdm.h", "to": "IofCompleteRequest"}, {"arrows": "to", "from": "wdm.h", "to": "MmUnmapLockedPages"}, {"arrows": "to", "from": "wdm.h", "to": "MmMapLockedPagesSpecifyCache"}, {"arrows": "to", "from": "wdm.h", "to": "MmGetSystemRoutineAddress"}, {"arrows": "to", "from": "wdm.h", "to": "ExInitializeNPagedLookasideList"}, {"arrows": "to", "from": "wdm.h", "to": "ExFreePoolWithTag"}, {"arrows": "to", "from": "wdm.h", "to": "ExAllocatePoolWithQuotaTag"}, {"arrows": "to", "from": "wdm.h", "to": "ExAllocatePoolWithTagPriority"}, {"arrows": "to", "from": "wdm.h", "to": "ExAllocatePoolWithTag"}, {"arrows": "to", "from": "wdm.h", "to": "KeReleaseSpinLockFromDpcLevel"}, {"arrows": "to", "from": "wdm.h", "to": "KeReleaseSpinLock"}, {"arrows": "to", "from": "wdm.h", "to": "KeAcquireSpinLockRaiseToDpc"}, {"arrows": "to", "from": "wdm.h", "to": "KeAcquireSpinLockAtDpcLevel"}, {"arrows": "to", "from": "wdm.h", "to": "KeInitializeSpinLock"}, {"arrows": "to", "from": "wdm.h", "to": "KeSetTimer"}, {"arrows": "to", "from": "wdm.h", "to": "KeCancelTimer"}, {"arrows": "to", "from": "wdm.h", "to": "KeInitializeTimer"}, {"arrows": "to", "from": "wdm.h", "to": "KeSetEvent"}, {"arrows": "to", "from": "wdm.h", "to": "KeInitializeEvent"}, {"arrows": "to", "from": "wdm.h", "to": "KeInsertQueueDpc"}, {"arrows": "to", "from": "wdm.h", "to": "KeInitializeThreadedDpc"}, {"arrows": "to", "from": "wdm.h", "to": "KeInitializeDpc"}, {"arrows": "to", "from": "wdm.h", "to": "KfRaiseIrql"}, {"arrows": "to", "from": "wdm.h", "to": "KeGetCurrentIrql"}, {"arrows": "to", "from": "wdm.h", "to": "__outdwordstring"}, {"arrows": "to", "from": "wdm.h", "to": "__outwordstring"}, {"arrows": "to", "from": "wdm.h", "to": "__outbytestring"}, {"arrows": "to", "from": "wdm.h", "to": "__indwordstring"}, {"arrows": "to", "from": "wdm.h", "to": "__inwordstring"}, {"arrows": "to", "from": "wdm.h", "to": "__inbytestring"}, {"arrows": "to", "from": "wdm.h", "to": "__outdword"}, {"arrows": "to", "from": "wdm.h", "to": "__outword"}, {"arrows": "to", "from": "wdm.h", "to": "__outbyte"}, {"arrows": "to", "from": "wdm.h", "to": "__indword"}, {"arrows": "to", "from": "wdm.h", "to": "__inword"}, {"arrows": "to", "from": "wdm.h", "to": "__inbyte"}, {"arrows": "to", "from": "wdm.h", "to": "RtlCompareMemory"}, {"arrows": "to", "from": "wdm.h", "to": "RtlGetVersion"}, {"arrows": "to", "from": "wdm.h", "to": "DbgPrint"}, {"arrows": "to", "from": "wdm.h", "to": "RtlQueryRegistryValues"}, {"arrows": "to", "from": "wdm.h", "to": "RtlInitUnicodeString"}, {"arrows": "to", "from": "wdm.h", "to": "__fastfail"}, {"arrows": "to", "from": "wdm.h", "to": "RtlAssert"}, {"arrows": "to", "from": "wdm.h", "to": "__int2c"}, {"arrows": "to", "from": "wdm.h", "to": "__readgsqword"}, {"arrows": "to", "from": "wdm.h", "to": "__readgsdword"}, {"arrows": "to", "from": "wdm.h", "to": "__readgsbyte"}, {"arrows": "to", "from": "wdm.h", "to": "_mul128"}, {"arrows": "to", "from": "wdm.h", "to": "_umul128"}, {"arrows": "to", "from": "wdm.h", "to": "__shiftright128"}, {"arrows": "to", "from": "wdm.h", "to": "__umulh"}, {"arrows": "to", "from": "wdm.h", "to": "__stosb"}, {"arrows": "to", "from": "wdm.h", "to": "__movsq"}, {"arrows": "to", "from": "wdm.h", "to": "__movsd"}, {"arrows": "to", "from": "wdm.h", "to": "__movsw"}, {"arrows": "to", "from": "wdm.h", "to": "__movsb"}, {"arrows": "to", "from": "wdm.h", "to": "__faststorefence"}, {"arrows": "to", "from": "wdm.h", "to": "_ReadWriteBarrier"}, {"arrows": "to", "from": "wdm.h", "to": "_InterlockedExchangePointer"}, {"arrows": "to", "from": "wdm.h", "to": "_InterlockedExchangeAdd64"}, {"arrows": "to", "from": "wdm.h", "to": "_InterlockedExchangeAdd"}, {"arrows": "to", "from": "wdm.h", "to": "_InterlockedExchange"}, {"arrows": "to", "from": "wdm.h", "to": "_InterlockedDecrement"}, {"arrows": "to", "from": "wdm.h", "to": "_InterlockedIncrement"}, {"arrows": "to", "from": "wdm.h", "to": "_bittest64"}, {"arrows": "to", "from": "ntddk.h", "to": "WheaErrorRecordBuilderAddSection"}, {"arrows": "to", "from": "ntddk.h", "to": "WheaIsValidErrorRecordSignature"}, {"arrows": "to", "from": "ntddk.h", "to": "WheaInitializeRecordHeader"}, {"arrows": "to", "from": "event.h", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "event.c", "to": "RegisterIrpBasedNotification"}, {"arrows": "to", "from": "event.h", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "event.c", "to": "RegisterEventBasedNotification"}, {"arrows": "to", "from": "event.h", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "event.c", "to": "CustomTimerDPC"}, {"arrows": "to", "from": "event.h", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "event.c", "to": "EventCancelRoutine"}, {"arrows": "to", "from": "event.h", "to": "EventUnload"}, {"arrows": "to", "from": "event.c", "to": "EventUnload"}, {"arrows": "to", "from": "event.h", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "event.c", "to": "EventDispatchIoControl"}, {"arrows": "to", "from": "event.h", "to": "EventCleanup"}, {"arrows": "to", "from": "event.c", "to": "EventCleanup"}, {"arrows": "to", "from": "event.h", "to": "EventCreateClose"}, {"arrows": "to", "from": "event.c", "to": "EventCreateClose"}, {"arrows": "to", "from": "event.h", "to": "DriverEntry"}, {"arrows": "to", "from": "event.c", "to": "DriverEntry"}, {"arrows": "to", "from": "EventCreateClose", "to": "IRP_MJ_CLOSE"}, {"arrows": "to", "from": "EventCreateClose", "to": "IRP_MJ_CREATE"}]);
+
+                  nodeColors = {};
+                  allNodes = nodes.get({ returnType: "Object" });
+                  for (nodeId in allNodes) {
+                    nodeColors[nodeId] = allNodes[nodeId].color;
+                  }
+                  allEdges = edges.get({ returnType: "Object" });
+                  // adding nodes and edges to the graph
+                  data = {nodes: nodes, edges: edges};
+
+                  var options = {
+    "configure": {
+        "enabled": true,
+        "filter": true
+    },
+    "edges": {
+        "color": {
+            "inherit": true
+        },
+        "smooth": {
+            "enabled": true,
+            "type": "dynamic"
+        }
+    },
+    "interaction": {
+        "dragNodes": true,
+        "hideEdgesOnDrag": false,
+        "hideNodesOnDrag": false
+    },
+    "physics": {
+        "enabled": true,
+        "stabilization": {
+            "enabled": true,
+            "fit": true,
+            "iterations": 1000,
+            "onlyDynamicEdges": false,
+            "updateInterval": 50
+        }
+    }
+};
+
+                  
+
+
+                  
+                  // if this network requires displaying the configure window,
+                  // put it in its div
+                  options.configure["container"] = document.getElementById("config");
+                  
+
+                  network = new vis.Network(container, data, options);
+
+                  
+                    network.on("click", neighbourhoodHighlight);
+                  
+
+                  
+
+                  
+
+
+                  
+                      network.on("stabilizationProgress", function(params) {
+                          document.getElementById('loadingBar').removeAttribute("style");
+                          var maxWidth = 496;
+                          var minWidth = 20;
+                          var widthFactor = params.iterations/params.total;
+                          var width = Math.max(minWidth,maxWidth * widthFactor);
+                          document.getElementById('bar').style.width = width + 'px';
+                          document.getElementById('text').innerHTML = Math.round(widthFactor*100) + '%';
+                      });
+                      network.once("stabilizationIterationsDone", function() {
+                          document.getElementById('text').innerHTML = '100%';
+                          document.getElementById('bar').style.width = '496px';
+                          document.getElementById('loadingBar').style.opacity = 0;
+                          // really clean the dom element
+                          setTimeout(function () {document.getElementById('loadingBar').style.display = 'none';}, 500);
+                      });
+                  
+
+                  return network;
+
+              }
+              drawGraph();
+        </script>
+    </body>
+</html>
