@@ -5,16 +5,6 @@
  * @kind graph
  * @name call-graph-driver
  * @description call graph
- * @platform Desktop
- * @feature.area Multiple
- * @impact Insecure Coding Practice
- * @repro.text
- * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-TODO
- * @problem.severity warning
- * @precision medium
- * @tags correctness
- * @scope domainspecific
  * @query-version v1
  */
 

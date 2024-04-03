@@ -257,6 +257,21 @@ def merge_nets(networks):
                         #net_all.add_edge(edge['from'], edge['to'])
                         print(edge['to'], node)
 
+    net_other = networks['irps-graph']
+    other_nodes = net_other.get_nodes()
+    other_edges = net_other.get_edges()
+    for irp_node in other_nodes:
+        if irp_node in net_all.get_nodes():
+            for edge in other_edges:
+                if edge['from'] == irp_node:
+                    net_all.add_node(edge['to'], label=edge['to'], level=LEVELS.IRPS.value, group='IRPS', hidden=False, shape='dot')
+                    if edge not in net_all.get_edges():
+                        net_all.add_edge(edge['from'], edge['to'])
+                if edge['to'] == irp_node:
+                    net_all.add_node(edge['from'], label=edge['from'], level=LEVELS.IRPS.value, group='IRPS', hidden=False, shape='dot')
+                    if edge not in net_all.get_edges():
+                        net_all.add_edge(edge['from'], edge['to'])
+                    
     net_all.show('merged.html', notebook=False)
     
     
