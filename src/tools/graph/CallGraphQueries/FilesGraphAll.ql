@@ -22,6 +22,13 @@ import cpp
 import semmle.code.cpp.pointsto.CallGraph
 
 from Function func
+where
+  (
+    func.getADeclarationEntry().getFile().toString().matches("%.h") or
+    func.getADeclarationEntry().getFile().toString().matches("%.cpp") or
+    func.getADeclarationEntry().getFile().toString().matches("%.c") or
+    func.getADeclarationEntry().getFile().toString().matches("%.hpp")
+  )
 // where
 //   (
 //     exists(FunctionCall fc | fc.getTarget() = func) or

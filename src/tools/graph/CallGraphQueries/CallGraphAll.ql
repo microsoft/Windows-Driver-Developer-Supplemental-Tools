@@ -30,7 +30,7 @@
   allCalls(caller, callee.getTarget())
   and allCalls*(root, caller)
 //   and root instanceof WdmDispatchRoutine
- // and not root.getFile().getAbsolutePath().matches("%Windows Kits%")
+  and not root.getFile().getAbsolutePath().matches("%Windows Kits%")
   
 
  select caller, callee.getTarget()
