@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/file-functions
+ * @id cpp/drivers/file-functions-driver
  * @kind graph
- * @name file-functions
+ * @name file-functions-driver
  * @description file-functions
  * @platform Desktop
  * @feature.area Multiple

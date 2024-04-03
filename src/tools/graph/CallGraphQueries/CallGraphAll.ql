@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/call-graph 
+ * @id cpp/drivers/call-graph-all 
  * @kind graph
- * @name call-graph
+ * @name call-graph-all
  * @description call graph
  * @platform Desktop
  * @feature.area Multiple
@@ -30,7 +30,7 @@
   allCalls(caller, callee.getTarget())
   and allCalls*(root, caller)
 //   and root instanceof WdmDispatchRoutine
-  and not root.getFile().getAbsolutePath().matches("%Windows Kits%")
+ // and not root.getFile().getAbsolutePath().matches("%Windows Kits%")
   
 
  select caller, callee.getTarget()
