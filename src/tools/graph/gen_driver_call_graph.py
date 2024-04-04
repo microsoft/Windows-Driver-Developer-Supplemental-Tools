@@ -1,4 +1,5 @@
-# 
+
+
 
 try:
     import pandas as pd
@@ -18,7 +19,7 @@ except ImportError as e:
     exit(1)
 
 driver_entry_points = {'FxDriverEntry':'KMDF', 'GsDriverEntry': 'WDM', '_DllMainCRTStartup':'dll' }
-
+SYSTEM='OS_Manager_Component'
 groups = ['DRIVER_ENTRY_POINT','FILES', 'DRIVER_FUNCTIONS','FUNCTIONS', 'IRPS', 'LIBS', 'DDIS']
 LEVELS = Enum('LEVELS', groups)
 
@@ -106,10 +107,10 @@ def gen_graph(net, file, nodes, node_ids, links, entry=None):
     if entry is not None:
         for e in entry:
             if e in driver_entry_points:
-                net.add_node("SYSTEM", label="SYSTEM", level=LEVELS.DRIVER_ENTRY_POINT.value, group='DRIVER_ENTRY_POINT', hidden=False, shape='ellipse')
+                net.add_node(SYSTEM, label=SYSTEM, level=LEVELS.DRIVER_ENTRY_POINT.value, group='DRIVER_ENTRY_POINT', hidden=False, shape='ellipse')
                 net.add_node(e, label=e, level=LEVELS.DRIVER_ENTRY_POINT.value, group='DRIVER_ENTRY_POINT', hidden=False, shape='ellipse')
-                if(e, "SYSTEM") not in links:
-                    links.append(("SYSTEM", e))
+                if(e, SYSTEM) not in links:
+                    links.append((SYSTEM, e))
                 if "DriverEntry" in nodes and (e, "DriverEntry") not in links:
                     net.add_node("DriverEntry", label="DriverEntry", level=LEVELS.DRIVER_ENTRY_POINT.value, group='DRIVER_ENTRY_POINT', hidden=False, shape='ellipse')
                     links.append((e, "DriverEntry"))
@@ -128,26 +129,25 @@ def gen_graph(net, file, nodes, node_ids, links, entry=None):
             for ddi in val:
                 if ddi == name:
                     #update params for function node
-                    net.add_node(lib, label=lib, level=LEVELS.LIBS.value, group='LIBS', hidden=False, shape='database')
-                    net.add_node(name, label=name, level=LEVELS.DDIS.value, group='DDIS', hidden=hidden, shape='ellipse')      
+                    net.add_node(lib, label=lib, level=LEVELS.LIBS.value, group='LIBS', hidden=args.hide_by_default, shape='database')
+                    net.add_node(name, label=name, level=LEVELS.DDIS.value, group='DDIS', hidden=args.hide_by_default, shape='ellipse')      
                     links.append((lib,name))
                     
         if '.cpp' in name or '.c' in name or '.h' in name or '.hpp' in name:
-            hidden= False
             level = LEVELS.FILES
             group = 'files'
             # name = name.split('.')[0]
-            net.add_node(name, label=name, level=level.value, group=group, hidden=hidden, shape='ellipse')      
+            net.add_node(name, label=name, level=level.value, group=group, hidden=args.hide_by_default, shape='ellipse')      
             continue
         elif 'IRP_' in name:
             level = LEVELS.IRPS
             group = 'irps'
-            net.add_node(name, label=name, level=level.value, group=group, hidden=hidden, shape='ellipse')      
+            net.add_node(name, label=name, level=level.value, group=group, hidden=args.hide_by_default, shape='ellipse')      
             continue
         else:
             level = LEVELS.FUNCTIONS
             group = 'FUNCTIONS'
-            net.add_node(name, label=name, level=level.value, group=group, hidden=hidden, shape='ellipse')      
+            net.add_node(name, label=name, level=level.value, group=group, hidden=args.hide_by_default, shape='ellipse')      
             
     # make edges
     for link in links:
@@ -191,7 +191,6 @@ def parse_dot(file, query):
         elif "->" not in e and "label=" not in e and '=' not in e and 'graph' not in e and '}' not in e and '{' not in e :
             print(e, "empty label")
             node_ids['error_empty_label'] = "ERROR EMPTY LABEL"
-            #net.add_node('error_empty_label', "ERROR EMPTY LABEL")
     for e in lines:
         e = e.replace('[', ' ').replace(']', ' ').replace(';', '').replace('\n', '')
         if "->" in e:
@@ -209,53 +208,36 @@ def merge_nets(networks):
     net_all = networks['call-graph-all']
     
     # Create reference for different groups
-    net_all.add_node('blank', label='', hidden=True, shape='dot')
+    net_all.add_node('blank', label='Legend', hidden=False, shape='text')
     for group in groups:
-        net_all.add_node(group, level=LEVELS[group].value, group=group, hidden=False, shape='circle')
-        net_all.add_edge(group, 'blank')
+        net_all.add_node(group, level=LEVELS[group].value, group=group, hidden=False, shape='dot')
+        net_all.add_edge(group, 'blank', hidden=True)
         
-    # net_other = networks['file-functions-all']
-    # other_nodes = net_other.get_nodes()
-    # other_edges = net_other.get_edges()
-    # for node in net_all.get_nodes():
-    #     if node in other_nodes:
-    #         for edge in other_edges:
-    #             if node == edge['from'] and edge['to'] not in net_all.get_nodes():
-    #                 print('to node not in net_all', edge['to'])
-    #                 net_all.add_node(edge['to'], label=edge['to'], level=LEVELS.FILES.value, group='FILES', hidden=False, shape='ellipse')
-    #                 net_all.add_edge(node, edge['to'])
-    #             if edge['from'] in net_all.get_nodes() and edge['to'] in net_all.get_nodes():
-    #                 if edge not in net_all.get_edges():
-    #                     print('add edge', edge['from'], edge['to'])
-    #                     net_all.add_edge(edge['from'], edge['to'])
-                # if node == edge['to'] and edge['from'] not in net_all.get_nodes():
-                #     print('to node not in net_all', edge['to'])
-                #     net_all.add_node(edge['from'], label=edge['from'], level=LEVELS.FILES.value, group='FILES', hidden=False)
-                #     print('add edge', node, edge['to'])
-                #     net_all.add_edge(edge['from'], node)
     net_other = networks['file-functions-driver']
     other_nodes = net_other.get_nodes()
     other_edges = net_other.get_edges()
     for node in net_all.get_nodes():
-        if node in other_nodes and not node in libs and node not in driver_entry_points and node != "SYSTEM" and '.exe' not in node.lower():
+        if node in other_nodes and not node in libs and node not in driver_entry_points and node != SYSTEM and '.exe' not in node.lower():
             net_all.get_node(node)['level'] = LEVELS.DRIVER_FUNCTIONS.value
             net_all.get_node(node)['group'] = 'DRIVER_FUNCTIONS'
-    
-    net_other = networks['file-functions-all']
-    other_nodes = net_other.get_nodes()
-    other_edges = net_other.get_edges()
-    for node in net_all.get_nodes():
-        if node in other_nodes:
-            for edge in other_edges:
-                if edge['to'] == node and ('.cpp' in edge['from'] or '.c' in edge['from'] or '.h' in edge['from'] or '.hpp' in edge['from']):
-                    net_all.add_node(edge['from'], label=edge['from'], level=LEVELS.FILES.value, group='FILES', hidden=False, shape='box')
-                    if edge not in net_all.get_edges():
-                        net_all.add_edge(edge['from'], edge['to'])
-                if edge['from'] == node and ('.cpp' in edge['to'] or '.c' in edge['to'] or '.h' in edge['to'] or '.hpp' in edge['to']):
-                    #net_all.add_node(edge['from'], label=edge['from'], level=LEVELS.FILES.value, group='FILES', hidden=False, shape='box')
-                    if edge not in net_all.get_edges():
-                        #net_all.add_edge(edge['from'], edge['to'])
-                        print(edge['to'], node)
+            net_all.get_node(node)['hidden'] = False
+   
+    if not args.skip_files:
+        net_other = networks['file-functions-all']
+        other_nodes = net_other.get_nodes()
+        other_edges = net_other.get_edges()
+        for node in net_all.get_nodes():
+            if node in other_nodes:
+                for edge in other_edges:
+                    if edge['to'] == node and ('.cpp' in edge['from'] or '.c' in edge['from'] or '.h' in edge['from'] or '.hpp' in edge['from']):
+                        net_all.add_node(edge['from'], label=edge['from'], level=LEVELS.FILES.value, group='FILES', hidden=args.hide_by_default, shape='box')
+                        if edge not in net_all.get_edges():
+                            net_all.add_edge(edge['from'], edge['to'])
+                    if edge['from'] == node and ('.cpp' in edge['to'] or '.c' in edge['to'] or '.h' in edge['to'] or '.hpp' in edge['to']):
+                        #net_all.add_node(edge['from'], label=edge['from'], level=LEVELS.FILES.value, group='FILES', hidden=False, shape='box')
+                        if edge not in net_all.get_edges():
+                            #net_all.add_edge(edge['from'], edge['to'])
+                            print(edge['to'], node)
 
     net_other = networks['irps-graph']
     other_nodes = net_other.get_nodes()
@@ -264,16 +246,30 @@ def merge_nets(networks):
         if irp_node in net_all.get_nodes():
             for edge in other_edges:
                 if edge['from'] == irp_node:
-                    net_all.add_node(edge['to'], label=edge['to'], level=LEVELS.IRPS.value, group='IRPS', hidden=False, shape='dot')
+                    net_all.add_node(edge['to'], label=edge['to'], level=LEVELS.IRPS.value, group='IRPS', hidden=args.hide_by_default, shape='dot')
                     if edge not in net_all.get_edges():
                         net_all.add_edge(edge['from'], edge['to'])
                 if edge['to'] == irp_node:
-                    net_all.add_node(edge['from'], label=edge['from'], level=LEVELS.IRPS.value, group='IRPS', hidden=False, shape='dot')
+                    net_all.add_node(edge['from'], label=edge['from'], level=LEVELS.IRPS.value, group='IRPS', hidden=args.hide_by_default, shape='dot')
                     if edge not in net_all.get_edges():
                         net_all.add_edge(edge['from'], edge['to'])
-                    
-    net_all.show('merged.html', notebook=False)
+    net_other = networks['driver-callbacks']
+    other_nodes = net_other.get_nodes()
+    other_edges = net_other.get_edges()
     
+    for edge in other_edges:
+        if edge['to'] in net_all.get_nodes() and edge['to'] != 'DriverEntry': #driver entry covered earlier
+            if edge not in net_all.get_edges():
+                net_all.add_node(edge['from']+edge['to'], label="callback", level=LEVELS.DRIVER_ENTRY_POINT.value, group='DRIVER_ENTRY_POINT', hidden=False, shape='ellipse')
+                net_all.add_edge(edge['from']+edge['to'], edge['to'])        
+        # if edge['to'] in net_all.get_nodes():
+        #     net_all.get_node(edge['from'])['level'] = LEVELS.DRIVER_ENTRY_POINT.value
+        #     net_all.get_node(edge['from'])['group'] = 'DRIVER_ENTRY_POINT'
+            
+    if args.show:
+        net_all.show('merged.html', notebook=False)
+    else:
+        net_all.write_html('merged.html', notebook=False)
     
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description='Generate a call graph of driver functions')
@@ -283,6 +279,8 @@ if __name__ == "__main__":
     parser.add_argument('--skip_codeql', action='store_true', help='Skip codeql database creation and analysis')
     parser.add_argument('--hide_by_default', action='store_true', help='Hide files by default')
     parser.add_argument('--show_all', action='store_true', help='Show all nets')
+    parser.add_argument('--show', action='store_true', help='Show graph')
+    parser.add_argument('--skip_files', action='store_true', help='Skip file functions')
     args = parser.parse_args()    
     
    

@@ -21,6 +21,11 @@
   and allCalls*(root, caller)
 //   and root instanceof WdmDispatchRoutine
   and not root.getFile().getAbsolutePath().matches("%Windows Kits%")
-  
+  and  (
+    caller.getADeclarationEntry().getFile().toString().matches("%.h") or
+    caller.getADeclarationEntry().getFile().toString().matches("%.cpp") or
+    caller.getADeclarationEntry().getFile().toString().matches("%.c") or
+    caller.getADeclarationEntry().getFile().toString().matches("%.hpp")
+  )
 
  select caller, callee.getTarget()

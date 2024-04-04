@@ -22,6 +22,12 @@
   and not root.getFile().getAbsolutePath().matches("%Windows Kits%")
   and not callee.getFile().getAbsolutePath().matches("%Windows Kits%")
   and not caller.getFile().getAbsolutePath().matches("%Windows Kits%")
+  and  (
+    caller.getADeclarationEntry().getFile().toString().matches("%.h") or
+    caller.getADeclarationEntry().getFile().toString().matches("%.cpp") or
+    caller.getADeclarationEntry().getFile().toString().matches("%.c") or
+    caller.getADeclarationEntry().getFile().toString().matches("%.hpp")
+  )
   // and not caller.getName().matches("_%")
   // and not callee.getTarget().getName().matches("_%")
   
