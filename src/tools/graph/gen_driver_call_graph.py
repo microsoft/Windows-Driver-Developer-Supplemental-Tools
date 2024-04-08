@@ -52,6 +52,15 @@ def find_entry(source_root):
                             for i in range(len(c)):
                                 if '/entry' in c[i].lower():
                                     entry.append(c[i].split(':')[-1].replace('\"', ''))
+                        #TODO test this 
+                        elif '/ENTRY' in line and '.dll' in line.lower():
+                            c = line.split()
+                            for i in range(len(c)):
+                                if '/entry' in c[i].lower():
+                                    entry.append(c[i].split(':')[-1].replace('\"', ''))            
+                        #elif '/ENTRY' in line:
+                        #some other entry TODO 
+                                    
                         if not '/ENTRY' in line and '/OUT' in line and '.exe' in line.lower(): # for solutions that have an app and a driver, the app will have an exe but no entry in the link log
                             c = line.split()
                             for i in range(len(c)):
@@ -131,7 +140,7 @@ def gen_graph(net, file, nodes, node_ids, links, entry=None):
                     #update params for function node
                     net.add_node(lib, label=lib, level=LEVELS.LIBS.value, group='LIBS', hidden=args.hide_by_default, shape='database')
                     net.add_node(name, label=name, level=LEVELS.DDIS.value, group='DDIS', hidden=args.hide_by_default, shape='ellipse')      
-                    links.append((lib,name))
+                    links.append((name,lib))
                     
         if '.cpp' in name or '.c' in name or '.h' in name or '.hpp' in name:
             level = LEVELS.FILES
@@ -181,6 +190,13 @@ def parse_dot(file, query):
             e = e.split()
             e[1] = e[1].split('/')[-1]
             name = e[1].strip()
+            macro_target = None
+            if '__macro__' in name:
+                name_split = name.split('__macro__')
+                name = name_split[0]
+                macro_target = name_split[1]
+                node_ids[e[0].strip()+query+'macro_target'] = macro_target
+              
             if name.startswith('_'):
                 # ignore internal functions
                 ignore_ids.append(e[0].strip()+query)
@@ -188,6 +204,10 @@ def parse_dot(file, query):
             else:
                 node_ids[e[0].strip()+query] = name
                 nodes.append(name)
+                if macro_target:
+                    nodes.append(macro_target) 
+                    links.append((name, macro_target))
+                   
         elif "->" not in e and "label=" not in e and '=' not in e and 'graph' not in e and '}' not in e and '{' not in e :
             print(e, "empty label")
             node_ids['error_empty_label'] = "ERROR EMPTY LABEL"
@@ -301,7 +321,7 @@ if __name__ == "__main__":
     analyze_output_dir = 'graph.dot\\cpp\\drivers\\'
     for filename in os.listdir(analyze_output_dir):
         if filename.endswith(".dot"):
-            net_temp = Network(directed=True, filter_menu=True, select_menu=True, notebook=False,neighborhood_highlight=True, height='1500px')
+            net_temp = Network(directed=True, filter_menu=True, select_menu=True, notebook=False,neighborhood_highlight=True, height='1500px', cdn_resources='remote')
             #net_temp.barnes_hut(overlap=.001, spring_length=50)
             net_temp.show_buttons(False)    
             net_temp.toggle_physics(True)

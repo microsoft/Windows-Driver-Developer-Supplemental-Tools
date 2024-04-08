@@ -14,6 +14,18 @@
  import semmle.code.cpp.pointsto.CallGraph
  import drivers.wdm.libraries.WdmDrivers
 
+ string getName(FunctionCall call) {
+  // from FunctionCall caller, Macro macro
+// where caller.isInMacroExpansion()
+// and caller.findRootCause().(Macro).getName() = macro.getName()
+// select caller, caller.findRootCause(), macro.getName()
+   if call.isInMacroExpansion()
+   then
+      result = call.findRootCause().(Macro).getName()+"__macro__"+call.getTarget().getName()
+   else
+      result = call.getTarget().getName()
+   
+ }
  
  from Function caller, FunctionCall callee, Function root
  where
@@ -28,8 +40,7 @@
     caller.getADeclarationEntry().getFile().toString().matches("%.c") or
     caller.getADeclarationEntry().getFile().toString().matches("%.hpp")
   )
-  // and not caller.getName().matches("_%")
-  // and not callee.getTarget().getName().matches("_%")
-  
+select caller, getName(callee)
 
- select caller, callee.getTarget()
+
+  
