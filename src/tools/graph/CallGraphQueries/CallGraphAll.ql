@@ -16,10 +16,6 @@
 
  
  string getName(FunctionCall call) {
-    // from FunctionCall caller, Macro macro
-  // where caller.isInMacroExpansion()
-  // and caller.findRootCause().(Macro).getName() = macro.getName()
-  // select caller, caller.findRootCause(), macro.getName()
      if call.isInMacroExpansion()
      then
         result = call.findRootCause().(Macro).getName()+"__macro__"+call.getTarget().getName()
@@ -31,6 +27,17 @@
  where
   allCalls(caller, callee.getTarget())
   and allCalls*(root, caller)
-
-
+ // and not root.getFile().getAbsolutePath().matches("%Windows Kits%")
+ and  (
+   caller.getADeclarationEntry().getFile().toString().matches("%.h") or
+   caller.getADeclarationEntry().getFile().toString().matches("%.cpp") or
+   caller.getADeclarationEntry().getFile().toString().matches("%.c") or
+   caller.getADeclarationEntry().getFile().toString().matches("%.hpp")
+ )
+ and  (
+   callee.findRootCause().getLocation().getFile().toString().matches("%.h") or
+   callee.findRootCause().getLocation().getFile().toString().matches("%.cpp") or
+   callee.findRootCause().getLocation().getFile().toString().matches("%.c") or
+   callee.findRootCause().getLocation().getFile().toString().matches("%.hpp")
+ )
  select caller, getName(callee)

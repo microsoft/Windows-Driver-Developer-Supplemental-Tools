@@ -11,19 +11,56 @@
 import cpp
 import semmle.code.cpp.pointsto.CallGraph
 
-from Function func
+class FuncOrMacro extends Element {
+  FuncOrMacro() {
+    (
+      this instanceof Function
+      or
+      this instanceof Macro
+    ) and
+    (
+      this.getLocation().getFile().toString().matches("%h") or
+      this.getLocation().getFile().toString().matches("%hpp") or
+      this.getLocation().getFile().toString().matches("%c") or
+      this.getLocation().getFile().toString().matches("%cpp")
+    )
+  }
+
+  string getResultName() {
+    if this instanceof Macro
+    then
+      result =
+        this.findRootCause().(Macro).getName().toString() + "__macro__" +
+          this.(Macro).getName().toString()
+    else
+      if this instanceof Function
+      then result = this.(Function).getADeclarationEntry().toString()
+      else result = ""
+  }
+
+  string getResultFile() {
+    if this instanceof Function
+    then result = this.(Function).getADeclarationEntry().getFile().toString()
+    else
+      if this instanceof Macro
+      then result = this.(Macro).getFile().toString()
+      else result = ""
+  }
+}
+
+from FuncOrMacro func
 where
   (
-    func.getADeclarationEntry().getFile().toString().matches("%.h") or
-    func.getADeclarationEntry().getFile().toString().matches("%.cpp") or
-    func.getADeclarationEntry().getFile().toString().matches("%.c") or
-    func.getADeclarationEntry().getFile().toString().matches("%.hpp")
+    func.(Function).getADeclarationEntry().getFile().toString().matches("%.h") or
+    func.(Function).getADeclarationEntry().getFile().toString().matches("%.cpp") or
+    func.(Function).getADeclarationEntry().getFile().toString().matches("%.c") or
+    func.(Function).getADeclarationEntry().getFile().toString().matches("%.hpp")
   )
-// where
-//   (
-//     exists(FunctionCall fc | fc.getTarget() = func) or
-//     exists(FunctionAccess fa | fa.getTarget() = func)
-//   )
-//   or
-//   not func.getFile().getAbsolutePath().matches("%Windows Kits%")
-select func.getADeclarationEntry().getFile().toString(), func.getADeclarationEntry().toString()
+  or
+  (
+    func.(Macro).getLocation().getFile().toString().matches("%.h") or
+    func.(Macro).getLocation().getFile().toString().matches("%.cpp") or
+    func.(Macro).getLocation().getFile().toString().matches("%.c") or
+    func.(Macro).getLocation().getFile().toString().matches("%.hpp")
+  )
+select func.getResultFile(), func.getResultName()
