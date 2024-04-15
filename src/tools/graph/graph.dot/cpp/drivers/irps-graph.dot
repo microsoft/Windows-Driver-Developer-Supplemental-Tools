@@ -1,8 +1,0 @@
-digraph {
-  compound=true;
-  0[label="IRP_MJ_CLOSE"; ];
-  1[label="EventCreateClose"; ];
-  2[label="IRP_MJ_CREATE"; ];
-  0 -> 1[];
-  2 -> 1[];
-}
