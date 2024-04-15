@@ -2,7 +2,23 @@
 
 
 """
-This script generates a driver call graph by analyzing a codeql database.
+This script generates a driver call graph by analyzing a codeql database and msbuild linker output.
+
+Usage:
+
+Arguments:
+    --sln_file: The path to the driver project solution file. (A .vcxproj file can also be used)
+    --database_path: The path to the codeql database or the path to create a new one.
+    --source_root: The root directory of the source code. (Where the solution file/vcxproj file is located)
+    --skip_codeql: Skip codeql database creation and analysis.
+    --hide_by_default: Hide nodes by default.
+    --show_all: Show all graphs generated.
+    --show: Show graph when done
+    
+    
+
+Example usage: python gen_driver_call_graph.py --sln_file event.vcxproj --database_path e:\databases\event_2 --source_root D:\Windows-driver-samples\genera
+l\event\wdm --show
 """
 
 try:
@@ -159,7 +175,7 @@ def codeql_db_create(sln_file, source_root, output_dir):
     out = subprocess.run(['codeql', "database", "create", output_dir, "--overwrite", "-l", "cpp", "--source-root="+source_root,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ],
                         cwd=source_root,
-                        capture_output=True,
+                        capture_output=False,
                         shell=True)
 
 def gen_graph(net, file, nodes, node_ids, macros, links, entry=None):
@@ -236,7 +252,7 @@ def gen_graph(net, file, nodes, node_ids, macros, links, entry=None):
         net.show(file+'.html', notebook=False)
     return net
         
-        
+
 def parse_dot(file, query):
     node_ids = {}
     ignore_ids = []
@@ -285,7 +301,7 @@ def parse_dot(file, query):
     return nodes, node_ids, links, macros
   
 def merge_nets(networks):
-    net_all =Network(directed=True, filter_menu=True, select_menu=True, notebook=False,neighborhood_highlight=True, height='1500px', cdn_resources='remote', layout=args.hierarchical )# networks['call-graph-driver']
+    net_all =Network(directed=True, filter_menu=True, select_menu=True, notebook=False,neighborhood_highlight=True, height='1500px', cdn_resources=cnd_resources, layout=args.hierarchical )# networks['call-graph-driver']
     net_all.show_buttons(True)    
 
     # Create reference for different groups
@@ -387,8 +403,9 @@ if __name__ == "__main__":
     parser.add_argument('--physics_off', action='store_true', help='Turn off physics')
     parser.add_argument('--hierarchical', action='store_true', help='Use hierarchical layout')
     parser.add_argument('--files_ddi_only', action='store_true', help='Show only files for DDI functions')
+    parser.add_argument('--cdn_resources_remote', type=str, help='CDN resources')
     args = parser.parse_args()    
-    
+    cnd_resources = 'remote' if args.cdn_resources_remote else 'local'
    
     directory = "CallGraphQueries/"
     if not args.skip_codeql:
@@ -407,7 +424,8 @@ if __name__ == "__main__":
     analyze_output_dir = 'graph.dot\\cpp\\drivers\\'
     for filename in os.listdir(analyze_output_dir):
         if filename.endswith(".dot"):
-            net_temp = Network(directed=True, filter_menu=True, select_menu=True, notebook=False,neighborhood_highlight=True, height='1500px', cdn_resources='remote', layout=args.hierarchical )
+
+            net_temp = Network(directed=True, filter_menu=True, select_menu=True, notebook=False,neighborhood_highlight=True, height='1500px', cdn_resources=cnd_resources, layout=args.hierarchical )
             #net_temp.barnes_hut(overlap=.001, spring_length=50)
             net_temp.show_buttons(True)    
             net_temp.toggle_physics(not args.physics_off)
