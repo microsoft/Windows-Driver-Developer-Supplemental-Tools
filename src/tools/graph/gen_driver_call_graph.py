@@ -300,6 +300,10 @@ def parse_dot(file, query):
                 links.append((from_node,to_node))
     return nodes, node_ids, links, macros
   
+  
+def is_file_node(node):
+    return '.cpp' in node or '.c' in node or '.h' in node or '.hpp' in node 
+ 
 def merge_nets(networks):
     net_all =Network(directed=True, filter_menu=True, select_menu=True, notebook=False,neighborhood_highlight=True, height='1500px', cdn_resources=cnd_resources, layout=args.hierarchical )# networks['call-graph-driver']
     net_all.show_buttons(True)    
@@ -314,10 +318,10 @@ def merge_nets(networks):
     net_other = networks['file-functions-driver']
     other_nodes = net_other.get_nodes()
     other_edges = net_other.get_edges()
-    for node in net_all.get_nodes():
-        if node in other_nodes and not node in libs and node not in driver_entry_points and node != SYSTEM and '.exe' not in node.lower():
+    for node in other_nodes:
+        if not node in libs and node not in driver_entry_points and node != SYSTEM and '.exe' not in node.lower() and not is_file_node(node):
             net_all.add_node(node, label=node, level=LEVELS.DRIVER_FUNCTION.value, group='DRIVER_FUNCTION', hidden=args.hide_by_default, shape='ellipse')
-   
+        
     # add nodes for driver call graph
     call_nodes = networks['call-graph-driver'].get_nodes()
     call_edges = networks['call-graph-driver'].get_edges()
@@ -341,7 +345,13 @@ def merge_nets(networks):
                 
     for edge in call_edges:
         net_all.add_edge(edge['from'], edge['to'])
-    
+    ffd_net = networks['file-functions-driver']
+    ffd_edges = ffd_net.get_edges()
+    for edge in ffd_edges:
+        if edge['from'] in net_all.get_nodes() and edge['to'] in net_all.get_nodes() and edge not in net_all.get_edges() and edge['from'] != edge['to']:
+            net_all.add_edge(edge['from'], edge['to'])
+            
+            
     # add nodes for files and link function nodes to file nodes
     net_other = networks['file-functions-all']
     other_nodes = net_other.get_nodes()
@@ -383,7 +393,7 @@ def merge_nets(networks):
             if edge not in net_all.get_edges():
                 net_all.add_node(edge['from']+edge['to'], label="callback", level=LEVELS.DRIVER_ENTRY_POINT.value, group='DRIVER_ENTRY_POINT', hidden=False, shape='ellipse')
                 net_all.add_edge(edge['from']+edge['to'], edge['to'])        
-        
+            
             
     if args.show:
         net_all.show('merged.html', notebook=False)
