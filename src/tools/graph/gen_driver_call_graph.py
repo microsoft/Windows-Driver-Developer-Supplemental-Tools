@@ -413,7 +413,7 @@ if __name__ == "__main__":
     parser.add_argument('--physics_off', action='store_true', help='Turn off physics')
     parser.add_argument('--hierarchical', action='store_true', help='Use hierarchical layout')
     parser.add_argument('--files_ddi_only', action='store_true', help='Show only files for DDI functions')
-    parser.add_argument('--cdn_resources_remote', type=str, help='CDN resources')
+    parser.add_argument('--cdn_resources_remote', action='store_true', help='CDN resources')
     args = parser.parse_args()    
     cnd_resources = 'remote' if args.cdn_resources_remote else 'local'
    
