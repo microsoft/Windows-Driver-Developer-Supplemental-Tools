@@ -8,7 +8,8 @@ param(
     [string]$default_configuration = "Release",
     [string]$db_name = "temp_db"
 )
-$starting_location = ".\src\drivers\test\dvl_tests\"
+$starting_location = Get-Location
+write-host $starting_location
 $platforms = @("x64", "arm64")
 $configurations = @("Debug", "Release")
 function Test-DVL {
