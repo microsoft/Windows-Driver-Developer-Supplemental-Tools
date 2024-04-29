@@ -34,7 +34,7 @@ jobs:
       uses: github/codeql-action/init@v3
       
     - name: codeql test
-      run: codeql version
+      run: Get-ChildItem -Path C:\ -Include codeql.exe -File -Recurse
     
       
   
