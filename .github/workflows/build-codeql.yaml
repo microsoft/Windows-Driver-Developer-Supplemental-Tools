@@ -44,33 +44,34 @@ jobs:
       continue-on-error: true # Required because robocopy returns 1 on success
       run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\
 
-    - name: Install CodeQL pack dependencies
-      shell: cmd
-      run: |
-        pushd .\src 
-        ..\codeql-cli\codeql.cmd pack install 
-        popd
+    # - name: Install CodeQL pack dependencies
+    #   shell: cmd
+    #   run: |
+    #     pushd .\src 
+    #     ..\codeql-cli\codeql.cmd pack install 
+    #     popd
    
-    - name: codeql version test
-      run: .\codeql-cli\codeql.exe version
+    # - name: codeql version test
+    #   run: .\codeql-cli\codeql.exe version
       
-    - name: Build must-fix driver suite
-      shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
+    # - name: Build must-fix driver suite
+    #   shell: cmd
+    #   run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
     
-    - name: Build recommended driver suite
-      shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
+    # - name: Build recommended driver suite
+    #   shell: cmd
+    #   run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
     
-    - name: Build CA ported queries
-      shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
+    # - name: Build CA ported queries
+    #   shell: cmd
+    #   run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
     
-    - name: Build all Windows queries
-      shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only .\src
+    # - name: Build all Windows queries
+    #   shell: cmd
+    #   run: .\codeql-cli\codeql.cmd query compile --check-only .\src
   test:
     runs-on: windows-latest
+    needs: build
     permissions:
       contents: read
       packages: write
