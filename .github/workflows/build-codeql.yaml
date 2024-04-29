@@ -161,8 +161,33 @@ jobs:
         try{$old_qlpack_version = [version]($qlpack_changes -match "-version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 1 }
         try{$new_qlpack_version = [version]($qlpack_changes -match "\+version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 1 }
         if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { "qlpack.yml version not incremented"; exit 1 }
-      
-       
+  
+  test-create-dvl:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: write
+    steps:    
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0   
+    - name: Test DVL
+      run: src\drivers\test\dvl_tests.ps1
+        
   publish:
     runs-on: windows-latest
     needs: [build, test-version-update,test-script]
