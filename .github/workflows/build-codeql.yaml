@@ -34,15 +34,10 @@ jobs:
         fetch-depth: 0
 
     - name: CodeQL Download
-      run:  Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip
-
-    - name: Unzip CodeQL CLI
-      run: Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force
-    
-    - name: Move CodeQL CLI folder to main subdirectory
-      shell: cmd
-      continue-on-error: true # Required because robocopy returns 1 on success
-      run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
 
     # - name: Install CodeQL pack dependencies
     #   shell: cmd
@@ -51,8 +46,8 @@ jobs:
     #     ..\codeql-cli\codeql.cmd pack install 
     #     popd
    
-    # - name: codeql version test
-    #   run: .\codeql-cli\codeql.exe version
+    - name: codeql version test
+      run: .\codeql-cli\codeql.exe version
       
     # - name: Build must-fix driver suite
     #   shell: cmd
