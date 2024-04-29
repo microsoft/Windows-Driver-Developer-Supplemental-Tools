@@ -191,6 +191,9 @@ jobs:
         pushd .\src 
         ..\codeql-cli\codeql.cmd pack install 
         popd
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
     - name: Test DVL
       run: src\drivers\test\dvl_tests\dvl_tests.ps1
         
