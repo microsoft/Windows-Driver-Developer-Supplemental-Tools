@@ -13,11 +13,12 @@ on:
   # Allow manual scheduling
   workflow_dispatch:
 env:
-  CODEQL_VERSION: 2.15.4
+  CODEQL_VERSION: "2.15.4"
   
 jobs:
   build:
     runs-on: windows-latest
+    
     permissions:
       contents: read
       packages: write
