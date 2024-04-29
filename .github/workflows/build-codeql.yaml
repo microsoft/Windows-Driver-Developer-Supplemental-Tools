@@ -39,31 +39,32 @@ jobs:
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
 
-    # - name: Install CodeQL pack dependencies
-    #   shell: cmd
-    #   run: |
-    #     pushd .\src 
-    #     ..\codeql-cli\codeql.cmd pack install 
-    #     popd
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
    
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
       
-    # - name: Build must-fix driver suite
-    #   shell: cmd
-    #   run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
+    - name: Build must-fix driver suite
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
     
-    # - name: Build recommended driver suite
-    #   shell: cmd
-    #   run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
+    - name: Build recommended driver suite
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
     
-    # - name: Build CA ported queries
-    #   shell: cmd
-    #   run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
+    - name: Build CA ported queries
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
     
-    # - name: Build all Windows queries
-    #   shell: cmd
-    #   run: .\codeql-cli\codeql.cmd query compile --check-only .\src
+    - name: Build all Windows queries
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only .\src
+      
   test-script:
     runs-on: windows-latest
     needs: build
@@ -127,6 +128,16 @@ jobs:
       contents: read
       packages: write
     steps:
+    - name: Enable long git paths
+      shell: cmd
+      run: git config --global core.longpaths true
+    
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0
+        
     - name: Check for changes to qlpack
       shell: pwsh
       run: 
@@ -159,11 +170,21 @@ jobs:
       contents: read
       packages: write
     steps:
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
     - name: Publish New CodeQL Pack
       shell: pwsh
       env:
         GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
-
       run: 
         $build = git rev-parse --short HEAD;
         $version =( Select-String .\src\qlpack.yml -Pattern "version").line;
