@@ -53,6 +53,22 @@ jobs:
    
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
+      
+    - name: Build must-fix driver suite
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
+    
+    - name: Build recommended driver suite
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
+    
+    - name: Build CA ported queries
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
+    
+    - name: Build all Windows queries
+      shell: cmd
+      run: .\codeql-cli\codeql.cmd query compile --check-only .\src
           
       
   
