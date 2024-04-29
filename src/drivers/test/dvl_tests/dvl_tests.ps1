@@ -2,14 +2,15 @@ param(
     [string]$vcxproj_path_clean = "src\drivers\test\dvl_tests\\hidusbfx2_clean\sys\",
     [string]$vcxproj_path_mustfix = "src\drivers\test\dvl_tests\\hidusbfx2_mustfix\sys\",
     [string]$vcxproj_name = "hidusbfx2",
-    [string]$codeql_path = "C:\codeql-home\codeql\",
-    [string]$query_suite = "C:\codeql-home\suites\windows_driver_mustfix.qls",
+    [string]$codeql_path = ".\codeql-cli\",
+    [string]$query_suite = ".\suites\windows_driver_mustfix.qls",
     [string]$default_platform = "x64",
     [string]$default_configuration = "Release",
     [string]$db_name = "temp_db"
 )
 $starting_location = Get-Location
 write-host $starting_location
+
 $platforms = @("x64", "arm64")
 $configurations = @("Debug", "Release")
 function Test-DVL {
