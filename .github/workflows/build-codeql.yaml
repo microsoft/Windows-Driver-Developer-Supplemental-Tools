@@ -186,7 +186,7 @@ jobs:
         path: .
         fetch-depth: 0   
     - name: Test DVL
-      run: src\drivers\test\dvl_tests.ps1
+      run: src\drivers\test\dvl_tests\dvl_tests.ps1
         
   publish:
     runs-on: windows-latest
