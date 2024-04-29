@@ -1,9 +1,9 @@
 param(
-    [string]$vcxproj_path_clean = ".\hidusbfx2_clean\sys\",
-    [string]$vcxproj_path_mustfix = ".\hidusbfx2_mustfix\sys\",
+    [string]$vcxproj_path_clean = "src\drivers\test\dvl_tests\\hidusbfx2_clean\sys\",
+    [string]$vcxproj_path_mustfix = "src\drivers\test\dvl_tests\\hidusbfx2_mustfix\sys\",
     [string]$vcxproj_name = "hidusbfx2",
     [string]$codeql_path = "C:\codeql-home\codeql\",
-    [string]$query_suite = "C:\codeql-home\windows_driver_mustfix.qls",
+    [string]$query_suite = "C:\codeql-home\suites\windows_driver_mustfix.qls",
     [string]$default_platform = "x64",
     [string]$default_configuration = "Release",
     [string]$db_name = "temp_db"
