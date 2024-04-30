@@ -106,7 +106,6 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: Run test script
       shell: pwsh
-      continue-on-error: true # Allow script to return non-zero exit code
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
         ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
@@ -157,7 +156,6 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: Run test script
       shell: pwsh
-      continue-on-error: true # Allow script to return non-zero exit code
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
         ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
