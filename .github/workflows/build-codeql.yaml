@@ -14,6 +14,7 @@ on:
   workflow_dispatch:
 env:
   CODEQL_VERSION: "2.15.4"
+  CODEQL_LATEST_VERSION: "2.17.1"
   
 jobs:
   build:
@@ -65,9 +66,59 @@ jobs:
     #   shell: cmd
     #   run: .\codeql-cli\codeql.cmd query compile --check-only .\src
       
-  test-script:
+  test-query-health:
     runs-on: windows-latest
     needs: build
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Enable long git paths
+      shell: cmd
+      run: git config --global core.longpaths true
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
+    - name: codeql version test
+      run: .\codeql-cli\codeql.exe version
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+    - name: Install Python Packages
+      run: |
+          python -m pip install --upgrade pip
+          pip install -r .\src\drivers\test\requirements.txt
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    - name: Run test script
+      shell: pwsh
+      continue-on-error: true # Allow script to return non-zero exit code
+      env:
+        CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+        ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
+        SHARE_NAME: ${{ secrets.SHARE_NAME }}
+        CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+        ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"
+      
+  test-codeql-latest-vs-current:
+  # Tests if the latest codeql version produces the same results as the current version. 
+    runs-on: windows-latest
+    needs: [build,test-query-health]
     permissions:
       contents: read
       packages: write
@@ -81,13 +132,11 @@ jobs:
       with:
         path: .
         fetch-depth: 0
-
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_LATEST_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
-        
     - name: Install CodeQL pack dependencies
       shell: cmd
       run: |
@@ -96,19 +145,16 @@ jobs:
         popd
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
-      
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
         python-version: 3.11
-        
     - name: Install Python Packages
       run: |
           python -m pip install --upgrade pip
           pip install -r .\src\drivers\test\requirements.txt
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
- 
     - name: Run test script
       shell: pwsh
       continue-on-error: true # Allow script to return non-zero exit code
@@ -118,10 +164,9 @@ jobs:
         SHARE_NAME: ${{ secrets.SHARE_NAME }}
         CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
         ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
-        
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
-     
-  test-version-update:
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" 
+          
+  test-pack-version-update:
     runs-on: windows-latest
     needs: build
     permissions:
@@ -199,7 +244,7 @@ jobs:
         
   publish:
     runs-on: windows-latest
-    needs: [build, test-version-update,test-script]
+    needs: [build, test-pack-version-update, test-query-health]
     permissions:
       contents: read
       packages: write
