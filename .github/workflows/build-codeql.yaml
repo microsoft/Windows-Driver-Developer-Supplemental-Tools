@@ -244,7 +244,7 @@ jobs:
         
   publish:
     runs-on: windows-latest
-    needs: [build, test-version-update,test-script]
+    needs: [build, test-pack-version-update, test-query-health]
     permissions:
       contents: read
       packages: write
