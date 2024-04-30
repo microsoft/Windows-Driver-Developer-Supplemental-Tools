@@ -1078,5 +1078,4 @@ if __name__ == "__main__":
 
     end_time = time.time()
     print("Total run time: " + str((end_time - start_time)/60) + " minutes")
-    exit(1)
   
