@@ -843,23 +843,23 @@ def compare_health_results(curr_results_path):
         prev_results_codeql_packs_df.to_excel(writer, sheet_name="Previous CodeQL Packs")
         prev_results_system_info_df.to_excel(writer, sheet_name="Previous System Info")
         print("Saved diff results")
-    
-    no_diffs = all(diff_results.isnull().all())
-    if not no_diffs:
-        print("Differences found in results!")
-        exit(1)
-    
-    if no_diffs or args.overwrite_azure_results:
-        print("No differences found in results")
+
+    if not args.local_result_storage:
         # upload new results to Azure
-        if not args.local_result_storage:
+        if args.overwrite_azure_results:
             print("Uploading results")
             upload_results_to_azure(file_to_upload=curr_results_path, 
                                 file_name=curr_results_path, file_directory="")
-            # upload diff to Azure
-            print("Uploading diff results")
-            upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
-                                file_name="diff" + curr_results_path, file_directory="")
+            # upload diff to Azure 
+        print("Uploading diff results")
+        upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
+                                    file_name="diff" + curr_results_path, file_directory="")
+        
+    if not all(diff_results.isnull().all()):
+        print("Differences found in results!")
+        exit(1)
+    else:
+        print("No differences found in results")
     # delete downloaded file
     os.remove(prev_results)
     print("Deleted previous results")
@@ -1071,14 +1071,12 @@ if __name__ == "__main__":
     if threads:
        pass
     else:
-        try:
-            if(args.external_drivers):
-                run_tests_external_drivers(ql_tests)
-            else:
-                run_tests(ql_tests)
-        except Exception as e:
-            print("Error running tests: ", e)
-            end_time = time.time()
-            print("Total run time: " + str((end_time - start_time)/60) + " minutes")
-            exit(1)
+        if(args.external_drivers):
+            run_tests_external_drivers(ql_tests)
+        else:
+            run_tests(ql_tests)
+
+    end_time = time.time()
+    print("Total run time: " + str((end_time - start_time)/60) + " minutes")
+    exit(1)
   
