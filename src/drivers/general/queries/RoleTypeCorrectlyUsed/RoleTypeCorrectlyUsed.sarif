@@ -44,12 +44,12 @@
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
             "name" : "Incorrect Role Type Use",
-            "opaqueid" : "CQLD-C28158",
+            "opaqueid" : "CQLD-D0007",
             "owner.email:" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
-            "query-version" : "v1",
+            "query-version" : "v2",
             "repro.text" : "",
             "scope" : "domainspecific"
           }
@@ -57,14 +57,14 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "1.0.12+54db165bcee31f7827c56bf2bb9a408d8a4db4fe",
+        "semanticVersion" : "1.1.0+2affc3c634804dac7504a483a378cc9ba22a0f0b",
         "locations" : [ {
-          "uri" : "file:///C:/codeql-home/WDDST/src/",
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {
             "text" : "The QL pack root directory."
           }
         }, {
-          "uri" : "file:///C:/codeql-home/WDDST/src/qlpack.yml",
+          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
           "description" : {
             "text" : "The QL pack definition file."
           }
@@ -76,9 +76,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
+              "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+              "index" : 1
             }
           }
         } ],
@@ -99,9 +99,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+              "index" : 0
             }
           }
         } ],
