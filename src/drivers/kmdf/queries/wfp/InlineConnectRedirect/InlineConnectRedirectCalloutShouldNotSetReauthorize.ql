@@ -17,8 +17,6 @@
  import cpp
  import drivers.libraries.wfp
 
- // FUNCTIONING AND CORRECT
-
 // Contract
 // Inline callout shouldn’t ask for re-authorization i.e., 
 // shouldn’t set FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS
@@ -27,9 +25,14 @@
 // the connect redirect layers and sets the 
 // FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS flag
 
-from InlineRedirectionClassify waf
+class ConnectRedirectClassifyFunction extends Function {
+    WfpConnectRedirectInline scr;
+    ConnectRedirectClassifyFunction() { this.getADeclarationEntry() = src.getADeclarationEntry}
+}
+
+
+from ConnectRedirectClassifyFunction waf
 where
-    isWfpInlineConnectRedirectClassifyCall(waf) and 
     exists(ClassifyReauthorizeFlag flag)
 select waf,
 "A connect redirect callout " + waf.getName() + " is marked inline and sets FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS. This is a contract violation."

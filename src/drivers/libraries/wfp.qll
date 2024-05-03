@@ -117,6 +117,13 @@ class WfpConnectRedirect extends WfpAnnotation {
   }
 }
 
+class WfpConnectRedirectInline extends WfpAnnotation {
+  WfpConnectRedirect() {
+    this.getMacro().(WfpMacro).getName() = ["_Wfp_connect_redirect_inline_classify_"]
+  }
+}
+
+
 ///////////////////////////////////////////////////////////////////////////////
 // Implementation details
 /**
