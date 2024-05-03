@@ -7,7 +7,7 @@
  * @feature.area Multiple
  * @repro.text The following function does not call FwpsRedirectHandleCreate0 or calls it multiple times and does not cache the handle.
  * @kind problem
- * @id cpp/windows/drivers/kmdf/queries/wfp/ConnectReirectHandleCreation
+ * @id cpp/windows/wdk/kmdf/wfp/ConnectReirectHandleCreation
  * @problem.severity warning
  * @precision low
  * @tags correctness

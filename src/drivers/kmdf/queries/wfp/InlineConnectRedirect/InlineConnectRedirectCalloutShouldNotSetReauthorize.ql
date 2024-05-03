@@ -7,7 +7,7 @@
  * @feature.area Multiple
  * @repro.text The following function asks for reauthorization and is an inline callout this is a contract violation
  * @kind problem
- * @id cpp/windows/drivers/kmdf/queries/wfp/InlineConnectRedirect
+ * @id cpp/windows/wdk/kmdf/wfp/InlineConnectRedirect
  * @problem.severity warning
  * @precision medium
  * @tags correctness
@@ -26,7 +26,7 @@
 // FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS flag
 
 class WfpConnectRedirectInline extends WfpAnnotation {
-  WfpConnectRedirect() {
+  WfpConnectRedirectInline() {
     this.getMacro().(WfpMacro).getName() = ["_Wfp_connect_redirect_inline_classify_"]
   }
 }
@@ -36,6 +36,12 @@ class ConnectRedirectClassifyFunction extends Function {
     ConnectRedirectClassifyFunction() { this.getADeclarationEntry() = src.getADeclarationEntry()}
 }
 
+class ClassifyReauthorizeFlag extends AssignExpr {
+    ClassifyReauthorizeFlag(){
+        this.getLValue().getType().getName().matches(["UINT32"]) and
+        this.getRValue().getFullyConverted().getType().getName().matches(["FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS"])
+    }
+}
 
 from ConnectRedirectClassifyFunction waf
 where
