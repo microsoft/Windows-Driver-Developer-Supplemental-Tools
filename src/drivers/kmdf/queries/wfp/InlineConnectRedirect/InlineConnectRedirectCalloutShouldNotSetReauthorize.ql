@@ -25,6 +25,12 @@
 // the connect redirect layers and sets the 
 // FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS flag
 
+class WfpConnectRedirectInline extends WfpAnnotation {
+  WfpConnectRedirect() {
+    this.getMacro().(WfpMacro).getName() = ["_Wfp_connect_redirect_inline_classify_"]
+  }
+}
+
 class ConnectRedirectClassifyFunction extends Function {
     WfpConnectRedirectInline scr;
     ConnectRedirectClassifyFunction() { this.getADeclarationEntry() = src.getADeclarationEntry}
