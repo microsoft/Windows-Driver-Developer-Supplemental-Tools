@@ -33,7 +33,7 @@ class WfpConnectRedirectInline extends WfpAnnotation {
 
 class ConnectRedirectClassifyFunction extends Function {
     WfpConnectRedirectInline src;
-    ConnectRedirectClassifyFunction() { this.getADeclarationEntry() = src.getADeclarationEntry()}
+    ConnectRedirectClassifyFunction() { this.getADeclarationEntry() = src.getDeclarationEntry()}
 }
 
 class ClassifyReauthorizeFlag extends AssignExpr {

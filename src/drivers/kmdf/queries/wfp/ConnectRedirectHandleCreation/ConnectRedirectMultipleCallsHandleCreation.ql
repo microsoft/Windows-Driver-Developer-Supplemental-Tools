@@ -19,13 +19,11 @@ import drivers.libraries.wfp
 
 class RedirectCalloutFunction extends Function {
     WfpConnectRedirect scr;
-    RedirectCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry()}
+    RedirectCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
 }
 
 // Returns TRUE if the callout function is marked as a connect redirect callout and 
 // calls FwpsRedirectHandleCreate0 multiple times in the function.
-
-
 
 from RedirectCalloutFunction waf
 where
