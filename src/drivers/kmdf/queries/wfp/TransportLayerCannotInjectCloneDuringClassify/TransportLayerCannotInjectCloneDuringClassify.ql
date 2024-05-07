@@ -7,7 +7,7 @@
  * @feature.area Multiple
  * @repro.text The following function does inject a clone at the transport layers
  * @kind problem
- * @id cpp/windows/wdk/kmdf/wfp/TransportLayerCannotInjectCloneDuringClassify
+ * @id cpp/windows/wdk/kmdf/wfp/Transport-Layer-Cannot-Inject-Clone-During-Classify
  * @problem.severity warning
  * @precision medium
  * @tags correctness
