@@ -7,7 +7,7 @@
  * @feature.area Multiple
  * @repro.text The following function asks for reauthorization and is an inline callout this is a contract violation
  * @kind problem
- * @id cpp/windows/wdk/kmdf/wfp/Inline-Connect-Redirect
+ * @id cpp/windows/wdk/kmdf/wfp/inline-connect-redirect
  * @problem.severity warning
  * @precision medium
  * @tags correctness

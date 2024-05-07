@@ -7,7 +7,7 @@
  * @feature.area Multiple
  * @repro.text The following function does not correctly set an action type for stream injection OOB
  * @kind problem
- * @id cpp/windows/wdk/kmdf/wfp/Oob-Stream-Injection
+ * @id cpp/windows/wdk/kmdf/wfp/oob-stream-injection
  * @problem.severity warning
  * @precision medium
  * @tags correctness
