@@ -4,6 +4,7 @@ param(
     [string]$clean_sln = "src\drivers\test\dvl_tests\test_clean",
     [string]$mustfix_sln = "src\drivers\test\dvl_tests\test_mustfix",
     [string]$mustfix_snippet = "src\drivers\general\queries\WdkDeprecatedApis\driver_snippet.c",
+    [string]$clean_snippet = "src\drivers\general\queries\QueryTemplate\driver_snippet.c",
     [string]$vcxproj_template_path = "src\drivers\test\WDMTestTemplate",
     [string]$vcxproj_name = "fail_driver1",
     [string]$codeql_path = ".\codeql-cli\",
@@ -182,11 +183,12 @@ function Test-Driver {
 # copy the template to the test directory
 Copy-Item -Path $vcxproj_template_path -Destination $clean_sln -Recurse
 Copy-Item -Path $vcxproj_template_path -Destination $mustfix_sln -Recurse
-dir
-dir $clean_sln
+
 # Delete driver_snippet.c in $dvl_test_working_dir
 Remove-Item -Path "$vcxproj_path_clean\driver_snippet.c" -Force
+Remove-Item -Path "$vcxproj_path_mustfix\driver_snippet.c" -Force
 # Copy the mustfix driver snippet to the test directory
+Copy-Item -Path $clean_snippet -Destination $vcxproj_path_clean
 Copy-Item -Path $mustfix_snippet -Destination $vcxproj_path_mustfix
 
 
