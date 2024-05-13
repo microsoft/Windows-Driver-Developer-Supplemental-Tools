@@ -4,7 +4,7 @@ param(
     [string]$clean_sln = "src\drivers\test\dvl_tests\test_clean",
     [string]$mustfix_sln = "src\drivers\test\dvl_tests\test_mustfix",
     [string]$mustfix_snippet = "src\drivers\general\queries\WdkDeprecatedApis\driver_snippet.c",
-    [string]$vcxproj_template_path = "src\drivers\general\queries\WdkDeprecatedApis\",
+    [string]$vcxproj_template_path = "src\drivers\test\WDMTestTemplate\",
     [string]$vcxproj_name = "fail_driver1",
     [string]$codeql_path = ".\codeql-cli\",
     [string]$query_suite = ".\suites\windows_driver_mustfix.qls",
