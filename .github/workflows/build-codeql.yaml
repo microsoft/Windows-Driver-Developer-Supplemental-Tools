@@ -237,6 +237,14 @@ jobs:
 
     - name: Test DVL
       run: src\drivers\test\dvl_tests\dvl_tests.ps1
+    
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v4
+      with:
+        name: dvl-outputs
+        path: |
+          *.dvl
+          *.sarif
         
   publish:
     runs-on: windows-latest
