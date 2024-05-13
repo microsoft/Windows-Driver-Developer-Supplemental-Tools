@@ -132,7 +132,7 @@ function Test-Driver {
 
     $global:LASTEXITCODE = 1234567891
 
-    $command = $codeql_path + "codeql.exe database create $db_name --language=cpp --source-root=`"$vcxproj_path\..\`" --command=`"msbuild /t:Rebuild /p:Configuration=Release /p:Platform=x64`" --overwrite 2>&1"
+    $command = $codeql_path + "codeql.exe database create $db_name --language=cpp --source-root=`"$vcxproj_path\..\`" --command=`"msbuild /t:Rebuild /p:Configuration=Release /p:Platform=x64 /p:UseNTIFS=false`" --overwrite 2>&1"
     $out = Invoke-Expression $command
     $codeql_db_exit_code = $LastExitCode
     if ($LASTEXITCODE -eq 1234567891) {
