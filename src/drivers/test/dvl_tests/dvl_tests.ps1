@@ -1,6 +1,8 @@
 param(
     [string]$vcxproj_path_clean = "src\drivers\test\dvl_tests\test_clean\driver\",
     [string]$vcxproj_path_mustfix = "src\drivers\test\dvl_tests\test_mustfix\driver\",
+    [string]$clean_sln = "src\drivers\test\dvl_tests\test_clean",
+    [string]$mustfix_sln = "src\drivers\test\dvl_tests\test_mustfix",
     [string]$mustfix_snippet = "src\drivers\general\queries\WdkDeprecatedApis\driver_snippet.c",
     [string]$vcxproj_template_path = "src\drivers\general\queries\WdkDeprecatedApis\",
     [string]$vcxproj_name = "fail_driver1",
@@ -178,8 +180,8 @@ function Test-Driver {
 }
 
 # copy the template to the test directory
-Copy-Item -Path $vcxproj_template_path -Destination "$vcxproj_path_clean\..\" -Recurse
-Copy-Item -Path $vcxproj_template_path -Destination "$vcxproj_path_mustfix\..\" -Recurse
+Copy-Item -Path $vcxproj_template_path -Destination $clean_sln -Recurse
+Copy-Item -Path $vcxproj_template_path -Destination $mustfix_sln -Recurse
    
 # Delete driver_snippet.c in $dvl_test_working_dir
 Remove-Item -Path "$vcxproj_path_clean\driver_snippet.c" -Force
