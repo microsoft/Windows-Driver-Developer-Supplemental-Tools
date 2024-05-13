@@ -6,15 +6,12 @@ name: Build and Publish Windows CodeQL queries
 on:
   # Triggers the workflow on push or pull request events but only for the main and development branches
   push:
-    branches: [ main, development, jacob-ronstadt/github_actions_update ]
+    branches: [ main, development ]
   pull_request:
     branches: [ main, development ]
 
   # Allow manual scheduling
   workflow_dispatch:
-env:
-  CODEQL_VERSION: "2.15.4"
-  CODEQL_LATEST_VERSION: "2.17.1"
   
 jobs:
   build:
@@ -36,7 +33,7 @@ jobs:
 
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
 
@@ -83,7 +80,7 @@ jobs:
         fetch-depth: 0
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
     - name: Install CodeQL pack dependencies
@@ -106,7 +103,6 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: Run test script
       shell: pwsh
-      continue-on-error: true # Allow script to return non-zero exit code
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
         ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
@@ -118,6 +114,7 @@ jobs:
   test-codeql-latest-vs-current:
   # Tests if the latest codeql version produces the same results as the current version. 
     runs-on: windows-latest
+    continue-on-error: true # Allow script to return non-zero exit code
     needs: [build,test-query-health]
     permissions:
       contents: read
@@ -134,7 +131,7 @@ jobs:
         fetch-depth: 0
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_LATEST_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_LATEST_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
     - name: Install CodeQL pack dependencies
@@ -157,7 +154,6 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: Run test script
       shell: pwsh
-      continue-on-error: true # Allow script to return non-zero exit code
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
         ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
@@ -226,7 +222,7 @@ jobs:
 
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
         
@@ -261,7 +257,7 @@ jobs:
 
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
         
