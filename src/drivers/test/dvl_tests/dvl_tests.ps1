@@ -182,7 +182,7 @@ function Test-Driver {
 # copy the template to the test directory
 Copy-Item -Path $vcxproj_template_path -Destination $clean_sln -Recurse
 Copy-Item -Path $vcxproj_template_path -Destination $mustfix_sln -Recurse
-   
+dir $clean_sln
 # Delete driver_snippet.c in $dvl_test_working_dir
 Remove-Item -Path "$vcxproj_path_clean\driver_snippet.c" -Force
 # Copy the mustfix driver snippet to the test directory
