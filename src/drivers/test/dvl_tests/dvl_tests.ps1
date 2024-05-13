@@ -1,7 +1,8 @@
 param(
-    [string]$vcxproj_path_clean = "src\drivers\test\dvl_tests\\hidusbfx2_clean\sys\",
-    [string]$vcxproj_path_mustfix = "src\drivers\test\dvl_tests\\hidusbfx2_mustfix\sys\",
-    [string]$vcxproj_name = "hidusbfx2",
+    [string]$vcxproj_path_clean = "src\drivers\test\dvl_tests\test_clean\driver\",
+    [string]$vcxproj_path_mustfix = "src\drivers\test\dvl_tests\test_mustfix\driver\",
+    [string]$mustfix_snippet = "src\drivers\general\queries\WdkDeprecatedApis\driver_snippet.c",
+    [string]$vcxproj_name = "fail_driver1",
     [string]$codeql_path = ".\codeql-cli\",
     [string]$query_suite = ".\suites\windows_driver_mustfix.qls",
     [string]$default_platform = "x64",
@@ -174,6 +175,16 @@ function Test-Driver {
     
     Set-Location -Path $starting_location
 }
+
+# copy the template to the test directory
+Copy-Item -Path $vcxproj_template_path -Destination "$vcxproj_path_clean\..\" -Recurse
+Copy-Item -Path $vcxproj_template_path -Destination "$vcxproj_path_mustfix\..\" -Recurse
+   
+# Delete driver_snippet.c in $dvl_test_working_dir
+Remove-Item -Path "$vcxproj_path_clean\driver_snippet.c" -Force
+# Copy the mustfix driver snippet to the test directory
+Copy-Item -Path $mustfix_snippet -Destination $vcxproj_path_mustfix
+
 
 Write-Host "Testing Clean Driver"
 Test-Driver $vcxproj_path_clean
