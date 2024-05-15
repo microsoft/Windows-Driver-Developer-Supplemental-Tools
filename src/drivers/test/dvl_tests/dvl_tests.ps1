@@ -202,3 +202,4 @@ Test-Driver $vcxproj_path_mustfix
 $result_loc = "$starting_location\mustfix_results\"
 New-Item -ItemType Directory -Path $result_loc -Force
 Get-ChildItem -Path $vcxproj_path_clean -Include *.sarif,*.DVL.XML -Recurse | Copy-Item -Destination $result_loc
+Write-Host "Tests complete. Results copied to $result_loc"
