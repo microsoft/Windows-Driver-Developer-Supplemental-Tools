@@ -11,11 +11,11 @@ param(
     [string]$query_suite = ".\suites\windows_driver_mustfix.qls",
     [string]$default_platform = "x64",
     [string]$default_configuration = "Release",
-    [string]$db_name = "temp_db"
+    [string]$db_name = "temp_db",
+    [string]$expected_sarif_path = "src\drivers\test\dvl_tests\expected_results"
 )
-$starting_location = Get-Location
-write-host $starting_location
 
+$starting_location = Get-Location
 $platforms = @("x64", "arm64")
 $configurations = @("Debug", "Release")
 function Test-DVL {
@@ -111,17 +111,11 @@ function Test-DVL {
 
 function Test-Driver {
     param (
-        [string]$vcxproj_path = $vcxproj_path_clean
+        [string]$vcxproj_path = $vcxproj_path_clean,
+        [string]$expected_sarif = ""
     )
 
-    if($vcxproj_path -eq $vcxproj_path_clean) {
-
-    }
-    else {
-    }
-
     # Delete any files ending in .sarif
-  
     Set-Location -Path $vcxproj_path
     Get-ChildItem -Path ".\" -Filter "*.sarif" -Recurse | Remove-Item -Force
     Get-ChildItem -Path ".\" -Filter "*.DVL.XML" -Recurse | Remove-Item -Force
@@ -150,7 +144,7 @@ function Test-Driver {
     }
     $sarif_out = "$vcxproj_path/results_$db_name.sarif"
     $global:LASTEXITCODE = 1234567891
-    $command = $codeql_path + "codeql.exe database analyze --download $db_name $query_suite --format=sarifv2.1.0 --output=`"$sarif_out`" 2>&1"
+    $command = $codeql_path + "codeql.exe database analyze --rerun --download $db_name $query_suite --format=sarifv2.1.0 --output=`"$sarif_out`" 2>&1 "
     $out = Invoke-Expression $command
     $codeql_analyze_exit_code = $LastExitCode
     if ($LASTEXITCODE -eq 1234567891) {
@@ -163,14 +157,19 @@ function Test-Driver {
         exit 1
     }
     if ($codeql_analyze_exit_code -ne 0) {
-        Write-Host "Failed to analyze CodeQL database"
+        Write-Host "FAIL -- Failed to analyze CodeQL database"
         Write-host $out
         exit 1
     }
-    else {
-        Write-Host "PASS -- Test analyze CodeQL database"
+    # Only compare results field to ignore specific fields that may change
+    if ( (((get-content  $sarif_out) | ConvertFrom-Json).runs | ConvertTo-Json -Compress -Depth 15) -eq (((get-content  $expected_sarif) | ConvertFrom-Json).runs | ConvertTo-Json -Compress -Depth 15 )) {
+        Write-Host "FAIL -- Sarif file does not match expected sarif file"
+        Compare-Object (Get-Content  $sarif_out ) (Get-Content $expected_sarif)
+        exit 1
     }
 
+    Write-Host "PASS -- Test analyze CodeQL database"
+    
     Set-Location -Path $vcxproj_path
 
     #Test DVL
@@ -181,8 +180,8 @@ function Test-Driver {
 }
 
 # copy the template to the test directory
-Copy-Item -Path $vcxproj_template_path -Destination $clean_sln -Recurse
-Copy-Item -Path $vcxproj_template_path -Destination $mustfix_sln -Recurse
+Copy-Item -Path $vcxproj_template_path -Destination $clean_sln -Recurse -Force
+Copy-Item -Path $vcxproj_template_path -Destination $mustfix_sln -Recurse -Force
 
 # Delete driver_snippet.c in $dvl_test_working_dir
 Remove-Item -Path "$vcxproj_path_clean\driver_snippet.c" -Force
@@ -193,13 +192,12 @@ Copy-Item -Path $mustfix_snippet -Destination $vcxproj_path_mustfix
 
 
 Write-Host "Testing Clean Driver"
-Test-Driver $vcxproj_path_clean
+Test-Driver $vcxproj_path_clean $expected_sarif_path"\clean_expected.sarif"
 $result_loc = "$starting_location\clean_results\"
 New-Item -ItemType Directory -Path $result_loc -Force
-Get-ChildItem -Path $vcxproj_path_clean -Include *.sarif,*.DVL.XML -Recurse | Copy-Item -Destination $result_loc
+Get-ChildItem -Path $vcxproj_path_clean -Include *.sarif, *.DVL.XML -Recurse | Copy-Item -Destination $result_loc -Force
 Write-Host "Testing MustFix Driver"
-Test-Driver $vcxproj_path_mustfix
+Test-Driver $vcxproj_path_mustfix $expected_sarif_path"\mustfix_expected.sarif"
 $result_loc = "$starting_location\mustfix_results\"
 New-Item -ItemType Directory -Path $result_loc -Force
-Get-ChildItem -Path $vcxproj_path_clean -Include *.sarif,*.DVL.XML -Recurse | Copy-Item -Destination $result_loc
-Write-Host "Tests complete. Results copied to $result_loc"
+Get-ChildItem -Path $vcxproj_path_mustfix -Include *.sarif, *.DVL.XML -Recurse | Copy-Item -Destination $result_loc -Force
