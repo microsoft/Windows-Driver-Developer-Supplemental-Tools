@@ -243,8 +243,8 @@ jobs:
       with:
         name: dvl-outputs
         path: |
-          *.dvl
-          *.sarif
+          clean_results\*.*
+          mustfix_results\*.*
         
   publish:
     runs-on: windows-latest
