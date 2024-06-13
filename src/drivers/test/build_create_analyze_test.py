@@ -766,15 +766,16 @@ def find_last_xlsx_file(curr_results_path):
     else:
         detailed = False
 
-    curr_results_timestamp = curr_results_path.split("--")[-1].replace(".xlsx", "")
     files = os.listdir()
+    print(files)
     files = [x for x in files if "diff" not in x]
     if detailed:
-        files = [x for x in files if x.endswith(".xlsx") and "detailed" in x and curr_results_timestamp not in x]
+        files = [x for x in files if x.endswith(".xlsx") and "detailed" in x and x != curr_results_path]
     else:
-        files = [x for x in files if x.endswith(".xlsx") and "detailed" not in x and curr_results_timestamp not in x]
+        files = [x for x in files if x.endswith(".xlsx") and "detailed" not in x and x != curr_results_path]
     files.sort(key=os.path.getmtime, reverse=True)
-  
+    if len(files) == 0:
+        return None
     return files[0]
 
 
@@ -788,30 +789,23 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
-    if not args.connection_string or not args.share_name and not args.local_result_storage:
+    if not args.connection_string or not args.share_name:
         raise Exception("Azure credentials not provided. Cannot compare results.")
     
-    # get most recent xlsx results file
-    if args.local_result_storage:
-        prev_results = find_last_xlsx_file(curr_results_path)
-        if prev_results == None:
-            print("No previous results found.")
-            return None
-    else:   
-        try:
-            prev_results = 'azure-'+curr_results_path
-            _ = download_file_from_azure(file_to_download=prev_results, 
-                            file_name=curr_results_path, file_directory="")
-            
-        except Exception as e:
-            if "ResourceNotFound" in str(e):
-                print("No previous results found. Uploading current results to Azure...")
-                upload_results_to_azure(file_to_upload=curr_results_path, 
-                            file_name=curr_results_path, file_directory="")
-                exit(1)
-            else:
-                print("Error downloading previous results ")
-                exit(1)
+    try:
+        prev_results = 'azure-'+curr_results_path
+        _ = download_file_from_azure(file_to_download=prev_results, 
+                        file_name=curr_results_path, file_directory="")
+        
+    except Exception as e:
+        if "ResourceNotFound" in str(e):
+            print("No previous results found. Uploading current results to Azure...")
+            upload_results_to_azure(file_to_upload=curr_results_path, 
+                        file_name=curr_results_path, file_directory="")
+            exit(1)
+        else:
+            print("Error downloading previous results ")
+            exit(1)
             
     prev_results_df = pd.read_excel(prev_results, index_col=0, sheet_name=0) 
     prev_results_codeql_version_df = pd.read_excel(prev_results, index_col=0, sheet_name=1)
@@ -838,6 +832,8 @@ def compare_health_results(curr_results_path):
         upload_results_to_azure(file_to_upload=curr_results_path, 
                             file_name=curr_results_path, file_directory="")
         exit(1)
+        
+    
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer, sheet_name="Diff")
         codeql_version_df.to_excel(writer, sheet_name="Current CodeQL Version")
@@ -846,23 +842,25 @@ def compare_health_results(curr_results_path):
         prev_results_codeql_version_df.to_excel(writer, sheet_name="Previous CodeQL Version")
         prev_results_codeql_packs_df.to_excel(writer, sheet_name="Previous CodeQL Packs")
         prev_results_system_info_df.to_excel(writer, sheet_name="Previous System Info")
-        
-    print("Saved diff results")
-    # upload new results to Azure
+        print("Saved diff results")
+
     if not args.local_result_storage:
-        
-        print("Uploading results")
-        upload_results_to_azure(file_to_upload=curr_results_path, 
-                            file_name=curr_results_path, file_directory="")
-        # upload diff to Azure
+        # upload new results to Azure
+        if args.overwrite_azure_results:
+            print("Uploading results")
+            upload_results_to_azure(file_to_upload=curr_results_path, 
+                                file_name=curr_results_path, file_directory="")
+            # upload diff to Azure 
         print("Uploading diff results")
         upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
-                            file_name="diff" + curr_results_path, file_directory="")
+                                    file_name="diff" + curr_results_path, file_directory="")
         
-        #upload_blob_to_azure("diff"+curr_results_path) # TODO this doesnt work in github actions
-
+    if not all(diff_results.isnull().all()):
+        print("Differences found in results!")
+        exit(1)
+    else:
+        print("No differences found in results")
     # delete downloaded file
-    
     os.remove(prev_results)
     print("Deleted previous results")
     
@@ -943,104 +941,30 @@ def find_sln_file(path):
 
 if __name__ == "__main__":
     # Sys input flags
-    parser = argparse.ArgumentParser(description='Build, create, and analyze CodeQL databases for testing queries. Running this script without any flags will run all queries on their respective driver template project with injected tests from driver_snippet.c')
-    parser.add_argument('-e', '--external_drivers',
-                    help='Use external drivers at <path> for testing instead of drivers in the repo',
-                    type=str,
-                    required=False,
-                    )
-    parser.add_argument('-l', '--no_clean',
-                    help='Do not clean the working directory before running tests',
-                    action='store_true',
-                    required=False,
-                    )
-    parser.add_argument('-b', '--existing_database',
-                    help='Use existing database at <path> for testing instead of creating a new one',
-                    type=str,
-                    required=False,
-                    )
-    parser.add_argument('-d', '--debug_only',
-                help='Debug only',
-                action='store_true',
-                required=False,
-                )
-    parser.add_argument('-r', '--release_only',
-                help='Release only',
-                action='store_true',
-                required=False,
-                )
-    parser.add_argument('-n', '--no_build',
-                help='Do not build the driver before running the test',
-                action='store_true',
-                required=False,
-                )
-    parser.add_argument('-o', '--override_template',
-                help='Override the template used for the test using <template>',
-                type=str,
-                required=False,
-                choices=["CppKMDFTestTemplate", "KMDFTestTemplate", "WDMTestTemplate"],
-                )
-    parser.add_argument('-v', '--verbose',
-                help='verbose output on',
-                action='store_true',
-                required=False,
-                )
-    parser.add_argument('-c', '--use_codeql_repo',
-                help='Use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager',
-                type=str,
-                required=False,
-                )
-    parser.add_argument('-i', '--individual_test',
-                help='Run only the tests with <name> in the name',
-                type=str,
-                required=False,
-                )
-    parser.add_argument('-t', '--threads',
-                help='Number of threads to use for multithreaded run',
-                type=int,
-                required=False,
-                )
-    parser.add_argument('-m', '--compare_results',
-                help='Compare results to previous run',
-                action='store_true',
-                required=False,
-                )
-    parser.add_argument('--compare_results_no_build',
-                help='Compare results to previous run',
-                type=str,
-                required=False,
-                )
-
-    parser.add_argument('--container_name',
-                help='Azure container name',
-                type=str,
-                required=False, )
-    parser.add_argument('--storage_account_name',
-                help='Azure storage account name',
-                type=str,
-                required=False, )
-    parser.add_argument('--share_name', 
-                        help='Azure share name',
-                type=str,
-                required=False,)
-    parser.add_argument('--storage_account_key',
-                help='Azure storage account key',
-                type=str,
-                required=False, )
-    parser.add_argument('--connection_string', 
-                        help='Azure connection string',
-                type=str,
-                required=False,)
-    parser.add_argument('--local_result_storage',
-                help='Store results locally instead of in Azure',
-                action='store_true',
-                required=False,
-                )
-    parser.add_argument('--codeql_path', 
-                        help='Path to the codeql executable',
-                type=str,
-                required=False,)
-
+    parser = argparse.ArgumentParser(description='Build, create, and analyze CodeQL databases for testing queries. \
+            Running this script without any flags will run all queries on their respective driver template project with\
+            injected tests from driver_snippet.c')
+    parser.add_argument('-e', '--external_drivers', help='Use external drivers at <path> for testing instead of drivers in the repo', type=str, required=False)
+    parser.add_argument('-l', '--no_clean', help='Do not clean the working directory before running tests', action='store_true', required=False)
+    parser.add_argument('-b', '--existing_database', help='Use existing database at <path> for testing instead of creating a new one', type=str, required=False)
+    parser.add_argument('-d', '--debug_only', help='Debug only', action='store_true', required=False)
+    parser.add_argument('-r', '--release_only', help='Release only', action='store_true', required=False)
+    parser.add_argument('-n', '--no_build', help='Do not build the driver before running the test', action='store_true', required=False)
+    parser.add_argument('-o', '--override_template', help='Override the template used for the test using <template>', type=str, required=False, choices=["CppKMDFTestTemplate", "KMDFTestTemplate", "WDMTestTemplate"])
+    parser.add_argument('-v', '--verbose', help='verbose output on', action='store_true', required=False)
+    parser.add_argument('-c', '--use_codeql_repo', help='Use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager', type=str, required=False)
+    parser.add_argument('-i', '--individual_test', help='Run only the tests with <name> in the name', type=str, required=False)
+    parser.add_argument('-t', '--threads', help='Number of threads to use for multithreaded run', type=int, required=False)
+    parser.add_argument('-m', '--compare_results', help='Compare results to previous run', action='store_true', required=False)
+    parser.add_argument('--compare_results_no_build',help='Compare results to previous run',type=str,required=False,)
+    parser.add_argument('--container_name',help='Azure container name',type=str,required=False, )
+    parser.add_argument('--storage_account_name',help='Azure storage account name',type=str,required=False, )
+    parser.add_argument('--share_name', help='Azure share name',type=str,required=False,)
+    parser.add_argument('--storage_account_key',help='Azure storage account key',type=str,required=False, )
+    parser.add_argument('--connection_string', help='Azure connection string', type=str, required=False,)
+    parser.add_argument('--local_result_storage',help='Store results locally instead of in Azure',action='store_true',required=False,)
+    parser.add_argument('--codeql_path', help='Path to the codeql executable',type=str,required=False,)
+    parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False,)
     args = parser.parse_args()
     
 
@@ -1059,10 +983,7 @@ if __name__ == "__main__":
 
     if args.compare_results_no_build:
         prev_results = "functiontestresults.xlsx"
-        download_blob_from_azure(prev_results)
-        #upload_blob_to_azure(prev_results)
-
-        #compare_health_results(args.compare_results_no_build)
+        compare_health_results(args.compare_results_no_build)
         exit(0)
 
     allowed_platforms = ["x64", "x86", "ARM", "ARM64"]
@@ -1157,3 +1078,4 @@ if __name__ == "__main__":
 
     end_time = time.time()
     print("Total run time: " + str((end_time - start_time)/60) + " minutes")
+  
