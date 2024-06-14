@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Transport 
+ * @name Transport Layer Cannot Inject Clone During Classify
  * @description checks that injections of clones at the transport do not happen
  * @platform Desktop
  * @feature.area Multiple
