@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @name Stream Inspection OOB functional contract
+ * @name Stream Inspection OOB (Out of Band) functional contract
  * @description checks that FwpsStreamContinue0 and FwpsStreamInjectAsync0 are not called in the same function
  * @platform Desktop
  * @feature.area Multiple
