@@ -12,6 +12,10 @@ on:
 
   # Allow manual scheduling
   workflow_dispatch:
+
+env:
+  CODEQL_LATEST_VERSION: 2.17.1
+  CODEQL_VERSION: 2.15.4
   
 jobs:
   build:
@@ -33,7 +37,7 @@ jobs:
 
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
 
@@ -80,7 +84,7 @@ jobs:
         fetch-depth: 0
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
     - name: Install CodeQL pack dependencies
@@ -131,7 +135,7 @@ jobs:
         fetch-depth: 0
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_LATEST_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_LATEST_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
     - name: Install CodeQL pack dependencies
@@ -222,7 +226,7 @@ jobs:
 
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
         
@@ -266,7 +270,7 @@ jobs:
 
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ vars.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
         
