@@ -248,6 +248,7 @@ jobs:
         
   publish:
     runs-on: windows-latest
+    continue-on-error: true 
     needs: [build, test-pack-version-update, test-query-health]
     permissions:
       contents: read
