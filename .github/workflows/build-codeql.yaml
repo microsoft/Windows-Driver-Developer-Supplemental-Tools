@@ -69,7 +69,6 @@ jobs:
       
   test-query-health:
     runs-on: windows-latest
-    continue-on-error: true # Allow script to return non-zero exit code
     needs: build
     permissions:
       contents: read
