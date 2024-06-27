@@ -142,13 +142,13 @@ jobs:
       shell: pwsh
       if: ${{ env.CONNECTION_STRING == '' }}
       run: exit 1
-    - name: fail if conditional job failed
+    - name: Check Prev Job
       if: ${{ needs.test-query-health.result == 'failure' }}
+      shell: pwsh
       run: exit 1  
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
-    
     - name: Clone self (windows-driver-developer-supplemental-tools)
       uses: actions/checkout@v4
       with:
@@ -179,6 +179,7 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: Run test script
       shell: pwsh
+      if: ${{ needs.test-query-health.result != 'failure' }}
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" 
           
   test-pack-version-update:
