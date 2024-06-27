@@ -1,0 +1,22 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Checks that FwpsStreamContinue0 and FwpsStreamInjectAsync0 are not called in the same function.
+	</overview>
+	<recommendation>
+		<p>
+			The following function calls both FwpsStreamContinue and FwpsStreamInjectAsync.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/network/callout-driver-programming-considerations">
+				Callout Drivers - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

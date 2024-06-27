@@ -1,0 +1,23 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			A callout should call FwpsRedirectHandleCreate0 only once and cache the handle and use it during classify.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The following function does not call FwpsRedirectHandleCreate0 or calls it multiple times and does not cache the handle.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/network/callout-driver-programming-considerations">
+				Callout Drivers - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>
