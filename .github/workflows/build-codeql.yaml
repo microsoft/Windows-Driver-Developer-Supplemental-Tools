@@ -111,7 +111,7 @@ jobs:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
         SHARE_NAME: ${{ secrets.SHARE_NAME }}
         CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-      if: ${{ env.CONNECTION_STRING != '' }}
+      if: ${{ env.test != '' }}
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"
       
   test-codeql-latest-vs-current:
@@ -160,7 +160,7 @@ jobs:
       env:
         CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
         SHARE_NAME: ${{ secrets.SHARE_NAME }}
-      if: ${{ env.CONNECTION_STRING != '' }}
+      if: ${{ env.test != '' }}
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" 
           
   test-pack-version-update:
