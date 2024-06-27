@@ -79,11 +79,6 @@ jobs:
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
       CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
     steps:
-    - name: Check Env
-      shell: pwsh
-      if: ${{ env.testCONNECTION_STRING == '' }}
-      run: exit 1
-      
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
