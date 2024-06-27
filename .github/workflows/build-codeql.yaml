@@ -68,6 +68,10 @@ jobs:
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
       
   test-query-health:
+    env:
+      CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+      SHARE_NAME: ${{ secrets.SHARE_NAME }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
     if: ${{ env.testCONNECTION_STRING != '' }}
     runs-on: windows-latest
     continue-on-error: true # Allow script to return non-zero exit code
@@ -109,10 +113,7 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: Run test script
       shell: pwsh
-      env:
-        CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
-        SHARE_NAME: ${{ secrets.SHARE_NAME }}
-        CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+     
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"
     
       
