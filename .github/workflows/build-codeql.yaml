@@ -137,7 +137,9 @@ jobs:
       shell: pwsh
       if: ${{ env.CONNECTION_STRING == '' }}
       run: exit 1
-      
+    - name: fail if conditional job failed
+      if: ${{ needs.test-query-health.result == 'failure' }}
+      run: exit 1  
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
