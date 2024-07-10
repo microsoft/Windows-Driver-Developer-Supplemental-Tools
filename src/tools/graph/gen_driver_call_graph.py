@@ -7,13 +7,14 @@ This script generates a driver call graph by analyzing a codeql database and msb
 Usage:
 
 Arguments:
-    --sln_file: The path to the driver project solution file. (A .vcxproj file can also be used) (DO NOT use quotes in the path)
-    --database_path: The path to the codeql database or the path to create a new one. (DO NOT use a relative path)
-    --source_root: The root directory of the source code. (Where the solution file/vcxproj file is located) (DO NOT use quotes in the path)
+    --sln_file <sln_path>: The path to the driver project solution file. (A .vcxproj file can also be used) (DO NOT use quotes in the path)
+    --database_path <db_path>: The path to the codeql database or the path where the new one will be created. (DO NOT use a relative path)
+    --source_root <path>: The root directory of the source code. (Where the solution file/vcxproj file is located) (DO NOT use quotes in the path)
     --skip_codeql: Skip codeql database creation and analysis.
     --hide_by_default: Hide nodes by default.
     --show_all: Show all graphs generated.
     --show: Show graph when done
+    --csv: Generate csv files for the graph.
     
     
 
@@ -177,6 +178,21 @@ def codeql_db_create(sln_file, source_root, output_dir):
                         cwd=source_root,
                         capture_output=False,
                         shell=True)
+
+def make_csv(file, links ):
+    """
+    Makes a csv file for the given graph.
+
+    Args:
+        net (Network): The network object used to create the graph.
+        nodes (list): A list of strings representing the nodes in the graph.
+        links (list): A list of tuples representing the links between nodes.
+        file (str): The name of the file for which the graph is generated.
+    Returns:
+        None
+    """
+    links_df = pd.DataFrame(links, columns=['source', 'target'])
+    links_df.to_csv(file+'_links.csv', index=False)
 
 def gen_graph(net, file, nodes, node_ids, macros, links, entry=None):
     """
@@ -414,6 +430,8 @@ if __name__ == "__main__":
     parser.add_argument('--hierarchical', action='store_true', help='Use hierarchical layout')
     parser.add_argument('--files_ddi_only', action='store_true', help='Show only files for DDI functions')
     parser.add_argument('--cdn_resources_remote', action='store_true', help='CDN resources')
+    parser.add_argument('--csv', action='store_true', help='Generate csv files for the graph')
+    
     args = parser.parse_args()    
     cnd_resources = 'remote' if args.cdn_resources_remote else 'local'
    
@@ -448,6 +466,8 @@ if __name__ == "__main__":
             entry = find_entry(args.source_root) 
             if entry is None:
                 print("entry none")
+            if args.csv:
+                make_csv(filename.split('.')[0], _links)
             networks[filename.split('.')[0]] = gen_graph(net_temp, filename.split('.')[0],  nodes=_nodes, node_ids=_node_ids, links=_links, macros=_macros,entry=entry)
             
     merge_nets(networks)
