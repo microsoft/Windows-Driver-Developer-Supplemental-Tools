@@ -7,9 +7,9 @@ This script generates a driver call graph by analyzing a codeql database and msb
 Usage:
 
 Arguments:
-    --sln_file: The path to the driver project solution file. (A .vcxproj file can also be used)
-    --database_path: The path to the codeql database or the path to create a new one.
-    --source_root: The root directory of the source code. (Where the solution file/vcxproj file is located)
+    --sln_file: The path to the driver project solution file. (A .vcxproj file can also be used) (DO NOT use quotes in the path)
+    --database_path: The path to the codeql database or the path to create a new one. (DO NOT use a relative path)
+    --source_root: The root directory of the source code. (Where the solution file/vcxproj file is located) (DO NOT use quotes in the path)
     --skip_codeql: Skip codeql database creation and analysis.
     --hide_by_default: Hide nodes by default.
     --show_all: Show all graphs generated.
@@ -265,7 +265,7 @@ def parse_dot(file, query):
         e = e.replace('declarationof','')
         e = e.replace('definitionof','')
         e = e.replace('[', ' ').replace(']', ' ').replace(';', '').replace('\n', '').replace('\"', '')
-        if "label=" in e and not '->' in e:
+        if "label=" in e:
             e = e.replace('label=', '')
             e = e.split()
             e[1] = e[1].split('/')[-1]
@@ -289,7 +289,7 @@ def parse_dot(file, query):
             node_ids['error_empty_label'] = "ERROR EMPTY LABEL"
     for e in lines:
         e = e.replace('[', ' ').replace(']', ' ').replace(';', '').replace('\n', '')
-        if "->" in e:
+        if "->" in e and not 'label=' in e:
             e = e.split("->")
             if e[0].strip()+query in ignore_ids or e[1].strip()+query in ignore_ids:
                 continue
