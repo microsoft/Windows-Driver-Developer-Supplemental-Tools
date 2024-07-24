@@ -58,29 +58,40 @@ class RegistryIsolationFunctionCall extends FunctionCall {
 }
 
 /*
-InitializeObjectAttributes: For second param (PUNICODE_STRING), if fully qualified object name passed, then RootDirectory is NULL. 
-If relative path name to the object directory specified by RootDirectory (not null)
-*/
-module FlowConfig implements DataFlow::ConfigSig{
+ * InitializeObjectAttributes: For second param (PUNICODE_STRING), if fully qualified object name passed, then RootDirectory is NULL.
+ * If relative path name to the object directory specified by RootDirectory (not null)
+ */
+
+module FlowConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    exists(FieldAccess fa, VariableAccess va | 
+    exists(FieldAccess fa, VariableAccess va|
       fa.getTarget().getName().matches("RootDirectory") and
-      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and 
+      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
       va.getParent*() = fa.getParent*() and
       source.asExpr() = va
     )
   }
-  // UninitializedNode ?
-
+  predicate isBarrier(DataFlow::Node barrier){
+    exists(Expr assignedValue, FieldAccess fa, VariableAccess va | 
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
+      va.getParent*() = fa.getParent*() and
+      assignedValue = fa.getTarget().getAnAssignedValue() and 
+      assignedValue.getParent*() = va.getParent*() and
+      assignedValue.getValue().toString().matches("%")  // assignedValue only has a value when it's constant
+      and barrier.asExpr() = assignedValue
+    )
+  }
+  
   predicate isSink(DataFlow::Node sink) {
-    exists( FunctionCall f|
-      zwViolation(f) and 
+    exists(FunctionCall f |
+      zwViolation(f) and
       sink.asExpr() = f.getAnArgument()
     )
   }
 }
-
 module IsolationDataFlow = DataFlow::Global<FlowConfig>;
+
 // rule 1
 predicate rtlViolation(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("Rtl%") and
@@ -95,24 +106,12 @@ predicate zwViolation(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("ZwCreateKey%")
 }
 
-// from RegistryIsolationFunctionCall f, Expr v
+// from RegistryIsolationFunctionCall f, int n, VariableAccess s
 // where
-//   zwViolation(f) and
-//   v.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
-//   v = f.getAnArgument() 
-//   // some zw functions have VariableAccess for object attrubutes arg others have AddressOfExpr
-// select f, f.toString(), v, v.toString()
-
+//   // rtlViolation(f)
+//select f
 from DataFlow::Node source, DataFlow::Node sink
-where IsolationDataFlow::flow(source, sink) and source != sink
+where
+  IsolationDataFlow::flow(source, sink) and
+  source != sink
 select source,source.toString(), sink, sink.toString()
-
-// from  VariableAccess oa, FieldAccess rootdir
-// where
-// rootdir.getTarget().getName().matches("RootDirectory") and 
-// oa.getType().toString().matches("%OBJECT_ATTRIBUTES%") and 
-// oa.getParent*() = rootdir.getParent*()
-
-
-// //, fa.getTarget().toString(), fa.getTarget().getAnAssignedValue().getValue()
-// select  rootdir, rootdir.toString(), oa, oa.toString()
