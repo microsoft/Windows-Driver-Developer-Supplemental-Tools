@@ -64,25 +64,27 @@ class RegistryIsolationFunctionCall extends FunctionCall {
 
 module FlowConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    exists(FieldAccess fa, VariableAccess va|
+    exists(FieldAccess fa, VariableAccess va |
       fa.getTarget().getName().matches("RootDirectory") and
       va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
       va.getParent*() = fa.getParent*() and
       source.asExpr() = va
     )
   }
-  predicate isBarrier(DataFlow::Node barrier){
-    exists(Expr assignedValue, FieldAccess fa, VariableAccess va | 
+
+  // Block the flow if value assigned to RootDirectory is null
+  predicate isBarrier(DataFlow::Node barrier) {
+    exists(Expr assignedValue, FieldAccess fa, VariableAccess va |
       fa.getTarget().getName().matches("RootDirectory") and
       va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
       va.getParent*() = fa.getParent*() and
-      assignedValue = fa.getTarget().getAnAssignedValue() and 
+      assignedValue = fa.getTarget().getAnAssignedValue() and
       assignedValue.getParent*() = va.getParent*() and
-      assignedValue.getValue().toString().matches("%")  // assignedValue only has a value when it's constant
-      and barrier.asExpr() = assignedValue
+      assignedValue.getValue().toString().matches("%") and // assignedValue only has a value when it's constant
+      barrier.asExpr() = assignedValue
     )
   }
-  
+
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
       zwViolation(f) and
@@ -90,7 +92,40 @@ module FlowConfig implements DataFlow::ConfigSig {
     )
   }
 }
+
 module IsolationDataFlow = DataFlow::Global<FlowConfig>;
+
+module FlowConfig2 implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
+    exists(Expr arg, FunctionCall fc |
+      (
+        fc.getTarget().getName().matches("IoOpenDeviceRegistryKey") or
+        fc.getTarget().getName().matches("WdfDeviceOpenRegistryKey") or
+        fc.getTarget().getName().matches("WdfFdoInitOpenRegistryKey ") or
+        fc.getTarget().getName().matches("CM_Open_DevNode_Key")
+      ) and
+      arg = fc.getAnArgument() and
+      (
+        arg.getType().toString().matches("%HANDLE%") or
+        arg.getType().toString().matches("%WDFKEY%")
+      ) and
+      source.asIndirectExpr() = arg
+    )
+  }
+
+  predicate isSink(DataFlow::Node sink) {
+    exists(Expr assignedValue, FieldAccess fa, VariableAccess va |
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
+      va.getParent*() = fa.getParent*() and
+      assignedValue = fa.getTarget().getAnAssignedValue() and
+      assignedValue.getParent*() = va.getParent*() and
+      sink.asExpr() = assignedValue
+    )
+  }
+}
+
+module IsolationDataFlow2 = DataFlow::Global<FlowConfig2>;
 
 // rule 1
 predicate rtlViolation(RegistryIsolationFunctionCall f) {
@@ -106,12 +141,32 @@ predicate zwViolation(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("ZwCreateKey%")
 }
 
-// from RegistryIsolationFunctionCall f, int n, VariableAccess s
-// where
-//   // rtlViolation(f)
-//select f
+// registry violation rtl functions
+/*
+ * from RegistryIsolationFunctionCall f, int n, VariableAccess s
+ * where
+ *   rtlViolation(f)
+ * select f
+ */
+
+// registry violation zw functions (only checks for non-null RootDirectory)
+
 from DataFlow::Node source, DataFlow::Node sink
 where
-  IsolationDataFlow::flow(source, sink) and
-  source != sink
+ IsolationDataFlow2::flow(source, sink) 
 select source,source.toString(), sink, sink.toString()
+ 
+// from FunctionCall fc, Expr arg
+// where
+//   (
+//     fc.getTarget().getName().matches("IoOpenDeviceRegistryKey") or
+//     fc.getTarget().getName().matches("WdfDeviceOpenRegistryKey") or
+//     fc.getTarget().getName().matches("WdfFdoInitOpenRegistryKey ") or
+//     fc.getTarget().getName().matches("CM_Open_DevNode_Key")
+//   ) and
+//   arg = fc.getAnArgument() and
+//   (
+//     arg.getType().toString().matches("%HANDLE%") or
+//     arg.getType().toString().matches("%WDFKEY%")
+//   )
+// select arg, arg.toString(), arg.getType(), arg.getType().toString()
