@@ -153,8 +153,12 @@ predicate zwViolation(RegistryIsolationFunctionCall f) {
 
 from DataFlow::Node source, DataFlow::Node sink
 where
- IsolationDataFlow2::flow(source, sink) 
-select source,source.toString(), sink, sink.toString()
+ IsolationDataFlow::flow(source, sink) and
+ not exists(DataFlow::Node source2, DataFlow::Node sink2 | 
+  IsolationDataFlow2::flow(source2, sink2) and
+  source.asExpr().getParent*() = sink2.asExpr().getParent*()
+ )
+select source, sink
  
 // from FunctionCall fc, Expr arg
 // where
