@@ -234,16 +234,15 @@ predicate zwViolation(RegistryIsolationFunctionCall f) { f.getTarget().getName()
 
 
 // 
-from DataFlow::Node source, DataFlow::Node sink, DataFlow::Node source2, DataFlow::Node sink2, Stmt p1, Stmt p2
+from DataFlow::Node source, DataFlow::Node sink, DataFlow::Node source2, DataFlow::Node sink2, Element p1, Stmt p2
 where
   IsolationDataFlowNullRootDir::flow(source, sink) 
   and AllowedReadFlow::flow(source2, sink2)
   and sink2 != source2
   //and source.asIndirectExpr().getParent*() = sink2.asIndirectExpr().getParent*()
-  and p1 = source.asIndirectExpr().getEnclosingStmt()
-  and p2 = sink2.asIndirectExpr().getEnclosingStmt()
+  and p1 = source.asIndirectExpr().getEnclosingStmt().getEnclosingElement()
+  and p2 = sink2.asIndirectExpr().getEnclosingStmt().getEnclosingElement()
   and p1 = p2
-
   and source.asIndirectExpr().getFile().getAbsolutePath().toString().matches("%shnotification.cpp%")
   and sink2.asIndirectExpr().getFile().getAbsolutePath().toString().matches("%shnotification.cpp%")
 
