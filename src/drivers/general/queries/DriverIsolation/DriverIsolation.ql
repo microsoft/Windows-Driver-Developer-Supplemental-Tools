@@ -230,27 +230,61 @@ predicate rtlViolation(RegistryIsolationFunctionCall f) {
   // TODO read only OK
 }
 
-predicate zwViolation(RegistryIsolationFunctionCall f) { f.getTarget().getName().matches("Zw%") }
+predicate zwRead(RegistryIsolationFunctionCall f) {
+  (
+    f.getTarget().getName().matches("ZwQueryKey") or
+    f.getTarget().getName().matches("ZwQueryValueKey")
+  )
+  or
+  f.getTarget().getName().matches("Zw%") and
+  f.getAnArgument().getType().toString().matches("ACCESS_MASK") and
+  exists(MacroInvocation m |
+    f.getAnArgument() = m.getExpr() and // more comments
+    (
+      m.getMacroName().matches("KEY_QUERY_VALUE") or
+      m.getMacroName().matches("KEY_ENUMERATE_SUB_KEYS") or
+      m.getMacroName().matches("KEY_CREATE_LINK") or
+      m.getMacroName().matches("KEY_NOTIFY")
+    )
+  )
+}
+
+predicate zwWrite(RegistryIsolationFunctionCall f) {
+  (
+    f.getTarget().getName().matches("ZwDeleteKey") or
+    f.getTarget().getName().matches("ZwDeleteValueKey") or
+    f.getTarget().getName().matches("ZwSetValueKey")
+  )
+  or
+  f.getTarget().getName().matches("Zw%") and
+  f.getAnArgument().getType().toString().matches("ACCESS_MASK") and
+  not exists(MacroInvocation m |
+    f.getAnArgument() = m.getExpr() and // more comments
+    (
+      m.getMacroName().matches("KEY_QUERY_VALUE") or
+      m.getMacroName().matches("KEY_ENUMERATE_SUB_KEYS") or
+      m.getMacroName().matches("KEY_CREATE_LINK") or
+      m.getMacroName().matches("KEY_NOTIFY")
+    )
+  )
+}
+
+predicate zwViolation(RegistryIsolationFunctionCall f) { zwRead(f) or zwWrite(f) }
 
 
-// 
-from DataFlow::Node source, DataFlow::Node sink, DataFlow::Node source2, DataFlow::Node sink2, Element p1, Stmt p2
-where
-  IsolationDataFlowNullRootDir::flow(source, sink) 
-  and AllowedReadFlow::flow(source2, sink2)
-  and sink2 != source2
-  //and source.asIndirectExpr().getParent*() = sink2.asIndirectExpr().getParent*()
-  and p1 = source.asIndirectExpr().getEnclosingStmt().getEnclosingElement()
-  and p2 = sink2.asIndirectExpr().getEnclosingStmt().getEnclosingElement()
-  and p1 = p2
-  and source.asIndirectExpr().getFile().getAbsolutePath().toString().matches("%shnotification.cpp%")
-  and sink2.asIndirectExpr().getFile().getAbsolutePath().toString().matches("%shnotification.cpp%")
-
-select source, sink, source2, sink2, p1, p2
-
-
-
-
+//
+// from
+//   DataFlow::Node source, DataFlow::Node sink, DataFlow::Node source2, DataFlow::Node sink2,
+//   Element p1, Element p2
+// where
+//   IsolationDataFlowNullRootDir::flow(source, sink) and
+//   AllowedReadFlow::flow(source2, sink2) and
+//   sink2 != source2 and
+//   //and source.asIndirectExpr().getParent*() = sink2.asIndirectExpr().getParent*()
+//   p1 = source.asIndirectExpr().getEnclosingStmt().getEnclosingElement() and
+//   p2 = sink2.asIndirectExpr().getEnclosingStmt().getEnclosingElement() and
+//   p1 = p2
+// select source, sink, source2, sink2, p1, p2
 // registry violation rtl functions
 /*
  * from RegistryIsolationFunctionCall f, int n, VariableAccess s
