@@ -46,13 +46,6 @@ class RegistryIsolationFunction extends Function {
   }
 }
 
-/**
- * todo structured comment
- */
-class RegistryIsolationFunctionAccess extends FunctionAccess {
-  RegistryIsolationFunctionAccess() { this.getTarget() instanceof RegistryIsolationFunction }
-}
-
 class RegistryIsolationFunctionCall extends FunctionCall {
   RegistryIsolationFunctionCall() { this.getTarget() instanceof RegistryIsolationFunction }
 }
@@ -83,7 +76,7 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
 
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
-      zwViolation(f) and
+      zwCall(f) and
       sink.asIndirectExpr() = f.getAnArgument()
     )
   }
@@ -110,7 +103,7 @@ module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
 
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
-      zwViolation(f) and
+      zwCall(f) and
       sink.asIndirectExpr() = f.getAnArgument()
     )
   }
@@ -134,7 +127,7 @@ module IsolationDataFlowObjectNameConfig implements DataFlow::ConfigSig {
 
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
-      zwViolation(f) and
+      zwCall(f) and
       sink.asIndirectExpr() = f.getAnArgument()
     )
   }
@@ -148,7 +141,6 @@ module IsolationDataFlowObjectName = DataFlow::Global<IsolationDataFlowObjectNam
 
 module IsolationDataFlowAllowedRead implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    //source.asExpr().getType().toString().matches("%UNICODE_STRING%")
     exists(VariableAccess assignedVal |
       assignedVal.getTarget().getAnAssignedValue().toString().toLowerCase().matches("%") and // TODO \registry\machine\hardware
       source.asIndirectExpr() = assignedVal and
@@ -220,12 +212,23 @@ module AllowedRootDirectoryFlowConfig implements DataFlow::ConfigSig {
 
 module AllowedRootDirectoryFlow = DataFlow::Global<AllowedRootDirectoryFlowConfig>;
 
-// rule 1
 predicate rtlViolation(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("Rtl%") and
+  // Violation if RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP
   exists(MacroInvocation m |
-    f.getArgument(0) = m.getExpr() and // more comments
+    f.getArgument(0) = m.getExpr() and
     not m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP")
+  )
+  or
+  // Violation if RelativeTo parameter IS RTL_REGISTRY_DEVICEMAP and not doing a READ
+  exists(MacroInvocation m |
+    f.getArgument(0) = m.getExpr() and
+    m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP") and
+    not (
+      f.getTarget().getName().matches("RtlQueryRegistryValues%") or
+      f.getTarget().getName().matches("RtlQueryRegistryValuesEx%") or
+      f.getTarget().getName().matches("RtlCheckRegistryKey%")
+    )
   )
   // TODO read only OK
 }
@@ -239,12 +242,14 @@ predicate zwRead(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("Zw%") and
   f.getAnArgument().getType().toString().matches("ACCESS_MASK") and
   exists(MacroInvocation m |
-    f.getAnArgument() = m.getExpr() and // more comments
+    f.getAnArgument() = m.getExpr() and
     (
       m.getMacroName().matches("KEY_QUERY_VALUE") or
       m.getMacroName().matches("KEY_ENUMERATE_SUB_KEYS") or
       m.getMacroName().matches("KEY_CREATE_LINK") or
-      m.getMacroName().matches("KEY_NOTIFY")
+      m.getMacroName().matches("KEY_NOTIFY") or
+      m.getMacroName().matches("KEY_READ") or
+      m.getMacroName().matches("KEY_EXECUTE")
     )
   )
 }
@@ -259,48 +264,55 @@ predicate zwWrite(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("Zw%") and
   f.getAnArgument().getType().toString().matches("ACCESS_MASK") and
   not exists(MacroInvocation m |
-    f.getAnArgument() = m.getExpr() and // more comments
+    f.getAnArgument() = m.getExpr() and
     (
       m.getMacroName().matches("KEY_QUERY_VALUE") or
       m.getMacroName().matches("KEY_ENUMERATE_SUB_KEYS") or
       m.getMacroName().matches("KEY_CREATE_LINK") or
-      m.getMacroName().matches("KEY_NOTIFY")
+      m.getMacroName().matches("KEY_NOTIFY") or
+      m.getMacroName().matches("KEY_READ") or
+      m.getMacroName().matches("KEY_EXECUTE")
     )
   )
 }
 
-predicate zwViolation(RegistryIsolationFunctionCall f) { zwRead(f) or zwWrite(f) }
+predicate zwCall(RegistryIsolationFunctionCall f) {
+  zwRead(f)
+  or
+  zwWrite(f)
+}
 
-
-//
-// from
-//   DataFlow::Node source, DataFlow::Node sink, DataFlow::Node source2, DataFlow::Node sink2,
-//   Element p1, Element p2
-// where
-//   IsolationDataFlowNullRootDir::flow(source, sink) and
-//   AllowedReadFlow::flow(source2, sink2) and
-//   sink2 != source2 and
-//   //and source.asIndirectExpr().getParent*() = sink2.asIndirectExpr().getParent*()
-//   p1 = source.asIndirectExpr().getEnclosingStmt().getEnclosingElement() and
-//   p2 = sink2.asIndirectExpr().getEnclosingStmt().getEnclosingElement() and
-//   p1 = p2
-// select source, sink, source2, sink2, p1, p2
-// registry violation rtl functions
-/*
- * from RegistryIsolationFunctionCall f, int n, VariableAccess s
- * where
- *   rtlViolation(f)
- * select f
- */
-
-// // registry violation zw functions ( non-null RootDirectory)
-// from DataFlow::Node source, DataFlow::Node sink
-// where
-//   IsolationDataFlowNonNullRootDir::flow(source, sink) and
-//   not exists(DataFlow::Node source2, DataFlow::Node sink2 |
-//     AllowedRootDirectoryFlow::flow(source2, sink2) and
-//     source.asExpr().getParent*() = sink2.asExpr().getParent*()
-//   )
-//   or
-//   IsolationDataFlowNullRootDir::flow(source, sink)
-// select source, source.toString(), sink, sink.toString()
+from RegistryIsolationFunctionCall f
+where
+  //Function call is an rtl function violation
+  rtlViolation(f)
+  or
+  // registry violation zw functions ( non-null RootDirectory)
+  exists(DataFlow::Node source, DataFlow::Node sink |
+    IsolationDataFlowNonNullRootDir::flow(source, sink) and // OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
+    // check if the handle passed to Zw* function is not from a valid source
+    not exists(DataFlow::Node source2, DataFlow::Node sink2 |
+      AllowedRootDirectoryFlow::flow(source2, sink2) and
+      source.asExpr().getParent*() = sink2.asExpr().getParent*()
+    ) and
+    sink.asExpr().getParent*() = f
+  )
+  or
+  exists(
+    DataFlow::Node source, DataFlow::Node sink, DataFlow::Node source2, DataFlow::Node sink2,
+    Element p1, Element p2
+  |
+    IsolationDataFlowNullRootDir::flow(source, sink) and // OBJECT_ATTRIBUTES->RootDirectory is NULL and used in a Zw* function
+    sink.asExpr().getParent*() = f and
+    // a read access is allowed if OBJECT_ATTRIBUTES->ObjectName is initialized with \registry\machine\hardware%
+    (
+      not AllowedReadFlow::flow(source2, sink2) and // flow from variable assignment to  OBJECT_ATTRIBUTES->ObjectName
+      sink2 != source2 and
+      // check if source (OBJECT_ATTRIBUTES) and sink2 (OBJECT_ATTRIBUTES->ObjectName) are in the same function call
+      p1 = source.asIndirectExpr().getEnclosingStmt().getEnclosingElement() and
+      p2 = sink2.asIndirectExpr().getEnclosingStmt().getEnclosingElement() and
+      p1 = p2 and
+      not zwRead(f)
+    )
+  )
+select f, f.toString()
