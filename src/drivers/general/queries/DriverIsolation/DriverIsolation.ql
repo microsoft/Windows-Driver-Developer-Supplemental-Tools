@@ -90,13 +90,15 @@ module IsolationDataFlowNonNullRootDir = DataFlow::Global<IsolationDataFlowNonNu
 
 module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    exists(FieldAccess fa, VariableAccess va, Expr assignedValue |
+    exists(FieldAccess fa, VariableAccess va |
       fa.getTarget().getName().matches("RootDirectory") and
       va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
       va.getParent*() = fa.getParent*() and
-      assignedValue = fa.getTarget().getAnAssignedValue() and
-      assignedValue.getParent*() = va.getParent*() and
-      assignedValue.getValue().toString().matches("%") and // assignedValue only has a value when it's constant
+      exists(Expr assignedValue |
+        assignedValue = fa.getTarget().getAnAssignedValue() and
+        assignedValue.getParent*() = va.getParent*() and
+        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
+      ) and
       source.asIndirectExpr() = va
     )
   }
@@ -117,7 +119,12 @@ module IsolationDataFlowNullRootDir = DataFlow::Global<IsolationDataFlowNullRoot
 
 module IsolationDataFlowAllowedRead implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    source.asIndirectExpr().getValue().toString().toLowerCase().matches("%registry%machine%hardware%") or
+    source
+        .asIndirectExpr()
+        .getValue()
+        .toString()
+        .toLowerCase()
+        .matches("%registry%machine%hardware%") or
     source.asExpr().getValue().toString().toLowerCase().matches("%registry%machine%hardware%")
   }
 
@@ -158,8 +165,12 @@ module AllowedRootDirectoryFlowConfig implements DataFlow::ConfigSig {
     exists(Expr arg, FunctionCall fc |
       (
         fc.getTarget().getName().matches("IoOpenDeviceRegistryKey") or
+        fc.getTarget().getName().matches("IoOpenDeviceInterfaceRegistryKey") or
+        fc.getTarget().getName().matches("IoOpenDriverRegistryKey") or
+        fc.getTarget().getName().matches("WdfDriverOpenParametersRegistryKey") or
+        fc.getTarget().getName().matches("WdfDriverOpenPersistentStateRegistryKey") or
         fc.getTarget().getName().matches("WdfDeviceOpenRegistryKey") or
-        fc.getTarget().getName().matches("WdfFdoInitOpenRegistryKey ") or
+        fc.getTarget().getName().matches("WdfFdoInitOpenRegistryKey") or
         fc.getTarget().getName().matches("CM_Open_DevNode_Key")
       ) and
       arg = fc.getAnArgument() and
@@ -306,57 +317,35 @@ predicate zwCall(RegistryIsolationFunctionCall f) {
   zwWrite(f)
 }
 
-from
-  DataFlow::Node source, DataFlow::Node sink, FunctionCall f
+from RegistryIsolationFunctionCall f
 where
-  IsolationDataFlowNullRootDir::flow(source, sink) and
-  not exists( DataFlow::Node source2, DataFlow::Node sink2, Element p1, Element p2 |
-    AllowedReadFlow::flow(source2, sink2) and
-    p1 = source.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
-    p2 = sink2.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
-    p1 = p2 
-  ) and 
-  sink.asIndirectArgument().getParent*() = f
+  rtlViolation(f)
+  or
+  // registry violation zw functions ( non-null RootDirectory)
+  exists(DataFlow::Node source, DataFlow::Node sink |
+    IsolationDataFlowNonNullRootDir::flow(source, sink) and // OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
+    // check if the handle passed to Zw* function is not from a valid source
+    not exists(DataFlow::Node source2, DataFlow::Node sink2 |
+      AllowedRootDirectoryFlow::flow(source2, sink2) and
+      source.asIndirectExpr().getParent*() = sink2.asExpr().getParent*()
+    ) and
+    sink.asIndirectExpr().getParent*() = f
+  )
+  or
+  exists(DataFlow::Node source, DataFlow::Node sink |
+    IsolationDataFlowNullRootDir::flow(source, sink) and
+    not exists(DataFlow::Node source2, DataFlow::Node sink2, Element p1, Element p2 |
+      AllowedReadFlow::flow(source2, sink2) and
+      p1 = source.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
+      p2 = sink2.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
+      p1 = p2
+    ) and
+    sink.asIndirectArgument().getParent*() = f
+  )
+  or
+  zwWrite(f) and
+  not exists(DataFlow::Node source, DataFlow::Node sink |
+    AllowedZwRegWrite::flow(source, sink) and
+    sink.asExpr().getParent*() = f //Function call is an rtl function violation
+  )
 select f, f.toString()
-
-// from FunctionCall f
-// where
-// //   zwWrite(f) and
-// //   not exists(DataFlow::Node source, DataFlow::Node sink |
-// //     AllowedZwRegWrite::flow(source, sink) and
-// //     sink.asExpr().getParent*() = f //Function call is an rtl function violation
-// //   )
-// // select f, f.toString()
-// // from RegistryIsolationFunctionCall f
-// // where
-// // rtlViolation(f)
-// // or
-// // // registry violation zw functions ( non-null RootDirectory)
-// // exists(DataFlow::Node source, DataFlow::Node sink |
-// //   IsolationDataFlowNonNullRootDir::flow(source, sink) and // OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
-// //   // check if the handle passed to Zw* function is not from a valid source
-// //   not exists(DataFlow::Node source2, DataFlow::Node sink2 |
-// //     AllowedRootDirectoryFlow::flow(source2, sink2) and
-// //     source.asExpr().getParent*() = sink2.asExpr().getParent*()
-// //   ) and
-// //   sink.asExpr().getParent*() = f
-// // )
-// // or
-// exists(
-//   DataFlow::Node source, DataFlow::Node sink, DataFlow::Node source2, DataFlow::Node sink2,
-//   Element p1, Element p2
-// |
-//   IsolationDataFlowNullRootDir::flow(source, sink) and // OBJECT_ATTRIBUTES->RootDirectory is NULL and used in a Zw* function
-//   sink.asIndirectArgument().getParent*() = f
-//   and
-//   // a read access is allowed if OBJECT_ATTRIBUTES->ObjectName is initialized with \registry\machine\hardware%
-//   (
-//     not AllowedReadFlow::flow(source2, sink2) and // flow from variable assignment to  OBJECT_ATTRIBUTES->ObjectName
-//     sink2 != source2 and
-//     // check if source (OBJECT_ATTRIBUTES) and sink2 (OBJECT_ATTRIBUTES->ObjectName) are in the same function call
-//     p1 = source.asIndirectExpr().getEnclosingStmt().getEnclosingElement() and
-//     p2 = sink2.asIndirectExpr().getEnclosingStmt().getEnclosingElement() and
-//     p1 = p2
-//   )
-// )
-// select f, f.toString()

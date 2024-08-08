@@ -78,11 +78,78 @@ void test_zw_violation_2()
 void test_zw_violation_3()
 {
 }
-
-void test_zw_violation_4()
-{
-}
 */
+
+void test_zw_allowed_rootdirectory_source()
+{
+    OBJECT_ATTRIBUTES ObjectAttributes;
+    NTSTATUS Status;
+    HANDLE ParentKey, RootKey, ChildKey;
+    UNICODE_STRING UnicodeEnumName;
+    const WCHAR EnumString[] = L"Enum";
+
+    PAGED_CODE();
+
+    PDEVICE_OBJECT PhysicalDeviceObject = NULL;
+
+    Status = IoOpenDeviceRegistryKey(PhysicalDeviceObject,
+                                     PLUGPLAY_REGKEY_DRIVER,
+                                     STANDARD_RIGHTS_ALL,
+                                     &ParentKey);
+
+    //
+    // create the subkey for the enum section, in the form "\enum"
+    //
+    RtlInitUnicodeString(&UnicodeEnumName, EnumString);
+
+    //
+    // read the registry to determine if children are present.
+    //
+    InitializeObjectAttributes(&ObjectAttributes,
+                               &UnicodeEnumName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               ParentKey,
+                               NULL);
+
+    Status = ZwOpenKey(&RootKey, KEY_READ, &ObjectAttributes);
+
+    if (!NT_SUCCESS(Status))
+    {
+        ZwClose(ParentKey);
+        return Status;
+    }
+}
+
+void test_zw_not_allowed_rootdirectory_source()
+{
+    OBJECT_ATTRIBUTES ObjectAttributes;
+    NTSTATUS Status;
+    HANDLE ParentKey, RootKey, ChildKey;
+    UNICODE_STRING UnicodeEnumName;
+    const WCHAR EnumString[] = L"Enum";
+
+    PAGED_CODE();
+    Status = ZwOpenKey(&ParentKey, KEY_ALL_ACCESS, &ObjectAttributes); // also a violation
+    PDEVICE_OBJECT PhysicalDeviceObject = NULL;
+
+    RtlInitUnicodeString(&UnicodeEnumName, EnumString);
+    
+    InitializeObjectAttributes(&ObjectAttributes,
+                               &UnicodeEnumName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               ParentKey,
+                               NULL);
+
+    // Violation because ObjectAttributes->RootDirectory is not from an OK source
+    Status = ZwOpenKey(&RootKey, KEY_READ, &ObjectAttributes);
+
+    if (!NT_SUCCESS(Status))
+    {
+        ZwClose(ParentKey);
+        return Status;
+    }
+}
+
 void test_zw_allowed_read()
 {
 
@@ -119,7 +186,7 @@ void test_zw_not_allowed_read()
     ULONG ReturnedSize = 0;
     UNICODE_STRING FrameRateKey;
     PUNICODE_STRING pwszSymbolicLink = NULL;
-    
+
     RtlInitUnicodeString(&FrameRateKey, L"\\some\\bad\\path\\test\\test.txt");
     InitializeObjectAttributes(&ObjectAttributes, &FrameRateKey, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, 0, NULL);
     ZwOpenKey(&ChildKey, KEY_READ, &ObjectAttributes);
