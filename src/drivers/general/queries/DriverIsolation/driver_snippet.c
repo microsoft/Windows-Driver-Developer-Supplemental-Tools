@@ -30,7 +30,6 @@ void top_level_call()
 
     // return ntStatus;
 }
-/*
 void test_rtl_violation_0()
 {
     // RelativeTo != RTL_REGISTRY_DEVICEMAP
@@ -58,27 +57,17 @@ void test_rtl_violation_1()
     // RelativeTo == RTL_REGISTRY_DEVICEMAP AND function writes
 }
 
-void test_zw_violation_0()
-{
-    // OBJECT_ATTRIBUTES->RootDirectory != NULL AND didn't get RootDirectory from OK source
-}
-
 void test_zw_violation_1()
 {
     // OBJECT_ATTRIBUTES->RootDirectory == NULL
     // AND OBJECT_ATTRIBUTES->ObjectName starts with "\registry\machine\hardware\"
     // AND function writes
 }
-void test_zw_violation_2()
-{
-    // OBJECT_ATTRIBUTES->RootDirectory == NULL
-    // AND OBJECT_ATTRIBUTES->ObjectName doesn't start with "\registry\machine\hardware\"
-}
+
 
 void test_zw_violation_3()
 {
 }
-*/
 
 void test_zw_allowed_rootdirectory_source()
 {
@@ -120,6 +109,7 @@ void test_zw_allowed_rootdirectory_source()
     }
 }
 
+// OBJECT_ATTRIBUTES->RootDirectory != NULL AND didn't get RootDirectory from OK source
 void test_zw_not_allowed_rootdirectory_source()
 {
     OBJECT_ATTRIBUTES ObjectAttributes;
@@ -133,7 +123,7 @@ void test_zw_not_allowed_rootdirectory_source()
     PDEVICE_OBJECT PhysicalDeviceObject = NULL;
 
     RtlInitUnicodeString(&UnicodeEnumName, EnumString);
-    
+
     InitializeObjectAttributes(&ObjectAttributes,
                                &UnicodeEnumName,
                                OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
@@ -148,6 +138,33 @@ void test_zw_not_allowed_rootdirectory_source()
         ZwClose(ParentKey);
         return Status;
     }
+}
+
+
+
+// OBJECT_ATTRIBUTES->RootDirectory == NULL
+// AND OBJECT_ATTRIBUTES->ObjectName doesn't start with "\registry\machine\hardware\"
+void test_zw_not_allowed_read()
+{
+
+    NTSTATUS Status = STATUS_SUCCESS;
+    HANDLE RootKey = NULL;
+    HANDLE ChildKey = NULL;
+    KEY_FULL_INFORMATION FullKeyInformation = {};
+    OBJECT_ATTRIBUTES ObjectAttributes;
+    PKEY_BASIC_INFORMATION pKeyInformation = NULL;
+    ULONG Index = 0;
+    ULONG InformationSize = 0;
+    ULONG ReturnedSize = 0;
+    UNICODE_STRING FrameRateKey;
+    PUNICODE_STRING pwszSymbolicLink = NULL;
+
+    RtlInitUnicodeString(&FrameRateKey, L"\\some\\bad\\path\\test\\test.txt");
+    InitializeObjectAttributes(&ObjectAttributes, &FrameRateKey, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, 0, NULL);
+    ZwOpenKey(&ChildKey, KEY_READ, &ObjectAttributes);
+    // Open RGB data file for conversion to YUV space
+
+    Status = ZwQueryKey(ChildKey, KeyFullInformation, &FullKeyInformation, sizeof(FullKeyInformation), &ReturnedSize);
 }
 
 void test_zw_allowed_read()
@@ -172,29 +189,6 @@ void test_zw_allowed_read()
 
     Status = ZwQueryKey(ChildKey, KeyFullInformation, &FullKeyInformation, sizeof(FullKeyInformation), &ReturnedSize);
 }
-void test_zw_not_allowed_read()
-{
-
-    NTSTATUS Status = STATUS_SUCCESS;
-    HANDLE RootKey = NULL;
-    HANDLE ChildKey = NULL;
-    KEY_FULL_INFORMATION FullKeyInformation = {};
-    OBJECT_ATTRIBUTES ObjectAttributes;
-    PKEY_BASIC_INFORMATION pKeyInformation = NULL;
-    ULONG Index = 0;
-    ULONG InformationSize = 0;
-    ULONG ReturnedSize = 0;
-    UNICODE_STRING FrameRateKey;
-    PUNICODE_STRING pwszSymbolicLink = NULL;
-
-    RtlInitUnicodeString(&FrameRateKey, L"\\some\\bad\\path\\test\\test.txt");
-    InitializeObjectAttributes(&ObjectAttributes, &FrameRateKey, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, 0, NULL);
-    ZwOpenKey(&ChildKey, KEY_READ, &ObjectAttributes);
-    // Open RGB data file for conversion to YUV space
-
-    Status = ZwQueryKey(ChildKey, KeyFullInformation, &FullKeyInformation, sizeof(FullKeyInformation), &ReturnedSize);
-}
-
 /*
 void test_with_multiple_version()
 {

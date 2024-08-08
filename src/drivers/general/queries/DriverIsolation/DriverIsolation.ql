@@ -77,7 +77,10 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
       zwCall(f) and
-      sink.asIndirectExpr() = f.getAnArgument()
+      (
+        sink.asIndirectExpr() = f.getAnArgument() or
+        sink.asExpr() = f.getAnArgument()
+      )
     )
   }
 }
@@ -153,7 +156,7 @@ module IsolationDataFlowAllowedRead implements DataFlow::ConfigSig {
   }
 }
 
-module AllowedReadFlow = DataFlow::Global<IsolationDataFlowAllowedRead>;
+module AllowedObjectNamePathFlow = DataFlow::Global<IsolationDataFlowAllowedRead>;
 
 /*
  * If using a Zw* registry function and the OBJECT_ATTRIBUTES passed to it has a non-null RootDirectory
@@ -196,69 +199,52 @@ module AllowedRootDirectoryFlowConfig implements DataFlow::ConfigSig {
 
 module AllowedRootDirectoryFlow = DataFlow::Global<AllowedRootDirectoryFlowConfig>;
 
-module AllowedZwRegWriteConfig implements DataFlow::ConfigSig {
-  predicate isSource(DataFlow::Node source) {
-    exists(Expr arg, FunctionCall fc |
-      (
-        fc.getTarget().getName().matches("IoOpenDeviceRegistryKey") or
-        fc.getTarget().getName().matches("IoOpenDeviceInterfaceRegistryKey") or
-        fc.getTarget().getName().matches("WdfDeviceOpenRegistryKey") or
-        fc.getTarget().getName().matches("WdfFdoInitOpenRegistryKey ") or
-        fc.getTarget().getName().matches("CM_Open_DevNode_Key") or
-        fc.getTarget().getName().matches("CM_Open_Device_Interface_Key ")
-      ) and
-      arg = fc.getAnArgument() and
-      (
-        arg.getType().toString().matches("%HANDLE%") or
-        arg.getType().toString().matches("%WDFKEY%")
-      ) and
-      source.asIndirectExpr() = arg
-    )
-  }
-
-  predicate isSink(DataFlow::Node sink) {
-    exists(RegistryIsolationFunctionCall f |
-      f.getAnArgument() = sink.asExpr() and
-      zwWrite(f)
-    )
-  }
-}
-
-module AllowedZwRegWrite = DataFlow::Global<AllowedZwRegWriteConfig>;
-
-predicate rtlViolation(RegistryIsolationFunctionCall f) {
+// module AllowedZwRegCallConfig implements DataFlow::ConfigSig {
+//   predicate isSource(DataFlow::Node source) {
+//     exists(Expr arg, FunctionCall fc |
+//       (
+//         fc.getTarget().getName().matches("IoOpenDeviceRegistryKey") or
+//         fc.getTarget().getName().matches("IoOpenDeviceInterfaceRegistryKey") or
+//         fc.getTarget().getName().matches("IoOpenDriverRegistryKey") or
+//         fc.getTarget().getName().matches("WdfDriverOpenParametersRegistryKey") or
+//         fc.getTarget().getName().matches("WdfDriverOpenPersistentStateRegistryKey") or
+//         fc.getTarget().getName().matches("WdfDeviceOpenRegistryKey") or
+//         fc.getTarget().getName().matches("WdfFdoInitOpenRegistryKey") or
+//         fc.getTarget().getName().matches("CM_Open_DevNode_Key")
+//       ) and
+//       arg = fc.getAnArgument() and
+//       (
+//         arg.getType().toString().matches("%HANDLE%") or
+//         arg.getType().toString().matches("%WDFKEY%")
+//       ) and
+//       source.asIndirectExpr() = arg
+//     )
+//   }
+//   predicate isSink(DataFlow::Node sink) {
+//     exists(RegistryIsolationFunctionCall f |
+//       (
+//         f.getAnArgument() = sink.asExpr() or
+//         f.getAnArgument() = sink.asIndirectExpr()
+//       ) and
+//       zwCall(f)
+//     )
+//   }
+// }
+// module AllowedZwRegCall = DataFlow::Global<AllowedZwRegCallConfig>;
+predicate rtlViolation1(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("Rtl%") and
   // Violation if RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP
   exists(MacroInvocation m |
     f.getArgument(0) = m.getExpr() and
     not m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP")
   )
-  or
+}
+predicate rtlViolation2(RegistryIsolationFunctionCall f) {
   // Violation if RelativeTo parameter IS RTL_REGISTRY_DEVICEMAP and not doing a READ
   exists(MacroInvocation m |
     f.getArgument(0) = m.getExpr() and
     m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP") and
     not (
-      f.getTarget().getName().matches("RtlQueryRegistryValues%") or
-      f.getTarget().getName().matches("RtlQueryRegistryValuesEx%") or
-      f.getTarget().getName().matches("RtlCheckRegistryKey%")
-    )
-  )
-}
-
-predicate rtlNoViolation(RegistryIsolationFunctionCall f) {
-  f.getTarget().getName().matches("Rtl%") and
-  // if RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP
-  exists(MacroInvocation m |
-    f.getArgument(0) = m.getExpr() and
-    m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP")
-  )
-  or
-  //  if RelativeTo parameter IS RTL_REGISTRY_DEVICEMAP and  doing a READ
-  exists(MacroInvocation m |
-    f.getArgument(0) = m.getExpr() and
-    m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP") and
-    (
       f.getTarget().getName().matches("RtlQueryRegistryValues%") or
       f.getTarget().getName().matches("RtlQueryRegistryValuesEx%") or
       f.getTarget().getName().matches("RtlCheckRegistryKey%")
@@ -317,11 +303,15 @@ predicate zwCall(RegistryIsolationFunctionCall f) {
   zwWrite(f)
 }
 
-from RegistryIsolationFunctionCall f
+from RegistryIsolationFunctionCall f, string message
 where
-  rtlViolation(f)
+  rtlViolation1(f) and
+  message = "Rtl* registy function call RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP"
   or
-  // registry violation zw functions ( non-null RootDirectory)
+  rtlViolation2(f) and
+  message = "Rtl* registy function call RelativeTo parameter is RTL_REGISTRY_DEVICEMAP but is doing a write"
+  or
+  /* registry violation zw functions ( non-null RootDirectory)*/
   exists(DataFlow::Node source, DataFlow::Node sink |
     IsolationDataFlowNonNullRootDir::flow(source, sink) and // OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
     // check if the handle passed to Zw* function is not from a valid source
@@ -330,22 +320,35 @@ where
       source.asIndirectExpr().getParent*() = sink2.asExpr().getParent*()
     ) and
     sink.asIndirectExpr().getParent*() = f
-  )
+  ) and
+  message = f.getTarget().toString() + " call with non-null RootDirectory and invalid handle source"
   or
   exists(DataFlow::Node source, DataFlow::Node sink |
     IsolationDataFlowNullRootDir::flow(source, sink) and
     not exists(DataFlow::Node source2, DataFlow::Node sink2, Element p1, Element p2 |
-      AllowedReadFlow::flow(source2, sink2) and
+      AllowedObjectNamePathFlow::flow(source2, sink2) and
       p1 = source.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
       p2 = sink2.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
       p1 = p2
     ) and
     sink.asIndirectArgument().getParent*() = f
-  )
+  ) and
+  message =
+    f.getTarget().toString() +
+      " call with NULL RootDirectory and invalid OBJECT_ATTRIBUTES->ObjectName"
   or
   zwWrite(f) and
-  not exists(DataFlow::Node source, DataFlow::Node sink |
-    AllowedZwRegWrite::flow(source, sink) and
-    sink.asExpr().getParent*() = f //Function call is an rtl function violation
-  )
-select f, f.toString()
+  exists(DataFlow::Node source, DataFlow::Node sink |
+    IsolationDataFlowNullRootDir::flow(source, sink) and
+    exists(DataFlow::Node source2, DataFlow::Node sink2, Element p1, Element p2 |
+      AllowedObjectNamePathFlow::flow(source2, sink2) and
+      p1 = source.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
+      p2 = sink2.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
+      p1 = p2
+    ) and
+    sink.asIndirectArgument().getParent*() = f
+  ) and
+  message =
+    f.getTarget().toString() +
+      " write call with NULL RootDirectory and valid OBJECT_ATTRIBUTES->ObjectName"
+select f, message
