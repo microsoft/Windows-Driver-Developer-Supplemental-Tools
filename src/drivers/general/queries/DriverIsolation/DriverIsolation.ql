@@ -135,10 +135,14 @@ module IsolationDataFlowAllowedRead implements DataFlow::ConfigSig {
     exists(Expr va0, Expr va1, FunctionCall fc |
       (
         fc.getTarget().getName().matches("RtlInitUnicodeString") or
-        fc.getTarget().getName().matches("RtlUnicodeStringInit")
+        fc.getTarget().getName().matches("RtlUnicodeStringInit") or
+        fc.getTarget().getName().matches("RtlInitString") or
+        fc.getTarget().getName().matches("RtlAnsiStringToUnicodeString") or
+        fc.getTarget().getName().matches("RtlStringCchPrintf%")
       ) and
-      va0 = fc.getArgument(0) and
-      va1 = fc.getArgument(1) and
+      va0 = fc.getArgument(0) and // output of the above functions is the first argument
+      va1 = fc.getAnArgument() and
+      va0 != va1 and
       pred.asIndirectExpr() = va1 and
       succ.asIndirectExpr() = va0
     )
@@ -239,6 +243,7 @@ predicate rtlViolation1(RegistryIsolationFunctionCall f) {
     not m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP")
   )
 }
+
 predicate rtlViolation2(RegistryIsolationFunctionCall f) {
   // Violation if RelativeTo parameter IS RTL_REGISTRY_DEVICEMAP and not doing a READ
   exists(MacroInvocation m |
@@ -306,10 +311,14 @@ predicate zwCall(RegistryIsolationFunctionCall f) {
 from RegistryIsolationFunctionCall f, string message
 where
   rtlViolation1(f) and
-  message = "Rtl* registy function call RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP"
+  message =
+    f.getTarget().getName().toString() +
+      " function call RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP"
   or
   rtlViolation2(f) and
-  message = "Rtl* registy function call RelativeTo parameter is RTL_REGISTRY_DEVICEMAP but is doing a write"
+  message =
+    f.getTarget().getName().toString() +
+      " function call RelativeTo parameter is RTL_REGISTRY_DEVICEMAP but is doing a write"
   or
   /* registry violation zw functions ( non-null RootDirectory)*/
   exists(DataFlow::Node source, DataFlow::Node sink |
