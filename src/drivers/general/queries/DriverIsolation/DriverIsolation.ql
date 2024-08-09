@@ -127,7 +127,8 @@ module IsolationDataFlowAllowedRead implements DataFlow::ConfigSig {
         .getValue()
         .toString()
         .toLowerCase()
-        .matches("%registry%machine%hardware%") or
+        .matches("%registry%machine%hardware%")
+    or
     source.asExpr().getValue().toString().toLowerCase().matches("%registry%machine%hardware%")
   }
 
@@ -203,38 +204,6 @@ module AllowedRootDirectoryFlowConfig implements DataFlow::ConfigSig {
 
 module AllowedRootDirectoryFlow = DataFlow::Global<AllowedRootDirectoryFlowConfig>;
 
-// module AllowedZwRegCallConfig implements DataFlow::ConfigSig {
-//   predicate isSource(DataFlow::Node source) {
-//     exists(Expr arg, FunctionCall fc |
-//       (
-//         fc.getTarget().getName().matches("IoOpenDeviceRegistryKey") or
-//         fc.getTarget().getName().matches("IoOpenDeviceInterfaceRegistryKey") or
-//         fc.getTarget().getName().matches("IoOpenDriverRegistryKey") or
-//         fc.getTarget().getName().matches("WdfDriverOpenParametersRegistryKey") or
-//         fc.getTarget().getName().matches("WdfDriverOpenPersistentStateRegistryKey") or
-//         fc.getTarget().getName().matches("WdfDeviceOpenRegistryKey") or
-//         fc.getTarget().getName().matches("WdfFdoInitOpenRegistryKey") or
-//         fc.getTarget().getName().matches("CM_Open_DevNode_Key")
-//       ) and
-//       arg = fc.getAnArgument() and
-//       (
-//         arg.getType().toString().matches("%HANDLE%") or
-//         arg.getType().toString().matches("%WDFKEY%")
-//       ) and
-//       source.asIndirectExpr() = arg
-//     )
-//   }
-//   predicate isSink(DataFlow::Node sink) {
-//     exists(RegistryIsolationFunctionCall f |
-//       (
-//         f.getAnArgument() = sink.asExpr() or
-//         f.getAnArgument() = sink.asIndirectExpr()
-//       ) and
-//       zwCall(f)
-//     )
-//   }
-// }
-// module AllowedZwRegCall = DataFlow::Global<AllowedZwRegCallConfig>;
 predicate rtlViolation1(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("Rtl%") and
   // Violation if RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP

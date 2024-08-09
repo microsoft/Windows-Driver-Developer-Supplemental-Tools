@@ -40,16 +40,13 @@ void test_rtl_violation_0()
     //                                  PLUGPLAY_REGKEY_DRIVER,
     //                                  KEY_WRITE,
     //                                  &DriverKey);
-    if (NT_SUCCESS(Status))
-    {
-        Status = RtlWriteRegistryValue(RTL_REGISTRY_HANDLE,
-                                       (PCWSTR)DriverKey,
-                                       ValueName,
-                                       REG_SZ,
-                                       ValueValue,
-                                       sizeof ValueValue);
-        ZwClose(DriverKey);
-    }
+    RtlWriteRegistryValue(RTL_REGISTRY_HANDLE,
+                          (PCWSTR)DriverKey,
+                          ValueName,
+                          REG_SZ,
+                          ValueValue,
+                          sizeof ValueValue);
+    ZwClose(DriverKey);
 }
 
 void test_rtl_violation_1()
@@ -65,9 +62,87 @@ void test_zw_violation_1()
 }
 
 
-void test_zw_violation_3()
+// OBJECT_ATTRIBUTES->RootDirectory == NULL and OBJECT_ATTRIBUTES->ObjectName starts with "\registry\machine\hardware\ BUT Zw function does a write"
+#include <ntstrsafe.h>
+#include <ntddscsi.h>
+void test_zw_violation_3(_In_ PDEVICE_OBJECT Fdo,
+                         _In_ PCHAR DeviceName,
+                         _In_ ULONG DeviceNumber,
+                         _In_ ULONG InquiryDataLength)
 {
-}
+    NTSTATUS status;
+    SCSI_ADDRESS scsiAddress = {0};
+    OBJECT_ATTRIBUTES objectAttributes = {0};
+    STRING string;
+    UNICODE_STRING unicodeName = {0};
+    UNICODE_STRING unicodeRegistryPath = {0};
+    UNICODE_STRING unicodeData = {0};
+    HANDLE targetKey;
+    IO_STATUS_BLOCK ioStatus;
+    UCHAR buffer[256] = {0};
+
+    PAGED_CODE();
+
+    targetKey = NULL;
+
+    // Issue GET_ADDRESS Ioctl to determine path, target, and lun information.
+    //
+
+    status = RtlStringCchPrintfA((NTSTRSAFE_PSTR)buffer,
+                                 sizeof(buffer) - 1,
+                                 "\\Registry\\Machine\\Hardware\\DeviceMap\\Scsi\\Scsi Port %d\\Scsi Bus %d\\Target Id %d\\Logical Unit Id %d",
+                                 scsiAddress.PortNumber,
+                                 scsiAddress.PathId,
+                                 scsiAddress.TargetId,
+                                 scsiAddress.Lun);
+
+    RtlInitString(&string, (PCSZ)buffer);
+
+    status = RtlAnsiStringToUnicodeString(&unicodeRegistryPath,
+                                          &string,
+                                          TRUE);
+
+    //
+    // Open the registry key for the scsi information for this
+    // scsibus, target, lun.
+    //
+
+    InitializeObjectAttributes(&objectAttributes,
+                               &unicodeRegistryPath,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               NULL,
+                               NULL);
+
+    status = ZwOpenKey(&targetKey,
+                       KEY_READ | KEY_WRITE,
+                       &objectAttributes);
+
+    //
+    // Now construct and attempt to create the registry value
+    // specifying the device name in the appropriate place in the
+    // device map.
+    //
+
+    RtlInitUnicodeString(&unicodeName, L"DeviceName");
+
+    status = RtlStringCchPrintfA((NTSTRSAFE_PSTR)buffer, sizeof(buffer) - 1, "%s%d", DeviceName, DeviceNumber);
+
+    RtlInitString(&string, (PCSZ)buffer);
+    status = RtlAnsiStringToUnicodeString(&unicodeData,
+                                          &string,
+                                          TRUE);
+    if (NT_SUCCESS(status))
+    {
+        status = ZwSetValueKey(targetKey,
+                               &unicodeName,
+                               0,
+                               REG_SZ,
+                               unicodeData.Buffer,
+                               unicodeData.Length);
+    }
+
+    
+} // end ClassUpdateInformationInRegistry()
 
 void test_zw_allowed_rootdirectory_source()
 {
@@ -119,7 +194,7 @@ void test_zw_not_allowed_rootdirectory_source()
     const WCHAR EnumString[] = L"Enum";
 
     PAGED_CODE();
-    Status = ZwOpenKey(&ParentKey, KEY_ALL_ACCESS, &ObjectAttributes); // also a violation
+    Status = ZwOpenKey(&ParentKey, KEY_ALL_ACCESS, &ObjectAttributes);
     PDEVICE_OBJECT PhysicalDeviceObject = NULL;
 
     RtlInitUnicodeString(&UnicodeEnumName, EnumString);
@@ -139,8 +214,6 @@ void test_zw_not_allowed_rootdirectory_source()
         return Status;
     }
 }
-
-
 
 // OBJECT_ATTRIBUTES->RootDirectory == NULL
 // AND OBJECT_ATTRIBUTES->ObjectName doesn't start with "\registry\machine\hardware\"
