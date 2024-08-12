@@ -20,6 +20,7 @@
 
 import cpp
 import semmle.code.cpp.dataflow.new.DataFlow
+import semmle.code.cpp.dataflow.new.TaintTracking
 
 class RegistryIsolationFunction extends Function {
   RegistryIsolationFunction() {
@@ -74,13 +75,25 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
     )
   }
 
+  // remove nodes from the flow that are null writes to RootDirectory
+  predicate isBarrier(DataFlow::Node node) {
+    exists(FieldAccess fa, VariableAccess va |
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
+      va.getParent*() = fa.getParent*() and
+      exists(Expr assignedValue |
+        assignedValue = fa.getTarget().getAnAssignedValue() and
+        assignedValue.getParent*() = va.getParent*() and
+        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
+      ) and
+      node.asIndirectExpr() = va
+    )
+  }
+
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
       zwCall(f) and
-      (
-        sink.asIndirectExpr() = f.getAnArgument() or
-        sink.asExpr() = f.getAnArgument()
-      )
+      sink.asIndirectExpr() = f.getAnArgument()
     )
   }
 }
@@ -103,6 +116,22 @@ module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
         assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
       ) and
       source.asIndirectExpr() = va
+    )
+  }
+
+  // FIXME still would have issue with multiple flows from InitializeObjectAttributes to zwCall if there are two in a row where both are null/nonnull
+  // remove nodes from the flow that are non-null writes to RootDirectory
+  predicate isBarrier(DataFlow::Node barrier) {
+    exists(FieldAccess fa, VariableAccess va |
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
+      va.getParent*() = fa.getParent*() and
+      barrier.asIndirectExpr() = va and
+      not exists(Expr assignedValue |
+        assignedValue = fa.getTarget().getAnAssignedValue() and
+        assignedValue.getParent*() = va.getParent*() and
+        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
+      )
     )
   }
 
@@ -204,6 +233,7 @@ module AllowedRootDirectoryFlowConfig implements DataFlow::ConfigSig {
 
 module AllowedRootDirectoryFlow = DataFlow::Global<AllowedRootDirectoryFlowConfig>;
 
+
 predicate rtlViolation1(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("Rtl%") and
   // Violation if RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP
@@ -223,9 +253,12 @@ predicate rtlViolation2(RegistryIsolationFunctionCall f) {
       f.getTarget().getName().matches("RtlQueryRegistryValuesEx%") or
       f.getTarget().getName().matches("RtlCheckRegistryKey%")
     )
-  ) 
+  )
 }
 
+/* 
+Call to a Zw* registry function that reads only
+*/
 predicate zwRead(RegistryIsolationFunctionCall f) {
   (
     f.getTarget().getName().matches("ZwQueryKey") or
@@ -260,6 +293,10 @@ predicate zwRead(RegistryIsolationFunctionCall f) {
   )
 }
 
+
+/* 
+Call to a Zw* registry function that writes
+*/
 predicate zwWrite(RegistryIsolationFunctionCall f) {
   (
     f.getTarget().getName().matches("ZwDeleteKey") or
@@ -271,6 +308,10 @@ predicate zwWrite(RegistryIsolationFunctionCall f) {
   not zwRead(f)
 }
 
+
+/* 
+Any call to a Zw* registry function that reads only
+*/
 predicate zwCall(RegistryIsolationFunctionCall f) {
   zwRead(f)
   or
@@ -283,13 +324,17 @@ predicate exception1(DataFlow::Node n1) {
       .getValue()
       .toString()
       .toLowerCase()
-      .matches("\\registry\\machine\\hardware\\devicemap\\serialcomm")
+      .matches("\\registry\\machine\\hardware\\devicemap\\serialcomm%")
+  or
+  n1.asIndirectExpr().getValue().toString().toLowerCase().matches("\\registry\\machine\\system%")
+  or
+  n1.asIndirectExpr().getValue().toString().toLowerCase().matches("\\registry\\machine\\software%")
 }
-predicate exception2(RegistryIsolationFunctionCall f){
+
+predicate exception2(RegistryIsolationFunctionCall f) {
   // Exception: Rtl Writes OK if key is named SERIALCOMM and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP
   f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm")
 }
-
 
 from RegistryIsolationFunctionCall f, string message
 where
@@ -303,9 +348,9 @@ where
   message =
     f.getTarget().getName().toString() +
       " function call RelativeTo parameter is RTL_REGISTRY_DEVICEMAP but is doing a write" and
-  rtlViolation2(f)
-  // Exception: Rtl Writes OK if key is named SERIALCOMM and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP 
-  and not exception2(f)
+  rtlViolation2(f) and
+  // Exception: Rtl Writes OK if key is named SERIALCOMM and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP
+  not exception2(f)
   or
   /* registry violation zw functions ( non-null RootDirectory)*/
   message = f.getTarget().toString() + " call with non-null RootDirectory and invalid handle source" and
