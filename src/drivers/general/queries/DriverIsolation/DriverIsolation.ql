@@ -128,8 +128,8 @@ module IsolationDataFlowAllowedRead implements DataFlow::ConfigSig {
         .toString()
         .toLowerCase()
         .matches("%registry%machine%hardware%")
-    or
-    source.asExpr().getValue().toString().toLowerCase().matches("%registry%machine%hardware%")
+    // or
+    // source.asExpr().getValue().toString().toLowerCase().matches("%registry%machine%hardware%")
   }
 
   predicate isAdditionalFlowStep(DataFlow::Node pred, DataFlow::Node succ) {
@@ -223,7 +223,7 @@ predicate rtlViolation2(RegistryIsolationFunctionCall f) {
       f.getTarget().getName().matches("RtlQueryRegistryValuesEx%") or
       f.getTarget().getName().matches("RtlCheckRegistryKey%")
     )
-  )
+  ) 
 }
 
 predicate zwRead(RegistryIsolationFunctionCall f) {
@@ -277,19 +277,38 @@ predicate zwCall(RegistryIsolationFunctionCall f) {
   zwWrite(f)
 }
 
+predicate exception1(DataFlow::Node n1) {
+  // Exception: zwWrite OK with this path
+  n1.asIndirectExpr()
+      .getValue()
+      .toString()
+      .toLowerCase()
+      .matches("\\registry\\machine\\hardware\\devicemap\\serialcomm")
+}
+predicate exception2(RegistryIsolationFunctionCall f){
+  // Exception: Rtl Writes OK if key is named SERIALCOMM and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP
+  f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm")
+}
+
+
 from RegistryIsolationFunctionCall f, string message
 where
-  rtlViolation1(f) and
+  /* registry violation rtl functions (1/2)*/
   message =
     f.getTarget().getName().toString() +
-      " function call RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP"
+      " function call RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP" and
+  rtlViolation1(f)
   or
-  rtlViolation2(f) and
+  /* registry violation rtl functions (2/2)*/
   message =
     f.getTarget().getName().toString() +
-      " function call RelativeTo parameter is RTL_REGISTRY_DEVICEMAP but is doing a write"
+      " function call RelativeTo parameter is RTL_REGISTRY_DEVICEMAP but is doing a write" and
+  rtlViolation2(f)
+  // Exception: Rtl Writes OK if key is named SERIALCOMM and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP 
+  and not exception2(f)
   or
   /* registry violation zw functions ( non-null RootDirectory)*/
+  message = f.getTarget().toString() + " call with non-null RootDirectory and invalid handle source" and
   exists(DataFlow::Node source, DataFlow::Node sink |
     IsolationDataFlowNonNullRootDir::flow(source, sink) and // OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
     // check if the handle passed to Zw* function is not from a valid source
@@ -298,9 +317,12 @@ where
       source.asIndirectExpr().getParent*() = sink2.asExpr().getParent*()
     ) and
     sink.asIndirectExpr().getParent*() = f
-  ) and
-  message = f.getTarget().toString() + " call with non-null RootDirectory and invalid handle source"
+  )
   or
+  /* registry violation zw functions ( null RootDirectory, invalid ObjectName)*/
+  message =
+    f.getTarget().toString() +
+      " call with NULL RootDirectory and invalid OBJECT_ATTRIBUTES->ObjectName" and
   exists(DataFlow::Node source, DataFlow::Node sink |
     IsolationDataFlowNullRootDir::flow(source, sink) and
     not exists(DataFlow::Node source2, DataFlow::Node sink2, Element p1, Element p2 |
@@ -310,11 +332,12 @@ where
       p1 = p2
     ) and
     sink.asIndirectArgument().getParent*() = f
-  ) and
+  )
+  or
+  /* registry violation zw functions ( null RootDirectory, valid ObjectName, write)*/
   message =
     f.getTarget().toString() +
-      " call with NULL RootDirectory and invalid OBJECT_ATTRIBUTES->ObjectName"
-  or
+      " write call with NULL RootDirectory and valid OBJECT_ATTRIBUTES->ObjectName" and
   zwWrite(f) and
   exists(DataFlow::Node source, DataFlow::Node sink |
     IsolationDataFlowNullRootDir::flow(source, sink) and
@@ -322,11 +345,10 @@ where
       AllowedObjectNamePathFlow::flow(source2, sink2) and
       p1 = source.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
       p2 = sink2.asIndirectExpr().getEnclosingStmt().getBasicBlock() and
-      p1 = p2
+      p1 = p2 and
+      // Exception: zwWrite OK with this path
+      not exception1(source)
     ) and
     sink.asIndirectArgument().getParent*() = f
-  ) and
-  message =
-    f.getTarget().toString() +
-      " write call with NULL RootDirectory and valid OBJECT_ATTRIBUTES->ObjectName"
+  )
 select f, message
