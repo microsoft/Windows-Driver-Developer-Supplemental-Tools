@@ -61,7 +61,6 @@ void test_zw_violation_1()
     // AND function writes
 }
 
-
 // OBJECT_ATTRIBUTES->RootDirectory == NULL and OBJECT_ATTRIBUTES->ObjectName starts with "\registry\machine\hardware\ BUT Zw function does a write"
 #include <ntstrsafe.h>
 #include <ntddscsi.h>
@@ -141,7 +140,6 @@ void test_zw_violation_3(_In_ PDEVICE_OBJECT Fdo,
                                unicodeData.Length);
     }
 
-    
 } // end ClassUpdateInformationInRegistry()
 
 void test_zw_allowed_rootdirectory_source()
@@ -262,6 +260,54 @@ void test_zw_allowed_read()
 
     Status = ZwQueryKey(ChildKey, KeyFullInformation, &FullKeyInformation, sizeof(FullKeyInformation), &ReturnedSize);
 }
+
+void test_zw_multiple_nulls(PUNICODE_STRING RegistryPath)
+{
+    OBJECT_ATTRIBUTES objectAttributes = {0};
+    HANDLE serviceKey = NULL;
+    HANDLE parametersKey = NULL;
+    RTL_QUERY_REGISTRY_TABLE parameters[3] = {0};
+
+    UNICODE_STRING paramStr;
+    //
+    //  Default to ENABLING MediaChangeNotification (!)
+    //
+
+    ULONG mcnRegistryValue = 1;
+
+    NTSTATUS status;
+
+    //
+    // open the service key.
+    //
+
+    InitializeObjectAttributes(&objectAttributes,
+                               RegistryPath,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               NULL,
+                               NULL);
+
+    status = ZwOpenKey(&serviceKey,
+                       KEY_READ,
+                       &objectAttributes);
+
+    //
+    // Open the parameters key (if any) beneath the services key.
+    //
+
+    RtlInitUnicodeString(&paramStr, L"Parameters");
+
+    InitializeObjectAttributes(&objectAttributes,
+                               L"\\Registry\\Machine\\Hardware\\test\\test.txt",
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               NULL,
+                               NULL);
+
+    status = ZwOpenKey(&parametersKey,
+                       KEY_READ,
+                       &objectAttributes);
+}
+
 /*
 void test_with_multiple_version()
 {
