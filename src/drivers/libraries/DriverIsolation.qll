@@ -10,6 +10,7 @@ class RtlRegistryIsolationFunction extends Function {
     this.getName().matches("RtlDeleteRegistryValue") or
     this.getName().matches("RtlWriteRegistryValue") or
     this.getName().matches("RtlQueryRegistryValues") or
+    this.getName().matches("RtlxQueryRegistryValues") or
     this.getName().matches("RtlQueryRegistryValuesEx")
   }
 }

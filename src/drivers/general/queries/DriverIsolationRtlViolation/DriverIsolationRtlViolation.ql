@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/TODO
+ * @id cpp/drivers/driver-isolation-rtl-violation
  * @kind problem
- * @name TODO
- * @description TODO
+ * @name Driver Isolation Rtl Violation
+ * @description Driver isolation violation if there is an Rtl* registry function call with with a RelativeTo parameter != RTL_REGISTRY_DEVICEMAP
+ * or a RelativeTo parameter == RTL_REGISTRY_DEVICEMAP and writes to registry (reads are OK)
  * @platform Desktop
  * @feature.area Multiple
  * @impact Insecure Coding Practice
- * @repro.text
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-TODO
+ * @opaqueid CQLD-D0008
  * @problem.severity warning
  * @precision medium
  * @tags correctness
@@ -50,7 +50,7 @@ where
   /* registry violation rtl functions (1/2)*/
   message =
     f.getTarget().getName().toString() +
-      " function call RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP" and
+      " function call RelativeTo parameter is not RTL_REGISTRY_DEVICEMAP" and
   rtlViolation1(f)
   or
   /* registry violation rtl functions (2/2)*/
@@ -58,5 +58,4 @@ where
     f.getTarget().getName().toString() +
       " function call RelativeTo parameter is RTL_REGISTRY_DEVICEMAP but is doing a write" and
   rtlViolation2(f)
- 
 select f, message

@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/TODO
+ * @id cpp/drivers/driver-isolation-zw-violation-1
  * @kind path-problem
- * @name TODO
- * @description TODO
+ * @name Driver Isolation Zw Violation 1
+ * @description Driver isolation violation if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with
+ *  RootDirectory!=NULL and the handle specified in RootDirectory comes from an unapproved ddi.
  * @platform Desktop
  * @feature.area Multiple
  * @impact Insecure Coding Practice
- * @repro.text
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-TODO
+ * @opaqueid CQLD-D0009
  * @problem.severity warning
  * @precision medium
  * @tags correctness
@@ -39,11 +39,9 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
     )
   }
 
-  // barrier prevents flow from source to source 
-  predicate isBarrierIn(DataFlow::Node node) {
-    isSource(node)
-  }
-  
+  // barrier prevents flow from source to source
+  predicate isBarrierIn(DataFlow::Node node) { isSource(node) }
+
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
       zwCall(f) and
@@ -103,7 +101,8 @@ from
 where
   /* registry violation zw functions ( non-null RootDirectory)*/
   message = f.getTarget().toString() + " call with non-null RootDirectory and invalid handle source" and
-  IsolationDataFlowNonNullRootDir::flowPath(source, sink) and // OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
+  // OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
+  IsolationDataFlowNonNullRootDir::flowPath(source, sink) and
   // check if the handle passed to Zw* function is not from a valid source
   not exists(DataFlow::Node source2, DataFlow::Node sink2 |
     AllowedRootDirectoryFlow::flow(source2, sink2) and

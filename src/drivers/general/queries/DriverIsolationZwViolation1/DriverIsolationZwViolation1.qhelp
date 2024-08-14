@@ -2,39 +2,54 @@
 <qhelp>
 	<overview>
 		<p>
-		TODO overview
+		 a Driver isolation violation occurs if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with RootDirectory!=NULL and the handle specified in RootDirectory comes from an unapproved ddi.
 		</p>
 	</overview>
 	<recommendation>
 		<p>
-			TODO recommendation
+			A Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with RootDirectory!=NULL should obtain the handle from an approved ddi https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation 
 		</p>
 	</recommendation>
 	<example>
 		<p>
-			TODO example
+			Example of Driver Isolation violation: ZwOpenKey call with an ObjectAttributes parameter with a RootDirectory value from an invalid source
 		</p>
 		<sample language="c"> <![CDATA[
-		// Example code
+		
+    	status = ZwOpenKey(&serviceKey,
+                       KEY_READ,
+                       &objectAttributes);
+ 		RtlInitUnicodeString(&paramStr, L"Parameters");
+
+    	InitializeObjectAttributes(&objectAttributes,
+                               &paramStr,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               serviceKey,
+                               NULL);
+
+    	status = ZwOpenKey(&parametersKey,
+                       KEY_READ,
+                       &objectAttributes);
 		}]]>
 		</sample>
 		<p>
-			TODO example 2
+			Example of no violation
 		</p>
 		<sample language="c"> <![CDATA[
-				// Example code
+			TODO
+        }
 		}]]>
 		</sample>
 	</example>
 	<semmleNotes>
 		<p>
-			TODO notes
+			
 		</p>
 	</semmleNotes>
 	<references>
 		<li>
-			<a href="example.com">
-				Example link
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation">
+				Driver package isolation
 			</a>
 		</li>
 	</references>

@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/DriverIsolationZwViolation2
+ * @id cpp/drivers/driver-isolation-zw-violation-2
  * @kind path-problem
- * @name TODO
- * @description TODO
+ * @name Driver Isolation Zw Violation 2
+ * @description Driver isolation violation if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with
+ *  RootDirectory=NULL and invalid OBJECT_ATTRIBUTES->ObjectName, or RootDirectory=NULL and valid OBJECT_ATTRIBUTES->ObjectName but with write access.
  * @platform Desktop
  * @feature.area Multiple
  * @impact Insecure Coding Practice
- * @repro.text
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-TODO
+ * @opaqueid CQLD-D0010
  * @problem.severity warning
  * @precision medium
  * @tags correctness
@@ -153,11 +153,11 @@ from
   IsolationDataFlowNullRootDir::PathNode sink, string message
 where
   /* registry violation zw functions ( null RootDirectory, invalid ObjectName)*/
-  message =
-    f.getTarget().toString() +
-      " call with NULL RootDirectory and invalid OBJECT_ATTRIBUTES->ObjectName" and
-  zwViolation2(f, source, sink)
-  or
+  // message =
+  //   f.getTarget().toString() +
+  //     " call with NULL RootDirectory and invalid OBJECT_ATTRIBUTES->ObjectName" and
+  // zwViolation2(f, source, sink)
+  // or
   /* registry violation zw functions ( null RootDirectory, valid ObjectName, write)*/
   message =
     f.getTarget().toString() +
