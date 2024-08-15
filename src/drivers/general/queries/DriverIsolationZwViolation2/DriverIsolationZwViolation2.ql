@@ -153,11 +153,11 @@ from
   IsolationDataFlowNullRootDir::PathNode sink, string message
 where
   /* registry violation zw functions ( null RootDirectory, invalid ObjectName)*/
-  // message =
-  //   f.getTarget().toString() +
-  //     " call with NULL RootDirectory and invalid OBJECT_ATTRIBUTES->ObjectName" and
-  // zwViolation2(f, source, sink)
-  // or
+  message =
+    f.getTarget().toString() +
+      " call with NULL RootDirectory and invalid OBJECT_ATTRIBUTES->ObjectName" and
+  zwViolation2(f, source, sink)
+  or
   /* registry violation zw functions ( null RootDirectory, valid ObjectName, write)*/
   message =
     f.getTarget().toString() +
