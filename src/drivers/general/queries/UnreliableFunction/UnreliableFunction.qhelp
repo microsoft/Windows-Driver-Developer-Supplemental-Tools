@@ -1,0 +1,47 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		PulseEvent is an unreliable function. A thread waiting on a synchronization object can be momentarily removed from the wait state by a kernel-mode APC, and then returned to the wait state after the APC is complete. If the call to PulseEvent occurs during the period when the thread was removed from the wait state, the thread will not be released and will "hang" forever. This is because PulseEvent releases only those threads that are waiting at the moment it is called.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+		If only one of the threads waiting on the event needs to be released AND the event is a manual-reset event, change it to an auto-reset event and call SetEvent instead of PulseEvent.
+
+		If only one of the threads waiting on the event needs to be released AND the event is an auto-reset event, call SetEvent instead of PulseEvent.
+
+		If all threads waiting on the event need to be released AND the event is a manual-reset event, redesign your code to use a different kind of synchronization object (such as a semaphore).
+
+		If all threads waiting on the event need to be released AND the event is an auto-reset event, call SetEvent instead of PulseEvent (your original call to PulseEvent was releasing only one thread anyway).
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			TODO example
+		</p>
+		<sample language="c"> <![CDATA[
+		// Example code
+		}]]>
+		</sample>
+		<p>
+			TODO example 2
+		</p>
+		<sample language="c"> <![CDATA[
+				// Example code
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+			TODO notes
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="example.com">
+				Example link
+			</a>
+		</li>
+	</references>
+</qhelp>
