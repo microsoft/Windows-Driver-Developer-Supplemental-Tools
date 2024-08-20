@@ -1,0 +1,52 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		Cast between semantically different integer types. This warning indicates that an NTSTATUS value is being explicitly cast to a Boolean type. This is likely to give undesirable results. For example, the typical success value for NTSTATUS, STATUS_SUCCESS, is false when tested as a Boolean.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			In most cases, the NT_SUCCESS macro should be used to test the value of an NTSTATUS. This macro returns true if the returned status value is neither a warning nor an error code. If a function returns a Boolean to indicate its failure/success, it should explicitly return the appropriate Boolean type rather than depend on casting of NTSTATUS to a Boolean type.
+			Also, occasionally a program may attempt to reuse a Boolean local variable to store NTSTATUS values. This practice is often error-prone; it is much safer (and likely more efficient) to use a separate NTSTATUS variable.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			If statement with explicit cast from NTSTATUS to Boolean
+		</p>
+		<sample language="c"> <![CDATA[
+		NTSTATUS status;
+		...  
+		if (!((BOOLEAN)status)){
+			;
+		}
+		
+		}]]>
+		</sample>
+		<p>
+			Use of NT_SUCCESS macro
+		</p>
+		<sample language="c"> <![CDATA[
+			NTSTATUS status;
+			...  
+			if (!NT_SUCCESS(status))
+			{
+				;
+				// handle error
+			}
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28714-ntstatus-cast-between-semantically-different-integer-types">
+				Warning C28714
+			</a>
+		</li>
+	</references>
+</qhelp>
