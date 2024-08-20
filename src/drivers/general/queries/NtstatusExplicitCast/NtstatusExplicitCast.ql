@@ -10,7 +10,7 @@
  * @impact Insecure Coding Practice
  * @repro.text This warning indicates that an NTSTATUS value is being explicitly cast to a Boolean type. This is likely to give undesirable results. For example, the typical success value for NTSTATUS, STATUS_SUCCESS, is false when tested as a Boolean.
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-TODO
+ * @opaqueid CQLD-C28714
  * @problem.severity warning
  * @precision medium
  * @tags correctness
@@ -20,9 +20,10 @@
 
 import cpp
 
-from Cast c, VariableAccess va
+
+from Conversion c
 where
-  va.getTarget().getType().toString().matches("NTSTATUS") and
-  c.getExplicitlyConverted().getType().toString().matches("BOOLEAN") and
-  c.getExpr() = va 
-select va, "Cast between semantically different integer types: NTSTATUS to Boolean" 
+c.getUnconverted().getType().toString().matches("NTSTATUS") and
+c.getType().toString().matches("BOOLEAN") 
+select c.getUnconverted(), "Cast between semantically different integer types: NTSTATUS to Boolean"
+ 
