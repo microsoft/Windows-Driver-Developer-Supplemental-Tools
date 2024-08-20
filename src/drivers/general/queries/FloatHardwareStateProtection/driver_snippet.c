@@ -8,6 +8,7 @@
 void top_level_call()
 {
 }
+int _fltused;
 
 _Kernel_float_used_
 void float_used_good()
