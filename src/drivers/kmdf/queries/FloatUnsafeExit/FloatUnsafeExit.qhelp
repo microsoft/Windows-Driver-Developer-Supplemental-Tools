@@ -1,0 +1,57 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		Exiting without acquiring the right to use floating hardware
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The _Kernel_float_saved_ annotation was used to acquire the right to use floating point, but a path through the function was detected where no function known to perform that operation was successfully called. This warning might indicate that a conditional (_When_) annotation is needed, or it might indicate a coding error.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+
+		</p>
+		<sample language="c"> <![CDATA[
+		_Kernel_float_saved_ 
+		void float_used_good1()
+		{
+			KFLOATING_SAVE saveData;
+			NTSTATUS status;
+			float f = 0.0f;
+			status = KeSaveFloatingPointState(&saveData);
+			if (status != STATUS_SUCCESS)
+			{
+				return;
+			}
+			for (int i = 0; i < 100; i++)
+			{
+				f = f + 1.0f;
+			}
+			KeRestoreFloatingPointState(&saveData);
+		}
+		}]]>
+		</sample>
+		<p>
+			TODO example 2
+		</p>
+		<sample language="c"> <![CDATA[
+				// Example code
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+			TODO notes
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="example.com">
+				Example link
+			</a>
+		</li>
+	</references>
+</qhelp>
