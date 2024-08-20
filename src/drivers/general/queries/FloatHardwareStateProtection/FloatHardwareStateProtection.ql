@@ -111,5 +111,4 @@ where
     safeFunc = floatAccess.getEnclosingFunction())
  
 select floatAccess,
-  "Use of float detected without protecting floating-point hardware state. $@, $@", floatAccess,
-  floatAccess.toString()
+  "Use of float detected without protecting floating-point hardware state"
