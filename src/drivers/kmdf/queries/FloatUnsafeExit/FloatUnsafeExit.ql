@@ -68,7 +68,9 @@ class SafeFloatAccessFuncCall extends FunctionCall {
   }
 }
 
-from KernelFloatAnnotatedFunction kernelFloatFunc, BasicBlock bb
+predicate unused(Expr e) { e instanceof ExprInVoidContext }
+
+from FunctionCall unusedFc, KernelFloatAnnotatedFunction kernelFloatFunc, BasicBlock bb, string msg
 where
   // each path must have a call to a float save function
   bb.getEnclosingFunction() = kernelFloatFunc and
@@ -76,8 +78,21 @@ where
     bb.getNode(0).getAPredecessor*().getBasicBlock().contains(node) and
     node = safeFloatAccessFuncCall.getBasicBlock().getANode() and
     safeFloatAccessFuncCall.getEnclosingFunction() = kernelFloatFunc
+  ) and
+  msg =
+    "Function annotated with _Kernel_float_saved_ but does not call a safe float access function for some path(s)"
+  or
+  // Paths have call to safe float access function but return value is not used
+  unusedFc instanceof SafeFloatAccessFuncCall and
+  unusedFc.getEnclosingFunction() = kernelFloatFunc and
+  msg =
+    "Function annotated with _Kernel_float_saved_ but does not check a safe float access function return value for some path(s)" and
+  (
+    // return value isn't used at all
+    unused(unusedFc)
+    or
+    // return value saved to variable but not used
+    definition(_, unusedFc.getParent()) and
+    not definitionUsePair(_, unusedFc.getParent(), _)
   )
-
-  
-select kernelFloatFunc,
-  "Function annotated with _Kernel_float_saved_ but does not call a safe float access function for some path(s)"
+select kernelFloatFunc, msg

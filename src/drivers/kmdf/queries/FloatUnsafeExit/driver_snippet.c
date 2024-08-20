@@ -91,7 +91,7 @@ _Kernel_float_saved_ void float_used_bad3()
     else
     {
         status = KeSaveFloatingPointState(&saveData);
-
+        // Status not checked here 
         for (int i = 0; i < 100; i++)
         {
             f = f + 1.0f;

@@ -12,10 +12,43 @@
 	</recommendation>
 	<example>
 		<p>
-
+		Function has _Kernel_float_saved_ annotation but has a path where the floating point state is not saved. Additionally, KeSaveFloatingPointState return value is not checked so the call might fail
 		</p>
 		<sample language="c"> <![CDATA[
 		_Kernel_float_saved_ 
+		void float_used_bad3()
+		{
+			float f = 0.0f;
+			// Status not checked here
+			int some_condition = 1;
+			KFLOATING_SAVE saveData;
+			NTSTATUS status;
+
+			if (some_condition)
+			{
+				// This code path doesn't save the floating point state
+				for (int i = 0; i < 100; i++)
+				{
+					f = f + 1;
+				}
+			}
+			else
+			{
+				status = KeSaveFloatingPointState(&saveData);
+				// Status not checked here 
+				for (int i = 0; i < 100; i++)
+				{
+					f = f + 1.0f;
+				}
+			}
+		}
+		}]]>
+		</sample>
+		<p>
+			Good example
+		</p>
+		<sample language="c"> <![CDATA[
+		Kernel_float_saved_ 
 		void float_used_good1()
 		{
 			KFLOATING_SAVE saveData;
@@ -34,23 +67,15 @@
 		}
 		}]]>
 		</sample>
-		<p>
-			TODO example 2
-		</p>
-		<sample language="c"> <![CDATA[
-				// Example code
-		}]]>
-		</sample>
 	</example>
 	<semmleNotes>
 		<p>
-			TODO notes
 		</p>
 	</semmleNotes>
 	<references>
 		<li>
-			<a href="example.com">
-				Example link
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28161-exiting-without-right-to-use-floating-hardware">
+				Warning C28161
 			</a>
 		</li>
 	</references>
