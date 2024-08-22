@@ -40,6 +40,7 @@ module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
   }
 
   predicate isAdditionalFlowStep(DataFlow::Node pred, DataFlow::Node succ) {
+    // flow between input/output of string functions
     exists(Expr va0, Expr va1, FunctionCall fc |
       (
         fc.getTarget().getName().matches("RtlInitUnicodeString") or
@@ -55,6 +56,7 @@ module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
       succ.asIndirectExpr() = va0
     )
     or
+    // flow between parameters of InitializeObjectAttributes macro
     exists(FieldAccess fa, VariableAccess va, Expr assignedValue, MacroInvocation m |
       fa.getTarget().getName().matches("ObjectName") and
       va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
@@ -94,18 +96,16 @@ from
 where
   IsolationDataFlowNullRootDir::flowPath(source, sink) and
   (
-    source.getNode().asIndirectExpr().getValue().toString().matches("%registry%machine%hardware%") and
+    (
+      allowedPath(source.getNode().asIndirectExpr()) and
+      pathWriteException(source.getNode().asIndirectExpr())
+    ) and
     zwWrite(f) and // null RootDirectory, valid ObjectName, write
     message =
       f.getTarget().toString() +
         " write call with NULL RootDirectory and valid OBJECT_ATTRIBUTES->ObjectName"
     or
-    not source
-        .getNode()
-        .asIndirectExpr()
-        .getValue()
-        .toString()
-        .matches("%registry%machine%hardware%") and
+    not allowedPath(source.getNode().asIndirectExpr()) and
     zwCall(f) and // null RootDirectory, invalid ObjectName
     message =
       f.getTarget().toString() +

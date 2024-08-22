@@ -44,6 +44,51 @@ class RegistryIsolationFunctionCall extends FunctionCall {
   RegistryIsolationFunctionCall() { this.getTarget() instanceof RegistryIsolationFunction }
 }
 
+class NullRootDirectory extends DataFlow::Node {
+  NullRootDirectory() {
+    exists(FieldAccess fa, VariableAccess va |
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("OBJECT_ATTRIBUTES") and // TODO need wild cards?
+      va.getParent+() = fa.getParent+() and
+      exists(Expr assignedValue |
+        assignedValue = fa.getTarget().getAnAssignedValue() and
+        assignedValue.getParent+() = va.getParent+() and
+        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
+      ) and
+      this.asIndirectExpr() = va
+    )
+  }
+}
+
+class NonNullRootDirectory extends DataFlow::Node {
+  NonNullRootDirectory() {
+    exists(FieldAccess fa, VariableAccess va |
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("OBJECT_ATTRIBUTES") and // TODO need wild cards?
+      va.getParent+() = fa.getParent+() and
+      not exists(Expr assignedValue |
+        assignedValue = fa.getTarget().getAnAssignedValue() and
+        assignedValue.getParent+() = va.getParent+() and
+        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
+      ) and
+      this.asIndirectExpr() = va
+    )
+  }
+}
+
+class AllowedHandleDDI extends Function {
+  AllowedHandleDDI() {
+    this.getName().matches("IoOpenDeviceRegistryKey") or
+    this.getName().matches("IoOpenDeviceInterfaceRegistryKey") or
+    this.getName().matches("IoOpenDriverRegistryKey") or
+    this.getName().matches("WdfDriverOpenParametersRegistryKey") or
+    this.getName().matches("WdfDriverOpenPersistentStateRegistryKey") or
+    this.getName().matches("WdfDeviceOpenRegistryKey") or
+    this.getName().matches("WdfFdoInitOpenRegistryKey") or
+    this.getName().matches("CM_Open_DevNode_Key")
+  }
+}
+
 /*
  * Call to a Zw* registry function that reads only
  */
@@ -82,38 +127,6 @@ predicate zwRead(RegistryIsolationFunctionCall f) {
   )
 }
 
-class NullRootDirectory extends DataFlow::Node {
-  NullRootDirectory() {
-    exists(FieldAccess fa, VariableAccess va |
-      fa.getTarget().getName().matches("RootDirectory") and
-      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
-      va.getParent+() = fa.getParent+() and
-      exists(Expr assignedValue |
-        assignedValue = fa.getTarget().getAnAssignedValue() and
-        assignedValue.getParent+() = va.getParent+() and
-        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
-      ) and
-      this.asIndirectExpr() = va
-    )
-  }
-}
-
-class NonNullRootDirectory extends DataFlow::Node {
-  NonNullRootDirectory() {
-    exists(FieldAccess fa, VariableAccess va |
-      fa.getTarget().getName().matches("RootDirectory") and
-      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
-      va.getParent*() = fa.getParent*() and
-      this.asIndirectExpr() = va and
-      not exists(Expr assignedValue |
-        assignedValue = fa.getTarget().getAnAssignedValue() and
-        assignedValue.getParent*() = va.getParent*() and
-        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
-      )
-    )
-  }
-}
-
 /*
  * Call to a Zw* registry function that writes
  */
@@ -140,16 +153,12 @@ predicate zwCall(RegistryIsolationFunctionCall f) {
 }
 
 // Exceptions to rules
-predicate exception1(Expr n1) {
+predicate pathWriteException(Expr n1) {
   // Exception: zwWrite OK with this path
   n1.getValue()
       .toString()
       .toLowerCase()
       .matches("\\registry\\machine\\hardware\\devicemap\\serialcomm%")
-  or
-  n1.getValue().toString().toLowerCase().matches("\\registry\\machine\\system%")
-  or
-  n1.getValue().toString().toLowerCase().matches("\\registry\\machine\\software%")
 }
 
 predicate exception2(RegistryIsolationFunctionCall f) {
@@ -157,7 +166,12 @@ predicate exception2(RegistryIsolationFunctionCall f) {
   f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm")
 }
 
-predicate exception3(Expr e) {
+predicate pathException(Expr e) {
   e.getValue().toString().toLowerCase().matches("%registry\\machine\\software%") or
   e.getValue().toString().toLowerCase().matches("%registry\\machine\\system%")
+}
+
+predicate allowedPath(Expr e) {
+  e.getValue().toString().toLowerCase().matches("%registry%machine%hardware%") or
+  pathException(e)
 }

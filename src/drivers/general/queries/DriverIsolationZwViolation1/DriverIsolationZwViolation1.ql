@@ -26,11 +26,39 @@ import drivers.libraries.DriverIsolation
 
 module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    source instanceof NonNullRootDirectory
+    exists(VariableAccess arg |
+      // fc.getTarget() instanceof AllowedHandleDDI and
+      //arg = fc.getAnArgument() and
+      (
+        arg.getType().toString().matches("HANDLE") or
+        arg.getType().toString().matches("WDFKEY")
+      ) and
+      source.asIndirectExpr() = arg
+    )
   }
 
-  // barrier prevents flow from source to source
-  predicate isBarrierIn(DataFlow::Node node) { isSource(node) }
+  //barrier prevents flow from source to source
+  predicate isBarrierIn(DataFlow::Node node) {
+    isSource(node) or
+    node instanceof NullRootDirectory
+    // not node instanceof NonNullRootDirectory
+  }
+
+  predicate isAdditionalFlowStep(DataFlow::Node pred, DataFlow::Node succ) {
+    // flow from handle to object attributes
+    exists(MacroInvocation m |
+      succ instanceof NonNullRootDirectory and
+      (
+        pred.asExpr().(VariableAccess).getType().toString().matches("HANDLE") or
+        pred.asExpr().(VariableAccess).getType().toString().matches("WDFKEY")
+      ) and
+      pred.asExpr().isAffectedByMacro() and
+      succ.asIndirectExpr().isAffectedByMacro() and
+      m.getAnAffectedElement() = succ.asIndirectExpr() and
+      m.getAnAffectedElement() = pred.asExpr() and
+      m.getMacroName().matches("InitializeObjectAttributes")
+    )
+  }
 
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
@@ -93,10 +121,18 @@ where
   message = f.getTarget().toString() + " call with non-null RootDirectory and invalid handle source" and
   // OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
   IsolationDataFlowNonNullRootDir::flowPath(source, sink) and
-  // check if the handle passed to Zw* function is not from a valid source
-  not exists(DataFlow::Node source2, DataFlow::Node sink2 |
-    AllowedRootDirectoryFlow::flow(source2, sink2) and
-    source.getNode().asIndirectExpr().getParent*() = sink2.asExpr().getParent*()
+  not exists(FunctionCall fc |
+    fc.getTarget() instanceof AllowedHandleDDI and
+    source.getNode().asIndirectArgument() = fc.getAnArgument()
   ) and
-  sink.getNode().asIndirectExpr().getParent*() = f
+  sink.getNode().asIndirectExpr().getParent*() = f and
+  source != sink
 select f, source, sink, message
+// from VariableAccess va, Struct s, FieldAccess fa, Field f
+// where
+// va.getType().toString().matches("OBJECT_ATTRIBUTES")
+// and va.getTarget().getType().getUnspecifiedType() = s
+// and f = s.getAField()
+// and f.getName().matches("RootDirectory")
+// and fa = f.getAnAccess()
+// select va, fa, s
