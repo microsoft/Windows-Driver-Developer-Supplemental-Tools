@@ -48,11 +48,11 @@ predicate rtlViolation2(RegistryIsolationFunctionCall f) {
 from RegistryIsolationFunctionCall f, string message
 where
   /* registry violation rtl functions (1/2)*/
-  message =
-    f.getTarget().getName().toString() +
-      " function call RelativeTo parameter is not RTL_REGISTRY_DEVICEMAP" and
-  rtlViolation1(f)
-  or
+  // message =
+  //   f.getTarget().getName().toString() +
+  //     " function call RelativeTo parameter is not RTL_REGISTRY_DEVICEMAP" and
+  // rtlViolation1(f)
+  // or
   /* registry violation rtl functions (2/2)*/
   message =
     f.getTarget().getName().toString() +

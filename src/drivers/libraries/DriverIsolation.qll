@@ -82,6 +82,38 @@ predicate zwRead(RegistryIsolationFunctionCall f) {
   )
 }
 
+class NullRootDirectory extends DataFlow::Node {
+  NullRootDirectory() {
+    exists(FieldAccess fa, VariableAccess va |
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
+      va.getParent+() = fa.getParent+() and
+      exists(Expr assignedValue |
+        assignedValue = fa.getTarget().getAnAssignedValue() and
+        assignedValue.getParent+() = va.getParent+() and
+        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
+      ) and
+      this.asIndirectExpr() = va
+    )
+  }
+}
+
+class NonNullRootDirectory extends DataFlow::Node {
+  NonNullRootDirectory() {
+    exists(FieldAccess fa, VariableAccess va |
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
+      va.getParent*() = fa.getParent*() and
+      this.asIndirectExpr() = va and
+      not exists(Expr assignedValue |
+        assignedValue = fa.getTarget().getAnAssignedValue() and
+        assignedValue.getParent*() = va.getParent*() and
+        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
+      )
+    )
+  }
+}
+
 /*
  * Call to a Zw* registry function that writes
  */
@@ -123,4 +155,9 @@ predicate exception1(Expr n1) {
 predicate exception2(RegistryIsolationFunctionCall f) {
   // Exception: Rtl Writes OK if key is named SERIALCOMM and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP
   f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm")
+}
+
+predicate exception3(Expr e) {
+  e.getValue().toString().toLowerCase().matches("%registry\\machine\\software%") or
+  e.getValue().toString().toLowerCase().matches("%registry\\machine\\system%")
 }

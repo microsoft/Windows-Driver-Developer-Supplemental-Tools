@@ -26,17 +26,7 @@ import drivers.libraries.DriverIsolation
 
 module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    exists(FieldAccess fa, VariableAccess va |
-      fa.getTarget().getName().matches("RootDirectory") and
-      va.getType().toString().matches("%OBJECT_ATTRIBUTES%") and
-      va.getParent*() = fa.getParent*() and
-      source.asIndirectExpr() = va and
-      not exists(Expr assignedValue |
-        assignedValue = fa.getTarget().getAnAssignedValue() and
-        assignedValue.getParent*() = va.getParent*() and
-        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
-      )
-    )
+    source instanceof NonNullRootDirectory
   }
 
   // barrier prevents flow from source to source
