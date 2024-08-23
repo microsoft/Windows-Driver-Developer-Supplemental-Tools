@@ -26,5 +26,5 @@ import drivers.libraries.RoleTypes
 from Function f
 where
   f.getName().matches("DriverEntry%") and
-  not f instanceof RoleTypeFunction  
+  not f.(RoleTypeFunction).getRoleTypeString().matches("DRIVER_INITIALIZE")
 select f, "DriverEntry functions should be declared using the DRIVER_INITIALIZE function typedef."
