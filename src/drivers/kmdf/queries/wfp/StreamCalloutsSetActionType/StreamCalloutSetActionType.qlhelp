@@ -1,0 +1,22 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Checks that a stream non-inspection callout sets the action type.
+	</overview>
+	<recommendation>
+		<p>
+			The following function does not correctly set an action type for non-inspection Stream callouts.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/network/callout-driver-programming-considerations">
+				Callout Drivers - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

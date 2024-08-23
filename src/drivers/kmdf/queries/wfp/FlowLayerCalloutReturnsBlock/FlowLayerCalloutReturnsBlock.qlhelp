@@ -1,0 +1,22 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			Checks that a Flow Layer Callout does not return FWP_ACTION_BLOCK.
+	</overview>
+	<recommendation>
+		<p>
+			The following function does not FWP_ACTION_BLOCK and/or clear the FWPS_RIGHT_ACTION_WRITE flag before calling FwpsPendClassify0.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/network/callout-driver-programming-considerations">
+				Callout Drivers - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

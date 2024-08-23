@@ -1,0 +1,52 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		Drivers must protect floating-point hardware state.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			This warning is only applicable in kernel mode. The driver is attempting to use a variable or constant of a float type when the code is not protected by KeSaveFloatingPointState and KeRestoreFloatingPointState, or EngSaveFloatingPointState and EngRestoreFloatingPointState. Display drivers should use EngSaveFloatingPointState and EngRestoreFloatingPointState.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			Function that uses float without protecting floating-point hardware state
+		</p>
+		<sample language="c"> <![CDATA[
+		void float_used_bad()
+		{
+			float f = 0.0f;
+			f = f + 1.0f;
+		}
+		}]]>
+		</sample>
+		<p>
+			Function that uses float with protected floating-point hardware state
+		</p>
+		<sample language="c"> <![CDATA[
+		KFLOATING_SAVE saveData;
+		NTSTATUS status;
+		float f = 0.0f;
+		status = KeSaveFloatingPointState(&saveData);
+		for (int i = 0; i < 100; i++)
+		{
+			f = f + 1.0f;
+		}
+		KeRestoreFloatingPointState(&saveData);
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28110-floating-point-hardware-protect">
+				Warning C28110
+			</a>
+		</li>
+	</references>
+</qhelp>
