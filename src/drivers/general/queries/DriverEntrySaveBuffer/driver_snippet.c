@@ -45,3 +45,22 @@ DriverEntryGood2(
     g_RP3 = *RegistryPath;
     return 0;
 }
+
+typedef struct _test_struct {
+    int a;
+    PUNICODE_STRING g_RP4;
+    char b;
+} test_struct;
+
+test_struct g_test_struct;
+
+NTSTATUS
+DriverEntryBad2(
+    PDRIVER_OBJECT DriverObject,
+    PUNICODE_STRING RegistryPath
+    )
+{
+    test_struct* localPtr = &g_test_struct;
+    localPtr->g_RP4 = RegistryPath;
+    return 0;
+}
