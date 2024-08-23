@@ -20,10 +20,12 @@
 
 import cpp
 
-
 from Conversion c
 where
-c.getUnconverted().getType().toString().matches("NTSTATUS") and
-c.getType().toString().matches("BOOLEAN") 
+  c.getUnconverted().getType().toString().matches("NTSTATUS") and
+  (
+    c.getType().toString().toLowerCase().matches("boolean") or
+    c.getType().toString().toLowerCase().matches("bool") or
+    c.getType().toString().matches("VARIANT_BOOL")
+  )
 select c.getUnconverted(), "Cast between semantically different integer types: NTSTATUS to Boolean"
- 
