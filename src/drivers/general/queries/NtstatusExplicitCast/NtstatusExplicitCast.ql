@@ -3,7 +3,7 @@
 /**
  * @id cpp/drivers/ntstatus-explicit-cast
  * @kind problem
- * @name Ntstatus Explicit Cast
+ * @name NTSTATUS Explicit Cast
  * @description Cast between semantically different integer types (NTSTATUS to Boolean).
  * @platform Desktop
  * @feature.area Multiple
