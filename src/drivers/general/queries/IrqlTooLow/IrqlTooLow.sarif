@@ -6,7 +6,7 @@
       "driver" : {
         "name" : "CodeQL",
         "organization" : "GitHub",
-        "semanticVersion" : "2.14.4",
+        "semanticVersion" : "2.15.4",
         "notifications" : [ {
           "id" : "cpp/baseline/expected-extracted-files",
           "name" : "cpp/baseline/expected-extracted-files",
@@ -27,7 +27,7 @@
           "id" : "cpp/drivers/irql-too-low",
           "name" : "cpp/drivers/irql-too-low",
           "shortDescription" : {
-            "text" : "IRQL too low (C28121)"
+            "text" : "IRQL too low (C28120)"
           },
           "fullDescription" : {
             "text" : "A function annotated with IRQL requirements was called at an IRQL too low for the requirements."
@@ -43,8 +43,8 @@
             "id" : "cpp/drivers/irql-too-low",
             "impact" : "Exploitable Design",
             "kind" : "problem",
-            "name" : "IRQL too low (C28121)",
-            "opaqueid" : "CQLD-C28121",
+            "name" : "IRQL too low (C28120)",
+            "opaqueid" : "CQLD-C28120",
             "owner.email" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
@@ -58,7 +58,7 @@
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+4842fd4116871d3b47eede85c2c4497b43c34d57",
+        "semanticVersion" : "1.1.0+2affc3c634804dac7504a483a378cc9ba22a0f0b",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
           "description" : {

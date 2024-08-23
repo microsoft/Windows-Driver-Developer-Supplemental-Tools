@@ -1,0 +1,55 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		Cast between semantically different integer types. This warning indicates that a Boolean is being cast to NTSTATUS. This is likely to give undesirable results. For example, the typical failure value for functions that return a Boolean (FALSE) is a success status when tested as an NTSTATUS.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+		Typically, a function that returns Boolean returns either 1 (for TRUE) or 0 (for FALSE). Both these values are treated as success codes by the NT_SUCCESS macro. Thus, the failure case will never be detected.
+		</p>
+
+	</recommendation>
+	<example>
+		<p>
+			Bad cast from Boolean to NTSTATUS
+		</p>
+		<sample language="c"> <![CDATA[
+		if (NT_SUCCESS(SomeFunction()))
+		{
+			return 0;
+		}
+		else
+		{
+			return -1;
+		}
+		}]]>
+		</sample>
+		<p>
+			Correct use of Boolean
+		</p>
+		<sample language="c"> <![CDATA[
+		if (SomeFunction() == TRUE)
+		{
+			return 0;
+		}
+		else
+		{
+			return -1;
+		}
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28715-boolean-cast-between-semantically-different-integer-types">
+				Warning C28715
+			</a>
+		</li>
+	</references>
+</qhelp>

@@ -13,9 +13,14 @@ on:
   # Allow manual scheduling
   workflow_dispatch:
 
+env:
+  CODEQL_LATEST_VERSION: 2.17.1
+  CODEQL_VERSION: 2.15.4
+  
 jobs:
-  build-publish:
+  build:
     runs-on: windows-latest
+    
     permissions:
       contents: read
       packages: write
@@ -30,21 +35,11 @@ jobs:
         path: .
         fetch-depth: 0
 
-    - name: Download CodeQL CLI
-      uses: i3h/download-release-asset@v1.2.0
-      with:
-        owner: "github"
-        repo: "codeql-cli-binaries"
-        tag: "v2.15.4"
-        file: "codeql-win64.zip"
-    
-    - name: Unzip CodeQL CLI
-      run: Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force
-    
-    - name: Move CodeQL CLI folder to main subdirectory
-      shell: cmd
-      continue-on-error: true # Required because robocopy returns 1 on success
-      run: robocopy /S /move .\codeql-zip\codeql .\codeql-cli\
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
 
     - name: Install CodeQL pack dependencies
       shell: cmd
@@ -52,32 +47,9 @@ jobs:
         pushd .\src 
         ..\codeql-cli\codeql.cmd pack install 
         popd
+   
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
-      
-    - name: Setup Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: 3.11
-        
-    - name: Install Python Packages
-      run: |
-          python -m pip install --upgrade pip
-          pip install -r .\src\drivers\test\requirements.txt
-    - name: Add msbuild to PATH
-      uses: microsoft/setup-msbuild@v2
- 
-    - name: Run test script
-      shell: pwsh
-      continue-on-error: true # Allow script to return non-zero exit code
-      env:
-        CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
-        ACCOUNT_KEY: ${{ secrets.ACCOUNT_KEY }}
-        SHARE_NAME: ${{ secrets.SHARE_NAME }}
-        CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
-        ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
-        
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"  --storage_account_key "$env:ACCOUNT_KEY" --storage_account_name "$env:ACCOUNT_NAME" 
       
     - name: Build must-fix driver suite
       shell: cmd
@@ -94,7 +66,132 @@ jobs:
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
-
+      
+  test-query-health:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: write
+    env:
+      CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+      SHARE_NAME: ${{ secrets.SHARE_NAME }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+    steps:
+    - name: Enable long git paths
+      shell: cmd
+      run: git config --global core.longpaths true
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
+    - name: codeql version test
+      run: .\codeql-cli\codeql.exe version
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+    - name: Install Python Packages
+      run: |
+          python -m pip install --upgrade pip
+          pip install -r .\src\drivers\test\requirements.txt
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    - name: Run test script
+      shell: pwsh
+      if: ${{ env.CONNECTION_STRING != '' }}
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"
+    - name: Run test script without compare
+      shell: pwsh
+      if: ${{ env.CONNECTION_STRING == '' }}
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build 
+    
+      
+  test-codeql-latest-vs-current:
+  # Tests if the latest codeql version produces the same results as the current version. 
+    runs-on: windows-latest
+    continue-on-error: true # Allow script to return non-zero exit code
+    needs: [build,test-query-health]
+    permissions:
+      contents: read
+      packages: write
+    env:
+      CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+      SHARE_NAME: ${{ secrets.SHARE_NAME }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+    steps:
+    - name: Check Env
+      shell: pwsh
+      if: ${{ env.CONNECTION_STRING == '' }}
+      run: exit 1
+    - name: Check Prev Job
+      if: ${{ needs.test-query-health.result == 'failure' }}
+      shell: pwsh
+      run: exit 1  
+    - name: Enable long git paths
+      shell: cmd
+      run: git config --global core.longpaths true
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_LATEST_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
+    - name: codeql version test
+      run: .\codeql-cli\codeql.exe version
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+    - name: Install Python Packages
+      run: |
+          python -m pip install --upgrade pip
+          pip install -r .\src\drivers\test\requirements.txt
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    - name: Run test script
+      shell: pwsh
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" 
+          
+  test-pack-version-update:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Enable long git paths
+      shell: cmd
+      run: git config --global core.longpaths true
+    
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0
+        
     - name: Check for changes to qlpack
       shell: pwsh
       run: 
@@ -118,16 +215,87 @@ jobs:
         try{$old_qlpack_version = [version]($qlpack_changes -match "-version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 1 }
         try{$new_qlpack_version = [version]($qlpack_changes -match "\+version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 1 }
         if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { "qlpack.yml version not incremented"; exit 1 }
+  
+  test-create-dvl:
+    runs-on: windows-latest
+    needs: build
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Enable long git paths
+      shell: cmd
+      run: git config --global core.longpaths true
+    
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0
 
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+        
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+
+    - name: Test DVL
+      run: src\drivers\test\dvl_tests\dvl_tests.ps1
+    
+    - name: Archive code coverage results
+      uses: actions/upload-artifact@v4
+      with:
+        name: dvl-outputs
+        path: |
+          clean_results\*.*
+          mustfix_results\*.*
+        
+  publish:
+    runs-on: windows-latest
+    continue-on-error: true 
+    needs: [build, test-pack-version-update, test-query-health]
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Enable long git paths
+      shell: cmd
+      run: git config --global core.longpaths true
+    
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0
+
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+        
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
     - name: Publish New CodeQL Pack
       shell: pwsh
       env:
         GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
-
       run: 
         $build = git rev-parse --short HEAD;
         $version =( Select-String .\src\qlpack.yml -Pattern "version").line;
         $new_ver = "$version-alpha+$build";
         (Get-Content .\src\qlpack.yml).Replace($version, $new_ver) | Set-Content .\src\qlpack.yml;
         .\codeql-cli\codeql.cmd pack publish --allow-prerelease ./src;
-    

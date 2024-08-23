@@ -1,0 +1,504 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.17.1",
+        "notifications" : [ {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "name" : "cpp/baseline/expected-extracted-files",
+          "shortDescription" : {
+            "text" : "Expected extracted files"
+          },
+          "fullDescription" : {
+            "text" : "Files appearing in the source archive that are expected to be extracted."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          },
+          "properties" : {
+            "tags" : [ "expected-extracted-files", "telemetry" ]
+          }
+        }, {
+          "id" : "cpp/extractor/summary",
+          "name" : "cpp/extractor/summary",
+          "shortDescription" : {
+            "text" : "C++ extractor telemetry"
+          },
+          "fullDescription" : {
+            "text" : "C++ extractor telemetry"
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          }
+        } ],
+        "rules" : [ {
+          "id" : "cpp/bad-addition-overflow-check",
+          "name" : "cpp/bad-addition-overflow-check",
+          "shortDescription" : {
+            "text" : "Bad check for overflow of integer addition"
+          },
+          "fullDescription" : {
+            "text" : "Checking for overflow of integer addition by comparing against one of the arguments of the addition does not work when the result of the addition is automatically promoted to a larger type."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "error"
+          },
+          "properties" : {
+            "tags" : [ "reliability", "correctness", "security", "external/cwe/cwe-190", "external/cwe/cwe-192" ],
+            "description" : "Checking for overflow of integer addition by comparing\n              against one of the arguments of the addition does not work\n              when the result of the addition is automatically promoted\n              to a larger type.",
+            "id" : "cpp/bad-addition-overflow-check",
+            "kind" : "problem",
+            "name" : "Bad check for overflow of integer addition",
+            "precision" : "very-high",
+            "problem.severity" : "error",
+            "security-severity" : "8.1"
+          }
+        }, {
+          "id" : "cpp/pointer-overflow-check",
+          "name" : "cpp/pointer-overflow-check",
+          "shortDescription" : {
+            "text" : "Pointer overflow check"
+          },
+          "fullDescription" : {
+            "text" : "Adding a value to a pointer to check if it overflows relies on undefined behavior and may lead to memory corruption."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "error"
+          },
+          "properties" : {
+            "tags" : [ "reliability", "security", "external/cwe/cwe-758" ],
+            "description" : "Adding a value to a pointer to check if it overflows relies\n              on undefined behavior and may lead to memory corruption.",
+            "id" : "cpp/pointer-overflow-check",
+            "kind" : "problem",
+            "name" : "Pointer overflow check",
+            "precision" : "high",
+            "problem.severity" : "error",
+            "security-severity" : "2.1"
+          }
+        }, {
+          "id" : "cpp/too-few-arguments",
+          "name" : "cpp/too-few-arguments",
+          "shortDescription" : {
+            "text" : "Call to function with fewer arguments than declared parameters"
+          },
+          "fullDescription" : {
+            "text" : "A function call is passing fewer arguments than the number of declared parameters of the function. This may indicate that the code does not follow the author's intent. It is also a vulnerability, since the function is likely to operate on undefined data."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "error"
+          },
+          "properties" : {
+            "tags" : [ "correctness", "maintainability", "security", "external/cwe/cwe-234", "external/cwe/cwe-685" ],
+            "description" : "A function call is passing fewer arguments than the number of\n              declared parameters of the function. This may indicate\n              that the code does not follow the author's intent. It is also\n              a vulnerability, since the function is likely to operate on\n              undefined data.",
+            "id" : "cpp/too-few-arguments",
+            "kind" : "problem",
+            "name" : "Call to function with fewer arguments than declared parameters",
+            "precision" : "very-high",
+            "problem.severity" : "error",
+            "security-severity" : "5.0"
+          }
+        }, {
+          "id" : "cpp/comparison-with-wider-type",
+          "name" : "cpp/comparison-with-wider-type",
+          "shortDescription" : {
+            "text" : "Comparison of narrow type with wide type in loop condition"
+          },
+          "fullDescription" : {
+            "text" : "Comparisons between types of different widths in a loop condition can cause the loop to behave unexpectedly."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "reliability", "security", "external/cwe/cwe-190", "external/cwe/cwe-197", "external/cwe/cwe-835" ],
+            "description" : "Comparisons between types of different widths in a loop\n              condition can cause the loop to behave unexpectedly.",
+            "id" : "cpp/comparison-with-wider-type",
+            "kind" : "problem",
+            "name" : "Comparison of narrow type with wide type in loop condition",
+            "precision" : "high",
+            "problem.severity" : "warning",
+            "security-severity" : "7.8"
+          }
+        }, {
+          "id" : "cpp/hresult-boolean-conversion",
+          "name" : "cpp/hresult-boolean-conversion",
+          "shortDescription" : {
+            "text" : "Cast between HRESULT and a Boolean type"
+          },
+          "fullDescription" : {
+            "text" : "Casting an HRESULT to/from a Boolean type and then using it in a test expression will yield an incorrect result because success (S_OK) in HRESULT is indicated by a value of 0."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "error"
+          },
+          "properties" : {
+            "tags" : [ "security", "external/cwe/cwe-253" ],
+            "description" : "Casting an HRESULT to/from a Boolean type and then using it in a test expression will yield an incorrect result because success (S_OK) in HRESULT is indicated by a value of 0.",
+            "id" : "cpp/hresult-boolean-conversion",
+            "kind" : "problem",
+            "name" : "Cast between HRESULT and a Boolean type",
+            "precision" : "high",
+            "problem.severity" : "error",
+            "security-severity" : "7.5"
+          }
+        }, {
+          "id" : "cpp/drivers/wdk-deprecated-api",
+          "name" : "cpp/drivers/wdk-deprecated-api",
+          "shortDescription" : {
+            "text" : "Use of deprecated WDK API"
+          },
+          "fullDescription" : {
+            "text" : "Use of deprecated allocation APIs can result in non-zeroed memory being provided to the caller."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "security", "wddst" ],
+            "description" : "Use of deprecated allocation APIs can result in non-zeroed memory being provided to the caller.",
+            "feature.area" : "Multiple",
+            "id" : "cpp/drivers/wdk-deprecated-api",
+            "impact" : "Attack Surface Reduction",
+            "kind" : "problem",
+            "name" : "Use of deprecated WDK API",
+            "opaqueid" : "CQLD-D0001",
+            "owner.email" : "sdat@microsoft.com",
+            "platform" : "Desktop",
+            "precision" : "high",
+            "problem.severity" : "warning",
+            "query-version" : "1.3",
+            "repro.text" : "The following code locations contain calls to a deprecated WDK allocation API.",
+            "scope" : "domainspecific",
+            "security.severity" : "Medium"
+          }
+        }, {
+          "id" : "cpp/incorrect-string-type-conversion-ignore-puchar-casts",
+          "name" : "cpp/incorrect-string-type-conversion-ignore-puchar-casts",
+          "shortDescription" : {
+            "text" : "Cast from char* to wchar_t* (ignore PUCHAR casts)"
+          },
+          "fullDescription" : {
+            "text" : "Casting a byte string to a wide-character string is likely to yield a string that is incorrectly terminated or aligned. This can lead to undefined behavior, including buffer overruns. This query is a specilized version of `cpp/incorrect-string-type-conversion` that ignores casting to `PUCHAR`"
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "error"
+          },
+          "properties" : {
+            "tags" : [ "security", "external/cwe/cwe-704" ],
+            "description" : "Casting a byte string to a wide-character string is likely\n              to yield a string that is incorrectly terminated or aligned.\n              This can lead to undefined behavior, including buffer overruns.\n              This query is a specilized version of `cpp/incorrect-string-type-conversion` that ignores casting to `PUCHAR`",
+            "id" : "cpp/incorrect-string-type-conversion-ignore-puchar-casts",
+            "kind" : "problem",
+            "name" : "Cast from char* to wchar_t* (ignore PUCHAR casts)",
+            "precision" : "high",
+            "problem.severity" : "error",
+            "query-version" : "1.0",
+            "security-severity" : "8.8"
+          }
+        } ]
+      },
+      "extensions" : [ {
+        "name" : "codeql/cpp-queries",
+        "semanticVersion" : "0.9.0+ff0c1ca2d6401e63914f20b650b49c2b82cac148",
+        "locations" : [ {
+          "uri" : "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-queries/0.9.0/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-queries/0.9.0/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      }, {
+        "name" : "microsoft/windows-drivers",
+        "semanticVersion" : "1.1.0+b88bdc25e663531f153541e6d900b90ce0acffef",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/WDDST/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/WDDST/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      } ]
+    },
+    "invocations" : [ {
+      "toolExecutionNotifications" : [ {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 1
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "WDMTestTemplate/driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "WDMTestTemplate/driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 3
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 4
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "WDMTestTemplate/driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 5
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "message" : {
+          "text" : "Internal telemetry for the C++ extractor.\n\nNo action needed.",
+          "markdown" : "Internal telemetry for the C++ extractor.\n\nNo action needed."
+        },
+        "level" : "note",
+        "descriptor" : {
+          "id" : "cpp/extractor/summary",
+          "index" : 1
+        },
+        "properties" : {
+          "attributes" : {
+            "cache-hits" : 0,
+            "cache-misses" : 1,
+            "extractor-failures" : 0,
+            "extractor-successes" : 1,
+            "trap-caching" : "disabled"
+          },
+          "visibility" : {
+            "statusPage" : false,
+            "telemetry" : true
+          }
+        }
+      } ],
+      "executionSuccessful" : true
+    } ],
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 1
+      }
+    }, {
+      "location" : {
+        "uri" : "WDMTestTemplate/driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 2
+      }
+    }, {
+      "location" : {
+        "uri" : "WDMTestTemplate/driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 3
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 4
+      }
+    }, {
+      "location" : {
+        "uri" : "WDMTestTemplate/driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 5
+      }
+    } ],
+    "results" : [ {
+      "ruleId" : "cpp/drivers/wdk-deprecated-api",
+      "ruleIndex" : 5,
+      "rule" : {
+        "id" : "cpp/drivers/wdk-deprecated-api",
+        "index" : 5
+      },
+      "message" : {
+        "text" : "Using deprecated API 'ExAllocatePoolWithTag'. Replacement function: ExAllocatePool2. For downlevel code, use ExAllocatePoolZero or ExAllocatePoolUninitialized. Do not use `POOL_FLAG_UNINITIALIZED` flag when fixing. For details, please visit https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 30,
+            "startColumn" : 5,
+            "endColumn" : 68
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "7fe183293afd1fdc:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    }, {
+      "ruleId" : "cpp/drivers/wdk-deprecated-api",
+      "ruleIndex" : 5,
+      "rule" : {
+        "id" : "cpp/drivers/wdk-deprecated-api",
+        "index" : 5
+      },
+      "message" : {
+        "text" : "Using deprecated API 'ExAllocatePool'. Replacement function: ExAllocatePool2. For downlevel code, use ExAllocatePoolZero or ExAllocatePoolUninitialized. Do not use `POOL_FLAG_UNINITIALIZED` flag when fixing. For details, please visit https://docs.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-exallocatepool2"
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 21,
+            "startColumn" : 5,
+            "endColumn" : 19
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "550333300fe9fc29:1",
+        "primaryLocationStartColumnFingerprint" : "0"
+      }
+    } ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}
