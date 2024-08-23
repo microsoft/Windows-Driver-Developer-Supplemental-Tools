@@ -1,0 +1,34 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		The function pointer annotation class does not match the function class
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			A function pointer has a __drv_functionClass annotation that specifies that only functions of a particular functional class should be assigned to it. In an assignment or implied assignment in a function call, the source and target must be of the same function class, but the function classes do not match.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			A call to IoQueueWorkItem is expecting a function pointer annotated with __drv_functionClass(IO_WORKITEM_ROUTINE) but in this example, badAnnotationFunc1 is annotated with __drv_functionClass(IO_TIMER_ROUTINE).
+		</p>
+		<sample language="c"> <![CDATA[
+    	IoQueueWorkItem(IoWorkItem, badAnnotationFunc1, DelayedWorkQueue, Context);
+		}]]>
+		</sample>
+		
+	</example>
+	<semmleNotes>
+		<p>
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28165-class-function-pointer-mismatch">
+				Warning C28165
+			</a>
+		</li>
+	</references>
+</qhelp>

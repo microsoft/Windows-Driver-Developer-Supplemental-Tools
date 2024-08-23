@@ -20,6 +20,10 @@
       - drivers/general/queries/IrqlSetTooHigh/IrqlSetTooHigh.ql
       - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
       - drivers/general/queries/IRPStackEntryCopy/IRPStackEntryCopy.ql
+      - drivers/general/queries/DriverEntrySaveBuffer/DriverEntrySaveBuffer.ql
+      - drivers/general/queries/CurrentFunctionTypeNotCorrect/CurrentFunctionTypeNotCorrect.ql
+      - drivers/general/queries/IoInitializeTimerCall/IoInitializeTimerCall.ql
+      - drivers/general/queries/OperandAssignment/OperandAssignment.ql
       - drivers/general/queries/MultithreadedAVCondition/MultithreadedAVCondition.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
@@ -34,4 +38,4 @@
       - drivers/wdm/queries/OpaqueMdlWrite/OpaqueMdlWrite.ql
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
       - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
-      
+      - drivers/kmdf/queries/experimental/FloatHardwareStateProtection/FloatHardwareStateProtection.ql

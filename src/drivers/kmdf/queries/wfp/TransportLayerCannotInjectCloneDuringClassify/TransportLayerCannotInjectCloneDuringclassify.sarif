@@ -1,0 +1,141 @@
+{
+    "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+    "version" : "2.1.0",
+    "runs" : [ {
+      "tool" : {
+        "driver" : {
+          "name" : "CodeQL",
+          "organization" : "GitHub",
+          "semanticVersion" : "2.11.5",
+          "rules" : [ {
+            "id" : "cpp/windows/drivers/kmdf/queries/wfp/transport-layer-cannot-inject-clone-during-classify",
+            "name" : "cpp/windows/drivers/kmdf/queries/wfp/transport-layer-cannot-inject-clone-during-classify",
+            "shortDescription" : {
+              "text" : "Checks that injections of clones at the transport do not happen."
+            },
+            "fullDescription" : {
+              "text" : "Checks that injections of clones at the transport do not happen."
+            },
+            "defaultConfiguration" : {
+              "enabled" : true,
+              "level" : "warning"
+            },
+            "properties" : {
+              "tags" : [ "correctness" ],
+              "description" : "Checks that injections of clones at the transport do not happen.",
+              "feature.area" : "Multiple",
+              "id" : "cpp/windows/drivers/kmdf/queries/wfp/transport-layer-cannot-inject-clone-during-classify",
+              "impact" : "Insecure Coding Practice",
+              "kind" : "problem",
+              "name" : "Checks that injections of clones at the transport do not happen.",
+              "opaqueid" : "CQLD-C2900",
+              "owner.email:" : "elhouha@microsoft.com",
+              "platform" : "Desktop",
+              "precision" : "low",
+              "problem.severity" : "warning",
+              "query-version" : "v1",
+              "repro.text" : "The following function does inject a clone at the transport layers.",
+              "scope" : "domainspecific"
+            }
+          } ]
+        },
+        "extensions" : [ {
+          "name" : "microsoft/windows-drivers",
+          "semanticVersion" : "0.1.0+933e876f096a70922173e4d5ad604d99d4481af4",
+          "locations" : [ {
+            "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
+            "description" : {
+              "text" : "The QL pack root directory."
+            }
+          }, {
+            "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+            "description" : {
+              "text" : "The QL pack definition file."
+            }
+          } ]
+        }, {
+          "name" : "legacy-upgrades",
+          "semanticVersion" : "0.0.0",
+          "locations" : [ {
+            "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/",
+            "description" : {
+              "text" : "The QL pack root directory."
+            }
+          }, {
+            "uri" : "file:///C:/codeql-home/codeql/legacy-upgrades/qlpack.yml",
+            "description" : {
+              "text" : "The QL pack definition file."
+            }
+          } ]
+        } ]
+      },
+      "artifacts" : [ {
+        "location" : {
+          "uri" : "driver/driver_snippet.c",
+          "uriBaseId" : "%SRCROOT%",
+          "index" : 0
+        }
+      } ],
+      "results" : [ {
+        "ruleId" : "cpp/windows/drivers/kmdf/queries/wfp/transport-layer-cannot-inject-clone-during-classify",
+        "ruleIndex" : 0,
+        "rule" : {
+          "id" : "cpp/windows/drivers/kmdf/queries/wfp/transport-layer-cannot-inject-clone-during-classify",
+          "index" : 0
+        },
+        "message" : {
+          "text" : "The following function does inject a clone at the transport layers."
+        },
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            },
+            "region" : {
+              "startLine" : 26,
+              "startColumn" : 46,
+              "endColumn" : 52
+            }
+          }
+        } ],
+        "partialFingerprints" : {
+          "primaryLocationLineHash" : "56b74a54af745f59:1",
+          "primaryLocationStartColumnFingerprint" : "41"
+        }
+      }, {
+        "ruleId" : "cpp/windows/drivers/kmdf/queries/wfp/transport-layer-cannot-inject-clone-during-classify",
+        "ruleIndex" : 0,
+        "rule" : {
+          "id" : "cpp/windows/drivers/kmdf/queries/wfp/transport-layer-cannot-inject-clone-during-classify",
+          "index" : 0
+        },
+        "message" : {
+          "text" : "The following function does inject a clone at the transport layers."
+        },
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            },
+            "region" : {
+              "startLine" : 27,
+              "startColumn" : 46,
+              "endColumn" : 52
+            }
+          }
+        } ],
+        "partialFingerprints" : {
+          "primaryLocationLineHash" : "eb0e8f748a3f7699:1",
+          "primaryLocationStartColumnFingerprint" : "41"
+        }
+      } ],
+      "columnKind" : "utf16CodeUnits",
+      "properties" : {
+        "semmle.formatSpecifier" : "sarifv2.1.0"
+      }
+    } ]
+  }
