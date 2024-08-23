@@ -12,29 +12,40 @@
 	</recommendation>
 	<example>
 		<p>
-			TODO example
+			Function that uses float without protecting floating-point hardware state
 		</p>
 		<sample language="c"> <![CDATA[
-		// Example code
+		void float_used_bad()
+		{
+			float f = 0.0f;
+			f = f + 1.0f;
+		}
 		}]]>
 		</sample>
 		<p>
-			TODO example 2
+			Function that uses float with protected floating-point hardware state
 		</p>
 		<sample language="c"> <![CDATA[
-				// Example code
+		KFLOATING_SAVE saveData;
+		NTSTATUS status;
+		float f = 0.0f;
+		status = KeSaveFloatingPointState(&saveData);
+		for (int i = 0; i < 100; i++)
+		{
+			f = f + 1.0f;
+		}
+		KeRestoreFloatingPointState(&saveData);
 		}]]>
 		</sample>
 	</example>
 	<semmleNotes>
 		<p>
-			TODO notes
 		</p>
 	</semmleNotes>
 	<references>
 		<li>
-			<a href="example.com">
-				Example link
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28110-floating-point-hardware-protect">
+				Warning C28110
 			</a>
 		</li>
 	</references>

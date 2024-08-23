@@ -81,7 +81,7 @@
                 "extensions": [
                     {
                         "name": "microsoft/windows-drivers",
-                        "semanticVersion": "1.1.0+f597e2aeb1c508ba009aa330f303f43dfe0280e1",
+                        "semanticVersion": "1.1.0+ed45a0947090dd9c23386d5d318ddc2662469c34",
                         "locations": [
                             {
                                 "uri": "file:///C:/codeql-home/WDDST/src/",
@@ -186,7 +186,7 @@
                                 "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
                             },
                             "level": "note",
-                            "timeUtc": "2024-08-21T04:14:03.463+00:00",
+                            "timeUtc": "2024-08-24T03:52:35.107+00:00",
                             "descriptor": {
                                 "id": "cpp/extractor/summary",
                                 "index": 1
@@ -241,7 +241,7 @@
                         "index": 0
                     },
                     "message": {
-                        "text": "Use of float detected without protecting floating-point hardware state. [f](1), $@"
+                        "text": "Use of float detected without protecting floating-point hardware state"
                     },
                     "locations": [
                         {
@@ -262,27 +262,7 @@
                     "partialFingerprints": {
                         "primaryLocationLineHash": "26ede89e4ff516da:1",
                         "primaryLocationStartColumnFingerprint": "0"
-                    },
-                    "relatedLocations": [
-                        {
-                            "id": 1,
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "driver/driver_snippet.c",
-                                    "uriBaseId": "%SRCROOT%",
-                                    "index": 0
-                                },
-                                "region": {
-                                    "startLine": 35,
-                                    "startColumn": 5,
-                                    "endColumn": 6
-                                }
-                            },
-                            "message": {
-                                "text": "f"
-                            }
-                        }
-                    ]
+                    }
                 },
                 {
                     "ruleId": "cpp/drivers/float-hardware-state-protection",
@@ -292,7 +272,7 @@
                         "index": 0
                     },
                     "message": {
-                        "text": "Use of float detected without protecting floating-point hardware state. [f](1), $@"
+                        "text": "Use of float detected without protecting floating-point hardware state"
                     },
                     "locations": [
                         {
@@ -313,27 +293,7 @@
                     "partialFingerprints": {
                         "primaryLocationLineHash": "26ede89e4ff516da:1",
                         "primaryLocationStartColumnFingerprint": "4"
-                    },
-                    "relatedLocations": [
-                        {
-                            "id": 1,
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "driver/driver_snippet.c",
-                                    "uriBaseId": "%SRCROOT%",
-                                    "index": 0
-                                },
-                                "region": {
-                                    "startLine": 35,
-                                    "startColumn": 9,
-                                    "endColumn": 10
-                                }
-                            },
-                            "message": {
-                                "text": "f"
-                            }
-                        }
-                    ]
+                    }
                 },
                 {
                     "ruleId": "cpp/drivers/float-hardware-state-protection",
@@ -343,7 +303,7 @@
                         "index": 0
                     },
                     "message": {
-                        "text": "Use of float detected without protecting floating-point hardware state. [f](1), $@"
+                        "text": "Use of float detected without protecting floating-point hardware state"
                     },
                     "locations": [
                         {
@@ -364,27 +324,7 @@
                     "partialFingerprints": {
                         "primaryLocationLineHash": "9c6e5f7e3e1f2dc2:1",
                         "primaryLocationStartColumnFingerprint": "0"
-                    },
-                    "relatedLocations": [
-                        {
-                            "id": 1,
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "driver/driver_snippet.c",
-                                    "uriBaseId": "%SRCROOT%",
-                                    "index": 0
-                                },
-                                "region": {
-                                    "startLine": 17,
-                                    "startColumn": 5,
-                                    "endColumn": 6
-                                }
-                            },
-                            "message": {
-                                "text": "f"
-                            }
-                        }
-                    ]
+                    }
                 },
                 {
                     "ruleId": "cpp/drivers/float-hardware-state-protection",
@@ -394,7 +334,7 @@
                         "index": 0
                     },
                     "message": {
-                        "text": "Use of float detected without protecting floating-point hardware state. [f](1), $@"
+                        "text": "Use of float detected without protecting floating-point hardware state"
                     },
                     "locations": [
                         {
@@ -415,27 +355,7 @@
                     "partialFingerprints": {
                         "primaryLocationLineHash": "9c6e5f7e3e1f2dc2:1",
                         "primaryLocationStartColumnFingerprint": "4"
-                    },
-                    "relatedLocations": [
-                        {
-                            "id": 1,
-                            "physicalLocation": {
-                                "artifactLocation": {
-                                    "uri": "driver/driver_snippet.c",
-                                    "uriBaseId": "%SRCROOT%",
-                                    "index": 0
-                                },
-                                "region": {
-                                    "startLine": 17,
-                                    "startColumn": 9,
-                                    "endColumn": 10
-                                }
-                            },
-                            "message": {
-                                "text": "f"
-                            }
-                        }
-                    ]
+                    }
                 }
             ],
             "columnKind": "utf16CodeUnits",

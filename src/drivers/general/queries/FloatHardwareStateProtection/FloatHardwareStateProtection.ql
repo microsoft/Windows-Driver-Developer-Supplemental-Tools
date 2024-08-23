@@ -78,9 +78,6 @@ class FuncWithSafeFloatAccess extends Function {
       // this function can call a function that uses float
     )
   }
-  // exists(Function fOuter |
-  //   fOuter.calls*(this.getEnclosingFunction())
-  // )
 }
 
 class SafeFloatAccess extends VariableAccess {
