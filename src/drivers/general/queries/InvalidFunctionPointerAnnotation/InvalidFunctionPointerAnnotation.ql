@@ -30,21 +30,19 @@ class FunctionClassAnnotatedTypedef extends TypedefType {
 }
 
 class FunctionClassAnnotation extends SALAnnotation {
-  string irqlAnnotationName;
+  string annotationName;
 
   FunctionClassAnnotation() {
-    this.getMacroName() = ["__drv_functionClass"] and
-    irqlAnnotationName = this.getMacroName()
+    this.getMacroName() = ["__drv_functionClass", "_Function_class_"] and
+    annotationName = this.getMacroName()
   }
-
-  string getFuncAnnotationMacroName() { result = irqlAnnotationName }
 }
 
 class AnnotatedFunction extends Function {
   FunctionClassAnnotation funcClassAnnotation;
 
   AnnotatedFunction() {
-    funcClassAnnotation.getMacroName() = ["__drv_functionClass"] and
+    funcClassAnnotation.getMacroName() = ["__drv_functionClass", "_Function_class_"] and
     exists(FunctionDeclarationEntry fde |
       fde = this.getADeclarationEntry() and
       funcClassAnnotation.getDeclarationEntry() = fde
@@ -56,8 +54,6 @@ class AnnotatedFunction extends Function {
         funcClassAnnotation
     )
   }
-
-  string getFuncAnnotation() { result = funcClassAnnotation.getFuncAnnotationMacroName() }
 
   FunctionClassAnnotation getFuncClassAnnotation() { result = funcClassAnnotation }
 }
@@ -83,11 +79,12 @@ where
           .getType()
           .toString()
   )
-select af, "Function pointer annotation mismatch. Function pointer type: " +
-  callingFunc
-      .getTarget()
-      .getADeclarationEntry()
-      .getParameterDeclarationEntry(n)
-      .getType()
-      .toString() +
-  ". Function annotation: " + af.getFuncClassAnnotation().getUnexpandedArgument(0).toString()
+select callingFunc.getArgument(n),
+  "Function pointer annotation mismatch. Function pointer type: " +
+    callingFunc
+        .getTarget()
+        .getADeclarationEntry()
+        .getParameterDeclarationEntry(n)
+        .getType()
+        .toString() + ". Function annotation: " +
+    af.getFuncClassAnnotation().getUnexpandedArgument(0).toString()
