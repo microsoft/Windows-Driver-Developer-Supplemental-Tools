@@ -19,7 +19,22 @@
       - drivers/general/queries/IrqlTooLow/IrqlTooLow.ql
       - drivers/general/queries/IrqlSetTooHigh/IrqlSetTooHigh.ql
       - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
+      - drivers/general/queries/IRPStackEntryCopy/IRPStackEntryCopy.ql
+      - drivers/general/queries/DriverEntrySaveBuffer/DriverEntrySaveBuffer.ql
+      - drivers/general/queries/CurrentFunctionTypeNotCorrect/CurrentFunctionTypeNotCorrect.ql
+      - drivers/general/queries/IoInitializeTimerCall/IoInitializeTimerCall.ql
+      - drivers/general/queries/OperandAssignment/OperandAssignment.ql
       - drivers/general/queries/MultithreadedAVCondition/MultithreadedAVCondition.ql
+      - drivers/general/queries/FloatHardwareStateProtection/FloatHardwareStateProtection.ql
+      - drivers/general/queries/FloatSafeExit/FloatSafeExit.ql
+      - drivers/general/queries/FloatUnsafeExit/FloatUnsafeExit.ql
+      - drivers/general/queries/InvalidFunctionPointerAnnotation/InvalidFunctionPointerAnnotation.ql
+      - drivers/general/queries/IrqlIllegalValue/IrqlIllegalValue.ql
+      - drivers/general/queries/NtstatusExplicitCast/NtstatusExplicitCast.ql
+      - drivers/general/queries/NtstatusExplicitCast2/NtstatusExplicitCast2.ql
+      - drivers/general/queries/NtstatusExplicitCast3/NtstatusExplicitCast3.ql
+      - drivers/general/queries/NullCharacterPointerAssignment/NullCharacterPointerAssignment.ql
+      - drivers/general/queries/PointerVariableSize/PointerVariableSize.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
       - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
@@ -33,4 +48,3 @@
       - drivers/wdm/queries/OpaqueMdlWrite/OpaqueMdlWrite.ql
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
       - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
-      
