@@ -13,6 +13,8 @@ src/drivers/test/**/Debug/*
 src/drivers/test/TestDB/*
 src/drivers/test/working/*
 src/drivers/test/AnalysisFiles/*
-
+AnalysisFiles/*
+TestDB/*
+working/*
 #excel files
 **/*.xlsx

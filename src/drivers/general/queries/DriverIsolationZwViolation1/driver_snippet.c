@@ -21,22 +21,15 @@ void test_zw_not_allowed_read()
 {
 
     NTSTATUS Status = STATUS_SUCCESS;
-    HANDLE RootKey = NULL;
     HANDLE ChildKey = NULL;
     KEY_FULL_INFORMATION FullKeyInformation = {};
     OBJECT_ATTRIBUTES ObjectAttributes;
-    PKEY_BASIC_INFORMATION pKeyInformation = NULL;
-    ULONG Index = 0;
-    ULONG InformationSize = 0;
     ULONG ReturnedSize = 0;
     UNICODE_STRING FrameRateKey;
-    PUNICODE_STRING pwszSymbolicLink = NULL;
 
     RtlInitUnicodeString(&FrameRateKey, L"\\some\\bad\\path\\test\\test.txt");
     InitializeObjectAttributes(&ObjectAttributes, &FrameRateKey, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, 0, NULL);
     ZwOpenKey(&ChildKey, KEY_READ, &ObjectAttributes);
-    // Open RGB data file for conversion to YUV space
-
     Status = ZwQueryKey(ChildKey, KeyFullInformation, &FullKeyInformation, sizeof(FullKeyInformation), &ReturnedSize);
 }
 
@@ -44,21 +37,15 @@ void test_zw_allowed_read()
 {
 
     NTSTATUS Status = STATUS_SUCCESS;
-    HANDLE RootKey = NULL;
     HANDLE ChildKey = NULL;
     KEY_FULL_INFORMATION FullKeyInformation = {};
     OBJECT_ATTRIBUTES ObjectAttributes;
-    PKEY_BASIC_INFORMATION pKeyInformation = NULL;
-    ULONG Index = 0;
-    ULONG InformationSize = 0;
     ULONG ReturnedSize = 0;
     UNICODE_STRING FrameRateKey;
-    PUNICODE_STRING pwszSymbolicLink = NULL;
 
     RtlInitUnicodeString(&FrameRateKey, L"\\Registry\\Machine\\Hardware\\test\\test.txt");
     InitializeObjectAttributes(&ObjectAttributes, &FrameRateKey, OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE, 0, NULL);
     ZwOpenKey(&ChildKey, KEY_READ, &ObjectAttributes);
-    // Open RGB data file for conversion to YUV space
 
     Status = ZwQueryKey(ChildKey, KeyFullInformation, &FullKeyInformation, sizeof(FullKeyInformation), &ReturnedSize);
 }
@@ -71,18 +58,9 @@ void test_zw_multiple_nulls(PUNICODE_STRING RegistryPath)
     RTL_QUERY_REGISTRY_TABLE parameters[3] = {0};
 
     UNICODE_STRING paramStr;
-    //
-    //  Default to ENABLING MediaChangeNotification (!)
-    //
-
-    ULONG mcnRegistryValue = 1;
 
     NTSTATUS status;
-
-    //
     // open the service key.
-    //
-
     InitializeObjectAttributes(&objectAttributes,
                                RegistryPath,
                                OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
@@ -92,10 +70,6 @@ void test_zw_multiple_nulls(PUNICODE_STRING RegistryPath)
     status = ZwOpenKey(&serviceKey,
                        KEY_READ,
                        &objectAttributes);
-
-    //
-    // Open the parameters key (if any) beneath the services key.
-    //
 
     RtlInitUnicodeString(&paramStr, L"Parameters");
 
@@ -113,10 +87,9 @@ void test_zw_multiple_nulls(PUNICODE_STRING RegistryPath)
 // OBJECT_ATTRIBUTES->RootDirectory == NULL and OBJECT_ATTRIBUTES->ObjectName starts with "\registry\machine\hardware\ BUT Zw function does a write"
 #include <ntstrsafe.h>
 #include <ntddscsi.h>
-void test_zw_violation_3(_In_ PDEVICE_OBJECT Fdo,
-                         _In_ PCHAR DeviceName,
-                         _In_ ULONG DeviceNumber,
-                         _In_ ULONG InquiryDataLength)
+void test_zw_violation_3(
+    PCHAR DeviceName,
+    ULONG DeviceNumber )
 {
     NTSTATUS status;
     SCSI_ADDRESS scsiAddress = {0};
@@ -126,16 +99,11 @@ void test_zw_violation_3(_In_ PDEVICE_OBJECT Fdo,
     UNICODE_STRING unicodeRegistryPath = {0};
     UNICODE_STRING unicodeData = {0};
     HANDLE targetKey;
-    IO_STATUS_BLOCK ioStatus;
     UCHAR buffer[256] = {0};
 
     PAGED_CODE();
 
     targetKey = NULL;
-
-    // Issue GET_ADDRESS Ioctl to determine path, target, and lun information.
-    //
-
     status = RtlStringCchPrintfA((NTSTRSAFE_PSTR)buffer,
                                  sizeof(buffer) - 1,
                                  "\\Registry\\Machine\\Hardware\\DeviceMap\\Scsi\\Scsi Port %d\\Scsi Bus %d\\Target Id %d\\Logical Unit Id %d",
@@ -150,10 +118,7 @@ void test_zw_violation_3(_In_ PDEVICE_OBJECT Fdo,
                                           &string,
                                           TRUE);
 
-    //
-    // Open the registry key for the scsi information for this
-    // scsibus, target, lun.
-    //
+    // Open the registry key
 
     InitializeObjectAttributes(&objectAttributes,
                                &unicodeRegistryPath,
@@ -165,16 +130,8 @@ void test_zw_violation_3(_In_ PDEVICE_OBJECT Fdo,
                        KEY_READ,
                        &objectAttributes);
 
-    //
-    // Now construct and attempt to create the registry value
-    // specifying the device name in the appropriate place in the
-    // device map.
-    //
-
     RtlInitUnicodeString(&unicodeName, L"DeviceName");
-
     status = RtlStringCchPrintfA((NTSTRSAFE_PSTR)buffer, sizeof(buffer) - 1, "%s%d", DeviceName, DeviceNumber);
-
     RtlInitString(&string, (PCSZ)buffer);
     status = RtlAnsiStringToUnicodeString(&unicodeData,
                                           &string,
@@ -188,14 +145,13 @@ void test_zw_violation_3(_In_ PDEVICE_OBJECT Fdo,
                                unicodeData.Buffer,
                                unicodeData.Length);
     }
-
-} // end ClassUpdateInformationInRegistry()
+}
 
 void test_zw_allowed_rootdirectory_source()
 {
     OBJECT_ATTRIBUTES ObjectAttributes;
     NTSTATUS Status;
-    HANDLE ParentKey, RootKey, ChildKey;
+    HANDLE ParentKey, RootKey;
     UNICODE_STRING UnicodeEnumName;
     const WCHAR EnumString[] = L"Enum";
 
@@ -208,14 +164,8 @@ void test_zw_allowed_rootdirectory_source()
                                      STANDARD_RIGHTS_ALL,
                                      &ParentKey);
 
-    //
-    // create the subkey for the enum section, in the form "\enum"
-    //
     RtlInitUnicodeString(&UnicodeEnumName, EnumString);
 
-    //
-    // read the registry to determine if children are present.
-    //
     InitializeObjectAttributes(&ObjectAttributes,
                                &UnicodeEnumName,
                                OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
@@ -239,14 +189,6 @@ TestUsingFunctionParam(
     HANDLE serviceKey = NULL;
     HANDLE parametersKey = NULL;
     RTL_QUERY_REGISTRY_TABLE parameters[3] = {0};
-
-    UNICODE_STRING paramStr;
-
-    //
-    //  Default to ENABLING MediaChangeNotification (!)
-    //
-
-    ULONG mcnRegistryValue = 1;
 
     NTSTATUS status;
 

@@ -97,7 +97,8 @@ where
   IsolationDataFlowNullRootDir::flowPath(source, sink) and
   (
     (
-      allowedPath(source.getNode().asIndirectExpr()) and
+      allowedPath(source.getNode().asIndirectExpr())
+      or
       pathWriteException(source.getNode().asIndirectExpr())
     ) and
     zwWrite(f) and // null RootDirectory, valid ObjectName, write
