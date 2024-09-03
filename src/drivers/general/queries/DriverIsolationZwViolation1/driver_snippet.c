@@ -89,7 +89,7 @@ void test_zw_multiple_nulls(PUNICODE_STRING RegistryPath)
 #include <ntddscsi.h>
 void test_zw_violation_3(
     PCHAR DeviceName,
-    ULONG DeviceNumber )
+    ULONG DeviceNumber)
 {
     NTSTATUS status;
     SCSI_ADDRESS scsiAddress = {0};
@@ -231,11 +231,13 @@ void GoodCallTestUsingFunctionParam()
     TestUsingFunctionParam(&RegistryPath);
 }
 
-void TestZwWithRelativeHandle(){
-      OBJECT_ATTRIBUTES ObjectAttributes;
-      OBJECT_ATTRIBUTES ObjectAttributes2;
+void TestZwWithRelativeHandle()
+{
+    OBJECT_ATTRIBUTES ObjectAttributes;
+    OBJECT_ATTRIBUTES ObjectAttributes2;
+    OBJECT_ATTRIBUTES ObjectAttributes3;
     NTSTATUS Status;
-    HANDLE ParentKey, RootKey, RootKey2;
+    HANDLE ParentKey, RootKey, RootKey2, RootKey3;
     UNICODE_STRING UnicodeEnumName;
     const WCHAR EnumString[] = L"Enum";
 
@@ -258,7 +260,6 @@ void TestZwWithRelativeHandle(){
 
     // Allowed because ParentKey came from IoOpenDeviceRegistryKey
     Status = ZwOpenKey(&RootKey, KEY_READ, &ObjectAttributes);
-     
 
     if (!NT_SUCCESS(Status))
     {
@@ -266,7 +267,7 @@ void TestZwWithRelativeHandle(){
         return Status;
     }
 
-     InitializeObjectAttributes(&ObjectAttributes2,
+    InitializeObjectAttributes(&ObjectAttributes2,
                                &UnicodeEnumName,
                                OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
                                RootKey,
@@ -274,11 +275,20 @@ void TestZwWithRelativeHandle(){
     // Allowed because RootKey is a valid handle
     Status = ZwOpenKey(&RootKey2, KEY_READ, &ObjectAttributes2);
 
+
+    InitializeObjectAttributes(&ObjectAttributes3,
+                               &UnicodeEnumName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               RootKey2,
+                               NULL);
+    // Allowed because RootKey is a valid handle
+    Status = ZwOpenKey(&RootKey3, KEY_READ, &ObjectAttributes3);
 }
 
-void TestZwWithRelativeHandleBad(){
-      OBJECT_ATTRIBUTES ObjectAttributes;
-      OBJECT_ATTRIBUTES ObjectAttributes2;
+void TestZwWithRelativeHandleBad()
+{
+    OBJECT_ATTRIBUTES ObjectAttributes;
+    OBJECT_ATTRIBUTES ObjectAttributes2;
     NTSTATUS Status;
     HANDLE ParentKey = NULL;
     HANDLE RootKey, RootKey2;
@@ -297,7 +307,6 @@ void TestZwWithRelativeHandleBad(){
 
     // Not allowed
     Status = ZwOpenKey(&RootKey, KEY_READ, &ObjectAttributes);
-     
 
     if (!NT_SUCCESS(Status))
     {
@@ -305,12 +314,11 @@ void TestZwWithRelativeHandleBad(){
         return Status;
     }
 
-     InitializeObjectAttributes(&ObjectAttributes2,
+    InitializeObjectAttributes(&ObjectAttributes2,
                                &UnicodeEnumName,
                                OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
                                RootKey,
                                NULL);
     // Not allowed
     Status = ZwOpenKey(&RootKey2, KEY_READ, &ObjectAttributes2);
-
 }

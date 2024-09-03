@@ -69,19 +69,23 @@ import IsolationDataFlowNonNullRootDir::PathGraph
  * OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
  */
 
-predicate allowedHandleSource(FunctionCall allowedFunction) {
+predicate allowedHandleSource(RegistryIsolationFunctionCall allowedFunction) {
   exists(
     IsolationDataFlowNonNullRootDir::PathNode source2,
-    IsolationDataFlowNonNullRootDir::PathNode sink2, FunctionCall f
+    IsolationDataFlowNonNullRootDir::PathNode sink2
   |
     IsolationDataFlowNonNullRootDir::flowPath(source2, sink2) and
-    exists(FunctionCall fc |
-      fc.getTarget() instanceof AllowedHandleDDI and
-      source2.getNode().asIndirectArgument() = fc.getAnArgument()
-    ) and
-    sink2.getNode().asIndirectExpr().getParent*() = f and
-    source2 != sink2 and
-    allowedFunction = f
+    (
+      exists(FunctionCall fc |
+        (
+          fc.getTarget() instanceof AllowedHandleDDI or
+          allowedHandleSource(fc)
+        ) and
+        source2.getNode().asIndirectArgument() = fc.getAnArgument()
+      ) and
+      sink2.getNode().asIndirectExpr().getParent*() = allowedFunction and
+      source2 != sink2
+    )
   )
 }
 
