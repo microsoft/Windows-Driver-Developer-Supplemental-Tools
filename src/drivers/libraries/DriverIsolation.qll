@@ -162,8 +162,9 @@ predicate pathWriteException(Expr n1) {
 }
 
 predicate exception2(RegistryIsolationFunctionCall f) {
-  // Exception: Rtl Writes OK if key is named SERIALCOMM and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP
-  f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm")
+  // Exception: Rtl Writes OK if key is named SERIALCOMM or SERIALCOMM\* and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP
+  f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm") or
+  f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm\\%")
 }
 
 predicate pathException(Expr e) {

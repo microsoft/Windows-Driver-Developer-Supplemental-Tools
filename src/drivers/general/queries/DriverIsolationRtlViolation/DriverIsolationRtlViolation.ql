@@ -32,6 +32,7 @@ predicate rtlViolation1(RegistryIsolationFunctionCall f) {
 
 predicate rtlViolation2(RegistryIsolationFunctionCall f) {
   // Violation if RelativeTo parameter IS RTL_REGISTRY_DEVICEMAP and not doing a READ
+  f.getTarget().getName().matches("Rtl%") and
   exists(MacroInvocation m |
     f.getArgument(0) = m.getExpr() and
     m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP") and
