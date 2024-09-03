@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 /**
  * @id cpp/drivers/driver-isolation-zw-violation-1
- * @kind problem
+ * @kind path-problem
  * @name Driver Isolation Zw Violation 1
  * @description Driver isolation violation if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with
  *  RootDirectory!=NULL and the handle specified in RootDirectory comes from an unapproved ddi.
@@ -62,21 +62,48 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
 
 module IsolationDataFlowNonNullRootDir = DataFlow::Global<IsolationDataFlowNonNullRootDirConfig>;
 
+import IsolationDataFlowNonNullRootDir::PathGraph
+
 /*
  * registry violation zw functions ( non-null RootDirectory)
  * OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
  */
 
-from RegistryIsolationFunctionCall f, DataFlow::Node source, DataFlow::Node sink
+predicate allowedHandleSource(FunctionCall allowedFunction) {
+  exists(
+    IsolationDataFlowNonNullRootDir::PathNode source2,
+    IsolationDataFlowNonNullRootDir::PathNode sink2, FunctionCall f
+  |
+    IsolationDataFlowNonNullRootDir::flowPath(source2, sink2) and
+    exists(FunctionCall fc |
+      fc.getTarget() instanceof AllowedHandleDDI and
+      source2.getNode().asIndirectArgument() = fc.getAnArgument()
+    ) and
+    sink2.getNode().asIndirectExpr().getParent*() = f and
+    source2 != sink2 and
+    allowedFunction = f
+  )
+}
+
+from
+  RegistryIsolationFunctionCall regFuncCall, IsolationDataFlowNonNullRootDir::PathNode source,
+  IsolationDataFlowNonNullRootDir::PathNode sink
 where
-  IsolationDataFlowNonNullRootDir::flow(source, sink) and
+  IsolationDataFlowNonNullRootDir::flowPath(source, sink) and
+  // Not a violation if the source handle comes from an approved DDI
   not exists(FunctionCall fc |
     fc.getTarget() instanceof AllowedHandleDDI and
-    source.asIndirectArgument() = fc.getAnArgument()
+    source.getNode().asIndirectArgument() = fc.getAnArgument()
   ) and
-  sink.asIndirectExpr().getParent*() = f and
+  // Not a violation if the source handle is relative to a handle obtained from an approved DDI
+  not exists(FunctionCall sourceFuncCall |
+    sourceFuncCall = source.getNode().asIndirectExpr().getParent*() and
+    allowedHandleSource(sourceFuncCall)
+  ) and
+  sink.getNode().asIndirectExpr().getParent*() = regFuncCall and
   source != sink
-select f,
-  f.getTarget().toString() +
-    " call has argument of type OBJECT_ATTRIBUTES with RootDirectory field initialized with handle $@ obtained from unapproved source.",
-  source, source.asIndirectArgument().(AddressOfExpr).getOperand().toString()
+// select f,
+//   f.getTarget().toString() +
+//     " call has argument of type OBJECT_ATTRIBUTES with RootDirectory field initialized with handle $@ obtained from unapproved source.",
+//   source, source.getNode().asIndirectArgument().(AddressOfExpr).getOperand().toString()
+select regFuncCall, source, sink, "message"

@@ -26,7 +26,8 @@ predicate rtlViolation1(RegistryIsolationFunctionCall f) {
   // Violation if RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP
   exists(MacroInvocation m |
     f.getArgument(0) = m.getExpr() and
-    not m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP")
+    not m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP") and 
+    not m.getMacroName().matches("RTL_REGISTRY_HANDLE") // These would be caught when the handle is opened
   )
 }
 

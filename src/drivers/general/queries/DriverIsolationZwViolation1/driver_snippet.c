@@ -230,3 +230,87 @@ void GoodCallTestUsingFunctionParam()
 
     TestUsingFunctionParam(&RegistryPath);
 }
+
+void TestZwWithRelativeHandle(){
+      OBJECT_ATTRIBUTES ObjectAttributes;
+      OBJECT_ATTRIBUTES ObjectAttributes2;
+    NTSTATUS Status;
+    HANDLE ParentKey, RootKey, RootKey2;
+    UNICODE_STRING UnicodeEnumName;
+    const WCHAR EnumString[] = L"Enum";
+
+    PAGED_CODE();
+
+    PDEVICE_OBJECT PhysicalDeviceObject = NULL;
+
+    Status = IoOpenDeviceRegistryKey(PhysicalDeviceObject,
+                                     PLUGPLAY_REGKEY_DRIVER,
+                                     STANDARD_RIGHTS_ALL,
+                                     &ParentKey);
+
+    RtlInitUnicodeString(&UnicodeEnumName, EnumString);
+
+    InitializeObjectAttributes(&ObjectAttributes,
+                               &UnicodeEnumName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               ParentKey,
+                               NULL);
+
+    // Allowed because ParentKey came from IoOpenDeviceRegistryKey
+    Status = ZwOpenKey(&RootKey, KEY_READ, &ObjectAttributes);
+     
+
+    if (!NT_SUCCESS(Status))
+    {
+        ZwClose(ParentKey);
+        return Status;
+    }
+
+     InitializeObjectAttributes(&ObjectAttributes2,
+                               &UnicodeEnumName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               RootKey,
+                               NULL);
+    // Allowed because RootKey is a valid handle
+    Status = ZwOpenKey(&RootKey2, KEY_READ, &ObjectAttributes2);
+
+}
+
+void TestZwWithRelativeHandleBad(){
+      OBJECT_ATTRIBUTES ObjectAttributes;
+      OBJECT_ATTRIBUTES ObjectAttributes2;
+    NTSTATUS Status;
+    HANDLE ParentKey = NULL;
+    HANDLE RootKey, RootKey2;
+    UNICODE_STRING UnicodeEnumName;
+    const WCHAR EnumString[] = L"Enum";
+
+    PAGED_CODE();
+
+    PDEVICE_OBJECT PhysicalDeviceObject = NULL;
+
+    InitializeObjectAttributes(&ObjectAttributes,
+                               &UnicodeEnumName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               ParentKey,
+                               NULL);
+
+    // Not allowed
+    Status = ZwOpenKey(&RootKey, KEY_READ, &ObjectAttributes);
+     
+
+    if (!NT_SUCCESS(Status))
+    {
+        ZwClose(ParentKey);
+        return Status;
+    }
+
+     InitializeObjectAttributes(&ObjectAttributes2,
+                               &UnicodeEnumName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               RootKey,
+                               NULL);
+    // Not allowed
+    Status = ZwOpenKey(&RootKey2, KEY_READ, &ObjectAttributes2);
+
+}
