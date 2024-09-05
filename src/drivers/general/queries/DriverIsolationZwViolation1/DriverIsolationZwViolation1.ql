@@ -63,11 +63,11 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
 module IsolationDataFlowNonNullRootDir = DataFlow::Global<IsolationDataFlowNonNullRootDirConfig>;
 
 /*
-For debugging, uncomment the following line, change the @kind to "path-problem", change the  DataFlow::Node to IsolationDataFlowNonNullRootDir::PathNode, 
-change IsolationDataFlowNonNullRootDir::flow to IsolationDataFlowNonNullRootDir::flowPath, and change the select to: select regFuncCall, source, sink, "message" 
-*/
-//import IsolationDataFlowNonNullRootDir::PathGraph
+ * For debugging, uncomment the following line, change the @kind to "path-problem", change the  DataFlow::Node to IsolationDataFlowNonNullRootDir::PathNode,
+ * change IsolationDataFlowNonNullRootDir::flow to IsolationDataFlowNonNullRootDir::flowPath, and change the select to: select regFuncCall, source, sink, "message"
+ */
 
+//import IsolationDataFlowNonNullRootDir::PathGraph
 /*
  * registry violation zw functions ( non-null RootDirectory)
  * OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
@@ -93,9 +93,7 @@ predicate allowedHandleSource(RegistryIsolationFunctionCall allowedFunction) {
   )
 }
 
-from
-  RegistryIsolationFunctionCall regFuncCall, DataFlow::Node source,
-  DataFlow::Node sink
+from RegistryIsolationFunctionCall regFuncCall, DataFlow::Node source, DataFlow::Node sink
 where
   IsolationDataFlowNonNullRootDir::flow(source, sink) and
   // Not a violation if the source handle comes from an approved DDI
@@ -111,6 +109,12 @@ where
   sink.asIndirectExpr().getParent*() = regFuncCall and
   source != sink
 select regFuncCall,
-regFuncCall.getTarget().toString() +
-    " call has argument of type OBJECT_ATTRIBUTES with RootDirectory field initialized with handle $@ obtained from unapproved source.",
-  source, source.asIndirectArgument().(AddressOfExpr).getOperand().toString()
+  "$@ call at " + regFuncCall.getLocation().getFile().toString() + " line " +
+    regFuncCall.getLocation().getStartLine().toString() +
+    " has argument of type OBJECT_ATTRIBUTES with RootDirectory field initialized with handle $@ obtained from unapproved source $@ at "
+    + source.asIndirectArgument().getLocation().getFile().toString() + " line " +
+    source.asIndirectArgument().getLocation().getStartLine().toString() + ".", regFuncCall,
+  regFuncCall.getTarget().toString(), source,
+  source.asIndirectArgument().(AddressOfExpr).getOperand().toString(),
+  source.asIndirectArgument().(AddressOfExpr).getParent().(FunctionCall).getTarget(),
+  source.asIndirectArgument().(AddressOfExpr).getParent().(FunctionCall).getTarget().toString()
