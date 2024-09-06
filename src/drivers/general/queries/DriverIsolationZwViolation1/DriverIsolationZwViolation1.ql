@@ -53,7 +53,8 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
     exists(FunctionCall f |
       zwCall(f) and
       sink.asIndirectExpr() = f.getAnArgument()
-    )
+    ) and
+    not isSource(sink)
   }
 }
 
@@ -71,8 +72,10 @@ module IsolationDataFlowNonNullRootDir = DataFlow::Global<IsolationDataFlowNonNu
  */
 
 predicate allowedHandleSource(FunctionCall allowedFunction) {
-  allowedFunction.getTarget() instanceof AllowedHandleDDI
-  // TODO add read access for handle opened with null RootDirectory and valid path as allowed
+  (
+    allowedFunction.getTarget() instanceof AllowedHandleDDI or
+    allowedFunction instanceof AllowedHandleRegFuncCall
+  )
   or
   exists(DataFlow::Node source, DataFlow::Node sink |
     IsolationDataFlowNonNullRootDir::flow(source, sink) and
@@ -85,14 +88,12 @@ FunctionCall firstCall(FunctionCall fc) {
   if
     exists(DataFlow::Node source, DataFlow::Node sink |
       IsolationDataFlowNonNullRootDir::flow(source, sink) and
-      fc.getAnArgument() = sink.asIndirectArgument() and
-      source != sink
+      fc.getAnArgument() = sink.asIndirectArgument()
     )
   then
     exists(DataFlow::Node source, DataFlow::Node sink |
       IsolationDataFlowNonNullRootDir::flow(source, sink) and
       fc.getAnArgument() = sink.asIndirectArgument() and
-      source != sink and
       result = firstCall(source.asIndirectExpr().getParent+())
     )
   else result = fc
