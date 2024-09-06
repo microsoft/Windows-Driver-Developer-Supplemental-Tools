@@ -27,7 +27,7 @@ import drivers.libraries.DriverIsolation
 module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     exists(VariableAccess arg |
-      arg.getType().toString().matches("HANDLE") and
+      arg.getType().toString().matches("%HANDLE") and
       not arg instanceof FieldAccess and
       source.asIndirectExpr() = arg
     )
