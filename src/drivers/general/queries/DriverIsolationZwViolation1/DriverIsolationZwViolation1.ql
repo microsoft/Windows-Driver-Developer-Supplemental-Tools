@@ -34,15 +34,12 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
   }
 
   //barrier prevents flow from source to source
-  predicate isBarrierIn(DataFlow::Node node) {
-    isSource(node) or
-    node instanceof NullRootDirectory
-  }
+  predicate isBarrierIn(DataFlow::Node node) { isSource(node) }
 
   predicate isAdditionalFlowStep(DataFlow::Node pred, DataFlow::Node succ) {
     /* Flow from handle to object attributes */
     exists(MacroInvocation m |
-      succ instanceof NonNullRootDirectory and
+      succ instanceof NonNullRootDirectoryNode and
       pred.asExpr().(VariableAccess).getType().toString().matches("HANDLE") and
       not pred.asExpr() instanceof FieldAccess and
       m.getAnAffectedElement() = succ.asIndirectExpr() and
@@ -73,48 +70,39 @@ module IsolationDataFlowNonNullRootDir = DataFlow::Global<IsolationDataFlowNonNu
  * OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
  */
 
-predicate allowedHandleSource(RegistryIsolationFunctionCall allowedFunction) {
-  exists(
-    IsolationDataFlowNonNullRootDir::PathNode source2,
-    IsolationDataFlowNonNullRootDir::PathNode sink2
-  |
-    IsolationDataFlowNonNullRootDir::flowPath(source2, sink2) and
-    (
-      exists(FunctionCall fc |
-        (
-          fc.getTarget() instanceof AllowedHandleDDI or
-          allowedHandleSource(fc) // TODO test this more
-        ) and
-        source2.getNode().asIndirectArgument() = fc.getAnArgument()
-      ) and
-      sink2.getNode().asIndirectExpr().getParent*() = allowedFunction and
-      source2 != sink2
-    )
+predicate allowedHandleSource(FunctionCall allowedFunction) {
+  allowedFunction.getTarget() instanceof AllowedHandleDDI
+  // TODO add read access for handle opened with null RootDirectory and valid path as allowed
+  or
+  exists(DataFlow::Node source, DataFlow::Node sink |
+    IsolationDataFlowNonNullRootDir::flow(source, sink) and
+    sink.asIndirectArgument() = allowedFunction.getAnArgument() and
+    allowedHandleSource(source.asIndirectArgument().getParent+())
   )
 }
 
-from RegistryIsolationFunctionCall regFuncCall, DataFlow::Node source, DataFlow::Node sink
+FunctionCall firstCall(FunctionCall fc) {
+  if
+    exists(DataFlow::Node source, DataFlow::Node sink |
+      IsolationDataFlowNonNullRootDir::flow(source, sink) and
+      fc.getAnArgument() = sink.asIndirectArgument() and
+      source != sink
+    )
+  then
+    exists(DataFlow::Node source, DataFlow::Node sink |
+      IsolationDataFlowNonNullRootDir::flow(source, sink) and
+      fc.getAnArgument() = sink.asIndirectArgument() and
+      source != sink and
+      result = firstCall(source.asIndirectExpr().getParent+())
+    )
+  else result = fc
+}
+
+from RegistryIsolationFunctionCall fc, FunctionCall sourceFuncCall
 where
-  IsolationDataFlowNonNullRootDir::flow(source, sink) and
-  // Not a violation if the source handle comes from an approved DDI
-  not exists(FunctionCall fc |
-    fc.getTarget() instanceof AllowedHandleDDI and
-    source.asIndirectArgument() = fc.getAnArgument()
-  ) and
-  // Not a violation if the source handle is relative to a handle obtained from an approved DDI
-  not exists(FunctionCall sourceFuncCall |
-    sourceFuncCall = source.asIndirectExpr().getParent*() and
-    allowedHandleSource(sourceFuncCall)
-  ) and
-  sink.asIndirectExpr().getParent*() = regFuncCall and
-  source != sink
-select regFuncCall,
-  "$@ call at " + regFuncCall.getLocation().getFile().toString() + " line " +
-    regFuncCall.getLocation().getStartLine().toString() +
-    " has argument of type OBJECT_ATTRIBUTES with RootDirectory field initialized with handle $@ obtained from unapproved source $@ at "
-    + source.asIndirectArgument().getLocation().getFile().toString() + " line " +
-    source.asIndirectArgument().getLocation().getStartLine().toString() + ".", regFuncCall,
-  regFuncCall.getTarget().toString(), source,
-  source.asIndirectArgument().(AddressOfExpr).getOperand().toString(),
-  source.asIndirectArgument().(AddressOfExpr).getParent().(FunctionCall).getTarget(),
-  source.asIndirectArgument().(AddressOfExpr).getParent().(FunctionCall).getTarget().toString()
+  not allowedHandleSource(fc) and
+  sourceFuncCall = firstCall(fc) and
+  zwCall(fc) and
+  fc != sourceFuncCall
+select fc, "Function call $@ uses handle obtained from unapproved DDI $@", fc,
+  fc.getTarget().toString(), sourceFuncCall, sourceFuncCall.toString()

@@ -36,7 +36,7 @@ module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
 
   // barrier prevents flow from source to source
   predicate isBarrierIn(DataFlow::Node node) {
-    isSource(node) or node instanceof NonNullRootDirectory
+    isSource(node) or node instanceof NonNullRootDirectoryNode
   }
 
   predicate isAdditionalFlowStep(DataFlow::Node pred, DataFlow::Node succ) {
@@ -69,7 +69,7 @@ module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
       m.getAnAffectedElement() = succ.asIndirectExpr() and
       m.getAnAffectedElement() = pred.asIndirectExpr()
     ) and
-    succ instanceof NullRootDirectory
+    succ instanceof NullRootDirectoryNode
   }
 
   predicate isSink(DataFlow::Node sink) {

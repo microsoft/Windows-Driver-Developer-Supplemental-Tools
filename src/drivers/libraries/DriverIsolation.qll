@@ -44,8 +44,26 @@ class RegistryIsolationFunctionCall extends FunctionCall {
   RegistryIsolationFunctionCall() { this.getTarget() instanceof RegistryIsolationFunction }
 }
 
-class NullRootDirectory extends DataFlow::Node {
-  NullRootDirectory() {
+
+class NullRootDirectoryObjAttr extends VariableAccess {
+  NullRootDirectoryObjAttr() {
+    exists(FieldAccess fa, VariableAccess va|
+      fa.getTarget().getName().matches("RootDirectory") and
+      va.getType().toString().matches("OBJECT_ATTRIBUTES") and // TODO need wild cards?
+      va.getParent+() = fa.getParent+() and
+      exists(Expr assignedValue |
+        assignedValue = fa.getTarget().getAnAssignedValue() and
+        assignedValue.getParent+() = va.getParent+() and
+        assignedValue.getValue().toString().matches("%") // assignedValue only has a value when it's constant
+      ) 
+      and this = va
+    )
+  }
+}
+
+
+class NullRootDirectoryNode extends DataFlow::Node {
+  NullRootDirectoryNode() {
     exists(FieldAccess fa, VariableAccess va |
       fa.getTarget().getName().matches("RootDirectory") and
       va.getType().toString().matches("OBJECT_ATTRIBUTES") and // TODO need wild cards?
@@ -60,8 +78,8 @@ class NullRootDirectory extends DataFlow::Node {
   }
 }
 
-class NonNullRootDirectory extends DataFlow::Node {
-  NonNullRootDirectory() {
+class NonNullRootDirectoryNode extends DataFlow::Node {
+  NonNullRootDirectoryNode() {
     exists(FieldAccess fa, VariableAccess va |
       fa.getTarget().getName().matches("RootDirectory") and
       va.getType().toString().matches("OBJECT_ATTRIBUTES") and // TODO need wild cards?
