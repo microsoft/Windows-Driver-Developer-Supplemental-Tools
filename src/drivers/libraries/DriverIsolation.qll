@@ -95,6 +95,7 @@ class NonNullRootDirectoryNode extends DataFlow::Node {
 module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
     source.asIndirectExpr().getValue().toString().toLowerCase().matches("%")
+    //source.asIndirectExpr().getType().toString().toLowerCase().matches("%string%") //potential violations
   }
 
   // barrier prevents flow from source to source
@@ -141,10 +142,10 @@ module IsolationDataFlowNullRootDirConfig implements DataFlow::ConfigSig {
    *  InitializeObjectAttributes(&ObjectAttributes,&KeyName,OBJ_CASE_INSENSITIVE,NULL,NULL);
    */
 
-  // predicate allowImplicitRead(DataFlow::Node n, DataFlow::ContentSet cs) {
-  //   isAdditionalFlowStep(n, any(DataFlow::Node succ)) and
-  //   cs.getAReadContent().(DataFlow::FieldContent).getField().hasName(["Buffer"])
-  // }
+  predicate allowImplicitRead(DataFlow::Node n, DataFlow::ContentSet cs) {
+    isAdditionalFlowStep(n, any(DataFlow::Node succ)) and
+    cs.getAReadContent().(DataFlow::FieldContent).getField().hasName(["Buffer"])
+  }
 
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall f |
@@ -256,12 +257,12 @@ predicate zwCall(RegistryIsolationFunctionCall f) {
 }
 
 // Exceptions to rules
-
 predicate exception2(RegistryIsolationFunctionCall f) {
   // Exception: Rtl Writes OK if key is named SERIALCOMM or SERIALCOMM\* and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP
   f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm") or
   f.getArgument(1).getValue().toString().toLowerCase().matches("serialcomm\\%")
 }
+
 predicate pathWriteException(Expr n1) {
   // Exception: zwWrite OK with this path
   n1.getValue()
@@ -276,6 +277,6 @@ predicate pathException(Expr e) {
 }
 
 predicate allowedPath(Expr e) {
-  e.getValue().toString().toLowerCase().matches("%registry%machine%hardware%")
-  or pathException(e)
+  e.getValue().toString().toLowerCase().matches("%registry%machine%hardware%") or
+  pathException(e)
 }

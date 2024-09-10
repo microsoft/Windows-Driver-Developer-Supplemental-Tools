@@ -19,6 +19,7 @@
  */
 
 import drivers.libraries.DriverIsolation
+import drivers.libraries.SAL
 
 /*
  * OBJECT_ATTRIBUTES->RootDirectory is non-null
@@ -51,7 +52,6 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
   predicate isSink(DataFlow::Node sink) {
     // sink is an argument in a Zw* function call
     exists(FunctionCall f |
-      zwCall(f) and
       sink.asIndirectExpr() = f.getAnArgument()
     ) and
     not isSource(sink)
@@ -61,8 +61,11 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
 module IsolationDataFlowNonNullRootDir = DataFlow::Global<IsolationDataFlowNonNullRootDirConfig>;
 
 /*
- * For debugging, uncomment the following line, change the @kind to "path-problem", change the  DataFlow::Node to IsolationDataFlowNonNullRootDir::PathNode,
- * change IsolationDataFlowNonNullRootDir::flow to IsolationDataFlowNonNullRootDir::flowPath, and change the select to: select regFuncCall, source, sink, "message"
+ * For debugging, uncomment the following line and:
+ *   change the @kind to "path-problem",
+ *   change the  DataFlow::Node to IsolationDataFlowNonNullRootDir::PathNode,
+ *   change IsolationDataFlowNonNullRootDir::flow to IsolationDataFlowNonNullRootDir::flowPath,
+ *   change the select to: select regFuncCall, source, sink, "message"
  */
 
 //import IsolationDataFlowNonNullRootDir::PathGraph
@@ -71,20 +74,7 @@ module IsolationDataFlowNonNullRootDir = DataFlow::Global<IsolationDataFlowNonNu
  * OBJECT_ATTRIBUTES->RootDirectory is non-null and flow from ObjectAttributes to Zw* function
  */
 
-predicate allowedHandleSource(FunctionCall allowedFunction) {
-  (
-    allowedFunction.getTarget() instanceof AllowedHandleDDI or
-    allowedFunction instanceof AllowedHandleRegFuncCall
-  )
-  or
-  exists(DataFlow::Node source, DataFlow::Node sink |
-    IsolationDataFlowNonNullRootDir::flow(source, sink) and
-    sink.asIndirectArgument() = allowedFunction.getAnArgument() and
-    allowedHandleSource(source.asIndirectArgument().getParent+())
-  )
-}
-
-FunctionCall firstCall(FunctionCall fc) {
+FunctionCall nonNullRootDirFlowFirstCall(FunctionCall fc) {
   if
     exists(DataFlow::Node source, DataFlow::Node sink |
       IsolationDataFlowNonNullRootDir::flow(source, sink) and
@@ -94,16 +84,18 @@ FunctionCall firstCall(FunctionCall fc) {
     exists(DataFlow::Node source, DataFlow::Node sink |
       IsolationDataFlowNonNullRootDir::flow(source, sink) and
       fc.getAnArgument() = sink.asIndirectArgument() and
-      result = firstCall(source.asIndirectExpr().getParent+())
+      result = nonNullRootDirFlowFirstCall(source.asIndirectExpr().getParent+())
     )
   else result = fc
 }
 
 from RegistryIsolationFunctionCall fc, FunctionCall sourceFuncCall
 where
-  not allowedHandleSource(fc) and
-  sourceFuncCall = firstCall(fc) and
+  sourceFuncCall = nonNullRootDirFlowFirstCall(fc) and
   zwCall(fc) and
-  fc != sourceFuncCall
-select fc, "Function call $@ uses handle obtained from unapproved DDI $@", fc,
-  fc.getTarget().toString(), sourceFuncCall, sourceFuncCall.toString()
+  fc != sourceFuncCall and
+  not sourceFuncCall.getTarget() instanceof AllowedHandleDDI and
+  not sourceFuncCall instanceof AllowedHandleRegFuncCall
+select fc,
+  "Potential Driver Isolation Violation: Function call $@  uses handle obtained from unapproved DDI",
+  fc, fc.getTarget().toString()
