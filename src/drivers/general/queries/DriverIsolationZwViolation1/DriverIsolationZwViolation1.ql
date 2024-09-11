@@ -95,8 +95,15 @@ where
   sink.asIndirectArgument().getParent*() = fc and
   sourceFuncCall = nonNullRootDirFlowFirstCall(source.asIndirectArgument().getParent*()) and
   zwCall(fc) and
-  not sourceFuncCall.getTarget() instanceof AllowedHandleDDI and
-  not sourceFuncCall instanceof AllowedHandleRegFuncCall
+  (
+    // non-zw* API calls
+    not sourceFuncCall.getTarget() instanceof AllowedHandleDDI and
+    not zwCall(sourceFuncCall)
+    and sourceFuncCall.getTarget().getADeclarationLocation().getFile().toString().matches("%Windows Kits%")
+    or
+    // zw* function calls
+    sourceFuncCall instanceof NotAllowedHandleRegFuncCall
+  )
 select fc,
-  "Potential Driver Isolation Violation: Function call $@ uses handle obtained from unapproved DDI",
-  fc, fc.getTarget().toString()
+  "Potential Driver Isolation Violation: Function call $@ uses handle obtained from unapproved DDI $@",
+  fc, fc.getTarget().toString(), sourceFuncCall, sourceFuncCall.getTarget().toString()
