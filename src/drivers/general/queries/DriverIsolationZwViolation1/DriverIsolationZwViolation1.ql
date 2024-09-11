@@ -51,9 +51,7 @@ module IsolationDataFlowNonNullRootDirConfig implements DataFlow::ConfigSig {
 
   predicate isSink(DataFlow::Node sink) {
     // sink is an argument in a Zw* function call
-    exists(FunctionCall f |
-      sink.asIndirectExpr() = f.getAnArgument()
-    ) and
+    exists(FunctionCall f | sink.asIndirectExpr() = f.getAnArgument()) and
     not isSource(sink)
   }
 }
@@ -89,13 +87,16 @@ FunctionCall nonNullRootDirFlowFirstCall(FunctionCall fc) {
   else result = fc
 }
 
-from RegistryIsolationFunctionCall fc, FunctionCall sourceFuncCall
+from
+  RegistryIsolationFunctionCall fc, FunctionCall sourceFuncCall, DataFlow::Node source,
+  DataFlow::Node sink
 where
-  sourceFuncCall = nonNullRootDirFlowFirstCall(fc) and
+  IsolationDataFlowNonNullRootDir::flow(source, sink) and
+  sink.asIndirectArgument().getParent*() = fc and
+  sourceFuncCall = nonNullRootDirFlowFirstCall(source.asIndirectArgument().getParent*()) and
   zwCall(fc) and
-  fc != sourceFuncCall and
   not sourceFuncCall.getTarget() instanceof AllowedHandleDDI and
   not sourceFuncCall instanceof AllowedHandleRegFuncCall
 select fc,
-  "Potential Driver Isolation Violation: Function call $@  uses handle obtained from unapproved DDI",
+  "Potential Driver Isolation Violation: Function call $@ uses handle obtained from unapproved DDI",
   fc, fc.getTarget().toString()

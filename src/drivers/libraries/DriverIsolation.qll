@@ -180,6 +180,25 @@ class AllowedHandleRegFuncCall extends RegistryIsolationFunctionCall {
   }
 }
 
+class NotAllowedHandleRegFuncCall extends RegistryIsolationFunctionCall {
+  NotAllowedHandleRegFuncCall() {
+    exists(DataFlow::Node source, DataFlow::Node sink |
+      IsolationDataFlowNullRootDir::flow(source, sink) and
+      (
+        // violation if RootDirectory=NULL and writes, even if ObjectName is valid. (Reads are OK)
+        allowedPath(source.asIndirectExpr()) and
+        not pathWriteException(source.asIndirectExpr()) and // this path allowed for now
+        zwWrite(this) // null RootDirectory, valid ObjectName, write
+        or
+        // All other paths are violations for both read and write
+        not allowedPath(source.asIndirectExpr()) and
+        zwCall(this) // null RootDirectory, invalid ObjectName
+      ) and
+      sink.asIndirectArgument().getParent*() = this
+    )
+  }
+}
+
 class AllowedHandleDDI extends Function {
   AllowedHandleDDI() {
     this.getName().matches("IoOpenDeviceRegistryKey") or
