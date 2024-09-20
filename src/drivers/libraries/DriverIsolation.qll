@@ -33,10 +33,18 @@ class ZwRegistryIsolationFunction extends Function {
   }
 }
 
+class WdfRegistryIsolationFunction extends Function {
+  WdfRegistryIsolationFunction() {
+    this.getName().matches("WdfRegistry%") and
+    not this.getName().matches("WdfRegistryClose")
+  }
+}
+
 class RegistryIsolationFunction extends Function {
   RegistryIsolationFunction() {
     this instanceof RtlRegistryIsolationFunction or
-    this instanceof ZwRegistryIsolationFunction
+    this instanceof ZwRegistryIsolationFunction or
+    this instanceof WdfRegistryIsolationFunction
   }
 }
 
