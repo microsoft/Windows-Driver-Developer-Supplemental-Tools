@@ -1,0 +1,9 @@
+name: "CodeQL config"
+disable-default-queries: true
+
+packs:
+  - microsoft/windows-drivers
+queries:
+  - uses: ./src/drivers/general/experimental/DriverIsolationZwViolation1/DriverIsolationZwViolation1.ql
+  - uses: ./src/drivers/general/experimental/DriverIsolationZwViolation2/DriverIsolationZwViolation2.ql
+  - uses: ./src/drivers/general/experimental/DriverIsolationRtlViolation/DriverIsolationRtlViolation.ql
