@@ -4,4 +4,4 @@ disable-default-queries: true
 packs:
   - microsoft/windows-drivers@1.1.0-alpha+3955681
 queries:
-  - uses: ./drivers/general/queries/experimental/DriverIsolationZwViolation1/DriverIsolationZwViolation1.ql
+  - uses: ./
