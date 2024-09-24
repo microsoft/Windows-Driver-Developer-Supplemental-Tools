@@ -4,4 +4,4 @@ disable-default-queries: true
 packs:
   - microsoft/windows-drivers@1.1.0-alpha+3955681
 queries:
-  - uses:  microsoft\windows-drivers\drivers\general\queries\
+  - uses:  .\microsoft\windows-drivers\drivers\general\queries\
