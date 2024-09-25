@@ -1056,6 +1056,9 @@ if __name__ == "__main__":
 
     if args.individual_test:
         ql_files_keys = [x for x in ql_tests if args.individual_test == x.split("\\")[-1].replace(".ql", "")]
+        if not ql_files_keys:
+            print("Invalid test name: " + args.individual_test + " not found") 
+            exit(1)
     elif args.threads:
         ql_files_keys = [x for x in ql_tests]
     elif len(sys.argv) == 1:

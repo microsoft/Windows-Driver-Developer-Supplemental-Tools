@@ -1,0 +1,5 @@
+name: "CodeQL config"
+disable-default-queries: true
+
+packs:
+  - microsoft/windows-drivers@1.2.0-beta:drivers\general\queries\experimental\DriverIsolationZwViolation1\DriverIsolationZwViolation1.ql
