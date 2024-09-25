@@ -15,10 +15,6 @@ void test_rtl_violation_0()
     HANDLE DriverKey = NULL;
     static WCHAR ValueName[] = L"KS", ValueValue[] = L"1";
 
-    // Status = IoOpenDeviceRegistryKey(PhysicalDevice,
-    //                                  PLUGPLAY_REGKEY_DRIVER,
-    //                                  KEY_WRITE,
-    //                                  &DriverKey);
     RtlWriteRegistryValue(RTL_REGISTRY_HANDLE,
                           (PCWSTR)DriverKey,
                           ValueName,
