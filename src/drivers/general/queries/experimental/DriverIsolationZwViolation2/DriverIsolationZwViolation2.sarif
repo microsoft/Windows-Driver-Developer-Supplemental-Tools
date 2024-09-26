@@ -24,13 +24,13 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/TODO",
-          "name" : "cpp/drivers/TODO",
+          "id" : "cpp/drivers/driver-isolation-zw-violation-2",
+          "name" : "cpp/drivers/driver-isolation-zw-violation-2",
           "shortDescription" : {
-            "text" : "TODO"
+            "text" : "Driver Isolation Zw Violation 2"
           },
           "fullDescription" : {
-            "text" : "TODO"
+            "text" : "Driver isolation violation if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with RootDirectory=NULL and invalid OBJECT_ATTRIBUTES->ObjectName, or RootDirectory=NULL and valid OBJECT_ATTRIBUTES->ObjectName but with write access."
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -38,26 +38,25 @@
           },
           "properties" : {
             "tags" : [ "correctness" ],
-            "description" : "TODO",
+            "description" : "Driver isolation violation if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with\n  RootDirectory=NULL and invalid OBJECT_ATTRIBUTES->ObjectName, or RootDirectory=NULL and valid OBJECT_ATTRIBUTES->ObjectName but with write access.",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/TODO",
+            "id" : "cpp/drivers/driver-isolation-zw-violation-2",
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "TODO",
-            "opaqueid" : "CQLD-TODO",
+            "name" : "Driver Isolation Zw Violation 2",
+            "opaqueid" : "CQLD-D0010",
             "owner.email:" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "",
             "scope" : "domainspecific"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "1.0.13+4cf80ade609037becb8999823de45e08bd818a20",
+        "semanticVersion" : "1.2.0+39f0f5d626a18b5c1b5b20dbb92237b59b700643",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/WDDST/src/",
           "description" : {
@@ -78,7 +77,7 @@
             "artifactLocation" : {
               "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+              "index" : 0
             }
           }
         } ],
@@ -101,7 +100,7 @@
             "artifactLocation" : {
               "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+              "index" : 1
             }
           }
         } ],
@@ -146,13 +145,13 @@
     } ],
     "artifacts" : [ {
       "location" : {
-        "uri" : "driver/fail_driver1.c",
+        "uri" : "driver/driver_snippet.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 0
       }
     }, {
       "location" : {
-        "uri" : "driver/driver_snippet.c",
+        "uri" : "driver/fail_driver1.c",
         "uriBaseId" : "%SRCROOT%",
         "index" : 1
       }
@@ -164,32 +163,143 @@
       }
     } ],
     "results" : [ {
-      "ruleId" : "cpp/drivers/TODO",
+      "ruleId" : "cpp/drivers/driver-isolation-zw-violation-2",
       "ruleIndex" : 0,
       "rule" : {
-        "id" : "cpp/drivers/TODO",
+        "id" : "cpp/drivers/driver-isolation-zw-violation-2",
         "index" : 0
       },
       "message" : {
-        "text" : "TODO"
+        "text" : "ZwOpenKey call has parameter of type OBJECT_ATTRIBUTES with NULL RootDirectory field uses an invalid path [invalid](1) for ObjectName field "
       },
       "locations" : [ {
         "physicalLocation" : {
           "artifactLocation" : {
-            "uri" : "driver/fail_driver1.c",
+            "uri" : "driver/driver_snippet.c",
             "uriBaseId" : "%SRCROOT%",
             "index" : 0
           },
           "region" : {
-            "startLine" : 56,
-            "endColumn" : 12
+            "startLine" : 265,
+            "startColumn" : 14,
+            "endColumn" : 23
           }
         }
       } ],
       "partialFingerprints" : {
-        "primaryLocationLineHash" : "60c6386a5ee58eb6:1",
+        "primaryLocationLineHash" : "96ebeab8bd79ddaf:1",
+        "primaryLocationStartColumnFingerprint" : "9"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 275,
+            "startColumn" : 32,
+            "endColumn" : 42
+          }
+        },
+        "message" : {
+          "text" : "invalid"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/driver-isolation-zw-violation-2",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/driver-isolation-zw-violation-2",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "ZwOpenKey call has parameter of type OBJECT_ATTRIBUTES with NULL RootDirectory field uses a valid path [\\Registry\\Machine\\Hardware\\DeviceMap\\Scsi\\Scsi Port %d\\Scsi Bus %d\\Target Id %d\\Logical Unit Id %d](1) for ObjectName field, but is a Driver Isolation Violation due to having write access "
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 164,
+            "startColumn" : 14,
+            "endColumn" : 23
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "3753272b5a4a918d:1",
+        "primaryLocationStartColumnFingerprint" : "9"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 141,
+            "startColumn" : 34,
+            "endColumn" : 143
+          }
+        },
+        "message" : {
+          "text" : "\\Registry\\Machine\\Hardware\\DeviceMap\\Scsi\\Scsi Port %d\\Scsi Bus %d\\Target Id %d\\Logical Unit Id %d"
+        }
+      } ]
+    }, {
+      "ruleId" : "cpp/drivers/driver-isolation-zw-violation-2",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/driver-isolation-zw-violation-2",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "ZwOpenKey call has parameter of type OBJECT_ATTRIBUTES with NULL RootDirectory field uses an invalid path [\\some\\bad\\path\\test\\test.txt](1) for ObjectName field "
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 37,
+            "startColumn" : 5,
+            "endColumn" : 14
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "3b681a6745eb1858:1",
         "primaryLocationStartColumnFingerprint" : "0"
-      }
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 35,
+            "startColumn" : 41,
+            "endColumn" : 77
+          }
+        },
+        "message" : {
+          "text" : "\\some\\bad\\path\\test\\test.txt"
+        }
+      } ]
     } ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {

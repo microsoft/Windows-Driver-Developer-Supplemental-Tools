@@ -873,13 +873,11 @@ def compare_health_results(curr_results_path):
         upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
                                     file_name="diff" + curr_results_path, file_directory="")
         
-        # we only care about differences if we aren't overwriting the results
-        if not all(diff_results.isnull().all()) :
-            print("Differences found in results!")
-            exit(1)
-        else:
-            print("No differences found in results")
-            
+    if not all(diff_results.isnull().all()) :
+        print("Differences found in results!")
+        exit(1)
+    else:
+        print("No differences found in results")
     # delete downloaded file
     os.remove(prev_results)
     print_conditionally("Deleted previous results")

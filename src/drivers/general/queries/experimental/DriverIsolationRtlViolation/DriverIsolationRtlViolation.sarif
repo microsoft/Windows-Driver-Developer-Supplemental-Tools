@@ -24,13 +24,13 @@
           }
         } ],
         "rules" : [ {
-          "id" : "cpp/drivers/TODO",
-          "name" : "cpp/drivers/TODO",
+          "id" : "cpp/drivers/driver-isolation-rtl-violation",
+          "name" : "cpp/drivers/driver-isolation-rtl-violation",
           "shortDescription" : {
-            "text" : "TODO"
+            "text" : "Driver Isolation Rtl Violation"
           },
           "fullDescription" : {
-            "text" : "TODO"
+            "text" : "Driver isolation violation if there is an Rtl* registry function call with with a RelativeTo parameter != RTL_REGISTRY_DEVICEMAP or a RelativeTo parameter == RTL_REGISTRY_DEVICEMAP and writes to registry (reads are OK)"
           },
           "defaultConfiguration" : {
             "enabled" : true,
@@ -38,26 +38,25 @@
           },
           "properties" : {
             "tags" : [ "correctness" ],
-            "description" : "TODO",
+            "description" : "Driver isolation violation if there is an Rtl* registry function call with with a RelativeTo parameter != RTL_REGISTRY_DEVICEMAP\n or a RelativeTo parameter == RTL_REGISTRY_DEVICEMAP and writes to registry (reads are OK)",
             "feature.area" : "Multiple",
-            "id" : "cpp/drivers/TODO",
+            "id" : "cpp/drivers/driver-isolation-rtl-violation",
             "impact" : "Insecure Coding Practice",
             "kind" : "problem",
-            "name" : "TODO",
-            "opaqueid" : "CQLD-TODO",
+            "name" : "Driver Isolation Rtl Violation",
+            "opaqueid" : "CQLD-D0008",
             "owner.email:" : "sdat@microsoft.com",
             "platform" : "Desktop",
             "precision" : "medium",
             "problem.severity" : "warning",
             "query-version" : "v1",
-            "repro.text" : "",
             "scope" : "domainspecific"
           }
         } ]
       },
       "extensions" : [ {
         "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "1.0.13+4cf80ade609037becb8999823de45e08bd818a20",
+        "semanticVersion" : "1.2.0+39f0f5d626a18b5c1b5b20dbb92237b59b700643",
         "locations" : [ {
           "uri" : "file:///C:/codeql-home/WDDST/src/",
           "description" : {
@@ -76,9 +75,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
+              "uri" : "driver/fail_driver1.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+              "index" : 0
             }
           }
         } ],
@@ -99,9 +98,9 @@
         "locations" : [ {
           "physicalLocation" : {
             "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
+              "uri" : "driver/driver_snippet.c",
               "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+              "index" : 1
             }
           }
         } ],
@@ -163,34 +162,7 @@
         "index" : 2
       }
     } ],
-    "results" : [ {
-      "ruleId" : "cpp/drivers/TODO",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/drivers/TODO",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "TODO"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/fail_driver1.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 56,
-            "endColumn" : 12
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "60c6386a5ee58eb6:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    } ],
+    "results" : [ ],
     "columnKind" : "utf16CodeUnits",
     "properties" : {
       "semmle.formatSpecifier" : "sarifv2.1.0"
