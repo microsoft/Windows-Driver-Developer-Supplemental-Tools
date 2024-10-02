@@ -1,0 +1,171 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.15.4",
+        "notifications" : [ {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "name" : "cpp/baseline/expected-extracted-files",
+          "shortDescription" : {
+            "text" : "Expected extracted files"
+          },
+          "fullDescription" : {
+            "text" : "Files appearing in the source archive that are expected to be extracted."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          },
+          "properties" : {
+            "tags" : [ "expected-extracted-files", "telemetry" ]
+          }
+        } ],
+        "rules" : [ {
+          "id" : "cpp/drivers/driver-isolation-zw-violation-1",
+          "name" : "cpp/drivers/driver-isolation-zw-violation-1",
+          "shortDescription" : {
+            "text" : "Driver Isolation Zw Violation 1"
+          },
+          "fullDescription" : {
+            "text" : "Driver isolation violation if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with RootDirectory!=NULL and the handle specified in RootDirectory comes from an unapproved ddi."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "correctness" ],
+            "description" : "Driver isolation violation if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with\n  RootDirectory!=NULL and the handle specified in RootDirectory comes from an unapproved ddi.",
+            "feature.area" : "Multiple",
+            "id" : "cpp/drivers/driver-isolation-zw-violation-1",
+            "impact" : "Insecure Coding Practice",
+            "kind" : "problem",
+            "name" : "Driver Isolation Zw Violation 1",
+            "opaqueid" : "CQLD-D0009",
+            "owner.email:" : "sdat@microsoft.com",
+            "platform" : "Desktop",
+            "precision" : "medium",
+            "problem.severity" : "warning",
+            "query-version" : "v1",
+            "scope" : "domainspecific"
+          }
+        } ]
+      },
+      "extensions" : [ {
+        "name" : "microsoft/windows-drivers",
+        "semanticVersion" : "1.2.0+39f0f5d626a18b5c1b5b20dbb92237b59b700643",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/WDDST/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/WDDST/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      } ]
+    },
+    "invocations" : [ {
+      "toolExecutionNotifications" : [ {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 1
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      } ],
+      "executionSuccessful" : true
+    } ],
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 1
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 2
+      }
+    } ],
+    "results" : [ ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}

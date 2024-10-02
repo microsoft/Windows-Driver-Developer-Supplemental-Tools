@@ -97,7 +97,8 @@ cached
 class IrqlFunctionAnnotation extends SALAnnotation {
   string irqlLevel;
   string irqlAnnotationName;
-
+  string innerAnnotationName;
+  string fullInnerAnnotationString;
   cached
   IrqlFunctionAnnotation() {
     (
@@ -109,22 +110,68 @@ class IrqlFunctionAnnotation extends SALAnnotation {
           "_IRQL_always_function_min_"
         ] and
       irqlLevel = this.getUnexpandedArgument(0)
+      and innerAnnotationName = this.getMacroName()
+      and fullInnerAnnotationString = this.getMacroName()+ "(" + irqlLevel + ")"
       or
       // Special case: _IRQL_saves_ annotations can apply to a whole function,
       // but do not have an associated IRQL value.
       this.getMacroName() = ["__drv_savesIRQL", "_IRQL_saves_"] and
       irqlLevel = "NA_IRQL_SAVES"
+      and innerAnnotationName = this.getMacroName()
+      and fullInnerAnnotationString = this.getMacroName()+ "(" + irqlLevel + ")"
+      // // Conditional IRQL annotations within a _When_ annotation
+      or
+      this.getMacroName() = ["_When_"] and
+      fullInnerAnnotationString = this.getUnexpandedArgument(1).toString() and
+      (
+        fullInnerAnnotationString.matches("__drv_requiresIRQL%") and
+        innerAnnotationName = "__drv_requiresIRQL"
+        or
+        fullInnerAnnotationString.matches("_IRQL_requires_%") and
+        innerAnnotationName = "_IRQL_requires_"
+        or
+        fullInnerAnnotationString.matches("_drv_minIRQL%") and
+        innerAnnotationName = "_drv_minIRQL"
+        or
+        fullInnerAnnotationString.matches("_drv_maxIRQL%") and
+        innerAnnotationName = "_drv_maxIRQL"
+        or
+        fullInnerAnnotationString.matches("_IRQL_requires_max_%") and
+        innerAnnotationName = "_IRQL_requires_max_"
+        or
+        fullInnerAnnotationString.matches("_IRQL_raises_%") and
+        innerAnnotationName = "_IRQL_raises_"
+        or
+        fullInnerAnnotationString.matches("__drv_maxFunctionIRQL%") and
+        innerAnnotationName = "__drv_maxFunctionIRQL"
+        or
+        fullInnerAnnotationString.matches("_IRQL_always_function_max_%") and
+        innerAnnotationName = "_IRQL_always_function_max_"
+        or
+        fullInnerAnnotationString.matches("__drv_minFunctionIRQL%") and
+        innerAnnotationName = "__drv_minFunctionIRQL"
+        or
+        fullInnerAnnotationString.matches("_IRQL_always_function_min_%") and
+        innerAnnotationName = "_IRQL_always_function_min_"
+      )
+      and irqlLevel =  fullInnerAnnotationString
+      .substring(fullInnerAnnotationString.indexOf(innerAnnotationName + "(") + 1 + innerAnnotationName.length(),
+        fullInnerAnnotationString.indexOf(")", 0, fullInnerAnnotationString.indexOf(innerAnnotationName + "(") + 1 + innerAnnotationName.length()))
     ) and
     irqlAnnotationName = this.getMacroName()
   }
-
+ 
   /** Returns the raw text of the IRQL value used in this annotation. */
-  cached
-  string getIrqlLevelString() { result = irqlLevel }
 
   /** Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.) */
   cached
-  string getIrqlMacroName() { result = irqlAnnotationName }
+  string getIrqlMacroName() {if this.getMacroName() = ["_When_"] then result = innerAnnotationName
+  else result = irqlAnnotationName }
+  
+  cached
+  string getIrqlLevelString() {
+     result = irqlLevel
+  }
 
   /**
    * Evaluate the IRQL specified in this annotation, if possible.
@@ -154,6 +201,7 @@ class IrqlFunctionAnnotation extends SALAnnotation {
   }
 }
 
+
 /** Represents an "\_IRQL\_requires\_same\_" annotation. */
 class IrqlSameAnnotation extends SALAnnotation {
   string irqlAnnotationName;
@@ -168,35 +216,35 @@ class IrqlSameAnnotation extends SALAnnotation {
 
 /** An "\_IRQL\_requires\_max\_" annotation. */
 class IrqlMaxAnnotation extends IrqlFunctionAnnotation {
-  IrqlMaxAnnotation() { this.getMacroName() = ["_drv_maxIRQL", "_IRQL_requires_max_"] }
+  IrqlMaxAnnotation() { this.getIrqlMacroName() = ["_drv_maxIRQL", "_IRQL_requires_max_"] }
 }
 
 /** An "\_IRQL\_raises\_" annotation. */
 class IrqlRaisesAnnotation extends IrqlFunctionAnnotation {
-  IrqlRaisesAnnotation() { this.getMacroName() = ["__drv_raisesIRQL", "_IRQL_raises_"] }
+  IrqlRaisesAnnotation() { this.getIrqlMacroName() = ["__drv_raisesIRQL", "_IRQL_raises_"] }
 }
 
 /** An "\_IRQL\_requires\_min\_" annotation. */
 class IrqlMinAnnotation extends IrqlFunctionAnnotation {
-  IrqlMinAnnotation() { this.getMacroName() = ["_drv_minIRQL", "_IRQL_requires_min_"] }
+  IrqlMinAnnotation() { this.getIrqlMacroName() = ["_drv_minIRQL", "_IRQL_requires_min_"] }
 }
 
 /** An "\_IRQL\_requires\_" annotation. */
 class IrqlRequiresAnnotation extends IrqlFunctionAnnotation {
-  IrqlRequiresAnnotation() { this.getMacroName() = ["__drv_requiresIRQL", "_IRQL_requires_"] }
+  IrqlRequiresAnnotation() { this.getIrqlMacroName() = ["__drv_requiresIRQL", "_IRQL_requires_"] }
 }
 
 /** An "\_IRQL\_always\_function\_max\_" annotation. */
 class IrqlAlwaysMaxAnnotation extends IrqlFunctionAnnotation {
   IrqlAlwaysMaxAnnotation() {
-    this.getMacroName() = ["__drv_maxFunctionIRQL", "_IRQL_always_function_max_"]
+    this.getIrqlMacroName() = ["__drv_maxFunctionIRQL", "_IRQL_always_function_max_"]
   }
 }
 
 /** An "\_IRQL\_always\_function\_min\_" annotation. */
 class IrqlAlwaysMinAnnotation extends IrqlFunctionAnnotation {
   IrqlAlwaysMinAnnotation() {
-    this.getMacroName() = ["__drv_minFunctionIRQL", "_IRQL_always_function_min_"]
+    this.getIrqlMacroName() = ["__drv_minFunctionIRQL", "_IRQL_always_function_min_"]
   }
 }
 
@@ -232,7 +280,7 @@ class IrqlRestoreAnnotation extends IrqlParameterAnnotation {
  * - If applied to a parameter, the function saves the IRQL to the parameter.
  */
 class IrqlSaveAnnotation extends IrqlFunctionAnnotation {
-  IrqlSaveAnnotation() { this.getMacroName() = ["__drv_savesIRQL", "_IRQL_saves_"] }
+  IrqlSaveAnnotation() { this.getIrqlMacroName() = ["__drv_savesIRQL", "_IRQL_saves_"] }
 }
 
 /** A parameter that is annotated with "\_IRQL\_restores\_". */
@@ -673,7 +721,7 @@ int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
                       cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
                       getAllowableIrqlLevel(cfn.getControlFlowScope()) != -1
                     then result = getAllowableIrqlLevel(cfn.getControlFlowScope())
-                    else result = 0
+                    else result = -123
 }
 
 import semmle.code.cpp.controlflow.Dominance

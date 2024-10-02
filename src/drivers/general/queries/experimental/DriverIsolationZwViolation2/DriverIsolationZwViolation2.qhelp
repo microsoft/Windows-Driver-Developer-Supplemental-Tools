@@ -1,0 +1,55 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		A driver isolation violation occurs if there is a Zw* registry function call with OBJECT_ATTRIBUTES parameter passed to it with RootDirectory=NULL and invalid OBJECT_ATTRIBUTES->ObjectName, or RootDirectory=NULL and valid OBJECT_ATTRIBUTES->ObjectName but with write access.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			For Zw* registry function calls where the OBJECT_ATTRIBUTES parameter passed to it has RootDirectory=NULL, the OBJECT_ATTRIBUTES->ObjectName value should start with L"\\Registry\\Machine\\Hardware and only read.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			Example of a driver isolation violation where the OBJECT_ATTRIBUTES->ObjectName value is invalid
+		</p>
+		<sample language="c"> <![CDATA[
+		RtlInitUnicodeString(&RegistryKeyName, L"\\Registry\\Machine\\Software\\Microsoft\\wtt\\MachineConfig");
+    	InitializeObjectAttributes(&ObjectAttributes,
+                               &RegistryKeyName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               NULL,    // handle
+                               NULL);
+
+    	ntstatus = ZwOpenKey(&handleRegKey, KEY_READ, &ObjectAttributes);
+		}]]>
+		</sample>
+		<p>
+			Example of a driver isolation violation where the OBJECT_ATTRIBUTES->ObjectName value is valid but with write access
+		</p>
+		<sample language="c"> <![CDATA[
+		RtlInitUnicodeString(&RegistryKeyName, L"\\Registry\\Machine\\Hardware\\Microsoft\\wtt\\MachineConfig");
+    	InitializeObjectAttributes(&ObjectAttributes,
+                               &RegistryKeyName,
+                               OBJ_CASE_INSENSITIVE | OBJ_KERNEL_HANDLE,
+                               NULL,    // handle
+                               NULL);
+
+    	ntstatus = ZwOpenKey(&handleRegKey, KEY_ALL_ACCESS, &ObjectAttributes);
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+			
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation">
+				Driver package isolation
+			</a>
+		</li>
+	</references>
+</qhelp>

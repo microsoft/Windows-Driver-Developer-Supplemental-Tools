@@ -873,7 +873,7 @@ def compare_health_results(curr_results_path):
         upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
                                     file_name="diff" + curr_results_path, file_directory="")
         
-    if not all(diff_results.isnull().all()):
+    if not all(diff_results.isnull().all()) :
         print("Differences found in results!")
         exit(1)
     else:
@@ -986,7 +986,14 @@ if __name__ == "__main__":
     parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False,)
     args = parser.parse_args()
     
-
+    if args.overwrite_azure_results:
+        print("Overwriting Azure results")
+        print("Type 'yes' to confirm")
+        confirm = input()
+        if confirm != "yes":
+            print("Exiting")
+            exit(1)
+            
     if args.codeql_path:
         codeql_path = args.codeql_path
     else:
@@ -1056,6 +1063,9 @@ if __name__ == "__main__":
 
     if args.individual_test:
         ql_files_keys = [x for x in ql_tests if args.individual_test == x.split("\\")[-1].replace(".ql", "")]
+        if not ql_files_keys:
+            print("Invalid test name: " + args.individual_test + " not found") 
+            exit(1)
     elif args.threads:
         ql_files_keys = [x for x in ql_tests]
     elif len(sys.argv) == 1:
