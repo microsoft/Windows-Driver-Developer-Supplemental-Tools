@@ -1,27 +1,44 @@
 import cpp
 import RoleTypes
+
 /*
-Functions called by the OS and not directly from the driver code
-*/
+ * Functions called by the OS and not directly from the driver code
+ */
+
 class OsCalledFunction extends Function {
-    OsCalledFunction() {
-        this.getName().matches("OsCalledFunction")
-        or
-        this instanceof RoleTypeFunction
-    }
+  OsCalledFunction() {
+    this.getName().matches("OsCalledFunction")
+    or
+    this instanceof RoleTypeFunction
+  }
 }
 
 class OSFunctionCallEdges extends AdditionalControlFlowEdge {
-    OSFunctionCallEdges() { exists(OsCalledFunction f | mkElement(this) = f.getControlFlowScope()) }
-  
-    override ControlFlowNode getAnEdgeTarget() {
-      exists(OsCalledFunction f |
-        result = f.getEntryPoint() and
-        not f.getControlFlowScope() = mkElement(this) and 
-        not f.getName().matches("DriverEntry") and // driver entry called first, so don't want it to be a target of an edge
-        not f instanceof WdmAddDevice // Add called first, so don't want it to be a target of an edge
-      )
-    }
+  OSFunctionCallEdges() { exists(OsCalledFunction f | mkElement(this) = f.getControlFlowScope()) }
+
+  override ControlFlowNode getAnEdgeTarget() {
+    exists(OsCalledFunction f |
+      result = f.getEntryPoint() and
+      not f.getControlFlowScope() = mkElement(this) and
+      not f.getName().matches("DriverEntry") and // driver entry called first, so don't want it to be a target of an edge
+      not f instanceof WdmAddDevice // Add called first, so don't want it to be a target of an edge
+    )
+  }
+}
+
+//Allow edges to be created from DriverEntry to AddDevice
+class OSFunctionCallEdges2 extends AdditionalControlFlowEdge {
+  OSFunctionCallEdges2() {
+    exists(OsCalledFunction f | mkElement(this) = f.getControlFlowScope() |
+      f.getName().matches("DriverEntry")
+    )
   }
 
-  
+  override ControlFlowNode getAnEdgeTarget() {
+    exists(OsCalledFunction f |
+      result = f.getEntryPoint() and
+      not f.getControlFlowScope() = mkElement(this) and
+      f instanceof WdmAddDevice
+    )
+  }
+}
