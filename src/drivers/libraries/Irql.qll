@@ -17,6 +17,7 @@ import drivers.libraries.SAL
 import drivers.wdm.libraries.WdmDrivers
 import drivers.libraries.IrqlDataFlow
 import drivers.libraries.Page
+import drivers.libraries.RoleTypes
 
 /**
  * A macro in wdm.h that represents an IRQL level,
@@ -322,6 +323,11 @@ class IrqlRestrictsFunction extends Function {
       fde.getFunction() = this and
       fde.getTypedefType().(IrqlAnnotatedTypedef).getIrqlAnnotation() = irqlAnnotation
     )
+    or
+    exists(ImplicitRoleTypeFunction irtf | 
+      irtf = this and
+      irtf.getExpectedRoleTypeType().(IrqlAnnotatedTypedef).getIrqlAnnotation() = irqlAnnotation
+      )
   }
 
   cached
@@ -669,6 +675,7 @@ private predicate exprsMatchText(Expr e1, Expr e2) {
  */
 cached
 int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
+  cfn.getLocation().getFile().toString().matches("%fail_driver%") and 
   if cfn instanceof KeRaiseIrqlCall
   then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
   else
@@ -721,7 +728,7 @@ int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
                       cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
                       getAllowableIrqlLevel(cfn.getControlFlowScope()) != -1
                     then result = getAllowableIrqlLevel(cfn.getControlFlowScope())
-                    else result = -123
+                    else result = 0
 }
 
 import semmle.code.cpp.controlflow.Dominance
