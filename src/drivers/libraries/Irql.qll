@@ -721,7 +721,7 @@ int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
                       cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
                       getAllowableIrqlLevel(cfn.getControlFlowScope()) != -1
                     then result = getAllowableIrqlLevel(cfn.getControlFlowScope())
-                    else result = -1
+                    else result = 0
 }
 
 import semmle.code.cpp.controlflow.Dominance
