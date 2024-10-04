@@ -675,7 +675,6 @@ private predicate exprsMatchText(Expr e1, Expr e2) {
  */
 cached
 int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
-  cfn.getLocation().getFile().toString().matches("%fail_driver%") and 
   if cfn instanceof KeRaiseIrqlCall
   then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
   else
