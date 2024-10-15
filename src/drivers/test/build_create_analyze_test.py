@@ -1062,7 +1062,7 @@ if __name__ == "__main__":
         # TODO doesn't work with --external_drivers
 
     if args.individual_test:
-        ql_files_keys = [x for x in ql_tests if args.individual_test == x.split("\\")[-1].replace(".ql", "")]
+        ql_files_keys = [x for x in ql_tests if args.individual_test in x.split("\\")[-1]]
         if not ql_files_keys:
             print("Invalid test name: " + args.individual_test + " not found") 
             exit(1)
