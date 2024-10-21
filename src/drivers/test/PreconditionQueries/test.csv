@@ -1,0 +1,3 @@
+"PreconditionTest1","TODO_description","warning","DriverEntry","/fail_driver1.c","56","1","56","11"
+"PreconditionTest2","TODO_description2","warning","DriverAddDevice","/fail_driver1.c","95","1","95","15"
+"PreconditionTest2","TODO_description2","warning","DriverEntry","/fail_driver1.c","56","1","56","11"

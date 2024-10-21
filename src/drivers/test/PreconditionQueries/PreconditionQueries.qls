@@ -1,0 +1,7 @@
+- description: Precondition Queries
+- queries: .
+  from: microsoft/windows-drivers
+- include:
+    query path: 
+      - drivers/test/PreconditionQueries/Precondition.ql
+      - drivers/test/PreconditionQueries/Precondition2.ql
