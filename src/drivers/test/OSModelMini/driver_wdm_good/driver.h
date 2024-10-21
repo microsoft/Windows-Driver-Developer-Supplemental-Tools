@@ -4,7 +4,7 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 
 Module Name:
 
-    fail_driver1.h
+    driver.h
 
 Environment:
 
@@ -51,35 +51,36 @@ typedef struct _DRIVER_DEVICE_EXTENSION
 }
 DRIVER_DEVICE_EXTENSION,*PDRIVER_DEVICE_EXTENSION;
 
+
 #ifdef __cplusplus
 extern "C"
 #endif
 
-DRIVER_INITIALIZE DriverEntry;
+DRIVER_INITIALIZE DriverEntry_good;
 
 
-DRIVER_ADD_DEVICE DriverAddDevice;
+DRIVER_ADD_DEVICE DriverAddDevice_good;
 
 
 _Dispatch_type_(IRP_MJ_POWER)
-DRIVER_DISPATCH DispatchPower; 
+DRIVER_DISPATCH DispatchPower_good;
 
 _Dispatch_type_(IRP_MJ_PNP)
-DRIVER_DISPATCH DispatchPnp;
+DRIVER_DISPATCH DispatchPnp_good;
 
 _Dispatch_type_(IRP_MJ_SYSTEM_CONTROL)
-DRIVER_DISPATCH DispatchSystemControl;
+DRIVER_DISPATCH DispatchSystemControl_good;
 
 
-IO_COMPLETION_ROUTINE CompletionRoutine;
+IO_COMPLETION_ROUTINE CompletionRoutine_good;
 
-KSERVICE_ROUTINE InterruptServiceRoutine;
+KSERVICE_ROUTINE InterruptServiceRoutine_good;
 
-IO_DPC_ROUTINE DpcForIsrRoutine;
+IO_DPC_ROUTINE DpcForIsrRoutine_good;
 
-DRIVER_UNLOAD DriverUnload;
-DRIVER_STARTIO StartIo;
-DRIVER_DISPATCH DeviceControl; // not used
-DRIVER_DISPATCH InternalDeviceControl;
-DRIVER_CONTROL FailDriverControllerRoutine;
+DRIVER_UNLOAD DriverUnload_good;
+DRIVER_STARTIO StartIo_good;
+DRIVER_DISPATCH DeviceControl_good; // not used
+DRIVER_DISPATCH InternalDeviceControl_good;
+DRIVER_CONTROL FailDriverControllerRoutine_good;
 

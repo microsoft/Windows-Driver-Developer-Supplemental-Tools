@@ -1,0 +1,1 @@
+codeql database create e:\databases\os_model_wdm_all --language=cpp --source-root=C:\codeql-home\WDDST\src\drivers\test\OSModelMini\ --command="msbuild /t:rebuild /p:Configuration=Debug /p:Platform=x64 C:\codeql-home\WDDST\src\drivers\test\OSModelMini\OsModelMini.sln" --overwrite

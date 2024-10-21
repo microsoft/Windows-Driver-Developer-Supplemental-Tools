@@ -4,7 +4,7 @@ Copyright (c) Microsoft Corporation.  All rights reserved.
 
 Module Name:
 
-    fail_driver1.c
+    driver.c
 
 Abstract:
 
@@ -21,53 +21,53 @@ Environment:
 
 --*/
 
-#include "fail_driver1.h"
+#include "driver.h"
 #include "driver_snippet.c"
 
 
-#define _DRIVER_NAME_ "fail_driver1"
+#define _DRIVER_NAME_ "driver"
 
 #define PAGED_CODE_SEG __declspec(code_seg("PAGE"))
 #define TAG (ULONG)'TAG1'
 
 #if SET_DISPATCH == 1
 _Dispatch_type_(IRP_MJ_PNP)
-DRIVER_DISPATCH DispatchPnp;
+DRIVER_DISPATCH DispatchPnp_good;
 _Dispatch_type_(IRP_MJ_CREATE)
-DRIVER_DISPATCH DispatchCreate;
+DRIVER_DISPATCH DispatchCreate_good;
 _Dispatch_type_(IRP_MJ_READ)
-DRIVER_DISPATCH DispatchRead;
+DRIVER_DISPATCH DispatchRead_good;
 #endif
 
 const ULONG myTag = '_gaT';
 
 #ifndef __cplusplus
-#pragma alloc_text (INIT, DriverEntry)
-#pragma alloc_text (PAGE, DriverAddDevice)
+#pragma alloc_text (INIT, DriverEntry_good)
+#pragma alloc_text (PAGE, DriverAddDevice_good)
 #ifndef SET_CUSTOM_CREATE
-#pragma alloc_text (PAGE, DispatchCreate)
+#pragma alloc_text (PAGE, DispatchCreate_good)
 #endif
-#pragma alloc_text (PAGE, DispatchRead)
-#pragma alloc_text (PAGE, DispatchPnp)
+#pragma alloc_text (PAGE, DispatchRead_good)
+#pragma alloc_text (PAGE, DispatchPnp_good)
 #endif
  PCONTROLLER_OBJECT ControllerObject;
 PKTIMER       Timer;
 
 NTSTATUS
-DriverEntry(
+DriverEntry_good(
     PDRIVER_OBJECT  DriverObject,
     PUNICODE_STRING RegistryPath
 )
 {
 
     UNREFERENCED_PARAMETER(RegistryPath);
-    DriverObject->MajorFunction[IRP_MJ_CREATE] = (PDRIVER_DISPATCH)DispatchCreate;
-    DriverObject->MajorFunction[IRP_MJ_READ] = (PDRIVER_DISPATCH)DispatchRead;
-    DriverObject->MajorFunction[IRP_MJ_POWER] = (PDRIVER_DISPATCH)DispatchPower;
-    DriverObject->MajorFunction[IRP_MJ_SYSTEM_CONTROL] = DispatchSystemControl;
-    DriverObject->MajorFunction[IRP_MJ_PNP] = (PDRIVER_DISPATCH)DispatchPnp;
-    DriverObject->MajorFunction[IRP_MJ_INTERNAL_DEVICE_CONTROL] = InternalDeviceControl;
-    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = DeviceControl;
+    DriverObject->MajorFunction[IRP_MJ_CREATE] = (PDRIVER_DISPATCH)DispatchCreate_good;
+    DriverObject->MajorFunction[IRP_MJ_READ] = (PDRIVER_DISPATCH)DispatchRead_good;
+    DriverObject->MajorFunction[IRP_MJ_POWER] = (PDRIVER_DISPATCH)DispatchPower_good;
+    DriverObject->MajorFunction[IRP_MJ_SYSTEM_CONTROL] = DispatchSystemControl_good;
+    DriverObject->MajorFunction[IRP_MJ_PNP] = (PDRIVER_DISPATCH)DispatchPnp_good;
+    DriverObject->MajorFunction[IRP_MJ_INTERNAL_DEVICE_CONTROL] = InternalDeviceControl_good;
+    DriverObject->MajorFunction[IRP_MJ_DEVICE_CONTROL] = DeviceControl_good;
 
 #if SET_DISPATCH == 0
     DriverObject->MajorFunction[IRP_MN_CANCEL_REMOVE_DEVICE] =
@@ -83,9 +83,9 @@ DriverEntry(
     DriverObject->MajorFunction[IRP_MJ_CLEANUP] = (PDRIVER_DISPATCH)DispatchCleanup;
     DriverObject->MajorFunction[IRP_MJ_SHUTDOWN] = (PDRIVER_DISPATCH)DispatchShutdown;
 #endif
-    DriverObject->DriverStartIo = StartIo;
-    DriverObject->DriverExtension->AddDevice = DriverAddDevice;
-    DriverObject->DriverUnload = DriverUnload;
+    DriverObject->DriverStartIo = StartIo_good;
+    DriverObject->DriverExtension->AddDevice = DriverAddDevice_good;
+    DriverObject->DriverUnload = DriverUnload_good;
 
     return STATUS_SUCCESS;
 }
@@ -93,7 +93,7 @@ DriverEntry(
 //This routine represents a failing case for NoPagedCode
 _Use_decl_annotations_
 NTSTATUS
-DriverAddDevice(
+DriverAddDevice_good(
     PDRIVER_OBJECT DriverObject,
     PDEVICE_OBJECT PhysicalDeviceObject
 )
@@ -108,43 +108,49 @@ DriverAddDevice(
 
     PAGED_CODE();
 
+    PDEVICE_OBJECT FdoDevice;
+    PDEVICE_OBJECT PdoDevice;
+
+    PDRIVER_DEVICE_EXTENSION FdoExtension;
+    PDRIVER_DEVICE_EXTENSION PdoExtension;
+
+
+    UNREFERENCED_PARAMETER(DriverObject);
+    UNREFERENCED_PARAMETER(PhysicalDeviceObject);
+
+
     status = IoCreateDevice(DriverObject,
         sizeof(DRIVER_DEVICE_EXTENSION),
         NULL,
         FILE_DEVICE_DISK,
         0,
         FALSE,
-        &device
+        &FdoDevice
     );
-    if (status == STATUS_SUCCESS)
-    {
 
-        extension = (PDRIVER_DEVICE_EXTENSION)(device->DeviceExtension);
-
-        TopOfStack = IoAttachDeviceToDeviceStack(
-            device,
-            PhysicalDeviceObject);
-
-        if (NULL == TopOfStack)
-        {
-            IoDeleteDevice(device);
-            return STATUS_DEVICE_REMOVED;
-        }
-
-        // MultRemoveLock injected defect
-
-        IoInitializeRemoveLock(&extension->RemoveLock, TAG, 0, 0);
-        IoInitializeRemoveLock(&extension->RemoveLock2, TAG, 0, 0);
-
-        status = IoAcquireRemoveLock(&extension->RemoveLock, device);
-        status = IoAcquireRemoveLock(&extension->RemoveLock2, device);
-
-        IoInitializeDpcRequest(device, DpcForIsrRoutine);
-
-        device->Flags &= ~DO_DEVICE_INITIALIZING;
+    status = IoCreateDevice(DriverObject,
+        sizeof(PDRIVER_DEVICE_EXTENSION),
+        NULL,
+        FILE_DEVICE_DISK,
+        0,
+        FALSE,
+        &PdoDevice
+    );
 
 
-    }
+    FdoExtension = (PDRIVER_DEVICE_EXTENSION)(FdoDevice->DeviceExtension);
+    PdoExtension = (PDRIVER_DEVICE_EXTENSION)(PdoDevice->DeviceExtension);
+
+    __analysis_assume((&FdoExtension->RemoveLock) == (&PdoExtension->RemoveLock));
+    status = IoAcquireRemoveLock(&FdoExtension->RemoveLock, FdoDevice);
+    status = IoAcquireRemoveLock(&PdoExtension->RemoveLock, PdoDevice);
+
+
+    IoInitializeDpcRequest(PdoDevice, DpcForIsrRoutine_good);
+
+    PdoDevice->Flags &= ~DO_DEVICE_INITIALIZING;
+
+
     KeInitializeTimer(Timer);
 
     return status;
@@ -153,7 +159,7 @@ DriverAddDevice(
 #ifndef SET_CUSTOM_CREATE
 _Use_decl_annotations_
 NTSTATUS
-DispatchCreate(
+DispatchCreate_good(
     PDEVICE_OBJECT DeviceObject,
     PIRP Irp
 )
@@ -178,7 +184,7 @@ DispatchCreate(
     ProcessorMask = (KAFFINITY)1;
 
     IoConnectInterrupt(&extension->InterruptObject,
-        InterruptServiceRoutine,
+        InterruptServiceRoutine_good,
         extension,
         NULL,
         extension->ControllerVector,
@@ -212,7 +218,7 @@ DispatchCancel(
 
 _Use_decl_annotations_
 NTSTATUS
-DispatchRead(
+DispatchRead_good(
     PDEVICE_OBJECT DeviceObject,
     PIRP Irp
 )
@@ -244,7 +250,7 @@ HelperRoutine1(
 }
 _Use_decl_annotations_
 NTSTATUS
-DispatchPower(
+DispatchPower_good(
     PDEVICE_OBJECT DeviceObject,
     PIRP Irp
 )
@@ -256,13 +262,12 @@ DispatchPower(
 
     if (NT_SUCCESS(status))
     {
-        // Injected defect for DoubleCompletion rule
-        HelperRoutine1(Irp);
+        // no Injected defect for DoubleCompletion rule
+        // HelperRoutine1(Irp);
         goto cleanup;
     }
 
 cleanup:
-    // Injected defect for DoubleCompletion rule
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
     return STATUS_SUCCESS;
 }
@@ -270,7 +275,7 @@ cleanup:
 PAGED_CODE_SEG
 _Use_decl_annotations_
 NTSTATUS
-DispatchSystemControl(
+DispatchSystemControl_good(
     PDEVICE_OBJECT  DeviceObject,
     PIRP            Irp
 )
@@ -293,7 +298,7 @@ DispatchSystemControl(
 #pragma code_seg("PAGE")
 _Use_decl_annotations_
 VOID
-DriverUnload(
+DriverUnload_good(
     PDRIVER_OBJECT DriverObject
 )
 {
@@ -309,7 +314,7 @@ DriverUnload(
 
 _Use_decl_annotations_
 NTSTATUS
-DispatchPnp(
+DispatchPnp_good(
     PDEVICE_OBJECT DeviceObject,
     PIRP Irp
 )
@@ -321,7 +326,12 @@ DispatchPnp(
     PIRP pIrp;
     UNREFERENCED_PARAMETER(Irp);
     buffer = ExAllocatePool2(NonPagedPool, 10, 'abcd');
-    pIrp = IoBuildAsynchronousFsdRequest(IRP_MJ_SYSTEM_CONTROL, DeviceObject, buffer, 10, NULL, NULL);
+    pIrp = IoBuildAsynchronousFsdRequest(IRP_MJ_WRITE,
+        DeviceObject,
+        (PVOID)buffer,
+        10,
+        NULL,
+        NULL);
 
     // injected defect for ForwardedAtBadIrqlFsdAsync
     KeRaiseIrql(
@@ -329,6 +339,7 @@ DispatchPnp(
         &oldIrql
     );
 
+	// No injected defect for ForwardedAtBadIrqlFsdAsync. OK to send irp with IRP_MJ_WRITE at IRQL > DISPATCH_LEVEL 
     status = IoCallDriver(
         DeviceObject,
         pIrp);
@@ -343,7 +354,7 @@ DispatchPnp(
 
 _Use_decl_annotations_
 NTSTATUS
-CompletionRoutine(
+CompletionRoutine_good(
     PDEVICE_OBJECT DeviceObject,
     PIRP Irp,
     PVOID EventIn
@@ -371,7 +382,7 @@ CompletionRoutine(
 
 _Use_decl_annotations_
 BOOLEAN
-InterruptServiceRoutine(
+InterruptServiceRoutine_good(
     PKINTERRUPT Interrupt,
     PVOID DeviceExtensionIn
 )
@@ -387,7 +398,7 @@ InterruptServiceRoutine(
 
 _Use_decl_annotations_
 VOID
-DpcForIsrRoutine(
+DpcForIsrRoutine_good(
     PKDPC  Dpc,
     struct _DEVICE_OBJECT* DeviceObject,
     struct _IRP* Irp,
@@ -410,13 +421,13 @@ DpcForIsrRoutine(
 
     status = Irp->IoStatus.Status;
     IoCompleteRequest(Irp, IO_NO_INCREMENT);
-    // IoReleaseRemoveLock not called
-    // IoReleaseRemoveLock(&(((PDRIVER_DEVICE_EXTENSION)DeviceObject->DeviceExtension)->RemoveLock), Irp);
+    // IoReleaseRemoveLock called
+    IoReleaseRemoveLock(&(((PDRIVER_DEVICE_EXTENSION)DeviceObject->DeviceExtension)->RemoveLock), Irp);
 }
 
 _Use_decl_annotations_
 VOID
-StartIo(
+StartIo_good(
     PDEVICE_OBJECT DeviceObject,
     PIRP Irp
 )
@@ -433,7 +444,7 @@ StartIo(
 
         IoAllocateController(ControllerObject,
             DeviceObject,
-            FailDriverControllerRoutine,
+            FailDriverControllerRoutine_good,
             NULL
         );
     }
@@ -443,7 +454,7 @@ StartIo(
 
 _Use_decl_annotations_
 IO_ALLOCATION_ACTION
-FailDriverControllerRoutine(
+FailDriverControllerRoutine_good(
     IN PDEVICE_OBJECT DeviceObject,
     IN PIRP           Irp,
     IN PVOID          MapRegisterBase,
@@ -454,13 +465,13 @@ FailDriverControllerRoutine(
     deltaTime.HighPart = -1;
     KeSetTimer(Timer,
         deltaTime,
-        (PKDPC)(&DpcForIsrRoutine)
+        (PKDPC)(&DpcForIsrRoutine_good)
     );
 
     return KeepObject;
 };
 
-NTSTATUS InternalDeviceControl(
+NTSTATUS InternalDeviceControl_good(
     PDEVICE_OBJECT DeviceObject,
     PIRP Irp
 )
