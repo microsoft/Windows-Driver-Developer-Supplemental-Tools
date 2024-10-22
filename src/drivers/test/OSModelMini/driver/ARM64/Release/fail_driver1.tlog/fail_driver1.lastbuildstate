@@ -1,2 +1,0 @@
-PlatformToolSet=WindowsKernelModeDriver10.0:VCToolArchitecture=Native32Bit:VCToolsVersion=14.40.33807:TargetPlatformVersion=10.0.26100.0:
-Release|ARM64|D:\Windows-driver-samples\tools\sdv\samples\SDV-FailDriver-KMDF\|

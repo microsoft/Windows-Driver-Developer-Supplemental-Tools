@@ -135,38 +135,6 @@ class ql_test_attributes:
     def set_external_drivers(self, external_drivers):
         self.external_drivers = external_drivers
     
-def upload_blob_to_azure(file_name):
-    """
-    Uploads a file to Azure Blob Storage.
-
-    Args:
-        file_name (str): The name of the file to be uploaded.
-
-    Returns:
-        None
-    """
-    print("Uploading file to Azure: " + file_name)
-    account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
-    blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
-    blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
-    with open(file=file_name, mode="rb") as data:
-        blob_client.upload_blob(data, overwrite=True)
-
-def download_blob_from_azure(file_name):
-    """
-    Downloads a blob from Azure Blob Storage.
-
-    Args:
-        file_name (str): The name of the blob file to download.
-
-    Returns:
-        None
-    """
-    account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
-    blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
-    blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
-    with open(file=file_name, mode="wb") as data:
-        data.write(blob_client.download_blob().readall())
 
 def upload_results_to_azure(file_to_upload, file_name, file_directory):
     """
@@ -387,8 +355,66 @@ def test_setup(ql_test):
         
     return out1
 
+def find_file_with_ext(path, ext):
+    """
+    Finds the solution file for the project.
 
-  
+    Args:
+        None
+
+    Returns:
+        str: The path to the solution file.
+    """
+    sln_paths = []
+    for root, dirs, files in os.walk(path):
+        for file in files:
+            if file.endswith(ext):
+                sln_paths.append(os.path.join(root, file))
+    return list(set(sln_paths))
+
+
+
+def db_create_for_external_driver_with_os_model(sln_file, config, platform):
+        
+    workdir = os.path.join(os.getcwd(), "Working")
+   
+    driver_dir = sln_file.split("\\")[:-1]
+    driver_dir = "\\".join(driver_dir)
+    #copy driver source code to working directory
+    print_conditionally("Copying driver source code from " + driver_dir +  " to working directory: " + workdir)
+    shutil.copytree(driver_dir, workdir)
+    
+    #copy OSModel files to working directory
+    os_model_dir = os.path.join(g_template_dir, "OSModel")
+    print_conditionally("Copying OSModel from " + os_model_dir +  " to working directory: " + workdir)
+    shutil.copytree(os_model_dir, workdir,dirs_exist_ok=True)
+    
+    #copy function-map.h to working directory
+    print_conditionally("Generating function-map.h")
+    function_map_file = gen_function_map(sln_file, config, platform)
+    
+    print_conditionally("Copying function-map.h to working directory: " + workdir+"\\function-map.h")
+    shutil.copyfile(function_map_file, workdir+"\\function-map.h")
+    
+    # Add osmodel.c to driver project
+    print_conditionally("Adding osmodel.c to driver project")
+    
+    project_files = find_file_with_ext(workdir, ".vcxproj")
+    for project_file in project_files:
+        with open(project_file, "r") as file:
+            content = file.read()
+            with open(project_file+".new.vcxproj", "w") as file:
+                for line in content.split("\n"):
+                    if "</Project>" in line:
+                        file.write("  <ItemGroup>\n")
+                        file.write("    <ClCompile Include=\"OSModel.c\" />\n")
+                        file.write("  </ItemGroup>\n")
+                    file.writelines(line + "\n")
+        # Build db with new driver source code
+        db_create_for_external_driver(project_file+".new.vcxproj", config, platform)
+    
+    exit(1)
+    
 def db_create_for_external_driver(sln_file, config, platform):
     """
     Create a CodeQL database for an external driver.
@@ -406,13 +432,13 @@ def db_create_for_external_driver(sln_file, config, platform):
     # TODO add database output location option 
     workdir = sln_file.split("\\")[:-1]
     workdir = "\\".join(workdir)
+    
     if not os.path.exists(os.getcwd() + "\\dbs"):
         os.makedirs(os.getcwd() + "\\dbs")
-
+        
     # TODO either clear these, ask for overwrite, or use a different name
     db_loc = os.getcwd() + "\\dbs\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
     print_conditionally("Creating database: ",  db_loc)
-    
     out2 = subprocess.run([codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
             cwd=workdir, 
@@ -690,16 +716,18 @@ def parse_attributes(queries):
 
 
 
-def gen_function_map(driver_db_path):
+def gen_function_map(sln_file, config, platform):
     '''
     gen function-map.h based on role types of driver source code
     '''
     
+    create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
+
     # get all role types using codeql
-    output_file = os.path.join(os.getcwd(), "function-map.h")
+    function_map_file = os.path.join(os.getcwd(), "function-map.h")
     output_file = os.path.join(os.getcwd(), "roletypes.csv")
     ql_file_path = os.path.join(g_template_dir, "PreconditionQueries\\GetRoleTypes.ql")
-    proc_command = [codeql_path, "database", "analyze", driver_db_path, "--format=csv", "--output="+output_file, ql_file_path ]
+    proc_command = [codeql_path, "database", "analyze", create_codeql_database_result, "--format=csv", "--output="+output_file, ql_file_path ]
     out3 = subprocess.run(proc_command, 
                     shell=True, capture_output=no_output  ) 
     if out3.returncode != 0:
@@ -713,7 +741,6 @@ def gen_function_map(driver_db_path):
     funcs = {}
     with open(output_file, "r") as file:
         reader = csv.reader(file, delimiter="\t")
-        role_types = []
         for idx, line in enumerate(reader):
             result_idx = 3
             if 'RoleTypePrecondition' not in line[0]:
@@ -724,7 +751,7 @@ def gen_function_map(driver_db_path):
             if role_type not in funcs.keys():
                 funcs[role_type] = []
             funcs[role_type].append(function_name)
-    with open("function-map.h", "w") as file:
+    with open(function_map_file, "w") as file:
         file.write("#ifndef FUNCTION_MAP_H\n#define FUNCTION_MAP_H\n\n")
         for role_type in funcs.keys():
             i = 0
@@ -739,7 +766,7 @@ def gen_function_map(driver_db_path):
                 file.write("#define " + func_map + " " + func + "\n")
                 i+=1
         file.write("\n#endif\n")
-    
+    return function_map_file
 def run_tests_external_drivers(ql_tests_dict):
     """
     Runs tests on external drivers.
@@ -758,24 +785,35 @@ def run_tests_external_drivers(ql_tests_dict):
     configs = test_setup_external_drivers(driver_sln_files)
     
     created_databases = []
+    sln_files = []
     if configs is None:
-        return    
-    total = len(configs.keys())
-    count = 0
+        if args.use_os_model: 
+            print_conditionally("Using OS Model, no configs necessary")
+            configs = {}
+            for sln_file in driver_sln_files:
+                configs[sln_file] = [("Debug", "x64")]
+        else:
+            return    
+        total = 1
+        sln_files = driver_sln_files
+    else:
+        total = len(configs.keys()) 
+        sln_files = configs.keys()
+    count = 1
     if args.existing_database:
             print_conditionally("Using existing database: " + args.existing_database)
             folder_names = [os.path.join(args.existing_database, name) for name in os.listdir(args.existing_database) if os.path.isdir(os.path.join(args.existing_database, name))]
             created_databases = folder_names
             total = len(folder_names)
     else:
-        for sln_file in configs.keys():
+        for sln_file in sln_files:
             print_conditionally("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
             for config, platform in configs[sln_file]:
-                create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
+                if(args.use_os_model):
+                    create_codeql_database_result = db_create_for_external_driver_with_os_model(sln_file, config, platform)
+                else:
+                    create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
                 
-                # TODO conditionally run
-                # Generate function-map.h 
-                gen_function_map(create_codeql_database_result)
                 exit(1)
     
                 if create_codeql_database_result is None: 
@@ -1001,24 +1039,6 @@ def find_g_template_dir(template):
     return None
 
 
-def find_sln_file(path):
-    """
-    Finds the solution file for the project.
-
-    Args:
-        None
-
-    Returns:
-        str: The path to the solution file.
-    """
-    sln_paths = []
-    for root, dirs, files in os.walk(path):
-        for file in files:
-            if file.endswith(".sln"):
-                sln_paths.append(os.path.join(root, file))
-    return list(set(sln_paths))
-
-
     
 
 if __name__ == "__main__":
@@ -1049,7 +1069,7 @@ if __name__ == "__main__":
     parser.add_argument('--codeql_path', help='Path to the codeql executable',type=str,required=False)
     parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False)
     parser.add_argument('-p', '--preconditions_only', help='Run precondition queries only', action='store_true', required=False)
-    parser.add_argument('--os_model', help='Use OS model for testing', action='store_true',  required=False)
+    parser.add_argument('--use_os_model', help='Use OS model for testing', action='store_true',  required=False)
     args = parser.parse_args()
     
     if args.overwrite_azure_results:
@@ -1111,13 +1131,17 @@ if __name__ == "__main__":
 
     driver_sln_files = []
     if args.external_drivers:
-        dir_to_search = args.external_drivers
-        extension_to_search = ".sln"
-        driver_sln_files = find_sln_file(dir_to_search)
-        print_conditionally("Found " + str(len(driver_sln_files)) + " drivers")
-        for ql_file in ql_tests:
-            ql_tests[ql_file].set_external_drivers(driver_sln_files)
-    
+        if ".sln" in args.external_drivers or ".vcxproj" in args.external_drivers:
+            driver_sln_files.append(args.external_drivers)
+        else:
+            print_conditionally("Searching", driver_sln_files, "for driver .sln files")
+            dir_to_search = args.external_drivers
+            extension_to_search = ".sln"
+            driver_sln_files = find_file_with_ext(dir_to_search, extension_to_search)
+            print_conditionally("Found " + str(len(driver_sln_files)) + " drivers")
+            for ql_file in ql_tests:
+                ql_tests[ql_file].set_external_drivers(driver_sln_files)
+        
    
     if args.more_verbose:
         no_output = False

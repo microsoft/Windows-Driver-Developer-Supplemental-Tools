@@ -12,19 +12,21 @@ Abstract:
 --*/
 
 #include "OSModel.h"
-#if defined(_NTIFS_INCLUDED_)
-#include <ntifs.h>
-#include <ntdddisk.h>
-#elif defined(_NTDDK_)
-#include <ntddk.h>
-#include <ntdddisk.h>
-#elif defined(_WDM_DRIVER_)
+
+//TODO 
+// #if defined(_NTIFS_INCLUDED_)
+// #include <ntifs.h>
+// #include <ntdddisk.h>
+// #elif defined(_NTDDK_)
+// #include <ntddk.h>
+// #include <ntdddisk.h>
+// #elif defined(_WDM_DRIVER_)
 #include <wdm.h>
 #include <ntdddisk.h>
-#else
-#include <ntddk.h>
-#include <wdf.h>
-#endif
+// #else
+// #include <ntddk.h>
+// #include <wdf.h>
+// #endif
 
 #include "driver_files.h"
 #include "dispatch_routines.h"
