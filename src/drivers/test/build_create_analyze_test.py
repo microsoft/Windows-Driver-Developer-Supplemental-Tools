@@ -15,7 +15,7 @@ try:
     from itertools import permutations
     import openpyxl # Not directly used but this will make sure it is installed
     import argparse
-
+    import csv
     from azure.storage.file import (
         ContentSettings,
         FileService,
@@ -412,6 +412,7 @@ def db_create_for_external_driver(sln_file, config, platform):
     # TODO either clear these, ask for overwrite, or use a different name
     db_loc = os.getcwd() + "\\dbs\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
     print_conditionally("Creating database: ",  db_loc)
+    
     out2 = subprocess.run([codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
             cwd=workdir, 
@@ -511,7 +512,7 @@ def analyze_codeql_database(ql_test, db_path=None):
     else:
         proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_file_path ]
         
-    print_conditionally("Sarif output location: " + output_file)
+    print_conditionally("Output file location: " + output_file)
       
     out3 = subprocess.run(proc_command, 
                     shell=True, capture_output=no_output  ) 
@@ -688,6 +689,57 @@ def parse_attributes(queries):
     return query_objs
 
 
+
+def gen_function_map(driver_db_path):
+    '''
+    gen function-map.h based on role types of driver source code
+    '''
+    
+    # get all role types using codeql
+    output_file = os.path.join(os.getcwd(), "function-map.h")
+    output_file = os.path.join(os.getcwd(), "roletypes.csv")
+    ql_file_path = os.path.join(g_template_dir, "PreconditionQueries\\GetRoleTypes.ql")
+    proc_command = [codeql_path, "database", "analyze", driver_db_path, "--format=csv", "--output="+output_file, ql_file_path ]
+    out3 = subprocess.run(proc_command, 
+                    shell=True, capture_output=no_output  ) 
+    if out3.returncode != 0:
+        try:
+            print(out3.stderr.decode()  )
+        except:
+            print(out3.stderr)
+        return None
+    
+    # parse roletypes.csv and generate function-map.h
+    funcs = {}
+    with open(output_file, "r") as file:
+        reader = csv.reader(file, delimiter="\t")
+        role_types = []
+        for idx, line in enumerate(reader):
+            result_idx = 3
+            if 'RoleTypePrecondition' not in line[0]:
+                result_idx = 0
+            function_name = line[0].split(",")[result_idx].split("]]|[[")[0].split("|")[0].replace("[","").replace("]","").replace("\"","")
+            role_type = line[0].split(",")[result_idx].split("]]|[[")[1].split("|")[0].replace("[","").replace("]","").replace("\"","")
+            print('Mapping', function_name,'-->', role_type)
+            if role_type not in funcs.keys():
+                funcs[role_type] = []
+            funcs[role_type].append(function_name)
+    with open("function-map.h", "w") as file:
+        file.write("#ifndef FUNCTION_MAP_H\n#define FUNCTION_MAP_H\n\n")
+        for role_type in funcs.keys():
+            i = 0
+            for func in funcs[role_type]:
+                if role_type == "DRIVER_DISPATCH":
+                  pass 
+                #TODO use role type number to go to role type name                 
+                func_map = "fun_"+role_type
+                if(i > 0):
+                    func_map += str(i)
+                
+                file.write("#define " + func_map + " " + func + "\n")
+                i+=1
+        file.write("\n#endif\n")
+    
 def run_tests_external_drivers(ql_tests_dict):
     """
     Runs tests on external drivers.
@@ -704,6 +756,7 @@ def run_tests_external_drivers(ql_tests_dict):
     
     # Only need to setup external drivers once
     configs = test_setup_external_drivers(driver_sln_files)
+    
     created_databases = []
     if configs is None:
         return    
@@ -719,6 +772,12 @@ def run_tests_external_drivers(ql_tests_dict):
             print_conditionally("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
             for config, platform in configs[sln_file]:
                 create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
+                
+                # TODO conditionally run
+                # Generate function-map.h 
+                gen_function_map(create_codeql_database_result)
+                exit(1)
+    
                 if create_codeql_database_result is None: 
                     print("Error creating database for " + sln_file + " " + config + " " + platform + " skipping...")
                     continue 
@@ -727,6 +786,9 @@ def run_tests_external_drivers(ql_tests_dict):
                         print("Database already created!  " + create_codeql_database_result)
                     created_databases.append(create_codeql_database_result)
             count += 1
+   
+
+            
     # Analyze created databses
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
     count = 0
@@ -957,6 +1019,8 @@ def find_sln_file(path):
     return list(set(sln_paths))
 
 
+    
+
 if __name__ == "__main__":
     # Sys input flags
     parser = argparse.ArgumentParser(description='Build, create, and analyze CodeQL databases for testing queries. \
@@ -975,15 +1039,17 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--individual_test', help='Run only the tests with <name> in the name', type=str, required=False)
     parser.add_argument('-t', '--threads', help='Number of threads to use for multithreaded run', type=int, required=False)
     parser.add_argument('-m', '--compare_results', help='Compare results to previous run', action='store_true', required=False)
-    parser.add_argument('--compare_results_no_build',help='Compare results to previous run',type=str,required=False,)
-    parser.add_argument('--container_name',help='Azure container name',type=str,required=False, )
-    parser.add_argument('--storage_account_name',help='Azure storage account name',type=str,required=False, )
-    parser.add_argument('--share_name', help='Azure share name',type=str,required=False,)
-    parser.add_argument('--storage_account_key',help='Azure storage account key',type=str,required=False, )
-    parser.add_argument('--connection_string', help='Azure connection string', type=str, required=False,)
-    parser.add_argument('--local_result_storage',help='Store results locally instead of in Azure',action='store_true',required=False,)
-    parser.add_argument('--codeql_path', help='Path to the codeql executable',type=str,required=False,)
-    parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False,)
+    parser.add_argument('--compare_results_no_build',help='Compare results to previous run',type=str,required=False)
+    parser.add_argument('--container_name',help='Azure container name',type=str,required=False )
+    parser.add_argument('--storage_account_name',help='Azure storage account name',type=str,required=False )
+    parser.add_argument('--share_name', help='Azure share name',type=str,required=False)
+    parser.add_argument('--storage_account_key',help='Azure storage account key',type=str,required=False )
+    parser.add_argument('--connection_string', help='Azure connection string', type=str, required=False)
+    parser.add_argument('--local_result_storage',help='Store results locally instead of in Azure',action='store_true',required=False)
+    parser.add_argument('--codeql_path', help='Path to the codeql executable',type=str,required=False)
+    parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False)
+    parser.add_argument('-p', '--preconditions_only', help='Run precondition queries only', action='store_true', required=False)
+    parser.add_argument('--os_model', help='Use OS model for testing', action='store_true',  required=False)
     args = parser.parse_args()
     
     if args.overwrite_azure_results:
@@ -1034,6 +1100,8 @@ if __name__ == "__main__":
     extension_to_search = ".ql"
     
     ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
+    
+    # Check where the script is being run from
     g_template_dir = ''
     if os.path.exists(os.path.join(os.getcwd(), "WDMTestTemplate")):
         g_template_dir = os.getcwd() + "\\"
@@ -1050,7 +1118,6 @@ if __name__ == "__main__":
         for ql_file in ql_tests:
             ql_tests[ql_file].set_external_drivers(driver_sln_files)
     
-    threads = []    
    
     if args.more_verbose:
         no_output = False
@@ -1061,13 +1128,12 @@ if __name__ == "__main__":
             exit(1)
         # TODO doesn't work with --external_drivers
 
+
     if args.individual_test:
         ql_files_keys = [x for x in ql_tests if args.individual_test == x.split("\\")[-1].replace(".ql", "")]
         if not ql_files_keys:
             print("Invalid test name: " + args.individual_test + " not found") 
             exit(1)
-    elif args.threads:
-        ql_files_keys = [x for x in ql_tests]
     elif len(sys.argv) == 1:
         ql_files_keys = [x for x in ql_tests]
     else:
@@ -1075,34 +1141,17 @@ if __name__ == "__main__":
    
     ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
 
-    if args.threads:
-        # TODO not set up for external drivers
-        if args.external_drivers:
-            print("Cannot run multithreaded with external drivers") 
-            exit(1)
-        print("Running multithreaded")
-        print("Live output disabled for multithreaded run")
-        print("\n\n\n !!! MULTITHREADED MODE IS NOT FULLY TESTED DO NOT USE FOR OFFICIAL TESTS !!! \n\n\n")
-        print("Press enter to continue")
-        input()
-        thread_count = 0
-        for q in ql_tests:
-            single_dict = {q:ql_tests[q]}
-            threads.append(single_dict)
-        pool = ThreadPool(processes=args.threads)
-        for result in pool.map(run_tests, threads):
-            print(result)
+   
     if ql_tests == []:
         print("Invalid argument")
         exit(1)
     
-    if threads:
-       pass
+    if args.preconditions_only:
+        pass
+    if(args.external_drivers):
+        run_tests_external_drivers(ql_tests)
     else:
-        if(args.external_drivers):
-            run_tests_external_drivers(ql_tests)
-        else:
-            run_tests(ql_tests)
+        run_tests(ql_tests)
 
     end_time = time.time()
     print_conditionally("Total run time: " + str((end_time - start_time)/60) + " minutes")
