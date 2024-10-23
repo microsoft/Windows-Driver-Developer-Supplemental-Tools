@@ -399,21 +399,23 @@ def db_create_for_external_driver_with_os_model(sln_file, config, platform):
     # Add osmodel.c to driver project
     print_conditionally("Adding osmodel.c to driver project")
     
-    project_files = find_file_with_ext(workdir, ".vcxproj")
-    for project_file in project_files:
-        with open(project_file, "r") as file:
-            content = file.read()
-            with open(project_file+".new.vcxproj", "w") as file:
-                for line in content.split("\n"):
-                    if "</Project>" in line:
-                        file.write("  <ItemGroup>\n")
-                        file.write("    <ClCompile Include=\"OSModel.c\" />\n")
-                        file.write("  </ItemGroup>\n")
-                    file.writelines(line + "\n")
-        # Build db with new driver source code
-        db_create_for_external_driver(project_file+".new.vcxproj", config, platform)
     
-    exit(1)
+    project_files = find_file_with_ext(workdir, ".vcxproj")
+    if len(project_files) != 1:
+        raise Exception(len(project_files), "project files found in " + workdir, "Please ensure there is only one project file in the directory")
+    project_file = project_files[0]
+    with open(project_file, "r") as file:
+        content = file.read()
+        with open(project_file+".new.vcxproj", "w") as file:
+            for line in content.split("\n"):
+                if "</Project>" in line:
+                    file.write("  <ItemGroup>\n")
+                    file.write("    <ClCompile Include=\"OSModel.c\" />\n")
+                    file.write("  </ItemGroup>\n")
+                file.writelines(line + "\n")
+    # Build db with new driver source code
+    db_loc = db_create_for_external_driver(project_file+".new.vcxproj", config, platform)
+    return db_loc
     
 def db_create_for_external_driver(sln_file, config, platform):
     """
@@ -813,8 +815,6 @@ def run_tests_external_drivers(ql_tests_dict):
                     create_codeql_database_result = db_create_for_external_driver_with_os_model(sln_file, config, platform)
                 else:
                     create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
-                
-                exit(1)
     
                 if create_codeql_database_result is None: 
                     print("Error creating database for " + sln_file + " " + config + " " + platform + " skipping...")
