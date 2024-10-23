@@ -376,7 +376,7 @@ def find_file_with_ext(path, ext):
 
 def db_create_for_external_driver_with_os_model(sln_file, config, platform):
         
-    workdir = os.path.join(os.getcwd(), "Working")
+    workdir = os.path.join(os.getcwd(), "working"+"\\" + sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform)
    
     driver_dir = sln_file.split("\\")[:-1]
     driver_dir = "\\".join(driver_dir)
@@ -769,6 +769,59 @@ def gen_function_map(sln_file, config, platform):
                 i+=1
         file.write("\n#endif\n")
     return function_map_file
+
+def create_dbs_for_external_drivers(configs):
+    """
+    Creates databases for external drivers based on the provided configurations.
+    Args:
+        configs (dict): A dictionary where the keys are solution file paths and the values are lists of tuples,
+                        each containing a configuration and a platform (e.g., {"path/to/solution.sln": [("Debug", "x64")]}).
+    Returns:
+        list: A list of paths to the created databases.
+    Raises:
+        Exception: If no configurations are found and the OS model is not used.
+    Notes:
+        - If `configs` is None and `args.use_os_model` is True, it uses the OS model and sets default configurations.
+        - If `configs` is None and `args.use_os_model` is False, it raises an exception.
+        - The function prints the progress of database creation and handles errors by skipping problematic configurations.
+    """
+    
+    created_databases = []
+    sln_files = []
+    if configs is None:
+        if args.use_os_model: 
+            print_conditionally("Using OS Model with default configurations (Debug, x64)")
+            configs = {}
+            for sln_file in driver_sln_files:
+                configs[sln_file] = [("Debug", "x64")]
+        else:
+            raise Exception("No configurations found for external drivers")    
+        total = 1
+        sln_files = driver_sln_files
+    else:
+        total = len(configs.keys()) 
+        sln_files = configs.keys()
+    count = 1
+    
+    for sln_file in sln_files:
+        print_conditionally("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
+        for config, platform in configs[sln_file]:
+            if(args.use_os_model):
+                create_codeql_database_result = db_create_for_external_driver_with_os_model(sln_file, config, platform)
+            else:
+                create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
+
+            if create_codeql_database_result is None: 
+                print("Error creating database for " + sln_file + " " + config + " " + platform + " skipping...")
+                continue 
+            else:
+                if create_codeql_database_result in created_databases:
+                    print("Database already created!  " + create_codeql_database_result)
+                created_databases.append(create_codeql_database_result)
+        count += 1
+   
+    return created_databases
+
 def run_tests_external_drivers(ql_tests_dict):
     """
     Runs tests on external drivers.
@@ -779,62 +832,21 @@ def run_tests_external_drivers(ql_tests_dict):
     Returns:
         None
     """
-    df_column_names = []
-    for ql_test in ql_tests_dict:
-        df_column_names.append(ql_test.split("\\")[-1].replace(".ql", ""))
-    
+  
     # Only need to setup external drivers once
     configs = test_setup_external_drivers(driver_sln_files)
     
-    created_databases = []
-    sln_files = []
-    if configs is None:
-        if args.use_os_model: 
-            print_conditionally("Using OS Model, no configs necessary")
-            configs = {}
-            for sln_file in driver_sln_files:
-                configs[sln_file] = [("Debug", "x64")]
-        else:
-            return    
-        total = 1
-        sln_files = driver_sln_files
-    else:
-        total = len(configs.keys()) 
-        sln_files = configs.keys()
-    count = 1
-    if args.existing_database:
-            print_conditionally("Using existing database: " + args.existing_database)
-            folder_names = [os.path.join(args.existing_database, name) for name in os.listdir(args.existing_database) if os.path.isdir(os.path.join(args.existing_database, name))]
-            created_databases = folder_names
-            total = len(folder_names)
-    else:
-        for sln_file in sln_files:
-            print_conditionally("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
-            for config, platform in configs[sln_file]:
-                if(args.use_os_model):
-                    create_codeql_database_result = db_create_for_external_driver_with_os_model(sln_file, config, platform)
-                else:
-                    create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
-    
-                if create_codeql_database_result is None: 
-                    print("Error creating database for " + sln_file + " " + config + " " + platform + " skipping...")
-                    continue 
-                else:
-                    if create_codeql_database_result in created_databases:
-                        print("Database already created!  " + create_codeql_database_result)
-                    created_databases.append(create_codeql_database_result)
-            count += 1
-   
+    # Create databases for external drivers
+    created_databases = create_dbs_for_external_drivers(configs)
 
-            
     # Analyze created databses
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
     count = 0
     total = len(created_databases)*len(ql_tests_with_attributes)
     for ql_test in ql_tests_with_attributes:
-        print_conditionally("Run query: " + ql_test.get_ql_name())
         for db in created_databases:
-            print_conditionally("...... on database " + str(count) + "/" + str(total)+ ": " + db)
+            print_conditionally("Run query: " + ql_test.get_ql_name() + " on database " + db)
+            print_conditionally("..." + str(count) + "/" + str(total))
             count += 1
             try:
                 result_sarif = analyze_codeql_database(ql_test, db)
@@ -850,6 +862,7 @@ def run_tests_external_drivers(ql_tests_dict):
                 continue
             health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error'] + analysis_results['warning'] + analysis_results['note'])
             detailed_health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(detailed_analysis_results)
+    
     # save results
     result_file = "results.xlsx"
     with pd.ExcelWriter(result_file) as writer:
@@ -1072,6 +1085,9 @@ if __name__ == "__main__":
     parser.add_argument('--use_os_model', help='Use OS model for testing', action='store_true',  required=False)
     args = parser.parse_args()
     
+    if args.existing_database and args.external_drivers:
+        raise Exception("Existing database not supported for external drivers")
+    
     if args.overwrite_azure_results:
         print("Overwriting Azure results")
         print("Type 'yes' to confirm")
@@ -1105,10 +1121,13 @@ if __name__ == "__main__":
     if not args.no_clean and not args.existing_database:
         print_conditionally("Cleaning working directories: TestDB, working, AnalysisFiles")
         if os.path.exists("TestDB"):
+            print_conditionally("Cleaning TestDB")
             shutil.rmtree("TestDB")
         if os.path.exists("working"):
+            print_conditionally("Cleaning working")
             shutil.rmtree("working")
         if os.path.exists("AnalysisFiles"):
+            print_conditionally("Cleaning AnalysisFiles")
             shutil.rmtree("AnalysisFiles")
 
     cwd = os.getcwd()
