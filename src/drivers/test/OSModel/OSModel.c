@@ -39,25 +39,23 @@ main(
 ) {
 	// unused parameters
 	argc = 0;
-	*argv = NULL;
+	*argv = NULL;  
 	PIRP Irp;
 
-	PDRIVER_OBJECT  DriverObject = NULL;
-	PDEVICE_OBJECT DeviceObject = NULL;
-	PUNICODE_STRING RegistryPath = NULL;
-	NTSTATUS status = DriverEntry(DriverObject, RegistryPath);
-	Irp = IoAllocateIrp(DriverObject->DeviceObject->StackSize, FALSE);
+	DRIVER_OBJECT  DriverObject;
+	UNICODE_STRING RegistryPath;
+	PDRIVER_OBJECT pDriverObject = &DriverObject;
+	PUNICODE_STRING pRegistryPath = &RegistryPath;
+	NTSTATUS status = DriverEntry(pDriverObject, pRegistryPath);
+	Irp = IoAllocateIrp(pDriverObject->DeviceObject->StackSize, FALSE);
 
 	if (status != STATUS_SUCCESS)
 		return 0;
 
-	status = fun_DRIVER_ADD_DEVICE(DriverObject, DeviceObject);
+	//status = fun_DRIVER_ADD_DEVICE(DriverObject, DriverObject->DeviceObject);
 
 
-	fun_DRIVER_UNLOAD(DriverObject);
-
-
-
+	fun_DRIVER_UNLOAD(pDriverObject);
 
 
 
