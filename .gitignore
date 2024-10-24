@@ -6,6 +6,9 @@
 **/.vs/*
 Debug/*
 
+# function map file
+**/function-map.h
+
 src/drivers/test/**/driver/Debug/*
 src/drivers/test/**/driver/x64/*
 src/drivers/test/**/x64/*
@@ -15,6 +18,9 @@ src/drivers/test/working/*
 src/drivers/test/AnalysisFiles/*
 AnalysisFiles/*
 TestDB/*
+dbs/*
 working/*
 #excel files
 **/*.xlsx
+**/*.xls
+**/*.csv
