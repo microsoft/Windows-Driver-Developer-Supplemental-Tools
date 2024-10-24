@@ -380,30 +380,34 @@ def db_create_for_external_driver_with_os_model(sln_file, config, platform):
    
     driver_dir = sln_file.split("\\")[:-1]
     driver_dir = "\\".join(driver_dir)
+
+    
+  
     #copy driver source code to working directory
     print_conditionally("Copying driver source code from " + driver_dir +  " to working directory: " + workdir)
     shutil.copytree(driver_dir, workdir)
-    
-    #copy OSModel files to working directory
-    os_model_dir = os.path.join(g_template_dir, "OSModel")
-    print_conditionally("Copying OSModel from " + os_model_dir +  " to working directory: " + workdir)
-    shutil.copytree(os_model_dir, workdir,dirs_exist_ok=True)
-    
-    #copy function-map.h to working directory
-    print_conditionally("Generating function-map.h")
-    function_map_file = gen_function_map(sln_file, config, platform)
-    
-    print_conditionally("Copying function-map.h to working directory: " + workdir+"\\function-map.h")
-    shutil.copyfile(function_map_file, workdir+"\\function-map.h")
-    
-    # Add osmodel.c to driver project
-    print_conditionally("Adding osmodel.c to driver project")
-    
     
     project_files = find_file_with_ext(workdir, ".vcxproj")
     if len(project_files) != 1:
         raise Exception(len(project_files), "project files found in " + workdir, "Please ensure there is only one project file in the directory")
     project_file = project_files[0]
+    project_file_dir = ("\\").join(project_file.split("\\")[:-1])
+    
+    #copy OSModel files to working directory
+    os_model_dir = os.path.join(g_template_dir, "OSModel")
+    print_conditionally("Copying OSModel from " + os_model_dir +  " to working directory: " + project_file_dir)
+    shutil.copytree(os_model_dir, project_file_dir,dirs_exist_ok=True)
+    
+    #copy function-map.h to working directory
+    print_conditionally("Generating function-map.h")
+    function_map_file = gen_function_map(sln_file, config, platform)
+    
+    print_conditionally("Copying function-map.h to working directory: " + project_file_dir+"\\function-map.h")
+    shutil.copyfile(function_map_file, project_file_dir+"\\function-map.h")
+    
+    # Add osmodel.c to driver project
+    print_conditionally("Adding osmodel.c to driver project file: " + project_file)
+    
     with open(project_file, "r") as file:
         content = file.read()
         with open(project_file+".new.vcxproj", "w") as file:
