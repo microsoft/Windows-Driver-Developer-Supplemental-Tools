@@ -32,5 +32,5 @@ where
   roleType = func.(ImplicitRoleTypeFunction).getExpectedRoleTypeString()
   or
   func instanceof WdmDispatchRoutine and
-  roleType = "DRIVER_DISPATCH" + func.(WdmDispatchRoutine).getDispatchType()
+  roleType = "DRIVER_DISPATCH#" + func.(WdmDispatchRoutine).getDispatchType()
 select func, "$@|$@", func, func.getName(), func, roleType

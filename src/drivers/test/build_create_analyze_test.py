@@ -37,6 +37,37 @@ print_mutex = threading.Lock()
 health_df = pd.DataFrame()
 detailed_health_df = pd.DataFrame()
 
+IRP_num_to_MajorFunction = {
+    0: "IRP_MJ_CREATE",
+    1: "IRP_MJ_CREATE_NAMED_PIPE",
+    2: "IRP_MJ_CLOSE",
+    3: "IRP_MJ_READ",
+    4: "IRP_MJ_WRITE",
+    5: "IRP_MJ_QUERY_INFORMATION",
+    6: "IRP_MJ_SET_INFORMATION",
+    7: "IRP_MJ_QUERY_EA",
+    8: "IRP_MJ_SET_EA",
+    9: "IRP_MJ_FLUSH_BUFFERS",
+    10: "IRP_MJ_QUERY_VOLUME_INFORMATION",
+    11: "IRP_MJ_SET_VOLUME_INFORMATION",
+    12: "IRP_MJ_DIRECTORY_CONTROL",
+    13: "IRP_MJ_FILE_SYSTEM_CONTROL",
+    14: "IRP_MJ_DEVICE_CONTROL",
+    15: "IRP_MJ_INTERNAL_DEVICE_CONTROL",
+    16: "IRP_MJ_SHUTDOWN",
+    17: "IRP_MJ_LOCK_CONTROL",
+    18: "IRP_MJ_CLEANUP",
+    19: "IRP_MJ_CREATE_MAILSLOT",
+    20: "IRP_MJ_QUERY_SECURITY",
+    21: "IRP_MJ_SET_SECURITY",
+    22: "IRP_MJ_POWER",
+    23: "IRP_MJ_SYSTEM_CONTROL",
+    24: "IRP_MJ_DEVICE_CHANGE",
+    25: "IRP_MJ_QUERY_QUOTA",
+    26: "IRP_MJ_SET_QUOTA",
+    27: "IRP_MJ_PNP"
+}
+
 
 def print_conditionally(*message):
     """
@@ -205,7 +236,7 @@ def find_ql_test_paths(directory, extension):
     Returns:
         dict: A dictionary mapping file paths to QL test attributes.
     """
-    
+    print_conditionally("** Searching for ql test paths **")
     ql_files_map = {}
     for root, dirs, files in os.walk(directory):
         # exclude wfp folder until correct test template is added
@@ -295,7 +326,7 @@ def test_setup_external_drivers(sln_files):
             
             # TODO make this multi threaded
             for config, platform in configs[sln_file]:
-                print_conditionally("Building: " + sln_file + " " + str(config) + " " + str(platform))
+                print_conditionally("** Building: " + sln_file + " " + str(config) + " " + str(platform))
                     
                 out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration="+config,  "-property:Platform="+platform, "-p:TargetVersion=Windows10",  
                             "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
@@ -330,9 +361,9 @@ def test_setup(ql_test):
     
     if os.path.exists(current_working_dir.strip()):
         shutil.rmtree(current_working_dir)
-    print_conditionally("Creating working directory: " + current_working_dir)
+    print_conditionally("** Creating working directory: " + current_working_dir)
     shutil.copytree(ql_test.get_template(), current_working_dir)
-    print_conditionally("Copying files to working directory: " + current_working_dir)
+    print_conditionally("** Copying files to working directory: " + current_working_dir)
     test_file_loc = os.path.join(g_template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())
     # Copy files to driver directory
     for file in os.listdir(test_file_loc):
@@ -341,19 +372,19 @@ def test_setup(ql_test):
     # Rebuild the project using msbuild
     if not args.no_build:
         print_conditionally("Building: " + ql_test.get_ql_name())
-        out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=current_working_dir, shell=True, capture_output=no_output  ) 
-        if out1.returncode != 0:
+        subproc_out = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=current_working_dir, shell=True, capture_output=no_output  ) 
+        if subproc_out.returncode != 0:
             print("Error in msbuild: " + ql_test.get_ql_name())
             try:
-                print(out1.stderr.decode())
+                print(subproc_out.stderr.decode())
             except:
-                print(out1.stderr)
+                print(subproc_out.stderr)
 
             return None
     else:
-        out1 = True
+        subproc_out = True
         
-    return out1
+    return subproc_out
 
 def find_file_with_ext(path, ext):
     """
@@ -374,18 +405,102 @@ def find_file_with_ext(path, ext):
 
 
 
-def db_create_for_external_driver_with_os_model(sln_file, config, platform):
+def gen_os_map_files(project_file, config, platform, project_file_dir, db_loc=None):
+    '''
+    gen function-map.h based on role types of driver source code
+    '''
+    print_conditionally("** Generating OS map files ** ")
+    # create codeql database of driver source code to get role types
+    if db_loc == None:
+        create_codeql_database_result = db_create_for_external_driver(project_file, config, platform)
+    else:
+        create_codeql_database_result = db_loc
         
-    workdir = os.path.join(os.getcwd(), "working"+"\\" + sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform)
+    if create_codeql_database_result is None:
+        raise Exception("Error creating database for driver source code")
+    # get all role types using codeql
+    function_map_file = os.path.join(project_file_dir, "function-map.h")
+    dispatch_routines_file = os.path.join(project_file_dir, "dispatch_routines.h")
+    output_file = os.path.join(project_file_dir, "roletypes.csv")
+    ql_file_path = os.path.join(g_template_dir, "PreconditionQueries\\GetRoleTypes.ql")
+    proc_command = [codeql_path, "database", "analyze", create_codeql_database_result, "--format=csv", "--output="+output_file, ql_file_path ]
+    subproc_out = subprocess.run(proc_command, shell=True, capture_output=no_output  ) 
    
+    if subproc_out.returncode != 0:
+        try:
+            print(subproc_out.stderr.decode()  )
+        except:
+            print(subproc_out.stderr)
+        return None
+    
+    # parse roletypes.csv and generate function-map.h
+    funcs = {}
+    with open(output_file, "r") as file:
+        reader = csv.reader(file, delimiter="\t")
+        for idx, line in enumerate(reader):
+            result_idx = 3
+            if 'RoleTypePrecondition' not in line[0]:
+                result_idx = 0
+            function_name = line[0].split(",")[result_idx].split("]]|[[")[0].split("|")[0].replace("[","").replace("]","").replace("\"","")
+            role_type = line[0].split(",")[result_idx].split("]]|[[")[1].split("|")[0].replace("[","").replace("]","").replace("\"","")
+            if role_type not in funcs.keys():
+                funcs[role_type] = []
+            funcs[role_type].append(function_name)
+
+    # function-map.h
+    with open(function_map_file, "w") as file:
+        file.write("#ifndef FUNCTION_MAP_H\n#define FUNCTION_MAP_H\n\n")
+        
+    # dispatch_routines.h
+    with open(dispatch_routines_file, "w") as file:
+        file.write("#include \"function-map.h\"\n")
+        file.write("#ifdef fun_DRIVER_INITIALIZE\n")
+        file.write("extern NTSTATUS DriverEntry(PDRIVER_OBJECT  DriverObject, PUNICODE_STRING RegistryPath);\n")
+        file.write("#endif\n")
+
+    for role_type in funcs.keys():
+        i = 0
+        for func in funcs[role_type]:
+            if "DRIVER_DISPATCH" in role_type:
+                dispatch_routine_number = int(role_type.split("#")[-1])
+                func_map = "fun_"+IRP_num_to_MajorFunction[dispatch_routine_number]
+            else:
+                func_map = "fun_"+role_type
+                if(i > 0):
+                    func_map += str(i)
+                i+=1
+            
+            with open(function_map_file, "a") as file:
+                file.write("#define " + func_map + " " + func + "\n")
+            if role_type == "DRIVER_INITIALIZE":
+                continue
+            with open(dispatch_routines_file, "a") as file:
+                file.write("#ifdef "+ func_map + "\n")
+                file.write("extern " + str(role_type.split("#")[0]) + " " + func_map + ";\n")
+                file.write("#endif\n")
+    with open(function_map_file, "a") as file:
+        file.write("\n#endif\n")
+    
+def setup_os_model(sln_file, config, platform, workdir, skip_copy=False, db_loc=None):
+    """
+    Sets up the OS model for a given solution file by copying necessary files and modifying the project file.
+    Args:
+        sln_file (str): The path to the solution file.
+        config (str): The configuration to be used (e.g., Debug, Release).
+        platform (str): The platform to be used (e.g., x86, x64).
+        workdir (str): The working directory where the driver source code and OS model will be copied.
+    Returns:
+        str: The path to the new project file with the OS model included.
+    Raises:
+        Exception: If there is not exactly one project file found in the working directory.
+    """
+    
     driver_dir = sln_file.split("\\")[:-1]
     driver_dir = "\\".join(driver_dir)
-
-    
-  
-    #copy driver source code to working directory
-    print_conditionally("Copying driver source code from " + driver_dir +  " to working directory: " + workdir)
-    shutil.copytree(driver_dir, workdir)
+    if not skip_copy:
+        #copy driver source code to working directory
+        print_conditionally("** Copying driver source code from " + driver_dir +  " to working directory: " + workdir)
+        shutil.copytree(driver_dir, workdir,dirs_exist_ok=True)
     
     project_files = find_file_with_ext(workdir, ".vcxproj")
     if len(project_files) != 1:
@@ -393,20 +508,16 @@ def db_create_for_external_driver_with_os_model(sln_file, config, platform):
     project_file = project_files[0]
     project_file_dir = ("\\").join(project_file.split("\\")[:-1])
     
+    #copy function-map.h to working directory
+    gen_os_map_files(sln_file, config, platform, project_file_dir, db_loc)
+    
     #copy OSModel files to working directory
     os_model_dir = os.path.join(g_template_dir, "OSModel")
-    print_conditionally("Copying OSModel from " + os_model_dir +  " to working directory: " + project_file_dir)
+    print_conditionally("** Copying OSModel from " + os_model_dir +  " to working directory: " + project_file_dir)
     shutil.copytree(os_model_dir, project_file_dir,dirs_exist_ok=True)
-    
-    #copy function-map.h to working directory
-    print_conditionally("Generating function-map.h")
-    function_map_file = gen_function_map(sln_file, config, platform)
-    
-    print_conditionally("Copying function-map.h to working directory: " + project_file_dir+"\\function-map.h")
-    shutil.copyfile(function_map_file, project_file_dir+"\\function-map.h")
-    
+
     # Add osmodel.c to driver project
-    print_conditionally("Adding osmodel.c to driver project file: " + project_file)
+    print_conditionally("** Adding osmodel.c to driver project file: " + project_file)
     
     with open(project_file, "r") as file:
         content = file.read()
@@ -417,10 +528,31 @@ def db_create_for_external_driver_with_os_model(sln_file, config, platform):
                     file.write("    <ClCompile Include=\"OSModel.c\" />\n")
                     file.write("  </ItemGroup>\n")
                 file.writelines(line + "\n")
-    # Build db with new driver source code
-    db_loc = db_create_for_external_driver(project_file+".new.vcxproj", config, platform)
-    return db_loc
+    return project_file+".new.vcxproj"
+
+
+
+def db_create_for_external_driver_with_os_model(sln_file, config, platform):
+    """
+    Creates a database for an external driver with an OS model.
+    This function sets up the working directory based on the provided solution file,
+    configuration, and platform. It then sets up the OS model and builds the database
+    with the new driver source code.
+    Args:
+        sln_file (str): The path to the solution (.sln) file.
+        config (str): The build configuration (e.g., 'Debug', 'Release').
+        platform (str): The target platform (e.g., 'x86', 'x64').
+    Returns:
+        str: The location of the created database.
+    """
     
+    workdir = os.path.join(os.getcwd(), "working"+"\\" + sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform)
+    project_file = setup_os_model(sln_file, config, platform, workdir)
+    # Build db with new driver source code
+    db_loc = db_create_for_external_driver(project_file, config, platform)
+    return db_loc
+                
+                
 def db_create_for_external_driver(sln_file, config, platform):
     """
     Create a CodeQL database for an external driver.
@@ -434,31 +566,30 @@ def db_create_for_external_driver(sln_file, config, platform):
         str: The path to the created CodeQL database, or None if an error occurred.
     """
     # TODO only run from test dir
-
     # TODO add database output location option 
     workdir = sln_file.split("\\")[:-1]
     workdir = "\\".join(workdir)
     
-    if not os.path.exists(os.getcwd() + "\\dbs"):
-        os.makedirs(os.getcwd() + "\\dbs")
+    if not os.path.exists(os.getcwd() + "\\TestDB"):
+        os.makedirs(os.getcwd() + "\\TestDB")
         
     # TODO either clear these, ask for overwrite, or use a different name
-    db_loc = os.getcwd() + "\\dbs\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
-    print_conditionally("Creating database: ",  db_loc)
-    out2 = subprocess.run([codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
-                           "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
+    db_loc = os.getcwd() + "\\TestDB\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
+    proc_command = [codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
+                           "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+
+                           " -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ]
+    subproc_out = subprocess.run(proc_command, 
             cwd=workdir, 
             shell=True, capture_output=no_output  )
-    if out2.returncode != 0:
+    if subproc_out.returncode != 0:
         print("Error in codeql database create: " + db_loc)
         try:
-            print(out2.stderr.decode())
+            print(subproc_out.stderr.decode())
         except:
-            print(out2.stderr)
-
+            print(subproc_out.stderr)
         return None
-    else:
-        print_conditionally(".... done!")
+    
+    print_conditionally("Created database: ",  db_loc)
     return db_loc
 
 
@@ -484,22 +615,40 @@ def create_codeql_test_database(ql_test):
     source_dir=os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name()+"\\")
     db_loc =   os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()+"\\")
     
+
     codeql_command = [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ 
-                           " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc]
+                        " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc]
     print_conditionally(" - Database location: " + db_loc)
     print_conditionally(" - Source directory: " + source_dir)
     print_conditionally(" - Command to run: " + str(codeql_command))
-    out2 = subprocess.run(codeql_command,
+    subproc_out = subprocess.run(codeql_command,
                             shell=True, capture_output=no_output  ) 
-    if out2.returncode != 0:
+    if subproc_out.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
         try:
-            print("ERROR MESSAGE:", out2.stderr.decode()  )
+            print("ERROR MESSAGE:", subproc_out.stderr.decode()  )
         except:
-            print("ERROR MESSAGE:", out2.stderr)
-
+            print("ERROR MESSAGE:", subproc_out.stderr)
         return None
-    return db_loc
+    
+    if args.use_os_model:
+        # use generated db for OS model setup and create new db which includes OS model
+        project_file = setup_os_model(source_dir + ql_test.get_template().split("\\")[-1] + ".sln", "Debug", "x64", source_dir, skip_copy=True, db_loc=db_loc)
+        codeql_command = [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ 
+                           " /t:rebuild " + project_file, db_loc+"_osmodel"]
+
+        subproc_out = subprocess.run(codeql_command,
+                                shell=True, capture_output=no_output  ) 
+        if subproc_out.returncode != 0:
+            print("Error in codeql database create: " + ql_test.get_ql_name())
+            try:
+                print("ERROR MESSAGE:", subproc_out.stderr.decode()  )
+            except:
+                print("ERROR MESSAGE:", subproc_out.stderr)
+            return None
+        return db_loc+"_osmodel"
+    else:
+        return db_loc
 
 
 def analyze_codeql_database(ql_test, db_path=None):
@@ -516,7 +665,7 @@ def analyze_codeql_database(ql_test, db_path=None):
         None
 
     """
-    print_conditionally("Analyzing database: " + db_path)
+    print_conditionally("** Analyzing database: " + db_path)
 
     # Analyze the CodeQL database
     if not os.path.exists("AnalysisFiles\Test Samples"):
@@ -546,15 +695,15 @@ def analyze_codeql_database(ql_test, db_path=None):
         
     print_conditionally("Output file location: " + output_file)
       
-    out3 = subprocess.run(proc_command, 
+    subproc_out = subprocess.run(proc_command, 
                     shell=True, capture_output=no_output  ) 
         
-    if out3.returncode != 0:
+    if subproc_out.returncode != 0:
         print("Error in codeql database analyze: " + ql_test.get_ql_name())
         try:
-            print(out3.stderr.decode()  )
+            print(subproc_out.stderr.decode()  )
         except:
-            print(out3.stderr)
+            print(subproc_out.stderr)
         return None
 
     return output_file
@@ -573,19 +722,19 @@ def sarif_diff(ql_test):
     sarif_prev = os.path.join(g_template_dir, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif")
     sarif_new = os.path.join(".\\AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif")
     sarif_out = os.path.join(g_template_dir,  "diff\\"+ql_test.get_ql_name()+".sarif")
-    print_conditionally("Running sarif diff: " + ql_test.get_ql_name(), "\n - Previous: ", sarif_prev, "\n - New: ", sarif_new)
-    out4 = subprocess.run(["sarif", "diff", "-o", sarif_out ,sarif_prev, sarif_new], 
+    print_conditionally("** Running sarif diff: " + ql_test.get_ql_name(), "\n - Previous: ", sarif_prev, "\n - New: ", sarif_new)
+    subproc_out = subprocess.run(["sarif", "diff", "-o", sarif_out ,sarif_prev, sarif_new], 
                     shell=True, capture_output=no_output  ) 
-    if out4.returncode != 0:
+    if subproc_out.returncode != 0:
         print("Error in sarif diff: " + ql_test.get_ql_name())
         try:
-            print(out4.stderr.decode()  )
+            print(subproc_out.stderr.decode()  )
         except:
-            print(out4.stderr)
+            print(subproc_out.stderr)
         return None
     print_conditionally("Diff output location:", sarif_out)
 
-    return out4
+    return subproc_out
 
 def sarif_results(ql_test, sarif_file):
     """
@@ -627,7 +776,7 @@ def run_test(ql_test):
   
     # Print test attributes
     print_mutex.acquire()
-    print("\nRunning test: " + ql_test.get_ql_name())
+    print("\n** Running test: " + ql_test.get_ql_name())
     
     print_conditionally(" - Template: ", ql_test.get_template(), "\n",  
           "- Driver Framework: ", ql_test.get_ql_type(), "\n",  
@@ -642,8 +791,9 @@ def run_test(ql_test):
             print("Error setting up test: " + ql_test.get_ql_name(),"Skipping...")
             return None
         
-        print_conditionally("Creating test database")
+        print_conditionally("** Creating test database")
         create_codeql_database_result = create_codeql_test_database(ql_test)
+        
         if create_codeql_database_result is None:
             print("Error creating database: " + ql_test.get_ql_name(),"Skipping...")
             return None
@@ -721,59 +871,7 @@ def parse_attributes(queries):
     return query_objs
 
 
-
-def gen_function_map(sln_file, config, platform):
-    '''
-    gen function-map.h based on role types of driver source code
-    '''
     
-    create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
-
-    # get all role types using codeql
-    function_map_file = os.path.join(os.getcwd(), "function-map.h")
-    output_file = os.path.join(os.getcwd(), "roletypes.csv")
-    ql_file_path = os.path.join(g_template_dir, "PreconditionQueries\\GetRoleTypes.ql")
-    proc_command = [codeql_path, "database", "analyze", create_codeql_database_result, "--format=csv", "--output="+output_file, ql_file_path ]
-    out3 = subprocess.run(proc_command, 
-                    shell=True, capture_output=no_output  ) 
-    if out3.returncode != 0:
-        try:
-            print(out3.stderr.decode()  )
-        except:
-            print(out3.stderr)
-        return None
-    
-    # parse roletypes.csv and generate function-map.h
-    funcs = {}
-    with open(output_file, "r") as file:
-        reader = csv.reader(file, delimiter="\t")
-        for idx, line in enumerate(reader):
-            result_idx = 3
-            if 'RoleTypePrecondition' not in line[0]:
-                result_idx = 0
-            function_name = line[0].split(",")[result_idx].split("]]|[[")[0].split("|")[0].replace("[","").replace("]","").replace("\"","")
-            role_type = line[0].split(",")[result_idx].split("]]|[[")[1].split("|")[0].replace("[","").replace("]","").replace("\"","")
-            print('Mapping', function_name,'-->', role_type)
-            if role_type not in funcs.keys():
-                funcs[role_type] = []
-            funcs[role_type].append(function_name)
-    with open(function_map_file, "w") as file:
-        file.write("#ifndef FUNCTION_MAP_H\n#define FUNCTION_MAP_H\n\n")
-        for role_type in funcs.keys():
-            i = 0
-            for func in funcs[role_type]:
-                if role_type == "DRIVER_DISPATCH":
-                  pass 
-                #TODO use role type number to go to role type name                 
-                func_map = "fun_"+role_type
-                if(i > 0):
-                    func_map += str(i)
-                
-                file.write("#define " + func_map + " " + func + "\n")
-                i+=1
-        file.write("\n#endif\n")
-    return function_map_file
-
 def create_dbs_for_external_drivers(configs):
     """
     Creates databases for external drivers based on the provided configurations.
@@ -808,7 +906,7 @@ def create_dbs_for_external_drivers(configs):
     count = 1
     
     for sln_file in sln_files:
-        print_conditionally("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
+        print_conditionally("** Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
         for config, platform in configs[sln_file]:
             if(args.use_os_model):
                 create_codeql_database_result = db_create_for_external_driver_with_os_model(sln_file, config, platform)
