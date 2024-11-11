@@ -241,7 +241,7 @@ def find_ql_test_paths(directory, extension):
     for root, dirs, files in os.walk(directory):
         # exclude wfp folder until correct test template is added
         if "wfp" in root.split("\\") or "wfp" in root.split("/"):
-            print_conditionally("Skipping: " + root)
+            #print_conditionally("Skipping: " + root)
             continue
         if fnmatch.filter(files, "driver_snippet.*"):
             use_ntifs = check_use_ntifs(os.path.join(root, fnmatch.filter(files, "driver_snippet.*")[0]))
@@ -318,8 +318,14 @@ def test_setup_external_drivers(sln_files):
     Returns:
         dict: A dictionary containing the configurations for each solution file.
     """
-    configs = find_project_configs(sln_files)
-    if not args.no_build:
+    if args.driver_config and args.driver_platform:
+        configs = {sln_file: [(args.driver_config, args.driver_platform)] for sln_file in sln_files}
+    elif (args.driver_config and not args.driver_platform) or (not args.driver_config and args.driver_platform):
+        raise Exception("Both driver configuration and platform must be specified for external drivers.")
+    else:   
+        configs = find_project_configs(sln_files)
+        
+    if not args.no_pre_build:
         for sln_file in configs.keys():
             workdir = sln_file.split("\\")[:-1]
             workdir = "\\".join(workdir)
@@ -370,7 +376,7 @@ def test_setup(ql_test):
         shutil.copyfile(os.path.join(test_file_loc,file), os.path.join(current_working_dir+"\\driver\\",file))
    
     # Rebuild the project using msbuild
-    if not args.no_build:
+    if not args.no_pre_build:
         print_conditionally("Building: " + ql_test.get_ql_name())
         subproc_out = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=current_working_dir, shell=True, capture_output=no_output  ) 
         if subproc_out.returncode != 0:
@@ -803,19 +809,20 @@ def run_test(ql_test):
         db_path=args.existing_database
         print_conditionally("Using existing database: " + db_path)
 
-    analyze_codeql_database_result = analyze_codeql_database(ql_test, db_path) # result is path to sarif file if successful
-    if analyze_codeql_database_result is None:
-        print("Error analyzing database: " + db_path,"Skipping...")
-        return None
-
-    if not args.existing_database:   
-        sarif_diff_result = sarif_diff(ql_test)
-        if sarif_diff_result is None: 
-            print("Error running sarif diff: " + db_path,"Skipping...")
+    if not args.no_analyze:
+        analyze_codeql_database_result = analyze_codeql_database(ql_test, db_path) # result is path to sarif file if successful
+        if analyze_codeql_database_result is None:
+            print("Error analyzing database: " + db_path,"Skipping...")
             return None
-    
-    return analyze_codeql_database_result
 
+        if not args.existing_database:   
+            sarif_diff_result = sarif_diff(ql_test)
+            if sarif_diff_result is None: 
+                print("Error running sarif diff: " + db_path,"Skipping...")
+                return None
+        return analyze_codeql_database_result
+    else: 
+        return None
 
 def parse_attributes(queries):
     """
@@ -924,23 +931,16 @@ def create_dbs_for_external_drivers(configs):
    
     return created_databases
 
-def run_tests_external_drivers(ql_tests_dict):
+def run_tests_external_drivers(ql_tests_dict, databases):
     """
     Runs tests on external drivers.
 
     Args:
         ql_tests_dict (dict): A dictionary containing the QL tests to be executed.
-
+        databases (list): A list of paths to the databases to be analyzed.
     Returns:
         None
     """
-  
-    # Only need to setup external drivers once
-    configs = test_setup_external_drivers(driver_sln_files)
-    
-    # Create databases for external drivers
-    created_databases = create_dbs_for_external_drivers(configs)
-
     # Analyze created databses
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
     count = 0
@@ -1112,7 +1112,9 @@ def run_tests(ql_tests_dict):
     
     for ql_test in ql_tests_with_attributes:
         result_sarif = run_test(ql_test)
-        if not result_sarif:
+        if args.no_analyze:
+            continue
+        if not result_sarif :
             print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
             continue
         analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
@@ -1121,7 +1123,11 @@ def run_tests(ql_tests_dict):
         
         #detailed_health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
         detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
-      
+    
+    if args.no_analyze:
+        # don't need to save results if not analyzing because no results are generated
+        return  
+    
     # save results
     result_file = "functiontestresults.xlsx"
     with pd.ExcelWriter(result_file) as writer:
@@ -1166,7 +1172,7 @@ if __name__ == "__main__":
     parser.add_argument('-b', '--existing_database', help='Use existing database at <path> for testing instead of creating a new one', type=str, required=False)
     parser.add_argument('-d', '--debug_only', help='Debug only', action='store_true', required=False)
     parser.add_argument('-r', '--release_only', help='Release only', action='store_true', required=False)
-    parser.add_argument('-n', '--no_build', help='Do not build the driver before running the test', action='store_true', required=False)
+    parser.add_argument('-n', '--no_pre_build', help='Do not build the driver before running the test', action='store_true', required=False)
     parser.add_argument('-o', '--override_template', help='Override the template used for the test using <template>', type=str, required=False, choices=["CppKMDFTestTemplate", "KMDFTestTemplate", "WDMTestTemplate"])
     parser.add_argument('-v', '--verbose', help='verbose output on', action='store_true', required=False)
     parser.add_argument('--more_verbose', help='verbose output on including subprocess outputs', action='store_true', required=False)
@@ -1185,6 +1191,10 @@ if __name__ == "__main__":
     parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False)
     parser.add_argument('-p', '--preconditions_only', help='Run precondition queries only', action='store_true', required=False)
     parser.add_argument('--use_os_model', help='Use OS model for testing', action='store_true',  required=False)
+    parser.add_argument('--no_analyze', help='Do not analyze the database(s) created', action='store_true', required=False)
+    parser.add_argument('--driver_config', help='Use the provided driver configurations for testing', type=str, required=False)
+    parser.add_argument('--driver_platform', help='Use the provided driver platform for testing', type=str, required=False)
+    
     args = parser.parse_args()
     
     if args.existing_database and args.external_drivers:
@@ -1240,7 +1250,6 @@ if __name__ == "__main__":
     dir_to_search ="/".join(path[0:path.index(root_dir)+1])
     extension_to_search = ".ql"
     
-    ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
     
     # Check where the script is being run from
     g_template_dir = ''
@@ -1249,13 +1258,15 @@ if __name__ == "__main__":
     else:
         print_conditionally("Using default template directory: src\\drivers\\test\\")    
         g_template_dir = os.path.join(os.getcwd(), "src\\drivers\\test\\")
+   
+    ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
 
     driver_sln_files = []
     if args.external_drivers:
         if ".sln" in args.external_drivers or ".vcxproj" in args.external_drivers:
             driver_sln_files.append(args.external_drivers)
         else:
-            print_conditionally("Searching", driver_sln_files, "for driver .sln files")
+            print_conditionally("** Searching", args.external_drivers, "for driver .sln files **")
             dir_to_search = args.external_drivers
             extension_to_search = ".sln"
             driver_sln_files = find_file_with_ext(dir_to_search, extension_to_search)
@@ -1294,7 +1305,12 @@ if __name__ == "__main__":
     if args.preconditions_only:
         pass
     if(args.external_drivers):
-        run_tests_external_drivers(ql_tests)
+        # Only need to setup external drivers once
+        configs = test_setup_external_drivers(driver_sln_files)
+        # Create databases for external drivers
+        created_databases = create_dbs_for_external_drivers(configs)
+        if not args.no_analyze:
+            run_tests_external_drivers(ql_tests, created_databases)
     else:
         run_tests(ql_tests)
 
