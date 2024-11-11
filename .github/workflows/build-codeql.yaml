@@ -6,7 +6,7 @@ name: Build and Publish Windows CodeQL queries
 on:
   # Triggers the workflow on push or pull request events but only for the main and development branches
   push:
-    branches: [ main, development, jacob-ronstadt-patch-2 ]
+    branches: [ main, development ]
   pull_request:
     branches: [ main, development ]
 
@@ -122,7 +122,7 @@ jobs:
   # Tests if the latest codeql version produces the same results as the current version. 
     runs-on: windows-latest
     continue-on-error: true # Allow script to return non-zero exit code
-    #needs: [build,test-query-health]
+    needs: [build,test-query-health]
     permissions:
       contents: read
       packages: write
