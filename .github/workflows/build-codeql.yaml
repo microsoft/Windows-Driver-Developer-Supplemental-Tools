@@ -14,7 +14,6 @@ on:
   workflow_dispatch:
 
 env:
-  CODEQL_LATEST_VERSION: 2.17.1
   CODEQL_VERSION: 2.15.4
   
 jobs:
@@ -150,7 +149,8 @@ jobs:
         fetch-depth: 0
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ env.CODEQL_LATEST_VERSION }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        $latest=(((Invoke-WebRequest -Uri https://github.com/github/codeql-cli-binaries/releases/latest).links.href | Where-Object{$_ -like "/github/codeql-cli-binaries/releases/tag/v*"}[0]) -split "/")[-1];
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/$latest/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
     - name: Install CodeQL pack dependencies
