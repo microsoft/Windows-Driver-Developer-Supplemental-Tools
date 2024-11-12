@@ -763,8 +763,8 @@ def run_tests_external_drivers(ql_tests_dict):
         codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
         system_info_df.to_excel(writer, sheet_name="System Info")
     if args.compare_results:
-        compare_health_results(result_file)
         compare_health_results("detailed"+result_file)
+        compare_health_results(result_file)
     
 
 def find_last_xlsx_file(curr_results_path):
@@ -805,6 +805,7 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
+    
     if not args.connection_string or not args.share_name:
         raise Exception("Azure credentials not provided. Cannot compare results.")
     
@@ -817,9 +818,7 @@ def compare_health_results(curr_results_path):
         
     except Exception as e:
         if "ResourceNotFound" in str(e):
-            print("No previous results found. Uploading current results to Azure...")
-            upload_results_to_azure(file_to_upload=curr_results_path, 
-                        file_name=curr_results_path, file_directory="")
+            print("No previous results found")
             exit(1)
         else:
             print("Error downloading previous results ")
@@ -833,26 +832,27 @@ def compare_health_results(curr_results_path):
     print_conditionally("Comparing results...")
     print_conditionally("Previous results: ", prev_results)
     print_conditionally("Current results: ", curr_results_path)
-    try:
-        for row in prev_results_df.index:
-            if row not in curr_results_df.index:
-                curr_results_df.loc[row] = None
-                print_conditionally("Adding row to current results: ", row)
-        for row in curr_results_df.index:
-            if row not in prev_results_df.index:
-                prev_results_df.loc[row] = None
-                print_conditionally("Adding row to previous results: ", row)
-        prev_results_df = prev_results_df.sort_index()
-        curr_results_df = curr_results_df.sort_index()
-        diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
-    except Exception as e: 
-        print("Error comparing results: ", e, "Uploading previous results back to Azure as", prev_results, "and current results back to Azure as", curr_results_path)
-        upload_results_to_azure(file_to_upload=prev_results, 
-                            file_name=prev_results, file_directory="")
-        upload_results_to_azure(file_to_upload=curr_results_path, 
-                            file_name=curr_results_path, file_directory="")
-        exit(1)
-        
+    for row in prev_results_df.index:
+        if row not in curr_results_df.index:
+            curr_results_df.loc[row] = None
+            print_conditionally("Adding row to current results: ", row)
+       
+    for row in curr_results_df.index:
+        if row not in prev_results_df.index:
+            prev_results_df.loc[row] = None
+            print_conditionally("Adding row to previous results: ", row)
+   
+    prev_results_df = prev_results_df.sort_index()
+    curr_results_df = curr_results_df.sort_index()
+
+    #TODO this is a tempoary fix for the issue with the backslashes in the results in codeql cli version 2.18.x+
+    for row in curr_results_df.index: 
+        curr_results_df.loc[row] = curr_results_df.loc[row].str.replace("\\", "")
+            
+    for row in prev_results_df.index:
+        prev_results_df.loc[row] = prev_results_df.loc[row].str.replace("\\", "")
+            
+    diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))  
     
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer, sheet_name="Diff")
@@ -922,8 +922,8 @@ def run_tests(ql_tests_dict):
         codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
         system_info_df.to_excel(writer, sheet_name="System Info")
     if args.compare_results:
-        compare_health_results(result_file)
         compare_health_results("detailed"+result_file)
+        compare_health_results(result_file)
     
 def find_g_template_dir(template):
     """
