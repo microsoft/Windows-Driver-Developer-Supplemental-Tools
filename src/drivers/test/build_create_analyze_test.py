@@ -241,7 +241,7 @@ def find_ql_test_paths(directory, extension):
     ql_files_map = {}
     for root, dirs, files in os.walk(directory):
         # exclude wfp folder until correct test template is added
-        if "wfp" in root.split("\\") or "wfp" in root.split("/"):
+        if "wfp" in root.split("\\") or "wfp" in root.split("/") or "QueryTemplate" in root:
             print_conditionally("Skipping: " + root)
             continue
         if fnmatch.filter(files, "driver_snippet.*"):
@@ -751,7 +751,7 @@ def run_tests_external_drivers(ql_tests_dict):
             health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error'] + analysis_results['warning'] + analysis_results['note'])
             detailed_health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(detailed_analysis_results)
     # save results
-    result_file = "results.xlsx"
+    result_file = "external_drivers_results.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer, sheet_name="Results")
         codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
@@ -810,8 +810,10 @@ def compare_health_results(curr_results_path):
     
     try:
         prev_results = 'azure-'+curr_results_path
-        _ = download_file_from_azure(file_to_download=prev_results, 
+        print_conditionally("Downloading previous results from Azure: " + prev_results)
+        temp_file = download_file_from_azure(file_to_download=prev_results, 
                         file_name=curr_results_path, file_directory="")
+        print_conditionally("Downloaded previous results: " + temp_file)
         
     except Exception as e:
         if "ResourceNotFound" in str(e):
