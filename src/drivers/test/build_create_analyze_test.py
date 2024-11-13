@@ -846,13 +846,8 @@ def compare_health_results(curr_results_path):
     curr_results_df = curr_results_df.sort_index()
 
     #TODO this is a tempoary fix for the issue with the backslashes in the results in codeql cli version 2.18.x+
-    for row in curr_results_df.index: 
-        if not curr_results_df.loc[row].empty:
-            curr_results_df.loc[row] = curr_results_df.loc[row].str.replace("\\", "")
-            
-    for row in prev_results_df.index:
-        if not prev_results_df.loc[row].empty:
-            prev_results_df.loc[row] = prev_results_df.loc[row].str.replace("\\", "")
+    prev_results_df = prev_results_df.replace({r'\\': ''}, regex=True)
+    curr_results_df = curr_results_df.replace({r'\\': ''}, regex=True)
             
     diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))  
     
@@ -905,11 +900,9 @@ def run_tests(ql_tests_dict):
             print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
             continue
         analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
-       # health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
-        health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
         
-        #detailed_health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
-        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
+        health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
+        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results) 
       
     # save results
     result_file = "functiontestresults.xlsx"
