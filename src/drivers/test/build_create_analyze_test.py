@@ -847,11 +847,11 @@ def compare_health_results(curr_results_path):
 
     #TODO this is a tempoary fix for the issue with the backslashes in the results in codeql cli version 2.18.x+
     for row in curr_results_df.index: 
-        if curr_results_df.loc[row] != None:
+        if not curr_results_df.loc[row].empty:
             curr_results_df.loc[row] = curr_results_df.loc[row].str.replace("\\", "")
             
     for row in prev_results_df.index:
-        if prev_results_df.loc[row] != None:
+        if not prev_results_df.loc[row].empty:
             prev_results_df.loc[row] = prev_results_df.loc[row].str.replace("\\", "")
             
     diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))  
