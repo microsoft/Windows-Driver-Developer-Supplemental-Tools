@@ -531,7 +531,7 @@ def setup_os_model(sln_file, config, platform, workdir, skip_copy=False, db_loc=
             for line in content.split("\n"):
                 if "</Project>" in line:
                     file.write("  <ItemGroup>\n")
-                    file.write("    <ClCompile Include=\"OSModel.c\" />\n")
+                    file.write("    <ClCompile Include=\"osmodel.c\" />\n")
                     file.write("  </ItemGroup>\n")
                 file.writelines(line + "\n")
     return project_file+".new.vcxproj"
