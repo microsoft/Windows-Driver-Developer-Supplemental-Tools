@@ -111,11 +111,11 @@ jobs:
     - name: Run test script
       shell: pwsh
       if: ${{ env.CONNECTION_STRING != '' }}
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME"
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME" -v
     - name: Run test script without compare
       shell: pwsh
       if: ${{ env.CONNECTION_STRING == '' }}
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build 
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build -v
     
       
   test-codeql-latest-vs-current:
@@ -173,7 +173,7 @@ jobs:
       uses: microsoft/setup-msbuild@v2
     - name: Run test script
       shell: pwsh
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" 
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" -v
           
   test-pack-version-update:
     runs-on: windows-latest

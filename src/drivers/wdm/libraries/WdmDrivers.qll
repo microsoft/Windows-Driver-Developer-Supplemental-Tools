@@ -97,7 +97,7 @@ class WdmDriverStartIo extends WdmCallbackRoutine {
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
-  string getExpectedMinIrqlLevelString() { result = "PASSIVE_LEVEL" }
+  string getExpectedMinIrqlLevelString() { result = "DISPATCH_LEVEL" }
 }
 
 /**
@@ -157,13 +157,16 @@ class WdmDriverCancel extends WdmCallbackRoutine {
   WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
+  string getExpectedMinIrqlLevelString() { result = "DISPATCH_LEVEL" }
 }
 
 /**
  * A WDM DriverDpcRoutine callback routine.
  */
 class WdmDriverDpcRoutine extends WdmCallbackRoutine {
-  WdmDriverDpcRoutine() { callbackType.getName().matches("IO_DPC_ROUTINE") }
+  WdmDriverDpcRoutine() { 
+    callbackType.getName().matches("IO_DPC_ROUTINE") 
+   }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 

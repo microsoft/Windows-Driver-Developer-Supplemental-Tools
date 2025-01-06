@@ -66,7 +66,7 @@
                 "impact": "Insecure Coding Practice",
                 "kind": "problem",
                 "name": "Irql Illegal Value",
-                "opaqueid": "CQLD-TODO",
+                "opaqueid": "CQLD-C28151",
                 "owner.email:": "sdat@microsoft.com",
                 "platform": "Desktop",
                 "precision": "medium",
