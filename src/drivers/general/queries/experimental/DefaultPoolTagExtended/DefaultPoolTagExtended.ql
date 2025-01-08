@@ -48,7 +48,7 @@ class GlobalDefaultPoolTag extends GlobalVariable {
 }
 
 /** An interprocedural data-flow analysis looking for flow from bad (default) pool tags. */
-class DefaultPoolTagFlow extends DataFlow::ConfigSig {
+module DefaultPoolTagFlow implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) { source.asExpr() instanceof DefaultPoolTag }
 
   predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::ExprNode }
@@ -83,8 +83,8 @@ where
   )
   or
   // A local variable with a bad tag is being passed in
-  exists(DefaultPoolTagFlow dataFlow, DataFlow::Node source, DataFlow::Node sink |
+  exists(DataFlow::Node source, DataFlow::Node sink |
     sink.asExpr() = fc.getArgument(i) and
-    dataFlow.hasFlow(source, sink)
+    DefaultPoolTagFlow::flow(source, sink)
   )
 select fc.getArgument(i), "Default pool tag used in function call"
