@@ -48,11 +48,13 @@ class GlobalDefaultPoolTag extends GlobalVariable {
 }
 
 /** An interprocedural data-flow analysis looking for flow from bad (default) pool tags. */
-module DefaultPoolTagFlow implements DataFlow::ConfigSig {
+module DefaultPoolTagFlowConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) { source.asExpr() instanceof DefaultPoolTag }
 
   predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::ExprNode }
 }
+module DefaultPoolTagFlow = DataFlow::Global<DefaultPoolTagFlowConfig>;
+
 
 /** An interprocedural data-flow analysis looking for flow from good pool tags. */
 module ValidPoolTagFlowConfig implements DataFlow::ConfigSig {
