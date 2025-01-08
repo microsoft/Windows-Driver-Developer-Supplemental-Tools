@@ -19,15 +19,18 @@
  import drivers.libraries.Page
  import drivers.libraries.RoleTypes
  
+
+
+
  /**
   * A macro in wdm.h that represents an IRQL level,
   * such as PASSIVE_LEVEL, DISPATCH_LEVEL, etc.
   */
- cached
+ 
  class IrqlMacro extends Macro {
    int irqlLevelAsInt;
  
-   cached
+   
    IrqlMacro() {
      this.getName().matches("%_LEVEL") and
      this.getFile().getBaseName() = "wdm.h" and
@@ -37,7 +40,7 @@
    }
  
    /** Returns the integer value of this IRQL level. */
-   cached
+   
    int getIrqlLevel() { result = irqlLevelAsInt }
  }
  
@@ -46,7 +49,7 @@
   * May cause incorrect results if database contains both 32-bit
   * and 64-bit builds.
   */
- cached
+ 
  int getGlobalMaxIrqlLevel() {
    result =
      any(int i |
@@ -66,11 +69,11 @@
  }
  
  /** An \_IRQL\_saves\_global\_(parameter, kind) annotation. */
- cached
+ 
  class IrqlSavesGlobalAnnotation extends SALAnnotation {
    MacroInvocation irqlMacroInvocation;
  
-   cached
+   
    IrqlSavesGlobalAnnotation() {
      // Needs to include other function and parameter annotations too
      this.getMacroName() = ["__drv_savesIRQLGlobal", "_IRQL_saves_global_"] and
@@ -79,11 +82,11 @@
  }
  
  /** An \_IRQL\_restores\_global\_(parameter, kind) annotation. */
- cached
+ 
  class IrqlRestoresGlobalAnnotation extends SALAnnotation {
    MacroInvocation irqlMacroInvocation;
  
-   cached
+   
    IrqlRestoresGlobalAnnotation() {
      // Needs to include other function and parameter annotations too
      this.getMacroName() = ["__drv_restoresIRQLGlobal", "_IRQL_restores_global_"] and
@@ -94,14 +97,14 @@
  /**
   * Standard IRQL annotations which apply to entire functions and manipulate or constrain the IRQL.
   */
- cached
+ 
  class IrqlFunctionAnnotation extends SALAnnotation {
    string irqlLevel;
    string irqlAnnotationName;
    string innerAnnotationName;
    string fullInnerAnnotationString;
  
-   cached
+   
    IrqlFunctionAnnotation() {
      (
        this.getMacroName() =
@@ -169,14 +172,14 @@
    }
  
    /** Returns the text of this annotation (i.e. \_IRQL\_requires\_, etc.) */
-   cached
+   
    string getIrqlMacroName() {
      if this.getMacroName() = ["_When_"]
      then result = innerAnnotationName
      else result = irqlAnnotationName
    }
  
-   cached
+   
    string getIrqlLevelString() { result = irqlLevel }
  
    /**
@@ -185,7 +188,7 @@
     * This will return -1 if the IRQL specified is anything other than a standard
     * IRQL level (i.e. PASSIVE_LEVEL).  This includes statements like "DPC_LEVEL - 1".
     */
-   cached
+   
    int getIrqlLevel() {
      // Special case for DPC_LEVEL, which is not defined normally
      if this.getIrqlLevelString() = "DPC_LEVEL"
@@ -312,11 +315,11 @@
   * either its entry or exit IRQL is restricted, either by having a min/max value,
   * a required value, or by raising the IRQL to a known value.
   */
- cached
+ 
  class IrqlRestrictsFunction extends Function {
    IrqlFunctionAnnotation irqlAnnotation;
  
-   cached
+   
    IrqlRestrictsFunction() {
      exists(FunctionDeclarationEntry fde |
        fde = this.getADeclarationEntry() and
@@ -334,7 +337,7 @@
      )
    }
  
-   cached
+   
    IrqlFunctionAnnotation getFuncIrqlAnnotation() { result = irqlAnnotation }
  }
  
@@ -584,7 +587,8 @@
          not exists(KeRaiseIrqlCall kric2 | kric2 != sgic and kric2.getAPredecessor*() = sgic)
        )
    }
- 
+
+
    /**
     * Get the corresponding KeRaiseIrql call that preceded this KeLowerIrql call.
     *
@@ -593,9 +597,7 @@
    KeRaiseIrqlCall getMostRecentRaiseInterprocedural() {
      result =
        any(KeRaiseIrqlCall kric |
-         exists(IrqlRaiseLowerFlow irlf |
-           irlf.hasFlow(DataFlow::exprNode(kric), DataFlow::exprNode(this.getAnArgument()))
-         )
+          IrqlRaiseLowerFlow::flow(DataFlow::exprNode(kric), DataFlow::exprNode(this.getAnArgument()))
        )
    }
  }
@@ -690,7 +692,7 @@
   *
   * Not implemented: _IRQL_limited_to_
   */
- cached
+ 
  int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
    if cfn instanceof KeRaiseIrqlCall
    then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
@@ -752,7 +754,7 @@
   * Similar to above, but only exit points where the Irql is explicit
   */
  
- cached
+ 
  int getExplicitExitIrqlAtCfn(ControlFlowNode cfn) {
    if cfn instanceof KeRaiseIrqlCall
    then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
@@ -807,7 +809,7 @@
   * Note: we implicitly apply DISPATCH_LEVEL as the max when a max is not specified but a minimum is,
   * and the global max if the minimum is > DISPATCH_LEVEL.
   */
- cached
+ 
  int getAllowableIrqlLevel(Function func) {
    exists(IrqlValue lowerBound, IrqlValue upperBound |
      hasLowerBound(func, lowerBound) and hasUpperBound(func, upperBound)

@@ -168,7 +168,7 @@ class SuppressPragma extends CASuppression {
 
   /** Finds the offset (in line count) to the closest non-pragma element after this suppression. */
   pragma[nomagic]
-  cached
+  
   int getMinimumLocationOffset() {
     result =
       min(int i |
@@ -281,7 +281,7 @@ class SuppressionPushPopSegment extends Location {
   }
 
   /** Returns a disable pragma within this push/pop segment. */
-  cached
+  
   DisablePragma getADisablePragma() {
     result = any(DisablePragma p | this.isInPushPopSegment(p.getLocation()))
   }
