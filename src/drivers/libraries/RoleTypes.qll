@@ -72,11 +72,9 @@ class RoleTypeAnnotatedTypedef extends TypedefType {
 /**
  * A function that is annotated to specify role type
  */
-cached
 class RoleTypeAnnotatedFunction extends Function {
   RoleTypeFunctionAnnotation roleTypeAnnotation;
 
-  cached
   RoleTypeAnnotatedFunction() {
     (
       this.hasCLinkage() and
@@ -96,10 +94,8 @@ class RoleTypeAnnotatedFunction extends Function {
     )
   }
 
-  cached
   string getFuncRoleTypeAnnotation() { result = roleTypeAnnotation.getRoleTypeMacroName() }
 
-  cached
   RoleTypeFunctionAnnotation getRoleTypeAnnotation() { result = roleTypeAnnotation }
 }
 
@@ -157,12 +153,10 @@ class DriverObjectFunctionAccess extends FunctionAccess {
 /**
  *  Declared functions that are used as if they have a role type, wether or not they do
  */
-cached
 class ImplicitRoleTypeFunction extends Function {
   RoleTypeType rttExpected;
   FunctionAccess funcUse;
 
-  cached
   ImplicitRoleTypeFunction() {
     (
       exists(FunctionCall fc, int n | fc.getArgument(n) instanceof FunctionAccess |
@@ -180,13 +174,10 @@ class ImplicitRoleTypeFunction extends Function {
     this.hasCLinkage()
   }
 
-  cached
   string getExpectedRoleTypeString() { result = rttExpected.getName() }
 
-  cached
   RoleTypeType getExpectedRoleTypeType() { result = rttExpected }
 
-  cached
   string getActualRoleTypeString() {
     if not this instanceof RoleTypeFunction
     then result = "<NO_ROLE_TYPE>"
@@ -194,19 +185,16 @@ class ImplicitRoleTypeFunction extends Function {
   }
 
   // TODO: add this back in
-  // cached
   // int getExpectedIrqlLevel() {
   //   if rttExpected instanceof IrqlAnnotatedTypedef
   //   then result = getAlloweableIrqlLevel(rttExpected)
   //   else result = -1
   // }
-  // cached
   // int getFoundIrqlLevel() {
   //   if this instanceof IrqlRestrictsFunction
   //   then result = getAllowableIrqlLevel(this)
   //   else result = -1
   // }
-  cached
   FunctionAccess getFunctionUse() { result = funcUse }
 }
 

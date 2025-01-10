@@ -6,7 +6,7 @@ import semmle.code.cpp.controlflow.StackVariableReachability
 import semmle.code.cpp.controlflow.ControlFlowGraph
 import semmle.code.cpp.controlflow.Guards
 import semmle.code.cpp.controlflow.SSA
-import semmle.code.cpp.dataflow.DataFlow
+import semmle.code.cpp.dataflow.new.DataFlow
 
 
 /** `e` is an expression that frees the memory pointed to by `v`. 
@@ -50,8 +50,8 @@ predicate isFreeExpr(Expr e, Variable v, Access va) {
 /** True if the argument `n` of function `f` may be called in a free (`isFreeExpr`) call **/
 predicate isPotentiallyFreeFunction( Function f, int n )
 {
-	exists( VariableAccess va, Variable v, ArgumentFLowsToFreeCallConfiguration config,  DataFlow::Node sink, DataFlow::Node source | 
-		config.hasFlow(source, sink) and
+	exists( VariableAccess va, Variable v, DataFlow::Node sink, DataFlow::Node source | 
+		ArgumentFLowsToFreeCall::flow(source, sink) and
 		va = source.asExpr() and
 		(va.getTarget() = v or va.getAChild*().(Access).getTarget() = v or va.(PointerFieldAccess).getQualifier() = v.getAnAccess()) and
 		f = va.getEnclosingFunction() and
@@ -74,23 +74,20 @@ predicate isPotentiallyFreeExpr(Expr e, Variable v, Access va) {
 }
 
 /** source of type `access` flows to the parameter of a `isFreeExpr` */
-class ArgumentFLowsToFreeCallConfiguration extends DataFlow::Configuration {
-  ArgumentFLowsToFreeCallConfiguration() {
-    this = "ArgumentFLowsToFreeCallConfiguration"
-  }
-  
-  override predicate isSource(DataFlow::Node source) {
+module ArgumentFLowsToFreeCallConfiguration implements DataFlow::ConfigSig {
+
+   predicate isSource(DataFlow::Node source) {
     source.asExpr() instanceof Access
   }
  
-  override predicate isSink(DataFlow::Node sink) {
+   predicate isSink(DataFlow::Node sink) {
   	exists( FunctionCall call, Access a |
 	    ( sink.asExpr() = a or sink.asExpr().getAChild*() = a or sink.asExpr().(PointerFieldAccess).getQualifier() = a ) and  
 	    isFreeExpr( call, _, a ) 
     )
-	
   }
 }
+module ArgumentFLowsToFreeCall = DataFlow::Global<ArgumentFLowsToFreeCallConfiguration>;
 
 /**
  * Lower precision check if an Expr `e` is a free call using a variable `v` 
@@ -98,9 +95,9 @@ class ArgumentFLowsToFreeCallConfiguration extends DataFlow::Configuration {
 predicate isPotentiallyFreeExprEx(Expr e, Variable v, Access va, Expr actualFreeArg) {
 	( isPotentiallyFreeExpr(e, v, va) and va = actualFreeArg ) or
 	(
-		exists( ArgumentFLowsToFreeCallConfiguration config, DataFlow::Node source, DataFlow::Node sink |
+		exists(  DataFlow::Node source, DataFlow::Node sink |
 			source.asExpr() = va and sink.asExpr() = actualFreeArg |
-			config.hasFlow(source, sink) and
+			ArgumentFLowsToFreeCall::flow(source, sink) and
 			e.(FunctionCall).getAnArgument() = va and
 			(va.getTarget() = v or va.getAChild*().(Access).getTarget() = v or va.(PointerFieldAccess).getQualifier() = v.getAnAccess())
 		)

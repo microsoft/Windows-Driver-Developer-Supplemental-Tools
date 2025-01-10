@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  CODEQL_VERSION: 2.15.4
+  CODEQL_VERSION: 2.20.1
   
 jobs:
   build:

@@ -15,7 +15,6 @@ import drivers.libraries.SAL
  * an assignment in DriverEntry that assigns the function to
  * the dispatch table.
  */
-cached
 class NdisDispatchRoutine extends NdisCallbackRoutine {
   /**
    * The OID type covered by this dispatch routine.
@@ -30,7 +29,6 @@ class NdisDispatchRoutine extends NdisCallbackRoutine {
    * This characteristic predicate thus looks for assignments of this form
    * where the right-side value is a function with the NDIS_DISPATCH typedef.
    */
-  cached
   NdisDispatchRoutine() {
     callbackType.getName().matches("NDIS_DISPATCH") and
     exists(
@@ -47,11 +45,11 @@ class NdisDispatchRoutine extends NdisCallbackRoutine {
   }
 
   /** Gets the OID type this dispatch routine handles, as a number. */
-  cached
+  
   Literal getDispatchType() { result = dispatchType }
 
   /** Gets the DriverEntry this dispatch routine was assigned in. */
-  cached
+  
   NdisDriverEntry getDriverEntry() { result = driverEntry }
 }
 
@@ -70,7 +68,7 @@ class NdisCallbackRoutineAssignment extends AssignExpr {
   NdisCallbackRoutineAssignment() { isNdisCallbackRoutineAssignment(this) }
 
   /** Gets the callback routine that this dispatch routine assignment is targeting. */
-  cached
+  
   NdisCallbackRoutine getTarget() {
     if
       exists(FunctionAccess fa |
