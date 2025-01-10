@@ -23,21 +23,19 @@
 import cpp
 import drivers.libraries.Irql
 import semmle.code.cpp.dataflow.new.DataFlow
-import semmle.code.cpp.dataflow.new.DataFlow2
 
 /**
  * A data-flow configuration describing flow from an
  * \_IRQL\_saves\_-annotated parameter to an OS function that restores
  * the IRQL.
  */
-class IrqlFlowConfiguration extends DataFlow::Configuration {
-  IrqlFlowConfiguration() { this = "IrqlFlowConfiguration" }
+module IrqlFlowConfigurationConfig implements DataFlow::ConfigSig {
 
-  override predicate isSource(DataFlow::Node source) {
+  predicate isSource(DataFlow::Node source) {
     source.asParameter() instanceof IrqlSaveParameter
   }
 
-  override predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall fc, FundamentalIrqlSaveFunction fisf |
       fc.getTarget() = fisf and
       (
@@ -49,6 +47,8 @@ class IrqlFlowConfiguration extends DataFlow::Configuration {
     )
   }
 }
+
+module IrqlFlowConfiguration = DataFlow::Global<IrqlFlowConfigurationConfig>;
 
 /**
  * A function that we know will restore the IRQL, i.e. one defined
@@ -75,38 +75,38 @@ class FundamentalIrqlSaveFunction extends IrqlSavesFunction {
 /**
  * A simple data flow from any IrqlSaveParameter.
  */
-class IrqlSaveParameterFlowConfiguration extends DataFlow2::Configuration {
-  IrqlSaveParameterFlowConfiguration() { this = "IrqlSaveParameterFlowConfiguration" }
+module IrqlSaveParameterFlowConfigurationConfig implements DataFlow::ConfigSig {
 
-  override predicate isSource(DataFlow::Node source) {
+   predicate isSource(DataFlow::Node source) {
     source.asParameter() instanceof IrqlSaveParameter
   }
 
-  override predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::Node }
+   predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::Node }
 }
+module IrqlSaveParameterFlowConfiguration = DataFlow::Global<IrqlSaveParameterFlowConfigurationConfig>;
+
 
 /**
  * A data-flow configuration representing flow from an
  * OS function that returns an IRQL to be saved to a parameter marked
  * \_IRQL\_saves\_ (or a variable aliasing that parameter.)
  */
-class IrqlAssignmentFlowConfiguration extends DataFlow::Configuration {
-  IrqlAssignmentFlowConfiguration() { this = "IrqlAssignmentFlowConfiguration" }
+module IrqlAssignmentFlowConfigurationConfig implements DataFlow::ConfigSig {
 
-  override predicate isSource(DataFlow::Node source) {
+  predicate isSource(DataFlow::Node source) {
     source.asExpr() instanceof FunctionCall and
     source.asExpr().(FunctionCall).getTarget() instanceof FundamentalIrqlSaveFunction and
     source.asExpr().(FunctionCall).getTarget() instanceof IrqlSavesViaReturnFunction
   }
 
-  override predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     exists(Assignment a |
       a.getLValue().getAChild*().(VariableAccess).getTarget() instanceof IrqlSaveVariableFlowedTo and
       a.getRValue() = sink.asExpr()
     )
   }
 }
-
+module IrqlAssignmentFlowConfiguration = DataFlow::Global<IrqlAssignmentFlowConfigurationConfig>;
 /**
  * A variable that is either a parameter annotated \_IRQL\_saves\_
  * or a variable which contains the value from a parameter annotated as such.
@@ -116,14 +116,14 @@ class IrqlSaveVariableFlowedTo extends Variable {
 
   IrqlSaveVariableFlowedTo() {
     exists(
-      IrqlSaveParameterFlowConfiguration ispfc, DataFlow::Node parameter, DataFlow::Node assignment
+      DataFlow::Node parameter, DataFlow::Node assignment
     |
       (
         this.getAnAssignedValue() = assignment.asExpr() or
         this = assignment.asParameter()
       ) and
       parameter.asParameter() = isp and
-      ispfc.hasFlow(parameter, assignment)
+      IrqlSaveParameterFlowConfiguration::flow(parameter, assignment)
     )
     or
     this = isp
@@ -142,19 +142,19 @@ where
    */
 
   not exists(
-    DataFlow::Node node, IrqlSaveVariableFlowedTo isvft, IrqlAssignmentFlowConfiguration iafc
+    DataFlow::Node node, IrqlSaveVariableFlowedTo isvft
   |
     isvft.getSaveParameter() = isp and
     exists(Assignment a |
       a.getLValue().getAChild*().(VariableAccess).getTarget() = isvft and
       a.getRValue() = node.asExpr()
     ) and
-    iafc.hasFlow(_, node)
+    IrqlAssignmentFlowConfiguration::flow(_, node)
   ) and
   // Case two: is the IrqlSaveParameter passed into an OS function that will save a value to it?
-  not exists(DataFlow::Node node, IrqlFlowConfiguration ifc |
+  not exists(DataFlow::Node node |
     node.asParameter() = isp and
-    ifc.hasFlow(node, _)
+    IrqlFlowConfiguration::flow(node, _)
   )
 select isp, "The parameter $@ is annotated \"_IRQL_saves_\" but never has the IRQL saved to it.",
   isp, isp.getName()
