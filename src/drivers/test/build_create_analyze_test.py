@@ -244,6 +244,10 @@ def find_ql_test_paths(directory, extension):
         if "wfp" in root.split("\\") or "wfp" in root.split("/") or "QueryTemplate" in root:
             print_conditionally("Skipping: " + root)
             continue
+        if "TestTemplate" in root:
+            #exclude empty template driver_snippet files
+            print_conditionally("Skipping: " + root)
+            continue
         if fnmatch.filter(files, "driver_snippet.*"):
             use_ntifs = check_use_ntifs(os.path.join(root, fnmatch.filter(files, "driver_snippet.*")[0]))
             for file in files:
