@@ -1,0 +1,42 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		The argument causes the IRQ Level to be set below the current IRQL, and this function cannot be used for that purpose
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+		A function call that lowers the IRQL at which a caller is executing is being used inappropriately. Typically, the function call lowers the IRQL as part of a more general routine or is intended to raise the caller's IRQL.		
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			The following code example elicits this warning.
+		</p>
+		<sample language="c"> <![CDATA[
+			KeRaiseIrql(DISPATCH_LEVEL, &OldIrql);
+			KeRaiseIrql(PASSIVE_LEVEL, &OldIrql);
+		}]]>
+		</sample>
+		<p>
+			The following code example avoids this warning.
+		</p>
+		<sample language="c"> <![CDATA[
+			KeRaiseIrql(DISPATCH_LEVEL, &OldIrql);
+			KeLowerIrql(OldIrql);
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28141-argument-lowers-irq-level">
+				C28141
+			</a>
+		</li>
+	</references>
+</qhelp>
