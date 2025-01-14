@@ -1,0 +1,63 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		TODO overview
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			TODO recommendation
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			Code which triggers this query:
+		</p>
+		<sample language="c"> <![CDATA[
+                    class MyClass
+                    {
+                        ...
+                        bool memberFunc();
+                        ...
+                    };
+                    const StructType MyStruct[] = {
+                        ...
+                        &MyClass::memberFunc,
+                        ...
+                    };
+                ]]>
+		</sample>
+		<p>
+			Good code:
+		</p>
+		<sample language="c"> <![CDATA[
+                    class MyClass
+                    {
+                        ...
+                        bool memberFunc();
+                        static bool memberFuncWrap(MyClass *thisPtr)
+                            { return thisPtr->memberFunc(); }
+                        ...
+                    };
+                    const StructType MyStruct[] = {
+                        ...
+                        &MyClass::memberFuncWrap,
+                        ...
+                    };
+                ]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+			
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28651-member-function-pointers-cause-write-pages-copy">
+				C28651
+			</a>
+		</li>
+	</references>
+</qhelp>

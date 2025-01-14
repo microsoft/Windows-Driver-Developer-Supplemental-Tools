@@ -9,41 +9,44 @@ void top_level_call()
 {
 }
 
-
-// bad code 
-void Func()
-{
-    WCHAR*pszBuf=newWCHAR[MAX_PATH];
-    DPA_InsertPtr(_hdpa, DA_LAST, pszBuf);
-}
-
-void CleanupDPA()
-{
-    int count = DPA_GetCount(_hdpa);
-    for (int i = 0; i < count; i++)
-{
-    delete [] (LPWSTR)DPA_GetPtr(_hdpa, i);
-}
-}  
-
-
-// good code
-typedef struct _MYSTRUCT
-{
-    int i;
-    int j;
-} StructType;
-
 class MyClass
 {
     //...
+    public:
     bool memberFunc();
-    static bool memberFuncWrap(MyClass *thisPtr)
+    //...
+};
+
+typedef struct _MYSTRUCT
+{
+  bool (MyClass::*pfn)();
+} StructType;
+
+const StructType badStruct[1] = {
+   // ...
+    &MyClass::memberFunc
+  //  ...
+};  
+
+
+// good code
+
+class MyClass2
+{
+    //...
+    public:
+    bool memberFunc();
+    static bool memberFuncWrap(MyClass2 *thisPtr)
         { return thisPtr->memberFunc(); }
     //...
 };
-const StructType MyStruct[] = {
-   // ...
-    &MyClass::memberFuncWrap,
-  //  ...
+
+typedef struct _MYSTRUCT2
+{
+  bool (*pfn)(MyClass2*);
+} StructType2;
+
+const StructType2 goodStruct[1] = {
+    &MyClass2::memberFuncWrap
 };  
+
