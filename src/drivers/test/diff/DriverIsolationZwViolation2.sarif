@@ -1,0 +1,42 @@
+{
+    "all": {
+        "+": 2,
+        "-": 2
+    },
+    "error": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    },
+    "warning": {
+        "+": 2,
+        "-": 2,
+        "codes": [
+            [
+                "cpp/drivers/driver-isolation-zw-violation-2 ZwOpenKey call has parameter of type OBJECT_ATTRIBUTES with NULL RootDirectory field uses a valid path [\\\\Registry\\\\Machine\\\\Hardware\\\\DeviceMap\\\\Scsi\\\\Scsi Port %d\\\\Scsi Bus %d\\\\Target Id %d\\\\Logical Unit Id %d](1) for ObjectName field, but is a Driver Isolation Violation due to having write access ",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/driver-isolation-zw-violation-2 ZwOpenKey call has parameter of type OBJECT_ATTRIBUTES with NULL RootDirectory field uses an invalid path [\\\\some\\\\bad\\\\path\\\\test\\\\test.txt](1) for ObjectName field ",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/driver-isolation-zw-violation-2 ZwOpenKey call has parameter of type OBJECT_ATTRIBUTES with NULL RootDirectory field uses a valid path [\\Registry\\Machine\\Hardware\\DeviceMap\\Scsi\\Scsi Port %d\\Scsi Bus %d\\Target Id %d\\Logical Unit Id %d](1) for ObjectName field, but is a Driver Isolation Violation due to having write access ",
+                1,
+                0
+            ],
+            [
+                "cpp/drivers/driver-isolation-zw-violation-2 ZwOpenKey call has parameter of type OBJECT_ATTRIBUTES with NULL RootDirectory field uses an invalid path [\\some\\bad\\path\\test\\test.txt](1) for ObjectName field ",
+                1,
+                0
+            ]
+        ]
+    },
+    "note": {
+        "+": 0,
+        "-": 0,
+        "codes": []
+    }
+}

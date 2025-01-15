@@ -3,9 +3,9 @@
 import cpp
 
 //Represents functions where a function has either PAGED_CODE or PAGED_CODE_LOCKED macro invocations
-cached
+
 class PagedFunc extends Function {
-  cached
+  
   PagedFunc() {
     exists(MacroInvocation mi |
       mi.getEnclosingFunction() = this and
@@ -56,11 +56,11 @@ predicate isPagedSegSetWithMacroAbove(Function f) {
 }
 
 //Represents functions for whom code_seg() is set
-cached
+
 class FunctionWithPageReset extends Function {
   DefaultCodeSegPragma dcs;
 
-  cached
+  
   FunctionWithPageReset() {
     exists(CodeSegPragma csp, DefaultCodeSegPragma dcsp |
       this.getLocation().getStartLine() > csp.getLocation().getStartLine() and
@@ -71,14 +71,14 @@ class FunctionWithPageReset extends Function {
     )
   }
 
-  cached
+  
   DefaultCodeSegPragma getCodeSeg() { result = dcs }
 }
 
 //Represents functions for whom code_seg("PAGE") is set
-cached
+
 class FunctionWithPageSet extends Function {
-  cached
+  
   FunctionWithPageSet() {
     exists(CodeSegPragma csp |
       this.getLocation().getStartLine() > csp.getLocation().getStartLine() and
@@ -93,9 +93,9 @@ class FunctionWithPageSet extends Function {
 }
 
 //Represents a paged section
-cached
+
 class PagedFunctionDeclaration extends Function {
-  cached
+  
   PagedFunctionDeclaration() {
     isPagedSegSetWithMacroAbove(this)
     or

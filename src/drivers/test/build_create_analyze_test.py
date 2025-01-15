@@ -38,6 +38,20 @@ health_df = pd.DataFrame()
 detailed_health_df = pd.DataFrame()
 
 
+def print_conditionally(*message):
+    """
+    Prints the message if the verbose flag is set.
+
+    Args:
+        message (str): The message to be printed.
+
+    Returns:
+        None
+    """
+    if args.verbose:
+        for m in message:
+            print(m, end=" ")
+        print("")
 
 # Any attributes specific to a test should be added to this class
 # This also allows for things to be conditionally added to the test call, such as the UseNTIFS parameter
@@ -226,6 +240,10 @@ def find_ql_test_paths(directory, extension):
     
     ql_files_map = {}
     for root, dirs, files in os.walk(directory):
+        # exclude wfp folder until correct test template is added
+        if "wfp" in root.split("\\") or "wfp" in root.split("/") or "QueryTemplate" in root:
+            print_conditionally("Skipping: " + root)
+            continue
         if fnmatch.filter(files, "driver_snippet.*"):
             use_ntifs = check_use_ntifs(os.path.join(root, fnmatch.filter(files, "driver_snippet.*")[0]))
             for file in files:
@@ -264,7 +282,6 @@ def find_project_configs(sln_files):
                     lines = lines[:end_index]
                     lines = lines.split("\n")
                     lines = [x for x in lines if x.strip() != ""]
-                    #print(lines)
                     for l in lines:
                         if "Debug" in l:
                             l = l[l.find("Debug"):]
@@ -310,7 +327,7 @@ def test_setup_external_drivers(sln_files):
             
             # TODO make this multi threaded
             for config, platform in configs[sln_file]:
-                print("Building: " + sln_file + " " + str(config) + " " + str(platform))
+                print_conditionally("Building: " + sln_file + " " + str(config) + " " + str(platform))
                     
                 out = subprocess.run(["msbuild", sln_file, "-clp:Verbosity=m", "-t:clean,build", "-property:Configuration="+config,  "-property:Platform="+platform, "-p:TargetVersion=Windows10",  
                             "-p:SignToolWS=/fdws", "-p:DriverCFlagAddOn=/wd4996", "-noLogo"], shell=True, capture_output=no_output)
@@ -345,9 +362,9 @@ def test_setup(ql_test):
     
     if os.path.exists(current_working_dir.strip()):
         shutil.rmtree(current_working_dir)
-    print("Creating working directory: " + current_working_dir)
+    print_conditionally("Creating working directory: " + current_working_dir)
     shutil.copytree(ql_test.get_template(), current_working_dir)
-    print("Copying files to working directory: " + current_working_dir)
+    print_conditionally("Copying files to working directory: " + current_working_dir)
     test_file_loc = os.path.join(g_template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())
     # Copy files to driver directory
     for file in os.listdir(test_file_loc):
@@ -355,7 +372,7 @@ def test_setup(ql_test):
    
     # Rebuild the project using msbuild
     if not args.no_build:
-        print("Building: " + ql_test.get_ql_name())
+        print_conditionally("Building: " + ql_test.get_ql_name())
         out1 = subprocess.run(["msbuild", "/t:rebuild", "/p:platform=x64", "/p:UseNTIFS="+ql_test.get_use_ntifs()+""],cwd=current_working_dir, shell=True, capture_output=no_output  ) 
         if out1.returncode != 0:
             print("Error in msbuild: " + ql_test.get_ql_name())
@@ -394,7 +411,7 @@ def db_create_for_external_driver(sln_file, config, platform):
 
     # TODO either clear these, ask for overwrite, or use a different name
     db_loc = os.getcwd() + "\\dbs\\"+sln_file.split("\\")[-1].replace(".sln", "")+"_"+config+"_"+platform
-    print("Creating database: ",  db_loc)
+    print_conditionally("Creating database: ",  db_loc)
     out2 = subprocess.run([codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
             cwd=workdir, 
@@ -408,7 +425,7 @@ def db_create_for_external_driver(sln_file, config, platform):
 
         return None
     else:
-        print(".... done!")
+        print_conditionally(".... done!")
     return db_loc
 
 
@@ -427,8 +444,6 @@ def create_codeql_test_database(ql_test):
 
     """
     # Create the CodeQL database
-   # print("current working directory: ", os.getcwd())
-    
     os.makedirs(os.path.join(os.getcwd(), "TestDB"), exist_ok=True) 
     if os.path.exists(os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name())):
         shutil.rmtree(os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()))
@@ -436,13 +451,13 @@ def create_codeql_test_database(ql_test):
     source_dir=os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name()+"\\")
     db_loc =   os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()+"\\")
     
-    
-    #print("-- Database location: " + db_loc)
-    #print("-- Source directory: " + source_dir)
-    #print("-- -- Command to run:", [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc])
-    out2 = subprocess.run([codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc],
-            
-            shell=True, capture_output=no_output  ) 
+    codeql_command = [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ 
+                           " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc]
+    print_conditionally(" - Database location: " + db_loc)
+    print_conditionally(" - Source directory: " + source_dir)
+    print_conditionally(" - Command to run: " + str(codeql_command))
+    out2 = subprocess.run(codeql_command,
+                            shell=True, capture_output=no_output  ) 
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
         try:
@@ -468,6 +483,8 @@ def analyze_codeql_database(ql_test, db_path=None):
         None
 
     """
+    print_conditionally("Analyzing database: " + db_path)
+
     # Analyze the CodeQL database
     if not os.path.exists("AnalysisFiles\Test Samples"):
         os.makedirs("AnalysisFiles\Test Samples", exist_ok=True) 
@@ -494,7 +511,7 @@ def analyze_codeql_database(ql_test, db_path=None):
     else:
         proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_file_path ]
         
-    print("Saving SARIF file to: " + output_file)
+    print_conditionally("Sarif output location: " + output_file)
       
     out3 = subprocess.run(proc_command, 
                     shell=True, capture_output=no_output  ) 
@@ -521,8 +538,9 @@ def sarif_diff(ql_test):
         The output of the SARIF diff command if successful, None otherwise.
     """
     sarif_prev = os.path.join(g_template_dir, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif")
-    sarif_new = os.path.join(g_template_dir, "AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif")
+    sarif_new = os.path.join(".\\AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif")
     sarif_out = os.path.join(g_template_dir,  "diff\\"+ql_test.get_ql_name()+".sarif")
+    print_conditionally("Running sarif diff: " + ql_test.get_ql_name(), "\n - Previous: ", sarif_prev, "\n - New: ", sarif_new)
     out4 = subprocess.run(["sarif", "diff", "-o", sarif_out ,sarif_prev, sarif_new], 
                     shell=True, capture_output=no_output  ) 
     if out4.returncode != 0:
@@ -532,7 +550,7 @@ def sarif_diff(ql_test):
         except:
             print(out4.stderr)
         return None
-    print("Saving output to:", sarif_out)
+    print_conditionally("Diff output location:", sarif_out)
 
     return out4
 
@@ -576,14 +594,14 @@ def run_test(ql_test):
   
     # Print test attributes
     print_mutex.acquire()
-    print(ql_test.get_ql_name(), "\n",  
-          "Template: ", ql_test.get_template(), "\n",  
-          "Driver Framework: ", ql_test.get_ql_type(), "\n",  
-          "Query location: ", ql_test.get_ql_location(), "\n",  
-          "UseNTIFS flag: ", ql_test.get_use_ntifs(),"\n")
+    print("\nRunning test: " + ql_test.get_ql_name())
+    
+    print_conditionally(" - Template: ", ql_test.get_template(), "\n",  
+          "- Driver Framework: ", ql_test.get_ql_type(), "\n",  
+          "- Query location: ", ql_test.get_ql_location(), "\n",  
+          "- UseNTIFS flag: ", ql_test.get_use_ntifs())
     print_mutex.release()
 
-    print("Running test: " + ql_test.get_ql_name())
     create_codeql_database_result = None
     if not args.existing_database:
         test_setup_result = test_setup(ql_test)
@@ -591,7 +609,7 @@ def run_test(ql_test):
             print("Error setting up test: " + ql_test.get_ql_name(),"Skipping...")
             return None
         
-        print("Creating test database")
+        print_conditionally("Creating test database")
         create_codeql_database_result = create_codeql_test_database(ql_test)
         if create_codeql_database_result is None:
             print("Error creating database: " + ql_test.get_ql_name(),"Skipping...")
@@ -600,9 +618,8 @@ def run_test(ql_test):
             db_path = create_codeql_database_result
     else:
         db_path=args.existing_database
-        print("Using existing database: " + db_path)
+        print_conditionally("Using existing database: " + db_path)
 
-    print("Analyzing database: " + db_path)
     analyze_codeql_database_result = analyze_codeql_database(ql_test, db_path) # result is path to sarif file if successful
     if analyze_codeql_database_result is None:
         print("Error analyzing database: " + db_path,"Skipping...")
@@ -693,13 +710,13 @@ def run_tests_external_drivers(ql_tests_dict):
     total = len(configs.keys())
     count = 0
     if args.existing_database:
-            print("Using existing database: " + args.existing_database)
+            print_conditionally("Using existing database: " + args.existing_database)
             folder_names = [os.path.join(args.existing_database, name) for name in os.listdir(args.existing_database) if os.path.isdir(os.path.join(args.existing_database, name))]
             created_databases = folder_names
             total = len(folder_names)
     else:
         for sln_file in configs.keys():
-            print("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
+            print_conditionally("Creating databases for " + sln_file + " ---> " + str(count) + "/" + str(total))
             for config, platform in configs[sln_file]:
                 create_codeql_database_result = db_create_for_external_driver(sln_file, config, platform)
                 if create_codeql_database_result is None: 
@@ -715,9 +732,9 @@ def run_tests_external_drivers(ql_tests_dict):
     count = 0
     total = len(created_databases)*len(ql_tests_with_attributes)
     for ql_test in ql_tests_with_attributes:
-        print("Run query: " + ql_test.get_ql_name())
+        print_conditionally("Run query: " + ql_test.get_ql_name())
         for db in created_databases:
-            print("...... on database " + str(count) + "/" + str(total)+ ": " + db)
+            print_conditionally("...... on database " + str(count) + "/" + str(total)+ ": " + db)
             count += 1
             try:
                 result_sarif = analyze_codeql_database(ql_test, db)
@@ -734,7 +751,7 @@ def run_tests_external_drivers(ql_tests_dict):
             health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(analysis_results['error'] + analysis_results['warning'] + analysis_results['note'])
             detailed_health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(detailed_analysis_results)
     # save results
-    result_file = "results.xlsx"
+    result_file = "external_drivers_results.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer, sheet_name="Results")
         codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
@@ -746,8 +763,8 @@ def run_tests_external_drivers(ql_tests_dict):
         codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
         system_info_df.to_excel(writer, sheet_name="System Info")
     if args.compare_results:
-        compare_health_results(result_file)
         compare_health_results("detailed"+result_file)
+        compare_health_results(result_file)
     
 
 def find_last_xlsx_file(curr_results_path):
@@ -767,7 +784,6 @@ def find_last_xlsx_file(curr_results_path):
         detailed = False
 
     files = os.listdir()
-    print(files)
     files = [x for x in files if "diff" not in x]
     if detailed:
         files = [x for x in files if x.endswith(".xlsx") and "detailed" in x and x != curr_results_path]
@@ -789,19 +805,20 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
+    
     if not args.connection_string or not args.share_name:
         raise Exception("Azure credentials not provided. Cannot compare results.")
     
     try:
         prev_results = 'azure-'+curr_results_path
-        _ = download_file_from_azure(file_to_download=prev_results, 
+        print_conditionally("Downloading previous results from Azure: " + prev_results)
+        temp_file = download_file_from_azure(file_to_download=prev_results, 
                         file_name=curr_results_path, file_directory="")
+        print_conditionally("Downloaded previous results: " + temp_file)
         
     except Exception as e:
         if "ResourceNotFound" in str(e):
-            print("No previous results found. Uploading current results to Azure...")
-            upload_results_to_azure(file_to_upload=curr_results_path, 
-                        file_name=curr_results_path, file_directory="")
+            print("No previous results found")
             exit(1)
         else:
             print("Error downloading previous results ")
@@ -812,27 +829,27 @@ def compare_health_results(curr_results_path):
     prev_results_codeql_packs_df = pd.read_excel(prev_results, index_col=0, sheet_name=2)
     prev_results_system_info_df = pd.read_excel(prev_results, index_col=0, sheet_name=3)
     curr_results_df = pd.read_excel(curr_results_path, index_col=0, sheet_name=0)
-    print("Comparing results...")
-    try:
-        for row in prev_results_df.index:
-            if row not in curr_results_df.index:
-                curr_results_df.loc[row] = None
-                print("Adding row to current results: ", row)
-        for row in curr_results_df.index:
-            if row not in prev_results_df.index:
-                prev_results_df.loc[row] = None
-                print("Adding row to previous results: ", row)
-        prev_results_df = prev_results_df.sort_index()
-        curr_results_df = curr_results_df.sort_index()
-        diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
-    except Exception as e: 
-        print("Error comparing results: ", e, "Uploading previous results back to Azure as", prev_results, "and current results back to Azure as", curr_results_path)
-        upload_results_to_azure(file_to_upload=prev_results, 
-                            file_name=prev_results, file_directory="")
-        upload_results_to_azure(file_to_upload=curr_results_path, 
-                            file_name=curr_results_path, file_directory="")
-        exit(1)
-        
+    print_conditionally("Comparing results...")
+    print_conditionally("Previous results: ", prev_results)
+    print_conditionally("Current results: ", curr_results_path)
+    for row in prev_results_df.index:
+        if row not in curr_results_df.index:
+            curr_results_df.loc[row] = None
+            print_conditionally("Adding row to current results: ", row)
+       
+    for row in curr_results_df.index:
+        if row not in prev_results_df.index:
+            prev_results_df.loc[row] = None
+            print_conditionally("Adding row to previous results: ", row)
+   
+    prev_results_df = prev_results_df.sort_index()
+    curr_results_df = curr_results_df.sort_index()
+
+    #TODO this is a tempoary fix for the issue with the backslashes in the results in codeql cli version 2.18.x+
+    prev_results_df = prev_results_df.replace({r'\\': ''}, regex=True)
+    curr_results_df = curr_results_df.replace({r'\\': ''}, regex=True)
+            
+    diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))  
     
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer, sheet_name="Diff")
@@ -842,27 +859,27 @@ def compare_health_results(curr_results_path):
         prev_results_codeql_version_df.to_excel(writer, sheet_name="Previous CodeQL Version")
         prev_results_codeql_packs_df.to_excel(writer, sheet_name="Previous CodeQL Packs")
         prev_results_system_info_df.to_excel(writer, sheet_name="Previous System Info")
-        print("Saved diff results")
+        print_conditionally("Saved diff results")
 
     if not args.local_result_storage:
         # upload new results to Azure
         if args.overwrite_azure_results:
-            print("Uploading results")
+            print_conditionally("Uploading results")
             upload_results_to_azure(file_to_upload=curr_results_path, 
                                 file_name=curr_results_path, file_directory="")
             # upload diff to Azure 
-        print("Uploading diff results")
+        print_conditionally("Uploading diff results")
         upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
                                     file_name="diff" + curr_results_path, file_directory="")
         
-    if not all(diff_results.isnull().all()):
+    if not all(diff_results.isnull().all()) :
         print("Differences found in results!")
         exit(1)
     else:
         print("No differences found in results")
     # delete downloaded file
     os.remove(prev_results)
-    print("Deleted previous results")
+    print_conditionally("Deleted previous results")
     
 
 def run_tests(ql_tests_dict):
@@ -883,11 +900,9 @@ def run_tests(ql_tests_dict):
             print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
             continue
         analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
-       # health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
-        health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
         
-        #detailed_health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
-        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
+        health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
+        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results) 
       
     # save results
     result_file = "functiontestresults.xlsx"
@@ -902,8 +917,8 @@ def run_tests(ql_tests_dict):
         codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
         system_info_df.to_excel(writer, sheet_name="System Info")
     if args.compare_results:
-        compare_health_results(result_file)
         compare_health_results("detailed"+result_file)
+        compare_health_results(result_file)
     
 def find_g_template_dir(template):
     """
@@ -952,6 +967,7 @@ if __name__ == "__main__":
     parser.add_argument('-n', '--no_build', help='Do not build the driver before running the test', action='store_true', required=False)
     parser.add_argument('-o', '--override_template', help='Override the template used for the test using <template>', type=str, required=False, choices=["CppKMDFTestTemplate", "KMDFTestTemplate", "WDMTestTemplate"])
     parser.add_argument('-v', '--verbose', help='verbose output on', action='store_true', required=False)
+    parser.add_argument('--more_verbose', help='verbose output on including subprocess outputs', action='store_true', required=False)
     parser.add_argument('-c', '--use_codeql_repo', help='Use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager', type=str, required=False)
     parser.add_argument('-i', '--individual_test', help='Run only the tests with <name> in the name', type=str, required=False)
     parser.add_argument('-t', '--threads', help='Number of threads to use for multithreaded run', type=int, required=False)
@@ -967,7 +983,14 @@ if __name__ == "__main__":
     parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False,)
     args = parser.parse_args()
     
-
+    if args.overwrite_azure_results:
+        print("Overwriting Azure results")
+        print("Type 'yes' to confirm")
+        confirm = input()
+        if confirm != "yes":
+            print("Exiting")
+            exit(1)
+            
     if args.codeql_path:
         codeql_path = args.codeql_path
     else:
@@ -991,7 +1014,7 @@ if __name__ == "__main__":
     start_time = time.time()
 
     if not args.no_clean and not args.existing_database:
-        print("Cleaning working directories: TestDB, working, AnalysisFiles")
+        print_conditionally("Cleaning working directories: TestDB, working, AnalysisFiles")
         if os.path.exists("TestDB"):
             shutil.rmtree("TestDB")
         if os.path.exists("working"):
@@ -1012,22 +1035,21 @@ if __name__ == "__main__":
     if os.path.exists(os.path.join(os.getcwd(), "WDMTestTemplate")):
         g_template_dir = os.getcwd() + "\\"
     else:
-        print("Template directory not found in current working directory, using default")    
+        print_conditionally("Using default template directory: src\\drivers\\test\\")    
         g_template_dir = os.path.join(os.getcwd(), "src\\drivers\\test\\")
 
-    print(g_template_dir)
     driver_sln_files = []
     if args.external_drivers:
         dir_to_search = args.external_drivers
         extension_to_search = ".sln"
         driver_sln_files = find_sln_file(dir_to_search)
-        print("Found " + str(len(driver_sln_files)) + " drivers")
+        print_conditionally("Found " + str(len(driver_sln_files)) + " drivers")
         for ql_file in ql_tests:
             ql_tests[ql_file].set_external_drivers(driver_sln_files)
     
     threads = []    
    
-    if args.verbose:
+    if args.more_verbose:
         no_output = False
    
     if args.existing_database:
@@ -1037,7 +1059,10 @@ if __name__ == "__main__":
         # TODO doesn't work with --external_drivers
 
     if args.individual_test:
-        ql_files_keys = [x for x in ql_tests if args.individual_test == x.split("\\")[-1].replace(".ql", "")]
+        ql_files_keys = [x for x in ql_tests if args.individual_test in x.split("\\")[-1]]
+        if not ql_files_keys:
+            print("Invalid test name: " + args.individual_test + " not found") 
+            exit(1)
     elif args.threads:
         ql_files_keys = [x for x in ql_tests]
     elif len(sys.argv) == 1:
@@ -1077,5 +1102,5 @@ if __name__ == "__main__":
             run_tests(ql_tests)
 
     end_time = time.time()
-    print("Total run time: " + str((end_time - start_time)/60) + " minutes")
+    print_conditionally("Total run time: " + str((end_time - start_time)/60) + " minutes")
   

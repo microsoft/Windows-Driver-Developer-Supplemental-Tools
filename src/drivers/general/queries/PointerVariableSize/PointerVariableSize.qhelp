@@ -1,0 +1,43 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		The driver is taking the size of a pointer variable, not the size of the value that is pointed to
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			If the driver needs the size of the pointed-to value, change the code so that it references the value. If the driver actually needs the size of the pointer, take the size of the pointer type (for example, LPSTR, char* or even void*) to clarify that this is the intent.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			The following code example elicits this warning.
+		</p>
+		<sample language="c"> <![CDATA[
+			void bad(){
+				char* b = 0;
+				memset(b, 0, sizeof(b));
+			}
+		}]]>
+		</sample>
+		<p>
+			The following code example avoids this warning.
+		</p>
+		<sample language="c"> <![CDATA[
+			void good(){
+				char* b = 0;
+				memset(b, 0, sizeof(*b));
+			}
+		}]]>
+		</sample>
+	</example>
+	
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28132-driver-taking-the-size-of-pointer">
+				Warning C28132
+			</a>
+		</li>
+	</references>
+</qhelp>

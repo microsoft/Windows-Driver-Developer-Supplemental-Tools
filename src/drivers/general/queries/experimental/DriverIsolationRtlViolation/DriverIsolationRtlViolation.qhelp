@@ -1,0 +1,51 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		There is a driver isolation violation if there is an Rtl* registry function call with with a RelativeTo parameter != RTL_REGISTRY_DEVICEMAP or a RelativeTo parameter == RTL_REGISTRY_DEVICEMAP and writes to registry (reads are OK)
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			If using an Rtl* registry function, use RelativeTo parameter == RTL_REGISTRY_DEVICEMAP and only read from the registry
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			Example of a driver isolation violation. A call to RtlWriteRegistryValue with RelativeTo parameter != RTL_REGISTRY_DEVICEMAP.
+		</p>
+		<sample language="c"> <![CDATA[
+		RtlWriteRegistryValue(RTL_REGISTRY_HANDLE,
+                          (PCWSTR)DriverKey,
+                          ValueName,
+                          REG_SZ,
+                          ValueValue,
+                          sizeof ValueValue);
+		}]]>
+		</sample>
+		<p>
+			TODO example 2
+		</p>
+		<sample language="c"> <![CDATA[
+         RtlQueryRegistryValues(
+                    RTL_REGISTRY_SERVICES,
+                    L"Serenum",
+                    QueryTable,
+                    NULL,
+                    NULL)
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+			
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+				<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation">
+				Driver package isolation
+			</a>
+		</li>
+	</references>
+</qhelp>
