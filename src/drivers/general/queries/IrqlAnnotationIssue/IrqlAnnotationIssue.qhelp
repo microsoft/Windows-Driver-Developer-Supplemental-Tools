@@ -1,0 +1,40 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		TODO overview
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			TODO recommendation
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			Incorrect IRQL annotation
+		</p>
+		<sample language="c"> <![CDATA[
+			_IRQL_requires_(65)
+		}]]>
+		</sample>
+		<p>
+			Incorrect IRQL annotation
+		</p>
+		<sample language="c"> <![CDATA[
+			_IRQL_always_function_max_(irql_variable)
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28153-irql-annotation-eval-context">
+				C28153
+			</a>
+		</li>
+	</references>
+</qhelp>
