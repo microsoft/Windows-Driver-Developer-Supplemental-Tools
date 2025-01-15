@@ -1,0 +1,52 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		TODO overview
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			TODO recommendation
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			Function annotated with _IRQL_requires_same_ but can possibly exit at a different IRQL level.
+		</p>
+		<sample language="c"> <![CDATA[
+		_IRQL_requires_same_ void fail1(PKIRQL oldIrql)
+		{
+
+			if (oldIrql == PASSIVE_LEVEL)
+			{
+				KeLowerIrql(*oldIrql);
+			}
+			else
+			{
+				KeRaiseIrql(DISPATCH_LEVEL, oldIrql); // Function exits at DISPATCH_LEVEL
+			}
+		}
+		}]]>
+		</sample>
+		<p>
+			TODO example 2
+		</p>
+		<sample language="c"> <![CDATA[
+				// Example code
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+			TODO notes
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="example.com">
+				Example link
+			</a>
+		</li>
+	</references>
+</qhelp>
