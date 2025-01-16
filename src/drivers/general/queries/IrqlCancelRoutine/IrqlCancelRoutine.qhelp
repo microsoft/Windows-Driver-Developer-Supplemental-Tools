@@ -1,0 +1,40 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		TODO overview
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			TODO recommendation
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			The following example shows an incorrect use of IoReleaseCncelSpinLock within a cancel routine
+		</p>
+		<sample language="c"> <![CDATA[
+			IoReleaseCancelSpinLock(PASSIVE_LEVEL);
+		}]]>
+		</sample>
+		<p>
+			Correct use of IoReleaseCncelSpinLock within a cancel routine
+		</p>
+		<sample language="c"> <![CDATA[
+			IoReleaseCancelSpinLock(Irp->CancelIrql);
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28144-cancelirql-should-be-current-irql">
+				C28144
+			</a>
+		</li>
+	</references>
+</qhelp>

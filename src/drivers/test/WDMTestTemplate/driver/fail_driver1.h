@@ -74,3 +74,5 @@ KSERVICE_ROUTINE InterruptServiceRoutine;
 IO_DPC_ROUTINE DpcForIsrRoutine;
 
 DRIVER_UNLOAD DriverUnload;
+
+DRIVER_CANCEL DriverCancel;
