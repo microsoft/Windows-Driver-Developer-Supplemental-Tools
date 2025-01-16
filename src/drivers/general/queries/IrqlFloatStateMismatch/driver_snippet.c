@@ -9,29 +9,32 @@ void top_level_call()
 {
 }
 
-_IRQL_always_function_min_(APC_LEVEL) 
+_IRQL_requires_(PASSIVE_LEVEL) 
 void driver_utility_bad(void)
 {
+    KIRQL oldIRQL;
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
     // running at APC level
     KFLOATING_SAVE FloatBuf;
     if (KeSaveFloatingPointState(&FloatBuf))
     {
-        KeLowerIrql(PASSIVE_LEVEL);
+        KeLowerIrql(oldIRQL); // lower back to PASSIVE_LEVEL
         // ...
         KeRestoreFloatingPointState(&FloatBuf);
     }
 }
 
-_IRQL_always_function_min_(APC_LEVEL) 
+_IRQL_requires_(PASSIVE_LEVEL) 
 void driver_utility_good(void)
 {
     // running at APC level
     KFLOATING_SAVE FloatBuf;
     KIRQL oldIRQL;
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
 
     if (KeSaveFloatingPointState(&FloatBuf))
     {
-        KeLowerIrql(PASSIVE_LEVEL);
+        KeLowerIrql(oldIRQL);
         // ...
         KeRaiseIrql(APC_LEVEL, &oldIRQL);
         KeRestoreFloatingPointState(&FloatBuf);

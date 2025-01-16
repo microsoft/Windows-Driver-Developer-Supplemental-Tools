@@ -12,17 +12,46 @@
 	</recommendation>
 	<example>
 		<p>
-			TODO example
+			Example of incorrect code. Floating point state was saved at APC_LEVEL but restored at PASSIVE_LEVEL
 		</p>
 		<sample language="c"> <![CDATA[
-		// Example code
+		_IRQL_requires_(PASSIVE_LEVEL) 
+		void driver_utility_bad(void)
+		{
+			KIRQL oldIRQL;
+			KeRaiseIrql(APC_LEVEL, &oldIRQL);
+			// running at APC level
+			KFLOATING_SAVE FloatBuf;
+			if (KeSaveFloatingPointState(&FloatBuf))
+			{
+				KeLowerIrql(oldIRQL); // lower back to PASSIVE_LEVEL
+				// ...
+				KeRestoreFloatingPointState(&FloatBuf);
+			}
+		}
+
 		}]]>
 		</sample>
 		<p>
-			TODO example 2
+			Correct example
 		</p>
 		<sample language="c"> <![CDATA[
-				// Example code
+			_IRQL_requires_(PASSIVE_LEVEL) 
+			void driver_utility_good(void)
+			{
+				// running at APC level
+				KFLOATING_SAVE FloatBuf;
+				KIRQL oldIRQL;
+				KeRaiseIrql(APC_LEVEL, &oldIRQL);
+
+				if (KeSaveFloatingPointState(&FloatBuf))
+				{
+					KeLowerIrql(oldIRQL);
+					// ...
+					KeRaiseIrql(APC_LEVEL, &oldIRQL);
+					KeRestoreFloatingPointState(&FloatBuf);
+				}
+			}
 		}]]>
 		</sample>
 	</example>

@@ -1,199 +1,343 @@
 {
-  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
-  "version" : "2.1.0",
-  "runs" : [ {
-    "tool" : {
-      "driver" : {
-        "name" : "CodeQL",
-        "organization" : "GitHub",
-        "semanticVersion" : "2.15.4",
-        "notifications" : [ {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "name" : "cpp/baseline/expected-extracted-files",
-          "shortDescription" : {
-            "text" : "Expected extracted files"
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+      {
+          "tool": {
+              "driver": {
+                  "name": "CodeQL",
+                  "organization": "GitHub",
+                  "semanticVersion": "2.19.3",
+                  "notifications": [
+                      {
+                          "id": "cpp/baseline/expected-extracted-files",
+                          "name": "cpp/baseline/expected-extracted-files",
+                          "shortDescription": {
+                              "text": "Expected extracted files"
+                          },
+                          "fullDescription": {
+                              "text": "Files appearing in the source archive that are expected to be extracted."
+                          },
+                          "defaultConfiguration": {
+                              "enabled": true
+                          },
+                          "properties": {
+                              "tags": [
+                                  "expected-extracted-files",
+                                  "telemetry"
+                              ]
+                          }
+                      },
+                      {
+                          "id": "cpp/extractor/summary",
+                          "name": "cpp/extractor/summary",
+                          "shortDescription": {
+                              "text": "C++ extractor telemetry"
+                          },
+                          "fullDescription": {
+                              "text": "C++ extractor telemetry"
+                          },
+                          "defaultConfiguration": {
+                              "enabled": true
+                          }
+                      }
+                  ],
+                  "rules": [
+                      {
+                          "id": "cpp/drivers/irql-float-state-mismatch",
+                          "name": "cpp/drivers/irql-float-state-mismatch",
+                          "shortDescription": {
+                              "text": "Irql Float State Mismatch"
+                          },
+                          "fullDescription": {
+                              "text": "The IRQL where the floating-point state was saved does not match the current IRQL (for this restore operation)."
+                          },
+                          "defaultConfiguration": {
+                              "enabled": true,
+                              "level": "warning"
+                          },
+                          "properties": {
+                              "tags": [
+                                  "correctness"
+                              ],
+                              "description": "The IRQL where the floating-point state was saved does not match the current IRQL (for this restore operation).",
+                              "feature.area": "Multiple",
+                              "id": "cpp/drivers/irql-float-state-mismatch",
+                              "impact": "Insecure Coding Practice",
+                              "kind": "problem",
+                              "name": "Irql Float State Mismatch",
+                              "opaqueid": "CQLD-C28111",
+                              "owner.email:": "sdat@microsoft.com",
+                              "platform": "Desktop",
+                              "precision": "medium",
+                              "problem.severity": "warning",
+                              "query-version": "v1",
+                              "repro.text": "The IRQL at which the driver is executing when it restores a floating-point state is different than the IRQL at which it was executing when it saved the floating-point state.\n Because the IRQL at which the driver runs determines how the floating-point state is saved, the driver must be executing at the same IRQL when it calls the functions to save and to restore the floating-point state.",
+                              "scope": "domainspecific"
+                          }
+                      }
+                  ]
+              },
+              "extensions": [
+                  {
+                      "name": "microsoft/windows-drivers",
+                      "semanticVersion": "1.3.0+ffa7244da2c2fe57cdf6260be5d8b90e7c335336",
+                      "locations": [
+                          {
+                              "uri": "file:///C:/codeql-home/WDDST/src/",
+                              "description": {
+                                  "text": "The QL pack root directory."
+                              },
+                              "properties": {
+                                  "tags": [
+                                      "CodeQL/LocalPackRoot"
+                                  ]
+                              }
+                          },
+                          {
+                              "uri": "file:///C:/codeql-home/WDDST/src/qlpack.yml",
+                              "description": {
+                                  "text": "The QL pack definition file."
+                              },
+                              "properties": {
+                                  "tags": [
+                                      "CodeQL/LocalPackDefinitionFile"
+                                  ]
+                              }
+                          }
+                      ]
+                  },
+                  {
+                      "name": "codeql/cpp-all",
+                      "semanticVersion": "3.1.0+d42788844f7ec0a6b9832140313cc2318e513987",
+                      "locations": [
+                          {
+                              "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/",
+                              "description": {
+                                  "text": "The QL pack root directory."
+                              },
+                              "properties": {
+                                  "tags": [
+                                      "CodeQL/LocalPackRoot"
+                                  ]
+                              }
+                          },
+                          {
+                              "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/qlpack.yml",
+                              "description": {
+                                  "text": "The QL pack definition file."
+                              },
+                              "properties": {
+                                  "tags": [
+                                      "CodeQL/LocalPackDefinitionFile"
+                                  ]
+                              }
+                          }
+                      ]
+                  }
+              ]
           },
-          "fullDescription" : {
-            "text" : "Files appearing in the source archive that are expected to be extracted."
-          },
-          "defaultConfiguration" : {
-            "enabled" : true
-          },
-          "properties" : {
-            "tags" : [ "expected-extracted-files", "telemetry" ]
+          "invocations": [
+              {
+                  "toolExecutionNotifications": [
+                      {
+                          "locations": [
+                              {
+                                  "physicalLocation": {
+                                      "artifactLocation": {
+                                          "uri": "driver/driver_snippet.c",
+                                          "uriBaseId": "%SRCROOT%",
+                                          "index": 0
+                                      }
+                                  }
+                              }
+                          ],
+                          "message": {
+                              "text": ""
+                          },
+                          "level": "none",
+                          "descriptor": {
+                              "id": "cpp/baseline/expected-extracted-files",
+                              "index": 0
+                          },
+                          "properties": {
+                              "formattedMessage": {
+                                  "text": ""
+                              }
+                          }
+                      },
+                      {
+                          "locations": [
+                              {
+                                  "physicalLocation": {
+                                      "artifactLocation": {
+                                          "uri": "driver/fail_driver1.h",
+                                          "uriBaseId": "%SRCROOT%",
+                                          "index": 1
+                                      }
+                                  }
+                              }
+                          ],
+                          "message": {
+                              "text": ""
+                          },
+                          "level": "none",
+                          "descriptor": {
+                              "id": "cpp/baseline/expected-extracted-files",
+                              "index": 0
+                          },
+                          "properties": {
+                              "formattedMessage": {
+                                  "text": ""
+                              }
+                          }
+                      },
+                      {
+                          "locations": [
+                              {
+                                  "physicalLocation": {
+                                      "artifactLocation": {
+                                          "uri": "driver/fail_driver1.c",
+                                          "uriBaseId": "%SRCROOT%",
+                                          "index": 2
+                                      }
+                                  }
+                              }
+                          ],
+                          "message": {
+                              "text": ""
+                          },
+                          "level": "none",
+                          "descriptor": {
+                              "id": "cpp/baseline/expected-extracted-files",
+                              "index": 0
+                          },
+                          "properties": {
+                              "formattedMessage": {
+                                  "text": ""
+                              }
+                          }
+                      },
+                      {
+                          "message": {
+                              "text": "Internal telemetry for the C++ extractor.\n\nNo action needed.",
+                              "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
+                          },
+                          "level": "note",
+                          "timeUtc": "2025-01-17T05:02:26.230274500Z",
+                          "descriptor": {
+                              "id": "cpp/extractor/summary",
+                              "index": 1
+                          },
+                          "properties": {
+                              "attributes": {
+                                  "cache-hits": 0,
+                                  "cache-misses": 1,
+                                  "extractor-failures": 1,
+                                  "extractor-successes": 0,
+                                  "trap-caching": "disabled"
+                              },
+                              "visibility": {
+                                  "statusPage": false,
+                                  "telemetry": true
+                              }
+                          }
+                      }
+                  ],
+                  "executionSuccessful": true
+              }
+          ],
+          "artifacts": [
+              {
+                  "location": {
+                      "uri": "driver/driver_snippet.c",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 0
+                  }
+              },
+              {
+                  "location": {
+                      "uri": "driver/fail_driver1.h",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 1
+                  }
+              },
+              {
+                  "location": {
+                      "uri": "driver/fail_driver1.c",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 2
+                  }
+              }
+          ],
+          "results": [
+              {
+                  "ruleId": "cpp/drivers/irql-float-state-mismatch",
+                  "ruleIndex": 0,
+                  "rule": {
+                      "id": "cpp/drivers/irql-float-state-mismatch",
+                      "index": 0
+                  },
+                  "message": {
+                      "text": "The irql level where the floating-point state was saved (1) does not match the irql level for the restore operation (0)."
+                  },
+                  "locations": [
+                      {
+                          "physicalLocation": {
+                              "artifactLocation": {
+                                  "uri": "driver/driver_snippet.c",
+                                  "uriBaseId": "%SRCROOT%",
+                                  "index": 0
+                              },
+                              "region": {
+                                  "startLine": 23,
+                                  "startColumn": 38,
+                                  "endColumn": 46
+                              }
+                          }
+                      }
+                  ],
+                  "partialFingerprints": {
+                      "primaryLocationLineHash": "b3909ff165022b51:1",
+                      "primaryLocationStartColumnFingerprint": "29"
+                  }
+              },
+              {
+                  "ruleId": "cpp/drivers/irql-float-state-mismatch",
+                  "ruleIndex": 0,
+                  "rule": {
+                      "id": "cpp/drivers/irql-float-state-mismatch",
+                      "index": 0
+                  },
+                  "message": {
+                      "text": "The irql level where the floating-point state was saved (1) does not match the irql level for the restore operation (0)."
+                  },
+                  "locations": [
+                      {
+                          "physicalLocation": {
+                              "artifactLocation": {
+                                  "uri": "driver/driver_snippet.c",
+                                  "uriBaseId": "%SRCROOT%",
+                                  "index": 0
+                              },
+                              "region": {
+                                  "startLine": 23,
+                                  "startColumn": 37,
+                                  "endColumn": 46
+                              }
+                          }
+                      }
+                  ],
+                  "partialFingerprints": {
+                      "primaryLocationLineHash": "b3909ff165022b51:1",
+                      "primaryLocationStartColumnFingerprint": "28"
+                  }
+              }
+          ],
+          "columnKind": "utf16CodeUnits",
+          "properties": {
+              "semmle.formatSpecifier": "sarifv2.1.0"
           }
-        } ],
-        "rules" : [ {
-          "id" : "cpp/drivers/TODO",
-          "name" : "cpp/drivers/TODO",
-          "shortDescription" : {
-            "text" : "TODO"
-          },
-          "fullDescription" : {
-            "text" : "TODO"
-          },
-          "defaultConfiguration" : {
-            "enabled" : true,
-            "level" : "warning"
-          },
-          "properties" : {
-            "tags" : [ "correctness" ],
-            "description" : "TODO",
-            "feature.area" : "Multiple",
-            "id" : "cpp/drivers/TODO",
-            "impact" : "Insecure Coding Practice",
-            "kind" : "problem",
-            "name" : "TODO",
-            "opaqueid" : "CQLD-TODO",
-            "owner.email:" : "sdat@microsoft.com",
-            "platform" : "Desktop",
-            "precision" : "medium",
-            "problem.severity" : "warning",
-            "query-version" : "v1",
-            "repro.text" : "",
-            "scope" : "domainspecific"
-          }
-        } ]
-      },
-      "extensions" : [ {
-        "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "1.0.13+4cf80ade609037becb8999823de45e08bd818a20",
-        "locations" : [ {
-          "uri" : "file:///C:/codeql-home/WDDST/src/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/codeql-home/WDDST/src/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      } ]
-    },
-    "invocations" : [ {
-      "toolExecutionNotifications" : [ {
-        "locations" : [ {
-          "physicalLocation" : {
-            "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
-              "uriBaseId" : "%SRCROOT%",
-              "index" : 1
-            }
-          }
-        } ],
-        "message" : {
-          "text" : ""
-        },
-        "level" : "none",
-        "descriptor" : {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "index" : 0
-        },
-        "properties" : {
-          "formattedMessage" : {
-            "text" : ""
-          }
-        }
-      }, {
-        "locations" : [ {
-          "physicalLocation" : {
-            "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
-              "uriBaseId" : "%SRCROOT%",
-              "index" : 0
-            }
-          }
-        } ],
-        "message" : {
-          "text" : ""
-        },
-        "level" : "none",
-        "descriptor" : {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "index" : 0
-        },
-        "properties" : {
-          "formattedMessage" : {
-            "text" : ""
-          }
-        }
-      }, {
-        "locations" : [ {
-          "physicalLocation" : {
-            "artifactLocation" : {
-              "uri" : "driver/fail_driver1.h",
-              "uriBaseId" : "%SRCROOT%",
-              "index" : 2
-            }
-          }
-        } ],
-        "message" : {
-          "text" : ""
-        },
-        "level" : "none",
-        "descriptor" : {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "index" : 0
-        },
-        "properties" : {
-          "formattedMessage" : {
-            "text" : ""
-          }
-        }
-      } ],
-      "executionSuccessful" : true
-    } ],
-    "artifacts" : [ {
-      "location" : {
-        "uri" : "driver/fail_driver1.c",
-        "uriBaseId" : "%SRCROOT%",
-        "index" : 0
       }
-    }, {
-      "location" : {
-        "uri" : "driver/driver_snippet.c",
-        "uriBaseId" : "%SRCROOT%",
-        "index" : 1
-      }
-    }, {
-      "location" : {
-        "uri" : "driver/fail_driver1.h",
-        "uriBaseId" : "%SRCROOT%",
-        "index" : 2
-      }
-    } ],
-    "results" : [ {
-      "ruleId" : "cpp/drivers/TODO",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/drivers/TODO",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "TODO"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/fail_driver1.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 56,
-            "endColumn" : 12
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "60c6386a5ee58eb6:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      }
-    } ],
-    "columnKind" : "utf16CodeUnits",
-    "properties" : {
-      "semmle.formatSpecifier" : "sarifv2.1.0"
-    }
-  } ]
+  ]
 }
