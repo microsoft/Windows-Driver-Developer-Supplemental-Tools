@@ -72,6 +72,9 @@ predicate matchesBannedApi(string input) {
   or
   // Functions marked deprecated in C28750
   input = any(["lstrlen", "lstrlenA", "lstrlenW"])
+  or
+  // Functions marked deprecated in C28727
+  input = any(["_itow", "_ultow", "strtok", "swscanf", "wcstok"])
 }
 
 /** A deprecated API. */
@@ -448,6 +451,20 @@ class ExtendedDeprecatedCall extends Element {
         name.matches("lstrlenA") and replacement = "strlen"
         or
         name.matches("lstrlenW") and replacement = "wcslen"
+      )
+
+      or
+      // Functions marked deprecated in C28727
+      (
+        name.matches("_itow") and replacement = "None"
+        or
+        name.matches("_ultow") and replacement = "None"
+        or
+        name.matches("strtok") and replacement = "None"
+        or
+        name.matches("swscanf") and replacement = "None"
+        or
+        name.matches("wcstok") and replacement = "None"
       )
     )
   }
