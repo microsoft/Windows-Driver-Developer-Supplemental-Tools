@@ -4,7 +4,7 @@ import drivers.libraries.Irql
 /**
  * A debugging function used to print the rationale for why a given CFN has the IRQL value it does.
  */
-cached
+
 string getIrqlDebugInfoAtCfn(ControlFlowNode cfn) {
   if cfn instanceof KeRaiseIrqlCall
   then result = "This is a KeRaiseIRQL call"
