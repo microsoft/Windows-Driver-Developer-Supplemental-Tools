@@ -1,0 +1,59 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		A syntax error in the annotations was found for the property in the function.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			This warning indicates an error in the annotations, not in the code that is being analyzed.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			_IRQL_saves_global_ not applied to entire function
+		</p>
+		<sample language="c"> <![CDATA[
+		// FAIL 
+		VOID test1(
+			_IRQL_saves_global_(OldIrql, *Irql) PKIRQL Irql)
+		{
+			// ...
+			;
+		}
+		}]]>
+		</sample>
+		<p>
+		_Kernel_clear_do_init_ not used with either "yes" or "no"
+		</p>
+		<sample language="c"> <![CDATA[
+		// FAIL
+		_Function_class_(DRIVER_ADD_DEVICE)
+			_IRQL_requires_(PASSIVE_LEVEL)
+				_IRQL_requires_same_
+			_Kernel_clear_do_init_(IRP_MJ_CREATE)
+		NTSTATUS
+		test4(
+			_In_ PDRIVER_OBJECT DriverObject,
+			_In_ PDEVICE_OBJECT PhysicalDeviceObject)
+
+		{
+			; // do nothing
+		}
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+			TODO notes
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28266-function-property-syntax-error">
+				C28266
+			</a>
+		</li>
+	</references>
+</qhelp>
