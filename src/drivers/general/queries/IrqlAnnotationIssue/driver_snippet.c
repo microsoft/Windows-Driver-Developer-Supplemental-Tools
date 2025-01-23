@@ -53,6 +53,3 @@ _IRQL_always_function_max_(irql)
     KIRQL oldIRQL;
     KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
 }
-
-
-// TODO add tests for query
