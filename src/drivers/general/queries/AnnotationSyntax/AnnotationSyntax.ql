@@ -53,7 +53,6 @@ where
   not sa.getUnexpandedArgument(0).toString().toLowerCase().matches("\"yes\"") and
   not sa.getUnexpandedArgument(0).toString().toLowerCase().matches("\"no\"")
   or
-  //   f.toString().matches("%drv_dispatchType%") or
   //__drv_dispatch value out of range val > 63 || val < -1
   sa.toString().matches("%drv_dispatch%") and
   (
