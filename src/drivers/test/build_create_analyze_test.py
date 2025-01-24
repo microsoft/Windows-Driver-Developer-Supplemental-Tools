@@ -680,7 +680,6 @@ def parse_attributes(queries):
         else:
             pass
         
-        print(template)
         if args.override_template:
             template = args.override_template
 
