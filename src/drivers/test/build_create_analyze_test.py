@@ -244,6 +244,9 @@ def find_ql_test_paths(directory, extension):
         if "wfp" in root.split("\\") or "wfp" in root.split("/") or "QueryTemplate" in root:
             print_conditionally("Skipping: " + root)
             continue
+        if "TestTemplate" in root:
+            print_conditionally("Skipping: " + root)
+            continue
         if fnmatch.filter(files, "driver_snippet.*"):
             use_ntifs = check_use_ntifs(os.path.join(root, fnmatch.filter(files, "driver_snippet.*")[0]))
             for file in files:
@@ -367,8 +370,15 @@ def test_setup(ql_test):
     print_conditionally("Copying files to working directory: " + current_working_dir)
     test_file_loc = os.path.join(g_template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())
     # Copy files to driver directory
+
     for file in os.listdir(test_file_loc):
-        shutil.copyfile(os.path.join(test_file_loc,file), os.path.join(current_working_dir+"\\driver\\",file))
+        src = os.path.join(test_file_loc,file)
+        if(ql_test.get_ql_type() == "apps"):
+            dst = os.path.join(current_working_dir+"\\",file)
+        else:
+            dst = os.path.join(current_working_dir+"\\driver\\",file)
+        print_conditionally("Copying file "+file + " from " + src + " to " +  dst)
+        shutil.copyfile(src, dst)
    
     # Rebuild the project using msbuild
     if not args.no_build:
@@ -665,9 +675,12 @@ def parse_attributes(queries):
             template += "WDMTestTemplate"
         elif(ql_type == "kmdf"):
             template += "KMDFTestTemplate"
+        elif(ql_type == "apps"):
+            template += "ApplicationForDriversTestTemplate"
         else:
             pass
-            
+        
+        print(template)
         if args.override_template:
             template = args.override_template
 
