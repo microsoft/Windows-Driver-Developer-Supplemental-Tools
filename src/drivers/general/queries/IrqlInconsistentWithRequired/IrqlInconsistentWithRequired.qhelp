@@ -2,12 +2,12 @@
 <qhelp>
 	<overview>
 		<p>
-		TODO overview
+		The actual IRQL is inconsistent with the required IRQL
 		</p>
 	</overview>
 	<recommendation>
 		<p>
-			TODO recommendation
+			An _IRQL_requires_same_ annotation specifies that the driver should be executing at a particular IRQL when the function completes, but there is at least one path in which the driver is executing at a different IRQL when the function completes.
 		</p>
 	</recommendation>
 	<example>
@@ -28,24 +28,16 @@
 			}
 		}
 		}]]>
-		</sample>
-		<p>
-			TODO example 2
-		</p>
-		<sample language="c"> <![CDATA[
-				// Example code
-		}]]>
-		</sample>
+		
 	</example>
 	<semmleNotes>
 		<p>
-			TODO notes
 		</p>
 	</semmleNotes>
 	<references>
 		<li>
-			<a href="example.com">
-				Example link
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28166-function-does-not-restore-irql-value">
+				C28166
 			</a>
 		</li>
 	</references>

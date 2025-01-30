@@ -8,9 +8,9 @@
  * @platform Desktop
  * @feature.area Multiple
  * @impact Insecure Coding Practice
- * @repro.textAn _IRQL_requires_same_ annotation specifies that the driver should be executing at a particular IRQL when the function completes, but there is at least one path in which the driver is executing at a different IRQL when the function completes.
+ * @repro.text An _IRQL_requires_same_ annotation specifies that the driver should be executing at a particular IRQL when the function completes, but there is at least one path in which the driver is executing at a different IRQL when the function completes.
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-C28156
+ * @opaqueid CQLD-C28166
  * @problem.severity warning
  * @precision medium
  * @tags correctness
