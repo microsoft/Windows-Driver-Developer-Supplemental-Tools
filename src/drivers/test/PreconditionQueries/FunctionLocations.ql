@@ -19,12 +19,11 @@ import drivers.libraries.RoleTypes
 
 from FunctionDeclarationEntry fde
 where fde.getLocation().getFile().getAbsolutePath().matches("%.c%")
-select fde, "$@|$@|$@|$@|$@|$@", 
+select fde, "NAME##$@|RETURNTYPE##$@|PARAMSTR##$@|FILE##$@|BODYSTART##$@|BODYEND##$@",
 fde, fde.getName(), 
 fde, fde.getType().toString(), 
 fde, fde.getParameterString(), 
 fde.getLocation(), fde.getLocation().getFile().getAbsolutePath(),
 fde.getBlock(), fde.getBlock().getLocation().getStartLine().toString(),
 fde.getBlock(), fde.getBlock().getLocation().getEndLine().toString()
-
 
