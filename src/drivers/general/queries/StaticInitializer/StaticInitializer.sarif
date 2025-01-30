@@ -1,510 +1,536 @@
 {
-  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
-  "version": "2.1.0",
-  "runs": [
-      {
-          "tool": {
-              "driver": {
-                  "name": "CodeQL",
-                  "organization": "GitHub",
-                  "semanticVersion": "2.19.3",
-                  "notifications": [
-                      {
-                          "id": "cpp/baseline/expected-extracted-files",
-                          "name": "cpp/baseline/expected-extracted-files",
-                          "shortDescription": {
-                              "text": "Expected extracted files"
-                          },
-                          "fullDescription": {
-                              "text": "Files appearing in the source archive that are expected to be extracted."
-                          },
-                          "defaultConfiguration": {
-                              "enabled": true
-                          },
-                          "properties": {
-                              "tags": [
-                                  "expected-extracted-files",
-                                  "telemetry"
-                              ]
-                          }
-                      },
-                      {
-                          "id": "cpp/extractor/summary",
-                          "name": "cpp/extractor/summary",
-                          "shortDescription": {
-                              "text": "C++ extractor telemetry"
-                          },
-                          "fullDescription": {
-                              "text": "C++ extractor telemetry"
-                          },
-                          "defaultConfiguration": {
-                              "enabled": true
-                          }
-                      }
-                  ],
-                  "rules": [
-                      {
-                          "id": "cpp/drivers/static-initializer",
-                          "name": "cpp/drivers/static-initializer",
-                          "shortDescription": {
-                              "text": "Static Initializer"
-                          },
-                          "fullDescription": {
-                              "text": "Static initializers of global or static const variables can often be fully evaluated at compile time, thus generated in RDATA. However if any initializer is a pointer-to-member-function where it is a non-static function, the entire initialier may be placed in copy-on-write pages, which has a performance cost."
-                          },
-                          "defaultConfiguration": {
-                              "enabled": true,
-                              "level": "warning"
-                          },
-                          "properties": {
-                              "tags": [
-                                  "performance"
-                              ],
-                              "description": "Static initializers of global or static const variables can often\n be fully evaluated at compile time, thus generated in RDATA.\n However if any initializer is a pointer-to-member-function where\n it is a non-static function, the entire initialier may be placed\n in copy-on-write pages, which has a performance cost.",
-                              "feature.area": "Multiple",
-                              "id": "cpp/drivers/static-initializer",
-                              "impact": "Insecure Coding Practice",
-                              "kind": "problem",
-                              "name": "Static Initializer",
-                              "opaqueid": "CQLD-TODO",
-                              "owner.email:": "sdat@microsoft.com",
-                              "platform": "Desktop",
-                              "precision": "medium",
-                              "problem.severity": "warning",
-                              "query-version": "v1",
-                              "repro.text": "For binaries which require fast loading and minimizing copy on\n write pages, consider making sure all function pointer in the\n static initializer are not pointer-to-member-function.  If a\n pointer-to-member-function is required, write a simple static\n member function that wraps a call to the actual member function.",
-                              "scope": "domainspecific"
-                          }
-                      }
-                  ]
-              },
-              "extensions": [
-                  {
-                      "name": "microsoft/windows-drivers",
-                      "semanticVersion": "1.3.0+48277b067311c944f6de27c2567aa4277208088a",
-                      "locations": [
-                          {
-                              "uri": "file:///C:/codeql-home/WDDST/src/",
-                              "description": {
-                                  "text": "The QL pack root directory."
-                              },
-                              "properties": {
-                                  "tags": [
-                                      "CodeQL/LocalPackRoot"
-                                  ]
-                              }
-                          },
-                          {
-                              "uri": "file:///C:/codeql-home/WDDST/src/qlpack.yml",
-                              "description": {
-                                  "text": "The QL pack definition file."
-                              },
-                              "properties": {
-                                  "tags": [
-                                      "CodeQL/LocalPackDefinitionFile"
-                                  ]
-                              }
-                          }
-                      ]
-                  },
-                  {
-                      "name": "codeql/cpp-all",
-                      "semanticVersion": "3.1.0+d42788844f7ec0a6b9832140313cc2318e513987",
-                      "locations": [
-                          {
-                              "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/",
-                              "description": {
-                                  "text": "The QL pack root directory."
-                              },
-                              "properties": {
-                                  "tags": [
-                                      "CodeQL/LocalPackRoot"
-                                  ]
-                              }
-                          },
-                          {
-                              "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/qlpack.yml",
-                              "description": {
-                                  "text": "The QL pack definition file."
-                              },
-                              "properties": {
-                                  "tags": [
-                                      "CodeQL/LocalPackDefinitionFile"
-                                  ]
-                              }
-                          }
-                      ]
-                  }
-              ]
-          },
-          "invocations": [
-              {
-                  "toolExecutionNotifications": [
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "Driver.cpp",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 1
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "Driver.h",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 2
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "Queue.c",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 3
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "Public.h",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 4
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "Trace.h",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 5
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "Device.h",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 6
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "driver/driver_snippet.cpp",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 0
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "Device.c",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 7
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "Queue.h",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 8
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "message": {
-                              "text": "Internal telemetry for the C++ extractor.\n\nNo action needed.",
-                              "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
-                          },
-                          "level": "note",
-                          "timeUtc": "2025-01-14T02:44:26.867445700Z",
-                          "descriptor": {
-                              "id": "cpp/extractor/summary",
-                              "index": 1
-                          },
-                          "properties": {
-                              "attributes": {
-                                  "cache-hits": 0,
-                                  "cache-misses": 3,
-                                  "extractor-failures": 3,
-                                  "extractor-successes": 0,
-                                  "trap-caching": "disabled"
-                              },
-                              "visibility": {
-                                  "statusPage": false,
-                                  "telemetry": true
-                              }
-                          }
-                      }
-                  ],
-                  "executionSuccessful": true
-              }
-          ],
-          "artifacts": [
-              {
-                  "location": {
-                      "uri": "driver/driver_snippet.cpp",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 0
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "Driver.cpp",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 1
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "Driver.h",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 2
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "Queue.c",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 3
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "Public.h",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 4
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "Trace.h",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 5
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "Device.h",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 6
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "Device.c",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 7
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "Queue.h",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 8
-                  }
-              }
-          ],
-          "results": [
-              {
-                  "ruleId": "cpp/drivers/static-initializer",
-                  "ruleIndex": 0,
-                  "rule": {
-                      "id": "cpp/drivers/static-initializer",
-                      "index": 0
-                  },
-                  "message": {
-                      "text": "Static initializer causes copy on write pages due to member function pointers"
-                  },
-                  "locations": [
-                      {
-                          "physicalLocation": {
-                              "artifactLocation": {
-                                  "uri": "driver/driver_snippet.cpp",
-                                  "uriBaseId": "%SRCROOT%",
-                                  "index": 0
-                              },
-                              "region": {
-                                  "startLine": 27,
-                                  "startColumn": 5,
-                                  "endColumn": 25
-                              }
-                          }
-                      }
-                  ],
-                  "partialFingerprints": {
-                      "primaryLocationLineHash": "d09d666579d2855:1",
-                      "primaryLocationStartColumnFingerprint": "0"
-                  }
-              }
-          ],
-          "columnKind": "utf16CodeUnits",
-          "properties": {
-              "semmle.formatSpecifier": "sarifv2.1.0"
-          }
-      }
-  ]
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "CodeQL",
+                    "organization": "GitHub",
+                    "semanticVersion": "2.20.3",
+                    "notifications": [
+                        {
+                            "id": "cpp/baseline/expected-extracted-files",
+                            "name": "cpp/baseline/expected-extracted-files",
+                            "shortDescription": {
+                                "text": "Expected extracted files"
+                            },
+                            "fullDescription": {
+                                "text": "Files appearing in the source archive that are expected to be extracted."
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true
+                            },
+                            "properties": {
+                                "tags": [
+                                    "expected-extracted-files",
+                                    "telemetry"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "cpp/extractor/summary",
+                            "name": "cpp/extractor/summary",
+                            "shortDescription": {
+                                "text": "C++ extractor telemetry"
+                            },
+                            "fullDescription": {
+                                "text": "C++ extractor telemetry"
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true
+                            }
+                        }
+                    ],
+                    "rules": [
+                        {
+                            "id": "cpp/drivers/static-initializer",
+                            "name": "cpp/drivers/static-initializer",
+                            "shortDescription": {
+                                "text": "Static Initializer"
+                            },
+                            "fullDescription": {
+                                "text": "Static initializers of global or static const variables can often be fully evaluated at compile time, thus generated in RDATA. However if any initializer is a pointer-to-member-function where it is a non-static function, the entire initialier may be placed in copy-on-write pages, which has a performance cost."
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true,
+                                "level": "warning"
+                            },
+                            "properties": {
+                                "tags": [
+                                    "performance"
+                                ],
+                                "description": "Static initializers of global or static const variables can often\n be fully evaluated at compile time, thus generated in RDATA.\n However if any initializer is a pointer-to-member-function where\n it is a non-static function, the entire initialier may be placed\n in copy-on-write pages, which has a performance cost.",
+                                "feature.area": "Multiple",
+                                "id": "cpp/drivers/static-initializer",
+                                "impact": "Insecure Coding Practice",
+                                "kind": "problem",
+                                "name": "Static Initializer",
+                                "opaqueid": "CQLD-C28651",
+                                "owner.email:": "sdat@microsoft.com",
+                                "platform": "Desktop",
+                                "precision": "medium",
+                                "problem.severity": "warning",
+                                "query-version": "v1",
+                                "repro.text": "For binaries which require fast loading and minimizing copy on\n write pages, consider making sure all function pointer in the\n static initializer are not pointer-to-member-function.  If a\n pointer-to-member-function is required, write a simple static\n member function that wraps a call to the actual member function.",
+                                "scope": "domainspecific"
+                            }
+                        }
+                    ]
+                },
+                "extensions": [
+                    {
+                        "name": "microsoft/windows-drivers",
+                        "semanticVersion": "1.3.0+93a62f844e68510994a850352ad01ec90cadea19",
+                        "locations": [
+                            {
+                                "uri": "file:///C:/codeql-home/WDDST/src/",
+                                "description": {
+                                    "text": "The QL pack root directory."
+                                },
+                                "properties": {
+                                    "tags": [
+                                        "CodeQL/LocalPackRoot"
+                                    ]
+                                }
+                            },
+                            {
+                                "uri": "file:///C:/codeql-home/WDDST/src/qlpack.yml",
+                                "description": {
+                                    "text": "The QL pack definition file."
+                                },
+                                "properties": {
+                                    "tags": [
+                                        "CodeQL/LocalPackDefinitionFile"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "codeql/cpp-all",
+                        "semanticVersion": "3.1.0+d42788844f7ec0a6b9832140313cc2318e513987",
+                        "locations": [
+                            {
+                                "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/",
+                                "description": {
+                                    "text": "The QL pack root directory."
+                                },
+                                "properties": {
+                                    "tags": [
+                                        "CodeQL/LocalPackRoot"
+                                    ]
+                                }
+                            },
+                            {
+                                "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/qlpack.yml",
+                                "description": {
+                                    "text": "The QL pack definition file."
+                                },
+                                "properties": {
+                                    "tags": [
+                                        "CodeQL/LocalPackDefinitionFile"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "invocations": [
+                {
+                    "toolExecutionNotifications": [
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "Driver.cpp",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 1
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "Driver.h",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 2
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "Queue.c",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 3
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "Public.h",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 4
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "Trace.h",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 5
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "Device.h",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 6
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "driver/driver_snippet.cpp",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 0
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "Device.c",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 7
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "Queue.h",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 8
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "message": {
+                                "text": "Internal telemetry for the C++ extractor.\n\nNo action needed.",
+                                "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
+                            },
+                            "level": "note",
+                            "timeUtc": "2025-01-31T02:02:02.676882Z",
+                            "descriptor": {
+                                "id": "cpp/extractor/summary",
+                                "index": 1
+                            },
+                            "properties": {
+                                "attributes": {
+                                    "cache-hits": 0,
+                                    "cache-misses": 3,
+                                    "compilers": [
+                                        {
+                                            "program": "cl",
+                                            "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.42.34436 for x64"
+                                        }
+                                    ],
+                                    "extractor-failures": 3,
+                                    "extractor-successes": 0,
+                                    "trap-caching": "disabled"
+                                },
+                                "visibility": {
+                                    "statusPage": false,
+                                    "telemetry": true
+                                }
+                            }
+                        }
+                    ],
+                    "executionSuccessful": true
+                }
+            ],
+            "artifacts": [
+                {
+                    "location": {
+                        "uri": "driver/driver_snippet.cpp",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 0
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "Driver.cpp",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 1
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "Driver.h",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 2
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "Queue.c",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 3
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "Public.h",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 4
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "Trace.h",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 5
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "Device.h",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 6
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "Device.c",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 7
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "Queue.h",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 8
+                    }
+                }
+            ],
+            "results": [
+                {
+                    "ruleId": "cpp/drivers/static-initializer",
+                    "ruleIndex": 0,
+                    "rule": {
+                        "id": "cpp/drivers/static-initializer",
+                        "index": 0
+                    },
+                    "message": {
+                        "text": "Static initializer causes copy on write pages due to member function pointer(s): [memberFunc](1)"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "driver/driver_snippet.cpp",
+                                    "uriBaseId": "%SRCROOT%",
+                                    "index": 0
+                                },
+                                "region": {
+                                    "startLine": 27,
+                                    "startColumn": 5,
+                                    "endColumn": 25
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "primaryLocationLineHash": "d09d666579d2855:1",
+                        "primaryLocationStartColumnFingerprint": "0"
+                    },
+                    "relatedLocations": [
+                        {
+                            "id": 1,
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "driver/driver_snippet.cpp",
+                                    "uriBaseId": "%SRCROOT%",
+                                    "index": 0
+                                },
+                                "region": {
+                                    "startLine": 16,
+                                    "startColumn": 10,
+                                    "endColumn": 20
+                                }
+                            },
+                            "message": {
+                                "text": "memberFunc"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "columnKind": "utf16CodeUnits",
+            "properties": {
+                "semmle.formatSpecifier": "sarifv2.1.0"
+            }
+        }
+    ]
 }

@@ -2,12 +2,20 @@
 <qhelp>
 	<overview>
 		<p>
-		TODO overview
+		Static initializers of global or static const variables can often
+ 		be fully evaluated at compile time, thus generated in RDATA.
+ 		However if any initializer is a pointer-to-member-function where
+ 		it is a non-static function, the entire initialier may be placed
+ 		in copy-on-write pages, which has a performance cost.
 		</p>
 	</overview>
 	<recommendation>
 		<p>
-			TODO recommendation
+		For binaries which require fast loading and minimizing copy on
+		write pages, consider making sure all function pointer in the
+		static initializer are not pointer-to-member-function.  If a
+		pointer-to-member-function is required, write a simple static
+		member function that wraps a call to the actual member function.
 		</p>
 	</recommendation>
 	<example>
