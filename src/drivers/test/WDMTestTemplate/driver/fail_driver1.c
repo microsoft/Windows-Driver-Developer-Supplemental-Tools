@@ -190,12 +190,25 @@ DispatchCancel (
     PIRP Irp
     )
 {  
-    //Doesn't do anything
     UNREFERENCED_PARAMETER(DeviceObject);
-    UNREFERENCED_PARAMETER(Irp);
+	UNREFERENCED_PARAMETER(Irp);
     return STATUS_SUCCESS;
 }
 
+_Use_decl_annotations_
+VOID
+DriverCancel(
+    struct _DEVICE_OBJECT* DeviceObject,
+    struct _IRP* Irp
+) 
+{
+
+#ifdef IRQL_CANCEL_CHECK
+    IoReleaseCancelSpinLock(PASSIVE_LEVEL); // This is a failing case for IRQL check. C28144
+#else
+    IoReleaseCancelSpinLock(Irp->CancelIrql);
+#endif 
+}
 
 _Use_decl_annotations_
 NTSTATUS

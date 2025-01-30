@@ -240,8 +240,11 @@ def find_ql_test_paths(directory, extension):
     ql_files_map = {}
     for root, dirs, files in os.walk(directory):
         # exclude wfp folder until correct test template is added
-        if "wfp" in root.split("\\") or "wfp" in root.split("/"):
-            #print_conditionally("Skipping: " + root)
+        if "wfp" in root.split("\\") or "wfp" in root.split("/") or "QueryTemplate" in root:
+            print_conditionally("Skipping: " + root)
+            continue
+        if "TestTemplate" in root:
+            print_conditionally("Skipping: " + root)
             continue
         if fnmatch.filter(files, "driver_snippet.*"):
             use_ntifs = check_use_ntifs(os.path.join(root, fnmatch.filter(files, "driver_snippet.*")[0]))
@@ -372,8 +375,15 @@ def test_setup(ql_test):
     print_conditionally("** Copying files to working directory: " + current_working_dir)
     test_file_loc = os.path.join(g_template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())
     # Copy files to driver directory
+
     for file in os.listdir(test_file_loc):
-        shutil.copyfile(os.path.join(test_file_loc,file), os.path.join(current_working_dir+"\\driver\\",file))
+        src = os.path.join(test_file_loc,file)
+        if(ql_test.get_ql_type() == "apps"):
+            dst = os.path.join(current_working_dir+"\\",file)
+        else:
+            dst = os.path.join(current_working_dir+"\\driver\\",file)
+        print_conditionally("Copying file "+file + " from " + src + " to " +  dst)
+        shutil.copyfile(src, dst)
    
     # Rebuild the project using msbuild
     if not args.no_pre_build:
@@ -855,9 +865,11 @@ def parse_attributes(queries):
             template += "WDMTestTemplate"
         elif(ql_type == "kmdf"):
             template += "KMDFTestTemplate"
+        elif(ql_type == "apps"):
+            template += "ApplicationForDriversTestTemplate"
         else:
             pass
-            
+        
         if args.override_template:
             template = args.override_template
 
@@ -966,7 +978,7 @@ def run_tests_external_drivers(ql_tests_dict, databases):
             detailed_health_df.at[db.split("\\")[-1], ql_test.get_ql_name()] = str(detailed_analysis_results)
     
     # save results
-    result_file = "results.xlsx"
+    result_file = "external_drivers_results.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer, sheet_name="Results")
         codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
@@ -978,8 +990,8 @@ def run_tests_external_drivers(ql_tests_dict, databases):
         codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
         system_info_df.to_excel(writer, sheet_name="System Info")
     if args.compare_results:
-        compare_health_results(result_file)
         compare_health_results("detailed"+result_file)
+        compare_health_results(result_file)
     
 
 def find_last_xlsx_file(curr_results_path):
@@ -1020,19 +1032,20 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
+    
     if not args.connection_string or not args.share_name:
         raise Exception("Azure credentials not provided. Cannot compare results.")
     
     try:
         prev_results = 'azure-'+curr_results_path
-        _ = download_file_from_azure(file_to_download=prev_results, 
+        print_conditionally("Downloading previous results from Azure: " + prev_results)
+        temp_file = download_file_from_azure(file_to_download=prev_results, 
                         file_name=curr_results_path, file_directory="")
+        print_conditionally("Downloaded previous results: " + temp_file)
         
     except Exception as e:
         if "ResourceNotFound" in str(e):
-            print("No previous results found. Uploading current results to Azure...")
-            upload_results_to_azure(file_to_upload=curr_results_path, 
-                        file_name=curr_results_path, file_directory="")
+            print("No previous results found")
             exit(1)
         else:
             print("Error downloading previous results ")
@@ -1046,26 +1059,24 @@ def compare_health_results(curr_results_path):
     print_conditionally("Comparing results...")
     print_conditionally("Previous results: ", prev_results)
     print_conditionally("Current results: ", curr_results_path)
-    try:
-        for row in prev_results_df.index:
-            if row not in curr_results_df.index:
-                curr_results_df.loc[row] = None
-                print_conditionally("Adding row to current results: ", row)
-        for row in curr_results_df.index:
-            if row not in prev_results_df.index:
-                prev_results_df.loc[row] = None
-                print_conditionally("Adding row to previous results: ", row)
-        prev_results_df = prev_results_df.sort_index()
-        curr_results_df = curr_results_df.sort_index()
-        diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))
-    except Exception as e: 
-        print("Error comparing results: ", e, "Uploading previous results back to Azure as", prev_results, "and current results back to Azure as", curr_results_path)
-        upload_results_to_azure(file_to_upload=prev_results, 
-                            file_name=prev_results, file_directory="")
-        upload_results_to_azure(file_to_upload=curr_results_path, 
-                            file_name=curr_results_path, file_directory="")
-        exit(1)
-        
+    for row in prev_results_df.index:
+        if row not in curr_results_df.index:
+            curr_results_df.loc[row] = None
+            print_conditionally("Adding row to current results: ", row)
+       
+    for row in curr_results_df.index:
+        if row not in prev_results_df.index:
+            prev_results_df.loc[row] = None
+            print_conditionally("Adding row to previous results: ", row)
+   
+    prev_results_df = prev_results_df.sort_index()
+    curr_results_df = curr_results_df.sort_index()
+
+    #TODO this is a tempoary fix for the issue with the backslashes in the results in codeql cli version 2.18.x+
+    prev_results_df = prev_results_df.replace({r'\\': ''}, regex=True)
+    curr_results_df = curr_results_df.replace({r'\\': ''}, regex=True)
+            
+    diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))  
     
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer, sheet_name="Diff")
@@ -1118,16 +1129,10 @@ def run_tests(ql_tests_dict):
             print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
             continue
         analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
-       # health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
-        health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
         
-        #detailed_health_df.at[ql_test.get_ql_name(), "Template"] = ql_test.get_template()
-        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
-    
-    if args.no_analyze:
-        # don't need to save results if not analyzing because no results are generated
-        return  
-    
+        health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
+        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results) 
+      
     # save results
     result_file = "functiontestresults.xlsx"
     with pd.ExcelWriter(result_file) as writer:
@@ -1141,8 +1146,8 @@ def run_tests(ql_tests_dict):
         codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
         system_info_df.to_excel(writer, sheet_name="System Info")
     if args.compare_results:
-        compare_health_results(result_file)
         compare_health_results("detailed"+result_file)
+        compare_health_results(result_file)
     
 def find_g_template_dir(template):
     """
@@ -1286,7 +1291,7 @@ if __name__ == "__main__":
 
 
     if args.individual_test:
-        ql_files_keys = [x for x in ql_tests if args.individual_test == x.split("\\")[-1].replace(".ql", "")]
+        ql_files_keys = [x for x in ql_tests if args.individual_test in x.split("\\")[-1]]
         if not ql_files_keys:
             print("Invalid test name: " + args.individual_test + " not found") 
             exit(1)
