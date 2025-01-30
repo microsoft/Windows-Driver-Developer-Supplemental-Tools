@@ -9,7 +9,7 @@
  * @feature.area Multiple
  * @impact Insecure Coding Practice
  * @repro.text This warning indicates that the Code Analysis tool cannot interpret the function annotation because the annotation is not
- *  coded correctly. As a result, the Code Analysis tool cannot determine the specified IRQL value. This warning can occur with any of 
+ *  coded correctly. As a result, the Code Analysis tool cannot determine the specified IRQL value. This warning can occur with any of
  *  the driver-specific annotations that mention an IRQL when the Code Analysis tool cannot evaluate the expression for the IRQL.
  * @owner.email: sdat@microsoft.com
  * @opaqueid CQLD-C28153
@@ -24,6 +24,5 @@ import cpp
 import drivers.libraries.Irql
 
 from IrqlFunctionAnnotation ifa
-where
-  ifa.getIrqlLevel() < 0 or ifa.getIrqlLevel() > 31
+where not ifa.getIrqlLevel() instanceof IrqlValue
 select ifa, "Invalid IRQL annotation: " + ifa.getIrqlLevel()
