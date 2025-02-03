@@ -18,11 +18,11 @@ import cpp
 import drivers.libraries.RoleTypes
 
 string getName(FunctionDeclarationEntry fde) {
-  result = fde.getName()
-  or
   exists(Macro m |
     m.getBody().toString() = fde.getName() and result = m.getAnInvocation().toString()
   )
+  or
+  result = fde.getName()
 }
 
 from FunctionDeclarationEntry fde
