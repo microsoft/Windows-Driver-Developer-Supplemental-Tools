@@ -29,4 +29,4 @@ where
   or
   func instanceof WdmDispatchRoutine and
   roleType = "DRIVER_DISPATCH#" + func.(WdmDispatchRoutine).getDispatchType()
-select func, "$@|$@", func, func.getName(), func, roleType
+select func, "NAME##$@|ROLETYPE##$@", func, func.getName(), func, roleType
