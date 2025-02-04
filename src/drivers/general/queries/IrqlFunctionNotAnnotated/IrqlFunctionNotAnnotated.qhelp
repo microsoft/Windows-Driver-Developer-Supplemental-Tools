@@ -1,0 +1,46 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		The function changes the IRQL and does not restore the IRQL before it exits. It should be annotated to reflect the change or the IRQL should be restored.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			This warning indicates that the following conditions are true: 
+			1. The function changes the IRQL at which the driver is running. 
+			2. There is at least one path through a function that does not, by function exit, restore the IRQL to the original IRQL that the driver was running at function entry.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			Function which potentially raises the IRQL level but is not annotated to reflect the change.
+		</p>
+		<sample language="c"> <![CDATA[
+		void fail1(PKIRQL oldIrql)
+		{
+
+			if (oldIrql == PASSIVE_LEVEL)
+			{
+				KeLowerIrql(*oldIrql);
+			}
+			else
+			{
+				KeRaiseIrql(DISPATCH_LEVEL, oldIrql); // Function exits at DISPATCH_LEVEL
+			}
+		}
+		}]]>
+		
+	</example>
+	<semmleNotes>
+		<p>
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28167-function-changes-irql-without-restore">
+				C28167
+			</a>
+		</li>
+	</references>
+</qhelp>
