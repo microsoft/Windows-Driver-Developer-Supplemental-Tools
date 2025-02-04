@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/precondition-roletypes
+ * @id cpp/drivers/possible-values
  * @kind path-problem
- * @name FunctionLocationsPrecondition
+ * @name Possible Values
  * @description Get all function definition locations
  * @platform Desktop
  * @owner.email: sdat@microsoft.com
@@ -15,7 +15,7 @@
  */
 
 import cpp
-import semmle.code.cpp.interproccontrolflow.ControlFlow
+import drivers.libraries.interproccontrolflow.ControlFlow
 import Flow::PathGraph
 import semmle.code.cpp.ir.IR
 import Flow::PathGraph
@@ -55,12 +55,25 @@ Expr getBranchExpr(Flow::PathNode node) {
         .getUnconvertedResultExpression()
 }
 
-BasicBlock getAssignedValue(Flow::PathNode node) {
-  result = getBranchExpr(node).(VariableAccess).getTarget().getAnAssignment().getBasicBlock() or 
-  result = getEqualityOperand(node).(VariableAccess).getTarget().getAnAssignment().getBasicBlock()
+Expr getAssignedValue(Flow::PathNode node) {
+      exists(Expr e 
+        |(e=getBranchExpr(node).(VariableAccess).getTarget().getAnAssignment().(Assignment).getRValue() or
+      e = getEqualityOperand(node).(VariableAccess).getTarget().getAnAssignment().(Assignment).getRValue())
+      and result = e
+  )
 }
+
 Operand getCase(Flow::PathNode node) {
   node.getNode().asInstruction().(SwitchInstruction).getACaseSuccessor().getAnOperand() = result
+}
+
+VariableAccess getBranchVariableAccess(Flow::PathNode node) {
+  exists(EqualityOperation eo |
+    getBranchExpr(node) = eo and
+    result = eo.getAnOperand()
+  )
+  or
+  result = getBranchExpr(node)
 }
 
 Expr getEqualityOperand(Flow::PathNode node) {
@@ -69,25 +82,31 @@ Expr getEqualityOperand(Flow::PathNode node) {
     result = eo.getAnOperand()
   )
   or
-  (
-    result = getBranchExpr(node) and
-    not result instanceof EqualityOperation
-  )
-
+  result = getBranchExpr(node) and
+  not result instanceof EqualityOperation
 }
+
+// from
+//   Flow::PathNode source, Flow::PathNode sink, Flow::PathNode intermediateNode, Expr equalityOperand,
+//   BasicBlock assignedValBlock
+// where
+//   Flow::flowPath(source, sink) and
+//   intermediateNode = source.getASuccessorImpl*() and
+//   isBranch(intermediateNode) and
+//   getEqualityOperand(intermediateNode) = equalityOperand and
+//   assignedValBlock = getAssignedValue(intermediateNode)
+// select intermediateNode, source, sink, "$@|$@", intermediateNode, intermediateNode.toString(),
+//   assignedValBlock, assignedValBlock.toString()
+
+
 from
-  Flow::PathNode source, Flow::PathNode sink, Flow::PathNode intermediateNode, Expr equalityOperand
+  Flow::PathNode source, Flow::PathNode sink, Flow::PathNode intermediateNode, Expr equalityOperand,
+  Expr assignedVal
 where
   Flow::flowPath(source, sink) and
   intermediateNode = source.getASuccessorImpl*() and
   isBranch(intermediateNode) and
-  (
-    getEqualityOperand(intermediateNode) = equalityOperand
-  )
-  // TODO check if state machine assignment is in flow path
+  getEqualityOperand(intermediateNode) = equalityOperand and
+  assignedVal = getAssignedValue(intermediateNode)  
 select intermediateNode, source, sink, "$@|$@", intermediateNode, intermediateNode.toString(),
-  // getBranchExpr(intermediateNode).(VariableAccess).getTarget().getADeclarationEntry(),getBranchExpr(intermediateNode).(VariableAccess).getTarget().getADeclarationEntry().toString(), // TODO this prevents ..==.. branch exprs
-  //getAssignedValue(intermediateNode), getAssignedValue(intermediateNode).toString()
-  // // TODO need to check each side of a ..==.. branch expr
-  // intermediateNode.getNode().getLocation(), intermediateNode.getNode().getLocation().toString()
-  equalityOperand, equalityOperand.toString()
+  assignedVal, assignedVal.toString()

@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/precondition-roletypes
+ * @id cpp/drivers/branches
  * @kind path-problem
- * @name FunctionLocationsPrecondition
+ * @name Branches
  * @description Get all function definition locations
  * @platform Desktop
  * @owner.email: sdat@microsoft.com
@@ -15,7 +15,7 @@
  */
 
 import cpp
-import semmle.code.cpp.interproccontrolflow.ControlFlow
+import drivers.libraries.interproccontrolflow.ControlFlow
 import Flow::PathGraph
 import semmle.code.cpp.ir.IR
 import Flow::PathGraph
@@ -36,20 +36,30 @@ module Config implements ControlFlow::ConfigSig {
 module Flow = ControlFlow::Global<Config>;
 
 predicate isBranch(Flow::PathNode node) {
-  node.getNode().asInstruction() instanceof ConditionalBranchInstruction or 
+  node.getNode().asInstruction() instanceof ConditionalBranchInstruction or
   node.getNode().asInstruction() instanceof SwitchInstruction
 }
+
 Expr getBranchExpr(Flow::PathNode node) {
-  result = node.getNode().asInstruction().(SwitchInstruction).getExpression().getUnconvertedResultExpression() or
-  result = node.getNode().asInstruction().(ConditionalBranchInstruction).getCondition().getUnconvertedResultExpression()
+  result =
+    node.getNode()
+        .asInstruction()
+        .(SwitchInstruction)
+        .getExpression()
+        .getUnconvertedResultExpression() or
+  result =
+    node.getNode()
+        .asInstruction()
+        .(ConditionalBranchInstruction)
+        .getCondition()
+        .getUnconvertedResultExpression()
 }
 
-from
-  Flow::PathNode source, Flow::PathNode sink, Flow::PathNode intermediateNode
+from Flow::PathNode source, Flow::PathNode sink, Flow::PathNode intermediateNode
 where
   Flow::flowPath(source, sink) and
-  intermediateNode = source.getASuccessorImpl*()
-  and isBranch(intermediateNode)
-select getBranchExpr(intermediateNode), source, sink, "$@|$@", 
-getBranchExpr(intermediateNode).(VariableAccess).getTarget().getADeclarationEntry(), "", 
-intermediateNode.getNode().getLocation(), ""
+  intermediateNode = source.getASuccessorImpl*() and
+  isBranch(intermediateNode)
+select getBranchExpr(intermediateNode), source, sink, "$@|$@",
+  getBranchExpr(intermediateNode).(VariableAccess).getTarget().getADeclarationEntry(), "",
+  intermediateNode.getNode().getLocation(), ""
