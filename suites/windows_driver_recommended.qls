@@ -30,3 +30,24 @@
       - Likely Bugs/Underspecified Functions/TooFewArguments.ql
       - Security/CWE/CWE-190/ComparisonWithWiderType.ql
       - Security/CWE/CWE-253/HResultBooleanConversion.ql
+      - Security/CWE/CWE-120/BadlyBoundedWrite.ql
+      - Likely Bugs/Conversion/BadOverflowGuard.ql
+      - Security/Cryptography/BannedEncryption.ql
+      - Security/Cryptography/BannedModesCAPI.ql
+      - Security/Cryptography/BannedModesCNG.ql
+      - Security/CWE/CWE-676/DangerousFunctionOverflow.ql
+      - Security/CWE/CWE-676/DangerousUseOfCin.ql
+      - Security/CWE/CWE-078/ExecTainted.ql
+      - Security/Cryptography/HardcodedIVCNG.ql
+      - Security/CWE/CWE-170/ImproperNullTerminationTainted.ql
+      - experimental/Windows/SystemCalls/IncorrectUsageOfRtlCompareMemory.ql
+      - Security/CWE/CWE-131/NoSpaceForZeroTerminator.ql
+      - Security/CWE/CWE-327/OpenSslHeartbleed.ql
+      - Security/CWE/CWE-120/OverrunWrite.ql
+      - Likely Bugs/Memory Management/SuspiciousCallToStrncat.ql
+      - Likely Bugs/Protocols/TlsSettingsMisconfiguration.ql
+      - Security/MemoryAccess/EnumIndex/UncheckedBoundsEnumAsIndex.ql
+      - Security/CWE/CWE-114/UncontrolledProcessOperation.ql
+      - Security/CWE/CWE-732/UnsafeDaclSecurityDescriptor.ql
+      - Likely Bugs/OO/UnsafeUseOfThis.ql
+      - Likely Bugs/Protocols/UseOfDeprecatedHardcodedProtocol.ql
