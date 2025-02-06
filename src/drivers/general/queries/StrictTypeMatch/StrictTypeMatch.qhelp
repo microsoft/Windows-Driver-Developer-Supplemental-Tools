@@ -2,39 +2,48 @@
 <qhelp>
 	<overview>
 		<p>
-		TODO overview
+		 The argument should exactly match the type
 		</p>
 	</overview>
 	<recommendation>
 		<p>
-			TODO recommendation
+			An enumerated value in a function call does not match the type specified for the parameter in the function declaration. This error can occur when parameters are mis-coded, missing, or out of order. Because C permits enumerated values to be used interchangeably, and to be used interchangeably with integer constants, it is not unusual to pass the wrong enumerated value to a function without recognizing the error.
 		</p>
 	</recommendation>
 	<example>
 		<p>
-			TODO example
+		The following code example elicits this warning.		
 		</p>
 		<sample language="c"> <![CDATA[
-		// Example code
+ 		KeWaitForSingleObject(
+			&EventDone,
+			Executive,
+			KernelMode,
+			FALSE,
+			NULL);
 		}]]>
 		</sample>
 		<p>
-			TODO example 2
+			The following code example avoids this warning.
 		</p>
 		<sample language="c"> <![CDATA[
-				// Example code
+		KeWaitForSingleObject(
+			&EventDone,
+			Executive,
+			Executive,
+			FALSE,
+			NULL);
 		}]]>
 		</sample>
 	</example>
 	<semmleNotes>
 		<p>
-			TODO notes
 		</p>
 	</semmleNotes>
 	<references>
 		<li>
-			<a href="example.com">
-				Example link
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28139-argument-operand-should-exactly-match">
+				C28139
 			</a>
 		</li>
 	</references>

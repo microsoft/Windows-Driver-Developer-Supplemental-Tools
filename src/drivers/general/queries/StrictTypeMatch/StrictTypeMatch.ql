@@ -1,16 +1,16 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/TODO
+ * @id cpp/drivers/strict-type-match
  * @kind problem
- * @name TODO
- * @description TODO
+ * @name Strict Type Match
+ * @description The argument should exactly match the type
  * @platform Desktop
  * @feature.area Multiple
  * @impact Insecure Coding Practice
  * @repro.text
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-TODO
+ * @opaqueid CQLD-C28139
  * @problem.severity warning
  * @precision medium
  * @tags correctness
@@ -26,6 +26,7 @@ where
   fc.getArgument(i) = eca and
   p = fc.getTarget().getParameter(i) and
   (
+    // check for pattern __drv_strictType(typename, mode) 
     if p instanceof SALParameter
     then
     exists(string enumType1, string enumType2 | 
@@ -52,6 +53,7 @@ where
       )
     )
     else
+    // non SAL parameter
       eca.getTarget().getDeclaringEnum().toString() !=
         fc.getTarget()
             .getADeclarationEntry()
