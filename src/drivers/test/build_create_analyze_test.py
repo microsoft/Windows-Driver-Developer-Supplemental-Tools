@@ -245,6 +245,7 @@ def find_ql_test_paths(directory, extension):
             print_conditionally("Skipping: " + root)
             continue
         if "TestTemplate" in root:
+            #exclude empty template driver_snippet files
             print_conditionally("Skipping: " + root)
             continue
         if fnmatch.filter(files, "driver_snippet.*"):
