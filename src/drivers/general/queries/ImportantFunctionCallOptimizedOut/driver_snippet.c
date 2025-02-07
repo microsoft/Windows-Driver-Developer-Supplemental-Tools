@@ -46,4 +46,3 @@ void good_func2()
     // ... do something with Password
     RtlZeroMemory(Password, sizeof(globalPassword));
 }
-// TODO add tests for query
