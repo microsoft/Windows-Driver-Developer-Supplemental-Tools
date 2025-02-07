@@ -630,6 +630,9 @@ def run_test(ql_test):
         db_path=args.existing_database
         print_conditionally("Using existing database: " + db_path)
 
+    if args.build_database_only:
+        return None
+
     analyze_codeql_database_result = analyze_codeql_database(ql_test, db_path) # result is path to sarif file if successful
     if analyze_codeql_database_result is None:
         print("Error analyzing database: " + db_path,"Skipping...")
@@ -740,6 +743,9 @@ def run_tests_external_drivers(ql_tests_dict):
                     created_databases.append(create_codeql_database_result)
             count += 1
     # Analyze created databses
+    if not args.build_database_only:
+        return
+    
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
     count = 0
     total = len(created_databases)*len(ql_tests_with_attributes)
@@ -908,13 +914,13 @@ def run_tests(ql_tests_dict):
     
     for ql_test in ql_tests_with_attributes:
         result_sarif = run_test(ql_test)
-        if not result_sarif:
-            print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
-            continue
-        analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
-        
-        health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
-        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results) 
+        if not args.build_database_only:
+            if not result_sarif:
+                print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
+                continue
+            analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
+            health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
+            detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results) 
       
     # save results
     result_file = "functiontestresults.xlsx"
@@ -993,6 +999,7 @@ if __name__ == "__main__":
     parser.add_argument('--local_result_storage',help='Store results locally instead of in Azure',action='store_true',required=False,)
     parser.add_argument('--codeql_path', help='Path to the codeql executable',type=str,required=False,)
     parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False,)
+    parser.add_argument('--build_database_only', help='Build database only',action='store_true',required=False,)
     args = parser.parse_args()
     
     if args.overwrite_azure_results:
