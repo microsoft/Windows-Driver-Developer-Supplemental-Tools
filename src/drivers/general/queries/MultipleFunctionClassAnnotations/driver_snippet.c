@@ -31,5 +31,3 @@ _Use_decl_annotations_
 {
     return STATUS_SUCCESS;
 }
-
-// TODO add tests for query
