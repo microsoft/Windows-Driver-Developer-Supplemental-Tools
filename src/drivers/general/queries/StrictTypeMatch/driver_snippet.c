@@ -40,4 +40,3 @@ void good_call()
     test_func(KernelMode);
 
 }
-// TODO add tests for query
