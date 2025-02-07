@@ -18,7 +18,7 @@
  		KeWaitForSingleObject(
 			&EventDone,
 			Executive,
-			KernelMode,
+			Executive,
 			FALSE,
 			NULL);
 		}]]>
@@ -30,7 +30,7 @@
 		KeWaitForSingleObject(
 			&EventDone,
 			Executive,
-			Executive,
+			KernelMode,
 			FALSE,
 			NULL);
 		}]]>
