@@ -12,7 +12,7 @@
 	</recommendation>
 	<example>
 		<p>
-			TODO example
+			Example where typedef of one type is used to declare the function but typedef of a different type is used in the function definition inside __drv_functionClass
 		</p>
 		<sample language="c"> <![CDATA[
 	typedef __drv_functionClass(TEST_ROUTINE)
