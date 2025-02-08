@@ -12,7 +12,7 @@
 	</recommendation>
 	<example>
 		<p>
-			TODO example
+			Example function with multiple __drv_functionClass annotations
 		</p>
 		<sample language="c"> <![CDATA[
 		__drv_functionClass(FAKE_DRIVER_ADD_DEVICE)
