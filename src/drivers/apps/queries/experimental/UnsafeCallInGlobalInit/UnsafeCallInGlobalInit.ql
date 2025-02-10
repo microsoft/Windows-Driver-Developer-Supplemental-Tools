@@ -3,7 +3,7 @@
 /**
  * @id cpp/drivers/unsafe-call-in-global-init
  * @kind problem
- * @name TODO
+ * @name UnsafeCallInGlobalInit
  * @description When using a DLL, it is frequently the case that any
  *  static construtors are called from DllMain.
  *  There are a number of constraints that apply to calling
