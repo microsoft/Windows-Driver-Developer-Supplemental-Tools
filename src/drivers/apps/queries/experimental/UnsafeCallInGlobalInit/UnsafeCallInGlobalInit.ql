@@ -23,31 +23,33 @@
  * @query-version v1
  */
 
-import cpp
-import drivers.libraries.DriverIsolation
-
-from Function f, string msg
-where
-  f.getName().matches("DllMain") and
-  exists(FunctionCall fc |
-    fc.getEnclosingFunction() = f and
-    (
-      fc.getTarget()
-          .getName()
-          .matches([
-              "LoadLibrary", "LoadLibraryEx", "GetStringTypeA", "GetStringTypeEx", "GetStringTypeW",
-              "CoInitializeEx", "CreateProcess", "ExitThread", "CreateThread", "ShGetFolderPathW"
-            ]) or
-      fc instanceof RegistryIsolationFunctionCall
-    ) and
-    msg = "Unsafe call in DllMain."
-  )
-  or
-  exists(Initializer i |
-    f.getName().matches("DllMain") and
-    i.getExpr().getEnclosingFunction() = f and
-    not i.getDeclaration().isStatic() and
-    i.getExpr().toString().toLowerCase().matches("null") and
-    msg = "Potential unsafe initialization in DllMain."
-  )
-select f, msg + " Review Dynamic-Link Library Best Practices."
+ import cpp
+ import drivers.libraries.DriverIsolation
+ 
+ from Function f, string msg
+ where
+   f.getName().matches("DllMain") and
+   exists(FunctionCall fc |
+     fc.getEnclosingFunction() = f
+      and
+     (
+       fc.getTarget()
+           .getName()
+           .matches([
+               "LoadLibrary%", "LoadLibraryEx", "GetStringTypeA", "GetStringTypeEx", "GetStringTypeW",
+               "CoInitializeEx", "CreateProcess%", "ExitThread%", "CreateThread%", "ShGetFolderPathW"
+             ]) or
+       fc instanceof RegistryIsolationFunctionCall
+     )
+      and
+     msg = "Unsafe call in DllMain: " + fc.getTarget().getName() + ". "
+   )
+   or
+   exists(Initializer i |
+     f.getName().matches("DllMain") and
+     i.getExpr().getEnclosingFunction() = f and
+     not i.getDeclaration().isStatic() and
+     i.getExpr().toString().toLowerCase().matches("null") and
+     msg = "Potential unsafe initialization in DllMain. "
+   )
+ select f, msg + " Review Dynamic-Link Library Best Practices."
