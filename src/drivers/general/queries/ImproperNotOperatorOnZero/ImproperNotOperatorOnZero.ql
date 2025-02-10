@@ -10,7 +10,7 @@
  * @impact Insecure Coding Practice
  * @repro.text Returning a status value such as !TRUE is not the same as returning a status value that indicates failure.
  * @owner.email: sdat@microsoft.com
- * @opaqueid CQLD-TODO
+ * @opaqueid CQLD-C28650
  * @problem.severity warning
  * @precision medium
  * @tags correctness
