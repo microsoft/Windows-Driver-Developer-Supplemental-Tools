@@ -81,6 +81,7 @@ class ql_test_attributes:
         self.ql_location = ql_location
         self.use_cpp = use_cpp
         self.no_attributes = no_attributes
+        self.output_file = ""
     def get_use_cpp(self):
         return self.use_cpp
 
@@ -134,6 +135,12 @@ class ql_test_attributes:
 
     def set_external_drivers(self, external_drivers):
         self.external_drivers = external_drivers
+        
+    # output sarif file 
+    def set_output_file(self, output_file):
+        self.output_file = output_file
+    def get_output_file(self):
+        return self.output_file
     
 def upload_blob_to_azure(file_name):
     """
@@ -241,7 +248,9 @@ def find_ql_test_paths(directory, extension):
     ql_files_map = {}
     for root, dirs, files in os.walk(directory):
         # exclude wfp folder until correct test template is added
-        if "wfp" in root.split("\\") or "wfp" in root.split("/") or "QueryTemplate" in root:
+        ignore_paths = ["wfp", "QueryTemplate", "TestTemplate", ".vs"]
+        root = root.replace("\\", "/")
+        if any(path in ignore_paths for x in root.split("/")): 
             print_conditionally("Skipping: " + root)
             continue
         if "TestTemplate" in root:
@@ -358,7 +367,7 @@ def test_setup(ql_test):
 
     """
     
-    current_working_dir = os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name()+'\\')
+    current_working_dir = os.path.join(g_test_dir, "working",ql_test.get_ql_name()+'\\')
    
     # if os.getcwd().split("\\")[-1] == "test":
     # else:
@@ -368,7 +377,8 @@ def test_setup(ql_test):
     print_conditionally("Creating working directory: " + current_working_dir)
     shutil.copytree(ql_test.get_template(), current_working_dir)
     print_conditionally("Copying files to working directory: " + current_working_dir)
-    test_file_loc = os.path.join(g_template_dir,"..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name())
+    test_file_loc = os.path.dirname(ql_test.get_ql_file())
+    
     # Copy files to driver directory
 
     for file in os.listdir(test_file_loc):
@@ -454,12 +464,13 @@ def create_codeql_test_database(ql_test):
 
     """
     # Create the CodeQL database
-    os.makedirs(os.path.join(os.getcwd(), "TestDB"), exist_ok=True) 
-    if os.path.exists(os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name())):
-        shutil.rmtree(os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()))
+    test_db_dir = os.path.join(g_test_dir, "TestDB")
+    os.makedirs(test_db_dir, exist_ok=True) 
+    if os.path.exists(os.path.join(test_db_dir,ql_test.get_ql_name())):
+        shutil.rmtree(os.path.join(test_db_dir,ql_test.get_ql_name()))
     
-    source_dir=os.path.join(os.getcwd(), "working\\"+ql_test.get_ql_name()+"\\")
-    db_loc =   os.path.join(os.getcwd(), "TestDB\\"+ql_test.get_ql_name()+"\\")
+    source_dir=os.path.join(g_test_dir, "working\\"+ql_test.get_ql_name()+"\\")
+    db_loc =   os.path.join(test_db_dir, ql_test.get_ql_name()+"\\")
     
     codeql_command = [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ 
                            " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc]
@@ -496,30 +507,25 @@ def analyze_codeql_database(ql_test, db_path=None):
     print_conditionally("Analyzing database: " + db_path)
 
     # Analyze the CodeQL database
-    if not os.path.exists("AnalysisFiles\Test Samples"):
-        os.makedirs("AnalysisFiles\Test Samples", exist_ok=True) 
     
     if db_path is not None: # When using external drivers, save databases in current directory
         database_loc = db_path
         if args.existing_database:
-            if not os.path.exists(os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name())): 
-                os.makedirs(os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()), exist_ok=True)
-                
-            output_file = os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+ "\\" + db_path.split('\\')[-1]+".sarif")
+            if not os.path.exists(os.path.join(g_analysis_file_dir,ql_test.get_ql_name())): 
+                os.makedirs(os.path.join(g_analysis_file_dir,ql_test.get_ql_name()), exist_ok=True)
+            output_file = os.path.join(g_analysis_file_dir,ql_test.get_ql_name(), db_path.split('\\')[-1]+".sarif")
         else:
-            output_file = os.path.join(os.getcwd(),"AnalysisFiles\\Test Samples\\"+ql_test.get_ql_name()+".sarif")
-
+            output_file = os.path.join(g_analysis_file_dir,ql_test.get_ql_name()+".sarif")
+        ql_test.set_output_file(output_file)
     else:
         print("No database path provided!")
         return None
 
-    ql_file_path =  g_template_dir + "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\*.ql"
-
     if args.use_codeql_repo:
-        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file,ql_file_path, "--additional-packs", args.use_codeql_repo]
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file,ql_test.get_ql_file(), "--additional-packs", args.use_codeql_repo]
       
     else:
-        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_file_path ]
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_test.get_ql_file() ]
         
     print_conditionally("Sarif output location: " + output_file)
       
@@ -547,9 +553,9 @@ def sarif_diff(ql_test):
     Returns:
         The output of the SARIF diff command if successful, None otherwise.
     """
-    sarif_prev = os.path.join(g_template_dir, "..\\"+ql_test.get_ql_type()+"\\"+ql_test.get_ql_location()+"\\"+ql_test.get_ql_name()+"\\"+ql_test.get_ql_name()+".sarif")
-    sarif_new = os.path.join(".\\AnalysisFiles\Test Samples\\"+ql_test.get_ql_name()+".sarif")
-    sarif_out = os.path.join(g_template_dir,  "diff\\"+ql_test.get_ql_name()+".sarif")
+    sarif_prev = os.path.join(ql_test.get_path(),ql_test.get_ql_name()+".sarif")
+    sarif_new = ql_test.get_output_file()
+    sarif_out = os.path.join(g_diff_dir, ql_test.get_ql_name()+".sarif")
     print_conditionally("Running sarif diff: " + ql_test.get_ql_name(), "\n - Previous: ", sarif_prev, "\n - New: ", sarif_new)
     out4 = subprocess.run(["sarif", "diff", "-o", sarif_out ,sarif_prev, sarif_new], 
                     shell=True, capture_output=no_output  ) 
@@ -663,9 +669,11 @@ def parse_attributes(queries):
         if "working" in query or "TestDB" in query:
             continue
         path = os.path.normpath(query)
+        ql_file = path
+
         path = path.split(os.sep)
-        ql_file = path[-1]
         ql_name = path[-2]
+        
         di = path.index("drivers")
         ql_type = path[di+1]
 
@@ -694,7 +702,7 @@ def parse_attributes(queries):
         ql_location = "/".join(path[path.index(ql_type)+1:path.index(ql_name)])
         queries[query].set_use_ntifs(use_ntifs)
         queries[query].set_template(template)
-        queries[query].set_path(path)
+        queries[query].set_path(os.path.dirname("/".join(path)))
         queries[query].set_ql_file(ql_file)
         queries[query].set_ql_name(ql_name)
         queries[query].set_ql_type(ql_type)
@@ -948,9 +956,9 @@ def find_g_template_dir(template):
     Returns:
         str: The path to the template directory.
     """
-    for root, dirs, files in os.walk("./"):
+    for root, dirs, files in os.walk(os.getcwd()):
         if template in dirs:
-            return root
+            return os.path.abspath(os.path.join(root, template) )+ "\\"
     return None
 
 
@@ -988,7 +996,6 @@ if __name__ == "__main__":
     parser.add_argument('--more_verbose', help='verbose output on including subprocess outputs', action='store_true', required=False)
     parser.add_argument('-c', '--use_codeql_repo', help='Use the codeql repo at <path> for the test instead of qlpack installed with CodeQL Package Manager', type=str, required=False)
     parser.add_argument('-i', '--individual_test', help='Run only the tests with <name> in the name', type=str, required=False)
-    parser.add_argument('-t', '--threads', help='Number of threads to use for multithreaded run', type=int, required=False)
     parser.add_argument('-m', '--compare_results', help='Compare results to previous run', action='store_true', required=False)
     parser.add_argument('--compare_results_no_build',help='Compare results to previous run',type=str,required=False,)
     parser.add_argument('--container_name',help='Azure container name',type=str,required=False, )
@@ -1051,13 +1058,22 @@ if __name__ == "__main__":
     
     ql_tests = find_ql_test_paths(dir_to_search,extension_to_search)
     g_template_dir = ''
-    if os.path.exists(os.path.join(os.getcwd(), "WDMTestTemplate")):
-        g_template_dir = os.getcwd() + "\\"
-    else:
-        print_conditionally("Using default template directory: src\\drivers\\test\\")    
-        g_template_dir = os.path.join(os.getcwd(), "src\\drivers\\test\\")
-
+    
+    # find the template directory
+    g_template_dir = find_g_template_dir("TestTemplates")
+    if not g_template_dir:
+        print_conditionally("Using default template directory: src\\drivers\\test\\TestTemplates\\")    
+        g_template_dir = os.path.join(os.getcwd(), "src\\drivers\\test\\TestTemplates\\")
+    print_conditionally("Using template directory: " + g_template_dir)
+    
+    g_diff_dir = os.path.normpath(os.path.join(g_template_dir, "..\\diff\\"))
     driver_sln_files = []
+    
+    g_test_dir = os.path.normpath(os.path.join(g_template_dir, "..\\"))
+    g_analysis_file_dir = os.path.normpath(os.path.join(g_test_dir, "AnalysisFiles"))
+    if not os.path.exists(g_analysis_file_dir):
+        os.makedirs(g_analysis_file_dir, exist_ok=True) 
+        
     if args.external_drivers:
         dir_to_search = args.external_drivers
         extension_to_search = ".sln"
@@ -1066,8 +1082,6 @@ if __name__ == "__main__":
         for ql_file in ql_tests:
             ql_tests[ql_file].set_external_drivers(driver_sln_files)
     
-    threads = []    
-   
     if args.more_verbose:
         no_output = False
    
@@ -1082,8 +1096,6 @@ if __name__ == "__main__":
         if not ql_files_keys:
             print("Invalid test name: " + args.individual_test + " not found") 
             exit(1)
-    elif args.threads:
-        ql_files_keys = [x for x in ql_tests]
     elif len(sys.argv) == 1:
         ql_files_keys = [x for x in ql_tests]
     else:
@@ -1091,34 +1103,15 @@ if __name__ == "__main__":
    
     ql_tests = {x:ql_tests[x] for x in ql_tests if x in ql_files_keys}
 
-    if args.threads:
-        # TODO not set up for external drivers
-        if args.external_drivers:
-            print("Cannot run multithreaded with external drivers") 
-            exit(1)
-        print("Running multithreaded")
-        print("Live output disabled for multithreaded run")
-        print("\n\n\n !!! MULTITHREADED MODE IS NOT FULLY TESTED DO NOT USE FOR OFFICIAL TESTS !!! \n\n\n")
-        print("Press enter to continue")
-        input()
-        thread_count = 0
-        for q in ql_tests:
-            single_dict = {q:ql_tests[q]}
-            threads.append(single_dict)
-        pool = ThreadPool(processes=args.threads)
-        for result in pool.map(run_tests, threads):
-            print(result)
+  
     if ql_tests == []:
         print("Invalid argument")
         exit(1)
     
-    if threads:
-       pass
+    if(args.external_drivers):
+        run_tests_external_drivers(ql_tests)
     else:
-        if(args.external_drivers):
-            run_tests_external_drivers(ql_tests)
-        else:
-            run_tests(ql_tests)
+        run_tests(ql_tests)
 
     end_time = time.time()
     print_conditionally("Total run time: " + str((end_time - start_time)/60) + " minutes")
