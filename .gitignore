@@ -1,6 +1,8 @@
 # query compilation caches
 **/*.cache
 
+**/*.codeql/
+
 # IDE folders
 .vscode/*
 **/.vs/*
@@ -24,3 +26,6 @@ working/*
 **/*.xlsx
 **/*.xls
 **/*.csv
+
+# Log files
+**/*.log

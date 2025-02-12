@@ -1,0 +1,66 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		When using a DLL, it is frequently the case that any static construtors are called from DllMain. There are a number of constraints that apply to calling other functions from DllMain.  In particular, it is possible to create memory leaks if the DLL is loaded and unloaded dynamically. SysAllocString is an example of a function that, in this case, could cause a memory leak.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The ideal DllMain would be just an empty stub. However, given the complexity of many applications, this is generally too restrictive. A good rule of thumb for DllMain is to postpone as much initialization as possible. Lazy initialization increases robustness of the application because this initialization is not performed while the loader lock is held. Also, lazy initialization enables you to safely use much more of the Windows API.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			DLLMain function
+		</p>
+		<sample language="c"> <![CDATA[
+		BOOL WINAPI DllMain(
+		HINSTANCE hinstDLL,  // handle to DLL module
+		DWORD fdwReason,     // reason for calling function
+		LPVOID lpvReserved )  // reserved
+		{
+			// Perform actions based on the reason for calling.
+			switch( fdwReason ) 
+			{ 
+				case DLL_PROCESS_ATTACH:
+				// Initialize once for each new process.
+				// Return FALSE to fail DLL load.
+					break;
+
+				case DLL_THREAD_ATTACH:
+				// Do thread-specific initialization.
+					break;
+
+				case DLL_THREAD_DETACH:
+				// Do thread-specific cleanup.
+					break;
+
+				case DLL_PROCESS_DETACH:
+				
+					if (lpvReserved != nullptr)
+					{
+						break; // do not do cleanup if process termination scenario
+					}
+					
+				// Perform any necessary cleanup.
+					break;
+			}
+			return TRUE;  // Successful DLL_PROCESS_ATTACH.
+		}
+		}]]>
+		
+	</example>
+	<semmleNotes>
+		<p>
+
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28637-calling-function-in-a-global-initializer-is-unsafe">
+				C28637
+			</a>
+		</li>
+	</references>
+</qhelp>

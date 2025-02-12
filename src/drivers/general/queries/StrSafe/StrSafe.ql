@@ -17,6 +17,7 @@
  * @precision high
  * @tags security
  *       wddst
+ *       ca_ported
  * @scope domainspecific
  * @query-version v1
  */

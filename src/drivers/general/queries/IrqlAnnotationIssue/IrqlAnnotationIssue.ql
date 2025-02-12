@@ -16,6 +16,7 @@
  * @problem.severity warning
  * @precision medium
  * @tags correctness
+ *       ca_ported
  * @scope domainspecific
  * @query-version v1
  */
