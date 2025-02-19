@@ -4,7 +4,7 @@
 - description: Security queries required to fix when certifying Windows Drivers
 - queries: . 
   from: microsoft/cpp-queries 
-  version: 0.0.1
+  version: 0.0.2
 - include:
     query path: 
       - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql
@@ -34,7 +34,7 @@
       - Security/CWE/CWE-732/UnsafeDaclSecurityDescriptor.ql
       - Likely Bugs/OO/UnsafeUseOfThis.ql
       - Likely Bugs/Protocols/UseOfDeprecatedHardcodedProtocol.ql
-      - Security/CWE/CWE-704/WcharCharConversion.ql
+      - Security/CWE/CWE-704/WcharCharConversion.ql 
 
 - import: windows-driver-suites/windows_mustfix_partial.qls
   from: microsoft/windows-drivers

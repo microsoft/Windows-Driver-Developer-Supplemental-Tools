@@ -5,6 +5,7 @@ name: microsoft/windows-drivers
 version: 1.4.1
 dependencies:
     codeql/cpp-all: 4.0.0
+    microsoft/cpp-queries: 0.0.2
 suites: windows-driver-suites
 defaultSuiteFile: windows-driver-suites/windows_recommended_partial.qls
 extractor: cpp
