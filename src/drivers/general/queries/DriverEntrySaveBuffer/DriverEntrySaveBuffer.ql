@@ -16,6 +16,7 @@
  * @precision medium
  * @tags correctness
  *       wddst
+*        ca_ported
  * @scope domainspecific
  * @query-version v1
  */

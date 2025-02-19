@@ -16,6 +16,7 @@
  * @precision high
  * @tags correctness
  *       wddst
+ *       ca_ported
  * @scope general
  * @query-version v1
  */

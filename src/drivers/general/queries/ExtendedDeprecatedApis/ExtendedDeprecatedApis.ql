@@ -16,6 +16,7 @@
  * @precision high
  * @tags correctness
  *       security
+*        ca_ported
  * @scope generic
  * @query-version v1
  */
