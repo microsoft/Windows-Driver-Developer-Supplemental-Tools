@@ -6,7 +6,7 @@ This repository contains open-source components for supplemental use in developi
 
 |  CodeQL CLI version      | microsoft/windows-drivers qlpack version | codeql/cpp-queries version  |Associated Repo Branch|
 |--------------------------|-------------------------------------------|------------------------|------------------------|
-| 2.15.4                   | latest                                    | latest |main |
+| latest                   | latest                                    | latest |main |
 
 ### For Windows Hardware Compatibility Program Use
 
