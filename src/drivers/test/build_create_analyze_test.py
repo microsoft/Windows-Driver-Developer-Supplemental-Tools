@@ -781,14 +781,14 @@ def run_tests_external_drivers(ql_tests_dict):
     result_file = "external_drivers_results.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer, sheet_name="Results")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     with pd.ExcelWriter("detailed" + result_file) as writer:
         detailed_health_df.to_excel(writer, sheet_name="Results")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
         compare_health_results(result_file)
@@ -853,7 +853,7 @@ def compare_health_results(curr_results_path):
     prev_results_df = pd.read_excel(prev_results, index_col=0, sheet_name=0) 
     prev_results_codeql_version_df = pd.read_excel(prev_results, index_col=0, sheet_name=1)
     prev_results_codeql_packs_df = pd.read_excel(prev_results, index_col=0, sheet_name=2)
-    prev_results_system_info_df = pd.read_excel(prev_results, index_col=0, sheet_name=3)
+    prev_results_local_system_info_df = pd.read_excel(prev_results, index_col=0, sheet_name=3)
     curr_results_df = pd.read_excel(curr_results_path, index_col=0, sheet_name=0)
     print_conditionally("Comparing results...")
     print_conditionally("Previous results: ", prev_results)
@@ -879,12 +879,12 @@ def compare_health_results(curr_results_path):
     
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer, sheet_name="Diff")
-        codeql_version_df.to_excel(writer, sheet_name="Current CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="Current CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="Current System Info")
-        prev_results_codeql_version_df.to_excel(writer, sheet_name="Previous CodeQL Version")
-        prev_results_codeql_packs_df.to_excel(writer, sheet_name="Previous CodeQL Packs")
-        prev_results_system_info_df.to_excel(writer, sheet_name="Previous System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
+        prev_results_codeql_version_df.to_excel(writer, sheet_name="Last Stored CodeQL Version")
+        prev_results_codeql_packs_df.to_excel(writer, sheet_name="Last Stored CodeQL Packs")
+        prev_results_local_system_info_df.to_excel(writer, sheet_name="Last Stored System Info")
         print_conditionally("Saved diff results")
 
     if not args.local_result_storage:
@@ -947,14 +947,14 @@ def run_tests(ql_tests_dict):
     result_file = "functiontestresults.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer, sheet_name="Results")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     with pd.ExcelWriter("detailed"+result_file) as writer:
         detailed_health_df.to_excel(writer, sheet_name="Results")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
         compare_health_results(result_file)
@@ -1028,11 +1028,11 @@ if __name__ == "__main__":
         codeql_path = "codeql"
 
     codeql_version = subprocess.run([codeql_path, "version"], capture_output=True) # test codeql is working
-    codeql_version_df = pd.DataFrame([x for x in codeql_version.stdout.decode().split('\n')])
+    local_codeql_version_df = pd.DataFrame([x for x in codeql_version.stdout.decode().split('\n')])
     codeql_packs = subprocess.run([codeql_path, "resolve", "qlpacks"], capture_output=True) 
-    codeql_packs_df = pd.DataFrame([x for x in codeql_packs.stdout.decode().split('\n')])
+    local_codeql_packs_df = pd.DataFrame([x for x in codeql_packs.stdout.decode().split('\n')])
     system_info = subprocess.run(["systeminfo"], capture_output=True) 
-    system_info_df = pd.DataFrame([x for x in system_info.stdout.decode().split('\n')])
+    local_system_info_df = pd.DataFrame([x for x in system_info.stdout.decode().split('\n')])
 
 
     if args.compare_results_no_build:

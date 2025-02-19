@@ -14,7 +14,7 @@ on:
   workflow_dispatch:
 
 env:
-  CODEQL_VERSION: 2.20.1
+  CODEQL_VERSION: 2.20.4
   
 jobs:
   build:
@@ -214,7 +214,7 @@ jobs:
 
         try{$old_qlpack_version = [version]($qlpack_changes -match "-version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 1 }
         try{$new_qlpack_version = [version]($qlpack_changes -match "\+version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 1 }
-        if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { "qlpack.yml version not incremented"; exit 1 }
+        if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { "qlpack.yml version not incremented. Previously updated to version $old_qlpack_version, current version $new_qlpack_version"; exit 1 }
   
   test-create-dvl:
     runs-on: windows-latest
