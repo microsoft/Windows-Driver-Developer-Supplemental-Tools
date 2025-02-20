@@ -51,8 +51,8 @@ where
   )
   or
   sa.toString().matches("%_Kernel_clear_do_init_%") and
-  not sa.getUnexpandedArgument(0).toString().toLowerCase().matches("\"yes\"") and
-  not sa.getUnexpandedArgument(0).toString().toLowerCase().matches("\"no\"")
+  not sa.getUnexpandedArgument(0).toString().toLowerCase().matches("__yes") and
+  not sa.getUnexpandedArgument(0).toString().toLowerCase().matches("__no")
   or
   //__drv_dispatch value out of range val > 63 || val < -1
   sa.toString().matches("%drv_dispatch%") and
