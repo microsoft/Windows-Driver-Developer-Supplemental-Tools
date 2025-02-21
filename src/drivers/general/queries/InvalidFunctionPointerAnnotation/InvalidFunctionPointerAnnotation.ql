@@ -73,11 +73,11 @@ af.getAnAccess() = access and
         .getParameterDeclarationEntry(n)
         .getType()
         .toString() and
-  funcClass != expectedFuncClass and
+  funcClass.replaceAll("*", "").trim() != expectedFuncClass.replaceAll("*", "").trim() and // pointer to type OK
   not exists(TypedefType t, string baseType |
     t = callingFunc.getTarget().getADeclarationEntry().getParameterDeclarationEntry(n).getType() and
     baseType = t.getBaseType().toString().replaceAll("*", "").trim() and
-    baseType = funcClass
+    baseType = funcClass.replaceAll("*", "").trim()
   )
 select callingFunc.getArgument(n), "Function pointer annotation " + funcClass +
   " does not match the function class " + expectedFuncClass + " on the function pointer type"
