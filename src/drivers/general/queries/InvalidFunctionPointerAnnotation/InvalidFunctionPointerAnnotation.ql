@@ -79,6 +79,5 @@ af.getAnAccess() = access and
     baseType = t.getBaseType().toString().replaceAll("*", "").trim() and
     baseType = funcClass.replaceAll("*", "").trim()
   )
-select callingFunc.getArgument(n), "Function pointer annotation " + funcClass +
-  " does not match the function class " + expectedFuncClass + " on the function pointer type"
+select callingFunc.getArgument(n), "Function pointer annotation mismatch. Function pointer type: "+expectedFuncClass+". Function annotation: "+funcClass
 
