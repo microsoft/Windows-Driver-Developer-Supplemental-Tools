@@ -20,4 +20,7 @@
 			</a>
 		</li>
 	</references>
+	<semmleNotes>
+		<p>This rule reports a false positive when the registry path pointer is saved for use in functions such as HidRegisterMinidriver</p>
+	</semmleNotes>
 </qhelp>
