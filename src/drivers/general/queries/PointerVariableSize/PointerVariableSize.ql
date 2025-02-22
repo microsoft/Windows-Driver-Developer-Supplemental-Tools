@@ -21,7 +21,7 @@
 
 import cpp
 
-from SizeofExprOperator e, VariableAccess va, AddressOfExpr a
+from SizeofExprOperator e, VariableAccess va
 where
   va = e.getExprOperand() and
   va.getTarget().getUnspecifiedType() instanceof PointerType

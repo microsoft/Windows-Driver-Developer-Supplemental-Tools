@@ -2,39 +2,6 @@
 # Licensed under the MIT license.
 
 - description: Security queries required to fix when certifying Windows Drivers
-- queries: . 
-  from: microsoft/cpp-queries 
-  version: 0.0.2
-- include:
-    query path: 
-      - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql
-      - Likely Bugs/Memory Management/PointerOverflow.ql
-      - Likely Bugs/Underspecified Functions/TooFewArguments.ql
-      - Security/CWE/CWE-190/ComparisonWithWiderType.ql
-      - Security/CWE/CWE-253/HResultBooleanConversion.ql
-      - Security/CWE/CWE-120/BadlyBoundedWrite.ql
-      - Microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
-      - Microsoft/Security/Cryptography/BannedEncryption.ql
-      - Microsoft/Security/Cryptography/BannedModesCAPI.ql
-      - Microsoft/Security/Cryptography/BannedModesCNG.ql
-      - Security/CWE/CWE-676/DangerousFunctionOverflow.ql
-      - Security/CWE/CWE-676/DangerousUseOfCin.ql
-      - Security/CWE/CWE-078/ExecTainted.ql
-      - Microsoft/Security/Cryptography/HardcodedIVCNG.ql
-      - Security/CWE/CWE-253/HResultBooleanConversion.ql
-      - Security/CWE/CWE-170/ImproperNullTerminationTainted.ql
-      - Microsoft/Likely Bugs/Drivers/IncorrectUsageOfRtlCompareMemory.ql
-      - Security/CWE/CWE-131/NoSpaceForZeroTerminator.ql
-      - Security/CWE/CWE-327/OpenSslHeartbleed.ql
-      - Security/CWE/CWE-120/OverrunWrite.ql
-      - Likely Bugs/Memory Management/SuspiciousCallToStrncat.ql
-      - Likely Bugs/Protocols/TlsSettingsMisconfiguration.ql
-      - Microsoft/Security/MemoryAccess/EnumIndex/UncheckedBoundsEnumAsIndex.ql
-      - Security/CWE/CWE-114/UncontrolledProcessOperation.ql
-      - Security/CWE/CWE-732/UnsafeDaclSecurityDescriptor.ql
-      - Likely Bugs/OO/UnsafeUseOfThis.ql
-      - Likely Bugs/Protocols/UseOfDeprecatedHardcodedProtocol.ql
-      - Security/CWE/CWE-704/WcharCharConversion.ql 
 
-- import: windows-driver-suites/windows_mustfix_partial.qls
+- import: windows-driver-suites/mustfix.qls
   from: microsoft/windows-drivers

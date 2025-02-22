@@ -7,7 +7,7 @@
  * @kind path-problem
  * @problem.severity error
  * @precision medium
- * @id cpp/windows/wdk/kmdf/DeviceInitApi
+ * @id cpp/windows/wdk/kmdf/device-init-api
  * @tags correctness
  * @query-version v1
  */
