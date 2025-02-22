@@ -52,11 +52,11 @@ jobs:
       
     - name: Build must-fix driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only windows_mustfix_partial.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only mustfix.qls
     
     - name: Build recommended driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only windows_recommended_partial.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only recommended.qls
     
     - name: Build CA ported queries
       shell: cmd
@@ -196,15 +196,15 @@ jobs:
       shell: pwsh
       run: 
         $qlpack_diff = git diff HEAD~1:src/qlpack.yml src/qlpack.yml;
-        $rec_diff = git diff HEAD~1:src/windows-driver-suites/windows_recommended_partial.qls src/windows-driver-suites/windows_recommended_partial.qls;
-        $mf_diff = git diff HEAD~1:src/windows-driver-suites/windows_mustfix_partial.qls src/windows-driver-suites/windows_mustfix_partial.qls;
+        $rec_diff = git diff HEAD~1:src/windows-driver-suites/recommended.qls src/windows-driver-suites/recommended.qls;
+        $mf_diff = git diff HEAD~1:src/windows-driver-suites/mustfix.qls src/windows-driver-suites/mustfix.qls;
         if (!$qlpack_diff -and ($rec_diff -or $mf_diff)) { "Query suite file updated without updating qlpack version"; exit 1 }
 
         $last_qlpack_commit = git log -n 1 --pretty=format:%H -- src/qlpack.yml;
         $qlpack_changes =git show $last_qlpack_commit -- .\src\qlpack.yml;
       
-        $last_mf_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/windows_mustfix_partial.qls;
-        $last_rec_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/windows_recommended_partial.qls;
+        $last_mf_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/mustfix.qls;
+        $last_rec_commit = git log -n 1 --pretty=format:%H -- src/windows-driver-suites/recommended.qls;
         $commits_since_qlpack_change = [int](git rev-list --count HEAD...$last_qlpack_commit);
         $commits_since_mf_change = [int](git rev-list --count HEAD...$last_mf_commit);
         $commits_since_rec_change = [int](git rev-list --count HEAD...$last_rec_commit);
