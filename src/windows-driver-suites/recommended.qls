@@ -7,57 +7,57 @@
   from: microsoft/windows-drivers
 - include:
     query path: 
-      - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
-      - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
-      - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
-      - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
-      - microsoft/Likely Bugs/UninitializedPtrField.ql
-      - microsoft/Security/Crytpography/HardcodedIVCNG.ql
-      - drivers/general/queries/KeSetEventPageable/KeSetEventPageable.ql
-      - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
-      - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
-      - drivers/general/queries/ExaminedValue/ExaminedValue.ql
-      - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
-      - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
-      - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
-      - drivers/general/queries/IrqlTooHigh/IrqlTooHigh.ql
-      - drivers/general/queries/IrqlTooLow/IrqlTooLow.ql
-      - drivers/general/queries/IrqlSetTooHigh/IrqlSetTooHigh.ql
-      - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
-      - drivers/general/queries/StrSafe/StrSafe.ql
       - drivers/general/queries/AnnotationSyntax/AnnotationSyntax.ql
       - drivers/general/queries/CurrentFunctionTypeNotCorrect/CurrentFunctionTypeNotCorrect.ql
+      - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
       - drivers/general/queries/DriverEntrySaveBuffer/DriverEntrySaveBuffer.ql
+      - drivers/general/queries/ExaminedValue/ExaminedValue.ql
+      - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/general/queries/IRPStackEntryCopy/IRPStackEntryCopy.ql
       - drivers/general/queries/ImportantFunctionCallOptimizedOut/ImportantFunctionCallOptimizedOut.ql
       - drivers/general/queries/ImproperNotOperatorOnZero/ImproperNotOperatorOnZero.ql
-      - drivers/wdm/queries/InitNotCleared/InitNotCleared.ql
       - drivers/general/queries/InvalidFunctionClassTypedef/InvalidFunctionClassTypedef.ql
       - drivers/general/queries/InvalidFunctionPointerAnnotation/InvalidFunctionPointerAnnotation.ql
       - drivers/general/queries/IoInitializeTimerCall/IoInitializeTimerCall.ql
       - drivers/general/queries/IrqlAnnotationIssue/IrqlAnnotationIssue.ql
       - drivers/general/queries/IrqlCancelRoutine/IrqlCancelRoutine.ql
       - drivers/general/queries/IrqlFloatStateMismatch/IrqlFloatStateMismatch.ql
-      - drivers/wdm/queries/KeWaitLocal/KeWaitLocal.ql
-      - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
+      - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
+      - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
+      - drivers/general/queries/IrqlSetTooHigh/IrqlSetTooHigh.ql
+      - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
+      - drivers/general/queries/IrqlTooHigh/IrqlTooHigh.ql
+      - drivers/general/queries/IrqlTooLow/IrqlTooLow.ql
+      - drivers/general/queries/KeSetEventPageable/KeSetEventPageable.ql
       - drivers/general/queries/MultithreadedAVCondition/MultithreadedAVCondition.ql
       - drivers/general/queries/NtstatusExplicitCast/NtstatusExplicitCast.ql
       - drivers/general/queries/NtstatusExplicitCast2/NtstatusExplicitCast2.ql
       - drivers/general/queries/NtstatusExplicitCast3/NtstatusExplicitCast3.ql
       - drivers/general/queries/NullCharacterPointerAssignment/NullCharacterPointerAssignment.ql
-      - drivers/wdm/queries/ObReferenceMode/ObReferenceMode.ql
       - drivers/general/queries/OperandAssignment/OperandAssignment.ql
       - drivers/general/queries/PointerVariableSize/PointerVariableSize.ql
       - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
+      - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
       - drivers/general/queries/RoutineFunctionTypeNotExpected/RoutineFunctionTypeNotExpected.ql
+      - drivers/general/queries/StrSafe/StrSafe.ql
       - drivers/general/queries/StrictTypeMatch/StrictTypeMatch.ql
       - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
       - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
       - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
+      - drivers/wdm/queries/InitNotCleared/InitNotCleared.ql
+      - drivers/wdm/queries/KeWaitLocal/KeWaitLocal.ql
+      - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
+      - drivers/wdm/queries/ObReferenceMode/ObReferenceMode.ql
       - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlUse.ql
       - drivers/wdm/queries/OpaqueMdlWrite/OpaqueMdlWrite.ql
       - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
       - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
+      - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
+      - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
+      - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
+      - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - microsoft/Likely Bugs/UninitializedPtrField.ql
+      - microsoft/Security/Crytpography/HardcodedIVCNG.ql
 - queries: . 
   from: microsoft/cpp-queries 
   version: 0.0.2
