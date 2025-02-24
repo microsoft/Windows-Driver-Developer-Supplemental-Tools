@@ -37,6 +37,7 @@ where
       fa.getQualifier().(VariableAccess).getTarget() instanceof LocalVariable
     )
   )
+  and va.getTarget().getType().toString().matches("PUNICODE_STRING")
 select va,
   "The DriverEntry routine should save a copy of the argument $@, not the pointer, because the I/O Manager frees the buffer",
   va, va.toString()

@@ -63,7 +63,16 @@ from AnnotatedFunction af, string declTypedef, string funcClass
 where
   declTypedef = af.getADeclarationEntry().getTypedefType().toString() and
   funcClass = af.getFuncClassAnnotation().getUnexpandedArgument(0) and
-  declTypedef != funcClass
-select af,
-  "The function class " + funcClass + " on the function does not match the function class " +
+  funcClass.replaceAll("*", "").trim() != declTypedef.replaceAll("*", "").trim() and // pointer to type OK
+  not exists(TypedefType t, string baseType |
+    t.toString() = funcClass and
+    baseType = t.getBaseType().toString().replaceAll("*", "").trim() and
+    baseType = declTypedef.replaceAll("*", "").trim()
+  ) and
+  // Allow for EVT_WDF_DEVICE_ARM/DISARM_WAKE_FROM_S0/X
+  not (
+    funcClass.matches("EVT_WDF_DEVICE_%ARM_WAKE_FROM_S%") and
+    declTypedef.matches("EVT_WDF_DEVICE_%ARM_WAKE_FROM_S%")
+  )
+select af, "The function class " + funcClass + " on the function does not match the function class " +
     declTypedef + " on the typedef used here"

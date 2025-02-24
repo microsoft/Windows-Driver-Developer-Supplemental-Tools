@@ -59,33 +59,25 @@ class AnnotatedFunction extends Function {
   FunctionClassAnnotation getFuncClassAnnotation() { result = funcClassAnnotation }
 }
 
-from AnnotatedFunction af, FunctionAccess access, FunctionCall callingFunc, int n
+from
+  AnnotatedFunction af, FunctionAccess access, FunctionCall callingFunc, int n, string funcClass,
+ string expectedFuncClass
 where
-  af.getAnAccess() = access and
+af.getAnAccess() = access and
   callingFunc.getArgument(n) = access and
-  (
-    af.getFuncClassAnnotation().getUnexpandedArgument(0).toString() !=
-      callingFunc
-          .getTarget()
-          .getADeclarationEntry()
-          .getParameterDeclarationEntry(n)
-          .getType()
-          .toString() and
-    // Pointer type of same type is OK
-    "P" + af.getFuncClassAnnotation().getUnexpandedArgument(0).toString() !=
-      callingFunc
-          .getTarget()
-          .getADeclarationEntry()
-          .getParameterDeclarationEntry(n)
-          .getType()
-          .toString()
-  )
-select callingFunc.getArgument(n),
-  "Function pointer annotation mismatch. Function pointer type: " +
+  funcClass = af.getFuncClassAnnotation().getUnexpandedArgument(0).toString() and
+  expectedFuncClass =
     callingFunc
         .getTarget()
         .getADeclarationEntry()
         .getParameterDeclarationEntry(n)
         .getType()
-        .toString() + ". Function annotation: " +
-    af.getFuncClassAnnotation().getUnexpandedArgument(0).toString()
+        .toString() and
+  funcClass.replaceAll("*", "").trim() != expectedFuncClass.replaceAll("*", "").trim() and // pointer to type OK
+  not exists(TypedefType t, string baseType |
+    t = callingFunc.getTarget().getADeclarationEntry().getParameterDeclarationEntry(n).getType() and
+    baseType = t.getBaseType().toString().replaceAll("*", "").trim() and
+    baseType = funcClass.replaceAll("*", "").trim()
+  )
+select callingFunc.getArgument(n), "Function pointer annotation mismatch. Function pointer type: "+expectedFuncClass+". Function annotation: "+funcClass
+
