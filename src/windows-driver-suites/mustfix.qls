@@ -40,3 +40,4 @@
       - Likely Bugs/OO/UnsafeUseOfThis.ql
       - Likely Bugs/Protocols/UseOfDeprecatedHardcodedProtocol.ql
       - Security/CWE/CWE-704/WcharCharConversion.ql 
+      - Likely Bugs/Format/WrongNumberOfFormatArguments.ql
