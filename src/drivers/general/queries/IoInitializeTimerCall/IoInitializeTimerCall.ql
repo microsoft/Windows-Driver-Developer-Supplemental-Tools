@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/pool-tag-integral
+ * @id cpp/drivers/io-initialize-timer-call
  * @kind problem
  * @name IoInitializeTimer is best called from AddDevice
  * @description IoInitializeTimer can only be called once per device object. Calling it from the AddDevice routine helps assure that it is not unexpectedly called more than once.
