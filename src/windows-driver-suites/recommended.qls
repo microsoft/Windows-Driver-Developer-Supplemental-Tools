@@ -73,5 +73,7 @@
      - Security/CWE/CWE-121/UnterminatedVarargsCall.ql
      - Security/CWE/CWE-457/ConditionallyUninitializedVariable.ql
      - Security/CWE/CWE-468/SuspiciousAddWithSizeof.ql
+     - Security/CWE/CWE-468/IncorrectPointerScaling.ql
+     - Security/CWE/CWE-468/IncorrectPointerScalingVoid.ql
      - Security/CWE/CWE-676/PotentiallyDangerousFunction.ql
      - Security/CWE/CWE-119/OverflowBuffer.ql
