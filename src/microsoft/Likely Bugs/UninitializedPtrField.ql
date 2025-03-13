@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 /**
+ * @id cpp/uninitializedptrfield
  * @name Dereference of potentially uninitialized pointer field
  * @description A pointer field which was not initialized during or since class 
  *              construction will cause a null pointer dereference.
@@ -9,9 +10,8 @@
  * @problem.severity warning
  * @tags security
  *       external/cwe/cwe-476
- * @opaque-id SM02310
+ * @opaqueid SM02310
  * @microsoft.severity Important
- * @id cpp/uninitializedptrfield
  */
  
 import cpp

@@ -42,11 +42,8 @@ class ValidPoolTag extends Expr {
   }
 }
 
-from FunctionCall fc, int i
+from FunctionCall fc
 where
-  fc.getTarget() instanceof PoolTypeFunction and
-  fc.getTarget().getParameter(i).getName().matches("Tag") and
-  not fc.getArgument(i) instanceof ValidPoolTag
-select fc,
-  "A non-CHAR tag was passed into a pool allocation function (actual type: " +
-    fc.getArgument(i).getUnderlyingType().getName() + ")"
+  fc.getTarget() instanceof PoolTypeFunction 
+
+select fc,fc.toString()

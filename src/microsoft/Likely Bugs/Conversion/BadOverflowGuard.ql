@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 /**
+ * @id cpp/badoverflowguard
  * @name Bad overflow check
  * @description Checking for overflow of an addition by comparing against one
  *              of the arguments of the addition fails if the size of all the
@@ -12,9 +13,9 @@
  * @tags security
  *       external/cwe/cwe-190
  *       external/cwe/cwe-191
- * @opaque-id SM02324
  * @microsoft.severity Important
- * @id cpp/badoverflowguard
+ * @opaqueid SM02324
+ * 
  */
 
 import cpp
