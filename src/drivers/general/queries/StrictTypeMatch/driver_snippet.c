@@ -25,7 +25,7 @@ void bad_call()
         FALSE,
         NULL);
 
-    test_func(Executive);
+    test_func(Executive); // Doesn't cause warning because the function isn't annotated
 }
 
 void good_call()
