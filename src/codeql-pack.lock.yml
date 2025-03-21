@@ -11,6 +11,8 @@ dependencies:
     version: 1.0.16
   codeql/ssa:
     version: 1.0.16
+  codeql/suite-helpers:
+    version: 1.0.16
   codeql/tutorial:
     version: 1.0.16
   codeql/typeflow:
@@ -21,4 +23,6 @@ dependencies:
     version: 2.0.3
   codeql/xml:
     version: 1.0.16
+  microsoft/cpp-queries:
+    version: 0.0.2
 compiled: false

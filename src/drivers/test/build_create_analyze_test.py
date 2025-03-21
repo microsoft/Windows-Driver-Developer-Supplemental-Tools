@@ -189,7 +189,7 @@ def upload_results_to_azure(file_to_upload, file_name, file_directory):
     file_service = FileService(connection_string=args.connection_string)
     file_service.create_file_from_path(share_name=args.share_name, file_name=file_name, directory_name=file_directory, local_file_path=file_to_upload, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
 
-def download_file_from_azure(file_to_download, file_name, file_directory):
+def download_file_from_azure(out_file_path, file_name, file_directory):
     """
     Downloads a file from Azure.
 
@@ -200,7 +200,7 @@ def download_file_from_azure(file_to_download, file_name, file_directory):
         None
     """
     file_service = FileService(connection_string=args.connection_string)
-    file = file_service.get_file_to_path(share_name=args.share_name, file_name=file_name, directory_name=file_directory, file_path=file_to_download)
+    file = file_service.get_file_to_path(share_name=args.share_name, file_name=file_name, directory_name=file_directory, file_path=out_file_path)
     return file.name
 
 def get_git_root():
@@ -250,7 +250,7 @@ def find_ql_test_paths(directory, extension):
         # exclude wfp folder until correct test template is added
         ignore_paths = ["wfp", "QueryTemplate", "TestTemplate", ".vs"]
         root = root.replace("\\", "/")
-        if any(path in ignore_paths for x in root.split("/")): 
+        if any(path in ignore_paths for path in root.split("/")): 
             print_conditionally("Skipping: " + root)
             continue
         if "TestTemplate" in root:
@@ -265,6 +265,7 @@ def find_ql_test_paths(directory, extension):
                     ql_obj = ql_test_attributes(use_ntifs=use_ntifs, use_cpp=use_cpp)
                     ql_obj.set_use_cpp(use_cpp)
                     ql_files_map[os.path.join(root, file)] = ql_obj
+                    print_conditionally("Found: " + os.path.join(root, file))
 
     return ql_files_map
 
@@ -780,14 +781,14 @@ def run_tests_external_drivers(ql_tests_dict):
     result_file = "external_drivers_results.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer, sheet_name="Results")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     with pd.ExcelWriter("detailed" + result_file) as writer:
         detailed_health_df.to_excel(writer, sheet_name="Results")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
         compare_health_results(result_file)
@@ -838,9 +839,8 @@ def compare_health_results(curr_results_path):
     try:
         prev_results = 'azure-'+curr_results_path
         print_conditionally("Downloading previous results from Azure: " + prev_results)
-        temp_file = download_file_from_azure(file_to_download=prev_results, 
+        _ = download_file_from_azure(out_file_path=prev_results, 
                         file_name=curr_results_path, file_directory="")
-        print_conditionally("Downloaded previous results: " + temp_file)
         
     except Exception as e:
         if "ResourceNotFound" in str(e):
@@ -853,7 +853,7 @@ def compare_health_results(curr_results_path):
     prev_results_df = pd.read_excel(prev_results, index_col=0, sheet_name=0) 
     prev_results_codeql_version_df = pd.read_excel(prev_results, index_col=0, sheet_name=1)
     prev_results_codeql_packs_df = pd.read_excel(prev_results, index_col=0, sheet_name=2)
-    prev_results_system_info_df = pd.read_excel(prev_results, index_col=0, sheet_name=3)
+    prev_results_local_system_info_df = pd.read_excel(prev_results, index_col=0, sheet_name=3)
     curr_results_df = pd.read_excel(curr_results_path, index_col=0, sheet_name=0)
     print_conditionally("Comparing results...")
     print_conditionally("Previous results: ", prev_results)
@@ -879,16 +879,29 @@ def compare_health_results(curr_results_path):
     
     with pd.ExcelWriter("diff" + curr_results_path) as writer:
         diff_results.to_excel(writer, sheet_name="Diff")
-        codeql_version_df.to_excel(writer, sheet_name="Current CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="Current CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="Current System Info")
-        prev_results_codeql_version_df.to_excel(writer, sheet_name="Previous CodeQL Version")
-        prev_results_codeql_packs_df.to_excel(writer, sheet_name="Previous CodeQL Packs")
-        prev_results_system_info_df.to_excel(writer, sheet_name="Previous System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
+        prev_results_codeql_version_df.to_excel(writer, sheet_name="Last Stored CodeQL Version")
+        prev_results_codeql_packs_df.to_excel(writer, sheet_name="Last Stored CodeQL Packs")
+        prev_results_local_system_info_df.to_excel(writer, sheet_name="Last Stored System Info")
         print_conditionally("Saved diff results")
 
     if not args.local_result_storage:
         # upload new results to Azure
+        if args.overwrite_azure_results:
+            print("!! Overwriting Azure results !!")
+            print("Type 'yes' to confirm")
+            confirm = input()
+            if confirm != "yes":
+                print("Exiting")
+                exit(1)
+            else:
+                double_confirm = input("Are you sure?")
+                if double_confirm != "yes":
+                    print("Exiting")
+                    exit(1)
+                    
         if args.overwrite_azure_results:
             print_conditionally("Uploading results")
             upload_results_to_azure(file_to_upload=curr_results_path, 
@@ -934,14 +947,14 @@ def run_tests(ql_tests_dict):
     result_file = "functiontestresults.xlsx"
     with pd.ExcelWriter(result_file) as writer:
         health_df.to_excel(writer, sheet_name="Results")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     with pd.ExcelWriter("detailed"+result_file) as writer:
         detailed_health_df.to_excel(writer, sheet_name="Results")
-        codeql_version_df.to_excel(writer, sheet_name="CodeQL Version")
-        codeql_packs_df.to_excel(writer, sheet_name="CodeQL Packs")
-        system_info_df.to_excel(writer, sheet_name="System Info")
+        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
         compare_health_results(result_file)
@@ -1008,26 +1021,18 @@ if __name__ == "__main__":
     parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False,)
     parser.add_argument('--build_database_only', help='Build database only',action='store_true',required=False,)
     args = parser.parse_args()
-    
-    if args.overwrite_azure_results:
-        print("Overwriting Azure results")
-        print("Type 'yes' to confirm")
-        confirm = input()
-        if confirm != "yes":
-            print("Exiting")
-            exit(1)
-            
+           
     if args.codeql_path:
         codeql_path = args.codeql_path
     else:
         codeql_path = "codeql"
 
     codeql_version = subprocess.run([codeql_path, "version"], capture_output=True) # test codeql is working
-    codeql_version_df = pd.DataFrame([x for x in codeql_version.stdout.decode().split('\n')])
+    local_codeql_version_df = pd.DataFrame([x for x in codeql_version.stdout.decode().split('\n')])
     codeql_packs = subprocess.run([codeql_path, "resolve", "qlpacks"], capture_output=True) 
-    codeql_packs_df = pd.DataFrame([x for x in codeql_packs.stdout.decode().split('\n')])
+    local_codeql_packs_df = pd.DataFrame([x for x in codeql_packs.stdout.decode().split('\n')])
     system_info = subprocess.run(["systeminfo"], capture_output=True) 
-    system_info_df = pd.DataFrame([x for x in system_info.stdout.decode().split('\n')])
+    local_system_info_df = pd.DataFrame([x for x in system_info.stdout.decode().split('\n')])
 
 
     if args.compare_results_no_build:

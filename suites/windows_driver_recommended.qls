@@ -2,31 +2,7 @@
 # Licensed under the MIT license.
 
 - description: Recommended and required queries for Windows Drivers.
-- import: windows-driver-suites/windows_mustfix_partial.qls
+- import: windows-driver-suites/mustfix.qls
   from: microsoft/windows-drivers
-- import: windows-driver-suites/windows_recommended_partial.qls
+- import: windows-driver-suites/recommended.qls
   from: microsoft/windows-drivers
-- queries: . 
-  from: codeql/cpp-queries
-  version: 0.9.0
-- include:
-    query path: 
-      - Best Practices/Likely Errors/OffsetUseBeforeRangeCheck.ql
-      - Likely Bugs/Arithmetic/IntMultToLong.ql
-      - Likely Bugs/Arithmetic/SignedOverflowCheck.ql
-      - Likely Bugs/Conversion/CastArrayPointerArithmetic.ql
-      - Likely Bugs/Likely Typos/IncorrectNotOperatorUsage.ql
-      - Likely Bugs/Memory Management/SuspiciousSizeof.ql
-      - Likely Bugs/Memory Management/UninitializedLocal.ql
-      - Security/CWE/CWE-121/UnterminatedVarargsCall.ql
-      - Security/CWE/CWE-457/ConditionallyUninitializedVariable.ql
-      - Security/CWE/CWE-468/IncorrectPointerScaling.ql
-      - Security/CWE/CWE-468/IncorrectPointerScalingVoid.ql
-      - Security/CWE/CWE-468/SuspiciousAddWithSizeof.ql
-      - Security/CWE/CWE-676/PotentiallyDangerousFunction.ql
-      - Security/CWE/CWE-704/WcharCharConversion.ql
-      - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql
-      - Likely Bugs/Memory Management/PointerOverflow.ql
-      - Likely Bugs/Underspecified Functions/TooFewArguments.ql
-      - Security/CWE/CWE-190/ComparisonWithWiderType.ql
-      - Security/CWE/CWE-253/HResultBooleanConversion.ql

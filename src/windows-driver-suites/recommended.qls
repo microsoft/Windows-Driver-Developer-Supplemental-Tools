@@ -1,0 +1,79 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+- description: Recommended and required queries for Windows Drivers.
+- import: windows-driver-suites/mustfix.qls
+- queries: .
+  from: microsoft/windows-drivers
+- include:
+    query path: 
+      - drivers/general/queries/AnnotationSyntax/AnnotationSyntax.ql
+      - drivers/general/queries/CurrentFunctionTypeNotCorrect/CurrentFunctionTypeNotCorrect.ql
+      - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
+      - drivers/general/queries/DriverEntrySaveBuffer/DriverEntrySaveBuffer.ql
+      - drivers/general/queries/ExaminedValue/ExaminedValue.ql
+      - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
+      - drivers/general/queries/IRPStackEntryCopy/IRPStackEntryCopy.ql
+      - drivers/general/queries/ImportantFunctionCallOptimizedOut/ImportantFunctionCallOptimizedOut.ql
+      - drivers/general/queries/ImproperNotOperatorOnZero/ImproperNotOperatorOnZero.ql
+      - drivers/general/queries/InvalidFunctionClassTypedef/InvalidFunctionClassTypedef.ql
+      - drivers/general/queries/InvalidFunctionPointerAnnotation/InvalidFunctionPointerAnnotation.ql
+      - drivers/general/queries/IoInitializeTimerCall/IoInitializeTimerCall.ql
+      - drivers/general/queries/IrqlAnnotationIssue/IrqlAnnotationIssue.ql
+      - drivers/general/queries/IrqlCancelRoutine/IrqlCancelRoutine.ql
+      - drivers/general/queries/IrqlFloatStateMismatch/IrqlFloatStateMismatch.ql
+      - drivers/general/queries/IrqlNotSaved/IrqlNotSaved.ql
+      - drivers/general/queries/IrqlNotUsed/IrqlNotUsed.ql
+      - drivers/general/queries/IrqlSetTooHigh/IrqlSetTooHigh.ql
+      - drivers/general/queries/IrqlSetTooLow/IrqlSetTooLow.ql
+      - drivers/general/queries/IrqlTooHigh/IrqlTooHigh.ql
+      - drivers/general/queries/IrqlTooLow/IrqlTooLow.ql
+      - drivers/general/queries/KeSetEventPageable/KeSetEventPageable.ql
+      - drivers/general/queries/MultithreadedAVCondition/MultithreadedAVCondition.ql
+      - drivers/general/queries/NtstatusExplicitCast/NtstatusExplicitCast.ql
+      - drivers/general/queries/NtstatusExplicitCast2/NtstatusExplicitCast2.ql
+      - drivers/general/queries/NtstatusExplicitCast3/NtstatusExplicitCast3.ql
+      - drivers/general/queries/NullCharacterPointerAssignment/NullCharacterPointerAssignment.ql
+      - drivers/general/queries/OperandAssignment/OperandAssignment.ql
+      - drivers/general/queries/PointerVariableSize/PointerVariableSize.ql
+      - drivers/general/queries/PoolTagIntegral/PoolTagIntegral.ql
+      - drivers/general/queries/RoleTypeCorrectlyUsed/RoleTypeCorrectlyUsed.ql
+      - drivers/general/queries/RoutineFunctionTypeNotExpected/RoutineFunctionTypeNotExpected.ql
+      - drivers/general/queries/StrSafe/StrSafe.ql
+      - drivers/general/queries/StrictTypeMatch/StrictTypeMatch.ql
+      - drivers/wdm/queries/IllegalFieldAccess/IllegalFieldAccess.ql
+      - drivers/wdm/queries/IllegalFieldAccess2/IllegalFieldAccess2.ql
+      - drivers/wdm/queries/IllegalFieldWrite/IllegalFieldWrite.ql
+      - drivers/wdm/queries/InitNotCleared/InitNotCleared.ql
+      - drivers/wdm/queries/KeWaitLocal/KeWaitLocal.ql
+      - drivers/wdm/queries/MultiplePagedCode/MultiplePagedCode.ql
+      - drivers/wdm/queries/ObReferenceMode/ObReferenceMode.ql
+      - drivers/wdm/queries/OpaqueMdlUse/OpaqueMdlUse.ql
+      - drivers/wdm/queries/OpaqueMdlWrite/OpaqueMdlWrite.ql
+      - drivers/wdm/queries/PendingStatusError/PendingStatusError.ql
+      - drivers/wdm/queries/WrongDispatchTableAssignment/WrongDispatchTableAssignment.ql
+      - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
+      - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
+      - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
+      - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - microsoft/Likely Bugs/UninitializedPtrField.ql
+      - microsoft/Security/Crytpography/HardcodedIVCNG.ql
+- queries: . 
+  from: microsoft/cpp-queries 
+  version: 0.0.2
+- include:
+    query path: 
+     - Best Practices/Likely Errors/OffsetUseBeforeRangeCheck.ql
+     - Likely Bugs/Arithmetic/IntMultToLong.ql
+     - Likely Bugs/Arithmetic/SignedOverflowCheck.ql
+     - Likely Bugs/Conversion/CastArrayPointerArithmetic.ql
+     - Likely Bugs/Likely Typos/IncorrectNotOperatorUsage.ql
+     - Likely Bugs/Memory Management/SuspiciousSizeof.ql
+     - Likely Bugs/Memory Management/UninitializedLocal.ql
+     - Security/CWE/CWE-121/UnterminatedVarargsCall.ql
+     - Security/CWE/CWE-457/ConditionallyUninitializedVariable.ql
+     - Security/CWE/CWE-468/SuspiciousAddWithSizeof.ql
+     - Security/CWE/CWE-468/IncorrectPointerScaling.ql
+     - Security/CWE/CWE-468/IncorrectPointerScalingVoid.ql
+     - Security/CWE/CWE-676/PotentiallyDangerousFunction.ql
+     - Security/CWE/CWE-119/OverflowBuffer.ql
