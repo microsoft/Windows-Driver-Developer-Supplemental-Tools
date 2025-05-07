@@ -2,10 +2,10 @@
 # Licensed under the MIT license.
 
 name: microsoft/windows-drivers
-version: 1.5.1
+version: 1.5.2
 dependencies:
-    codeql/cpp-all: 4.0.0
-    microsoft/cpp-queries: 0.0.2
+    codeql/cpp-all: 4.2.0
+    microsoft/cpp-queries: 0.0.4
 suites: windows-driver-suites
 defaultSuiteFile: windows-driver-suites/recommended.qls
 extractor: cpp
