@@ -10,7 +10,7 @@
       - microsoft/Security/CWE/CWE-704/WcharCharConversionLimited.ql
 - queries: . 
   from: microsoft/cpp-queries 
-  version: 0.0.2
+  version: 0.0.4
 - include:
     query path: 
       - Likely Bugs/Arithmetic/BadAdditionOverflowCheck.ql

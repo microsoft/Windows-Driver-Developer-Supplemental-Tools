@@ -5,7 +5,7 @@
 - import: windows-driver-suites/mustfix.qls
 - queries: . 
   from: microsoft/cpp-queries 
-  version: 0.0.2
+  version: 0.0.4
 - include:
     query path: 
       - Likely Bugs/Format/WrongNumberOfFormatArguments.ql
