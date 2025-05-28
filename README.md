@@ -2,88 +2,56 @@
 
 This repository contains open-source components for supplemental use in developing device drivers for Windows, as well as driver specific [CodeQL](https://codeql.github.com/) query suites used for the [Windows Hardware Compatibility Program](https://learn.microsoft.com/en-us/windows-hardware/design/compatibility/). The quickstart below will get you set up to build your database and analyze your driver using CodeQL. For the full documentation, troubleshooting, and more details about the Static Tools Logo test within the WHCP Program, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql).
 
-### For General Use
+### For General Use or Windows Hardware Compatibility Program Use
 
-|  CodeQL CLI version      | microsoft/windows-drivers qlpack version | microsoft/cpp-queries version | codeql/cpp-queries version  |Associated Repo Branch|
-|--------------------------|------------------------------------------|-------------------------------|-----------------------------|------------------------|
-| 2.20.1                   | 1.5.0                                    | 0.0.2                         | N/A                      | Main |
+|  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
+|--------------------------|------------------------------------------|-------------------------------|-----------------------------|
+|  2.20.1 | 1.6.0 | 0.0.4 | Main |
 
-### For Windows Hardware Compatibility Program Use
+See appendix for more information
 
-### Windows Hardware Compatibility Program Release Version Matrix
-| Release                  | CodeQL CLI version | microsoft/windows-drivers qlpack version| microsoft/cpp-queries version | codeql/cpp-queries version | Associated Repo Branch|
-|--------------------------|--------------------|-----------------------------------------|-------------------------------|-----------------------------|----------------------|
-| Windows Server 2022      |  [2.4.6](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_21H2 |
-| Windows 11, version 22H2 |  [2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_22H2 |
-| Windows 11, version 23H2 |  [2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_22H2 |
-| Windows 11               |  [2.4.6](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_21H2 |
-| Windows 11, version 24H2 |  [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)		                                                                        |  1.1.0                          | N/A |0.9.0                          | WHCP_24H2 |
-| Windows Server 2025      |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.5.0                          | 0.0.2 | N/A                          | WHCP_TODO |
-| Windows 11, version <todo> |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.5.0                          | 0.0.2 | N/A                          | WHCP_TODO |
 
 
 ### For Testing the Latest in Development
 
 
-|  CodeQL CLI version      | microsoft/windows-drivers qlpack version | microsoft/cpp-queries version | codeql/cpp-queries version  |Associated Repo Branch|
-|--------------------------|------------------------------------------|-------------------------------|-----------------------------|------------------------|
-| [Latest](https://github.com/github/codeql-cli-binaries/releases/latest) | [Latest](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers)             | [Latest](https://github.com/orgs/microsoft/packages/container/package/cpp-queries)                         | N/A                      | Development |
+|  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
+|--------------------------|------------------------------------------|-------------------------------|-----------------------------|
+| [Latest](https://github.com/github/codeql-cli-binaries/releases/latest) | [Latest Beta Version](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers)             | [Latest](https://github.com/orgs/microsoft/packages/container/package/cpp-queries)                                             | Development |
 
 ## Quickstart
 
 1. Create a directory where you can place the CodeQL CLI and the queries you want to use:
     ```
-    D:\> mkdir codeql-home
+    mkdir codeql-home
     ```
 
 1. Download the CodeQL CLI 
    
-    **NOTE** Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in the WHCP_21H2 and WHCP_22H2 branches. [CodeQL CLI version 2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4) has been validated for use with WHCP 21H2 and WHCP 22H2 when using Visual Studio 17.8 or greater. 
-        
-    For the WHCP Program, use the CodeQL CLI version in accordance with the table above and Windows release you are certifying for
+    For the WHCP Program, use the CodeQL CLI version specified above. For special cases and more information see appendix.
     1. Navigate to the [CodeQL CLI Release Page](https://github.com/github/codeql-cli-binaries/releases)
     1. Find the release version based on the tables above and select the asset associated with your OS and architecture (codeql-win64.zip, codeql-linux64.zip, etc.), 
     1. Extract the downloaded zip to the directory you created in the previous step.
     1. (Optional) Add the CodeQL install location to your PATH
-
-1. Verify CodeQL is installed correctly by checking the version:
-    ```
-    D:\codeql-home\codeql>codeql --version
-    CodeQL command-line toolchain release 2.15.4.
-    Copyright (C) 2019-2023 GitHub, Inc.
-    Unpacked in: D:\codeql-home\codeql
-        Analysis results depend critically on separately distributed query and
-        extractor modules. To list modules that are visible to the toolchain,
-        use 'codeql resolve qlpacks' and 'codeql resolve languages'.
-    ```
+    1. (Optional) Verify CodeQL is installed correctly by checking the version `codeql --version`
 
 1. Install CodeQL Packages 
     
-    
-    
-	Download the correct version of the CodeQL packs from the Windows Hardware Compatibility Program Release Version Matrix:
+	Download the correct version of the CodeQL packs. For special cases and more information see appendix.
 	```
     codeql pack download microsoft/windows-drivers@<version>
 	```
     
 	```
-    codeql pack download codeql/cpp-queries@<version>
+    codeql pack download microsoft/cpp-queries@<version>
 	```
 
 	CodeQL will install the packs to the default directory `C:\Users\<current user>\.codeql\packages\microsoft\windows-drivers\<downloaded version>\`. Do not change this directory or move the installed pack.
 	
-    For examples, if using WHCP_24H2, run the following command to download query the microsoft/windows-drivers pack:
-
-    ```
-    codeql pack download microsoft/windows-drivers@1.1.0
-    ```
-
-    For special cases, see appendix below.
-
 1. Build your CodeQL database:
 
     ```
-    D:\codeql-home\codeql>codeql database create <path to new database> --language=cpp --source-root=<driver parent directory> --command=<build command or path to build file>
+    codeql database create <path to new database> --language=cpp --source-root=<driver parent directory> --command=<build command or path to build file>
     ```
     Single driver example: `codeql database create D:\DriverDatabase --language=cpp --source-root=D:\Drivers\SingleDriver --command="msbuild /t:rebuild D:\Drivers\SingleDriver\SingleDriver.sln"`
     
@@ -112,7 +80,7 @@ This repository contains open-source components for supplemental use in developi
 
 1. ***For WHCP Users Only***: Prepare to Create a Driver Verification Log (DVL):
 
-    Tocreate a DVL, your SARIF log file must be in the parent directory of your driver project. You can modify your output location in the `codeql database analyze` step or copy the file manyally
+    To create a DVL, your SARIF log file must be in the parent directory of your driver project. You can modify your output location in the `codeql database analyze` step or copy the file manyally
     
     Please refer to the continued instructions at [CodeQL and the Static Tools Logo Test, Driver Verification Log DVL Consumption of SARIF Output](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/static-tools-and-codeql#driver-verification-log-dvl-consumption-of-sarif-output).
 
@@ -122,7 +90,7 @@ Windows drivers queries are in the `src/drivers` directory.
 
 Non-driver Microsoft-specific queries provided by Microsoft are in the `src/microsoft` directory.
 
-Query suites are located in the `windows-driver-suites` directory and contain the Must-Fix and Recommended-Fix suites used by the WHCP Program.
+Query suites are located in the `windows-driver-suites` directory and contain the Must-Fix and Recommended suites used by the WHCP Program.
 
 
 
@@ -163,7 +131,22 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 
 ## Appendix
 
+### Windows Hardware Compatibility Program Release Version Matrix
+For WHCP, these versions can be used in place of the latest versions specified above. These versions were the latest available at the time new WHCP requirements were released and can continue to be used for WHCP certifications. However, newer versions of CodeQL continue to be validated for use.
+| Release                  | CodeQL CLI version | microsoft/windows-drivers qlpack version| microsoft/cpp-queries version | codeql/cpp-queries version | Associated Repo Branch|
+|--------------------------|--------------------|-----------------------------------------|-------------------------------|-----------------------------|----------------------|
+| Windows Server 2022      |  [2.4.6](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_21H2 |
+| Windows 11, version 22H2 |  [2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_22H2 |
+| Windows 11, version 23H2 |  [2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_22H2 |
+| Windows 11               |  [2.4.6](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_21H2 |
+| Windows 11, version 24H2 |  [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)		                                                                        |  1.1.0                          | N/A |0.9.0                          | WHCP_24H2 |
+| Windows Server 2025      |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.6.0                          | 0.0.4 | N/A                          | <todo> |
+| Windows 11, version <todo> |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.6.0                          | 0.0.4 | N/A                          | <todo> |
+
+
 ### Special instructions for for WHCP_21H2 and WHCP_22H2 branches:
+Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in the WHCP_21H2 and WHCP_22H2 branches. [CodeQL CLI version 2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4) has been validated for use with WHCP 21H2 and WHCP 22H2 when using Visual Studio 17.8 or greater. 
+        
  
 1. If using Visual Studio 2022 17.8 or greater with WHCP_21H2 or WHCP_22H2 and CodeQL CLI version 2.15.4:
 
