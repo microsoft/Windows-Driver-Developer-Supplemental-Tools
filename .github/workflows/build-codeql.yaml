@@ -68,7 +68,7 @@ jobs:
     
   test-query-health:
     runs-on: windows-latest
-    needs: build
+# FIXME removed for faster testing    needs: build
     permissions:
       contents: read
       packages: write
@@ -110,13 +110,7 @@ jobs:
       
     - name: Download previous results
       run: |
-        az storage file download \
-        --account-name "$env:ACCOUNT_NAME" \
-        --share-name "$env:SHARE_NAME" \
-        --path detailedfunctiontestresults.xlsx \
-        --file azure-detailedfunctiontestresults.xlsx \
-        --auth-mode login
-
+        az storage file download --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path detailedfunctiontestresults.xlsx --file azure-detailedfunctiontestresults.xlsx --auth-mode login
     - name: Run test script
       shell: pwsh
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
@@ -124,12 +118,7 @@ jobs:
     - name: Upload result diff
       if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
       run: |
-        az storage file upload \
-        --account-name "$env:ACCOUNT_NAME" \
-        --share-name "$env:SHARE_NAME" \
-        --path diffdetailedfunctiontestresults.xlsx \
-        --file diffdetailedfunctiontestresults.xlsx \
-        --auth-mode login \
+        az storage file upload --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path diffdetailedfunctiontestresults.xlsx --file diffdetailedfunctiontestresults.xlsx --auth-mode login
         exit 1 
     
       
