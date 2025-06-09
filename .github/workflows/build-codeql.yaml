@@ -16,10 +16,6 @@ on:
 env:
   CODEQL_VERSION: 2.21.2
 
-permissions:
-  id-token: write
-  contents: read
-  
 jobs:
   build:
     runs-on: windows-latest
@@ -76,6 +72,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     env:
       ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
@@ -144,6 +141,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     env:
       ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
