@@ -119,7 +119,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          az storage file download --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path detailedfunctiontestresults.xlsx --file azure-detailedfunctiontestresults.xlsx --auth-mode login
+          az storage file download --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path detailedfunctiontestresults.xlsx --file azure-detailedfunctiontestresults.xlsx --auth-mode login --enable-file-backup-request-intent
     - name: Run test script
       shell: pwsh
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
@@ -129,7 +129,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          az storage file upload --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path health-diffdetailedfunctiontestresults.xlsx --source diffdetailedfunctiontestresults.xlsx --auth-mode login
+          az storage file upload --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path health-diffdetailedfunctiontestresults.xlsx --source diffdetailedfunctiontestresults.xlsx --auth-mode login --enable-file-backup-request-intent
           exit 1 
     
       
@@ -193,7 +193,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          az storage file download --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path detailedfunctiontestresults.xlsx --file azure-detailedfunctiontestresults.xlsx --auth-mode login
+          az storage file download --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path detailedfunctiontestresults.xlsx --file azure-detailedfunctiontestresults.xlsx --auth-mode login --enable-file-backup-request-intent
     - name: Run test script
       shell: pwsh
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
@@ -203,7 +203,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          az storage file upload --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path version-diffdetailedfunctiontestresults.xlsx --source diffdetailedfunctiontestresults.xlsx --auth-mode login
+          az storage file upload --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path version-diffdetailedfunctiontestresults.xlsx --source diffdetailedfunctiontestresults.xlsx --auth-mode login --enable-file-backup-request-intent 
           exit 1 
           
   test-pack-version-update:
