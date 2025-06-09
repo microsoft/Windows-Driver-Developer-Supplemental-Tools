@@ -65,7 +65,7 @@ jobs:
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
-      
+    
   test-query-health:
     runs-on: windows-latest
     needs: build
@@ -73,9 +73,8 @@ jobs:
       contents: read
       packages: write
     env:
-      CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+      ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
-      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
     steps:
     - name: Enable long git paths
       shell: cmd
@@ -108,14 +107,30 @@ jobs:
           pip install -r .\src\drivers\test\requirements.txt
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
+      
+    - name: Download previous results
+      run: |
+        az storage file download \
+        --account-name "$env:ACCOUNT_NAME" \
+        --share-name "$env:SHARE_NAME" \
+        --path detailedfunctiontestresults.xlsx \
+        --file azure-detailedfunctiontestresults.xlsx \
+        --auth-mode login
+
     - name: Run test script
       shell: pwsh
-      if: ${{ env.CONNECTION_STRING != '' }}
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME" -v
-    - name: Run test script without compare
-      shell: pwsh
-      if: ${{ env.CONNECTION_STRING == '' }}
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build -v
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+
+    - name: Upload result diff
+      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      run: |
+        az storage file upload \
+        --account-name "$env:ACCOUNT_NAME" \
+        --share-name "$env:SHARE_NAME" \
+        --path diffdetailedfunctiontestresults.xlsx \
+        --file diffdetailedfunctiontestresults.xlsx \
+        --auth-mode login \
+        exit 1 
     
       
   test-codeql-latest-vs-current:
@@ -127,14 +142,9 @@ jobs:
       contents: read
       packages: write
     env:
-      CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+      ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
-      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
     steps:
-    - name: Check Env
-      shell: pwsh
-      if: ${{ env.CONNECTION_STRING == '' }}
-      run: exit 1
     - name: Check Prev Job
       if: ${{ needs.test-query-health.result == 'failure' }}
       shell: pwsh
@@ -171,9 +181,30 @@ jobs:
           pip install -r .\src\drivers\test\requirements.txt
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
+    
+    - name: Download previous results
+      run: |
+        az storage file download \
+        --account-name "$env:ACCOUNT_NAME" \
+        --share-name "$env:SHARE_NAME" \
+        --path detailedfunctiontestresults.xlsx \
+        --file azure-detailedfunctiontestresults.xlsx \
+        --auth-mode login
+
     - name: Run test script
       shell: pwsh
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" -v
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+
+    - name: Upload result diff
+      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      run: |
+        az storage file upload \
+        --account-name "$env:ACCOUNT_NAME" \
+        --share-name "$env:SHARE_NAME" \
+        --path diffdetailedfunctiontestresults.xlsx \
+        --file diffdetailedfunctiontestresults.xlsx \
+        --auth-mode login \
+        exit 1 
           
   test-pack-version-update:
     runs-on: windows-latest
