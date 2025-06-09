@@ -14,7 +14,11 @@ on:
   workflow_dispatch:
 
 env:
-  CODEQL_VERSION: 2.20.4
+  CODEQL_VERSION: 2.21.2
+
+permissions:
+  id-token: write
+  contents: read
   
 jobs:
   build:
