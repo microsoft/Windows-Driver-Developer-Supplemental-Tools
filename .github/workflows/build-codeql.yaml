@@ -115,9 +115,9 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     - name: Download previous results
-      uses: azure/cli@v2
+      uses: azure/powershell@v2
       with:
-        azcliversion: latest
+        azPSVersion: latest
         inlineScript: |
           az storage file download --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path detailedfunctiontestresults.xlsx --file azure-detailedfunctiontestresults.xlsx --auth-mode login
     - name: Run test script
@@ -125,9 +125,9 @@ jobs:
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
     - name: Upload result diff
       if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
-      uses: azure/cli@v2
+      uses: azure/powershell@v2
       with:
-        azcliversion: latest
+        azPSVersion: latest
         inlineScript: |
           az storage file upload --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path health-diffdetailedfunctiontestresults.xlsx --source diffdetailedfunctiontestresults.xlsx --auth-mode login
           exit 1 
@@ -189,9 +189,9 @@ jobs:
         tenant-id: ${{ secrets.AZURE_TENANT_ID }}
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
     - name: Download previous results
-      uses: azure/cli@v2
+      uses: azure/powershell@v2
       with:
-        azcliversion: latest
+        azPSVersion: latest
         inlineScript: |
           az storage file download --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path detailedfunctiontestresults.xlsx --file azure-detailedfunctiontestresults.xlsx --auth-mode login
     - name: Run test script
@@ -199,9 +199,9 @@ jobs:
       run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
     - name: Upload result diff
       if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
-      uses: azure/cli@v2
+      uses: azure/powershell@v2
       with:
-        azcliversion: latest
+        azPSVersion: latest
         inlineScript: |
           az storage file upload --account-name "$env:ACCOUNT_NAME" --share-name "$env:SHARE_NAME" --path version-diffdetailedfunctiontestresults.xlsx --source diffdetailedfunctiontestresults.xlsx --auth-mode login
           exit 1 
