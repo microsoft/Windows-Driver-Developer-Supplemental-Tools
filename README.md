@@ -6,14 +6,19 @@ This repository contains open-source components for supplemental use in developi
 
 |  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
 |--------------------------|------------------------------------------|-------------------------------|-----------------------------|
-|  2.20.1 | 1.6.0 | 0.0.4 | Main |
+|  2.15.4 or greater* | [Latest Stable Version](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers) | 0.0.4 | Main |
 
-See appendix for more information
+#### Validated CodeQL Versions For Use with WHCP
+|  CodeQL CLI Version      |
+|--------------------------|
+|  2.21.4 |
+|  2.21.2 |
+|  2.20.1 |
+|  2.15.4 |
 
-
+*See appendix for more information
 
 ### For Testing the Latest in Development
-
 
 |  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
 |--------------------------|------------------------------------------|-------------------------------|-----------------------------|
@@ -132,7 +137,7 @@ Any use of third-party trademarks or logos are subject to those third-party's po
 ## Appendix
 
 ### Windows Hardware Compatibility Program Release Version Matrix
-For WHCP, these versions can be used in place of the latest versions specified above. These versions were the latest available at the time new WHCP requirements were released and can continue to be used for WHCP certifications. However, newer versions of CodeQL continue to be validated for use.
+The versions below are the minumum required versions for WHCP certification. Newer versions continue to be validated for use and are listed above.
 | Release                  | CodeQL CLI version | microsoft/windows-drivers qlpack version| microsoft/cpp-queries version | codeql/cpp-queries version | Associated Repo Branch|
 |--------------------------|--------------------|-----------------------------------------|-------------------------------|-----------------------------|----------------------|
 | Windows Server 2022      |  [2.4.6](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_21H2 |
