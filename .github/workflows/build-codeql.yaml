@@ -90,7 +90,7 @@ jobs:
       run : |
           Install-Module -Name Az.Storage -Force -Scope CurrentUser
           Import-Module Az.Storage
-          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           $destination = "azure-detailedfunctiontestresults.xlsx"
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
 
