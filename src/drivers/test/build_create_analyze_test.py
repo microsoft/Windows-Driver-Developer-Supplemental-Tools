@@ -16,18 +16,6 @@ try:
     import openpyxl # Not directly used but this will make sure it is installed
     import argparse
 
-    from azure.storage.file import (
-        ContentSettings,
-        FileService,
-    )
-    from azure.storage.blob import (
-        BlobServiceClient,
-        BlobClient,
-        ContainerClient 
-    )
-    from azure.identity import DefaultAzureCredential
-    from azure.data.tables import TableServiceClient
-
 except ImportError as e:
     print("Import error: " + str(e) + "\nPlease install the required modules using pip install -r requirements.txt")
     exit(1)
@@ -141,67 +129,6 @@ class ql_test_attributes:
         self.output_file = output_file
     def get_output_file(self):
         return self.output_file
-    
-def upload_blob_to_azure(file_name):
-    """
-    Uploads a file to Azure Blob Storage.
-
-    Args:
-        file_name (str): The name of the file to be uploaded.
-
-    Returns:
-        None
-    """
-    print("Uploading file to Azure: " + file_name)
-    account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
-    blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
-    blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
-    with open(file=file_name, mode="rb") as data:
-        blob_client.upload_blob(data, overwrite=True)
-
-def download_blob_from_azure(file_name):
-    """
-    Downloads a blob from Azure Blob Storage.
-
-    Args:
-        file_name (str): The name of the blob file to download.
-
-    Returns:
-        None
-    """
-    account_url = "https://"+ args.storage_account_name +".blob.core.windows.net"
-    blob_service_client = BlobServiceClient(account_url, credential=args.storage_account_key)
-    blob_client = blob_service_client.get_blob_client(container=args.container_name, blob=file_name)
-    with open(file=file_name, mode="wb") as data:
-        data.write(blob_client.download_blob().readall())
-
-def upload_results_to_azure(file_to_upload, file_name, file_directory):
-    """
-    Uploads the results to Azure.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-    print("Upload results to file share: " + file_to_upload)
-    file_service = FileService(connection_string=args.connection_string)
-    file_service.create_file_from_path(share_name=args.share_name, file_name=file_name, directory_name=file_directory, local_file_path=file_to_upload, content_settings=ContentSettings(content_type='application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'))
-
-def download_file_from_azure(out_file_path, file_name, file_directory):
-    """
-    Downloads a file from Azure.
-
-    Args:
-        None
-
-    Returns:
-        None
-    """
-    file_service = FileService(connection_string=args.connection_string)
-    file = file_service.get_file_to_path(share_name=args.share_name, file_name=file_name, directory_name=file_directory, file_path=out_file_path)
-    return file.name
 
 def get_git_root():
     """
@@ -473,7 +400,7 @@ def create_codeql_test_database(ql_test):
     source_dir=os.path.join(g_test_dir, "working\\"+ql_test.get_ql_name()+"\\")
     db_loc =   os.path.join(test_db_dir, ql_test.get_ql_name()+"\\")
     
-    codeql_command = [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ 
+    codeql_command = [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "--threads=0", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ 
                            " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc]
     print_conditionally(" - Database location: " + db_loc)
     print_conditionally(" - Source directory: " + source_dir)
@@ -523,10 +450,9 @@ def analyze_codeql_database(ql_test, db_path=None):
         return None
 
     if args.use_codeql_repo:
-        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file,ql_test.get_ql_file(), "--additional-packs", args.use_codeql_repo]
-      
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file,ql_test.get_ql_file(), "--additional-packs", args.use_codeql_repo, "--threads=0"]
     else:
-        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_test.get_ql_file() ]
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_test.get_ql_file(), "--threads=0"]
         
     print_conditionally("Sarif output location: " + output_file)
       
@@ -791,7 +717,6 @@ def run_tests_external_drivers(ql_tests_dict):
         local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
-        compare_health_results(result_file)
     
 
 def find_last_xlsx_file(curr_results_path):
@@ -832,23 +757,8 @@ def compare_health_results(curr_results_path):
     Returns:
         None
     """
-    
-    if not args.connection_string or not args.share_name:
-        raise Exception("Azure credentials not provided. Cannot compare results.")
-    
-    try:
-        prev_results = 'azure-'+curr_results_path
-        print_conditionally("Downloading previous results from Azure: " + prev_results)
-        _ = download_file_from_azure(out_file_path=prev_results, 
-                        file_name=curr_results_path, file_directory="")
-        
-    except Exception as e:
-        if "ResourceNotFound" in str(e):
-            print("No previous results found")
-            exit(1)
-        else:
-            print("Error downloading previous results ")
-            exit(1)
+   
+    prev_results = 'azure-'+curr_results_path 
             
     prev_results_df = pd.read_excel(prev_results, index_col=0, sheet_name=0) 
     prev_results_codeql_version_df = pd.read_excel(prev_results, index_col=0, sheet_name=1)
@@ -877,50 +787,22 @@ def compare_health_results(curr_results_path):
             
     diff_results = curr_results_df.compare(prev_results_df, keep_shape=True, result_names=("Current", "Previous"))  
     
-    with pd.ExcelWriter("diff" + curr_results_path) as writer:
-        diff_results.to_excel(writer, sheet_name="Diff")
-        local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
-        local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
-        local_system_info_df.to_excel(writer, sheet_name="Local System Info")
-        prev_results_codeql_version_df.to_excel(writer, sheet_name="Last Stored CodeQL Version")
-        prev_results_codeql_packs_df.to_excel(writer, sheet_name="Last Stored CodeQL Packs")
-        prev_results_local_system_info_df.to_excel(writer, sheet_name="Last Stored System Info")
-        print_conditionally("Saved diff results")
-
-    if not args.local_result_storage:
-        # upload new results to Azure
-        if args.overwrite_azure_results:
-            print("!! Overwriting Azure results !!")
-            print("Type 'yes' to confirm")
-            confirm = input()
-            if confirm != "yes":
-                print("Exiting")
-                exit(1)
-            else:
-                double_confirm = input("Are you sure?")
-                if double_confirm != "yes":
-                    print("Exiting")
-                    exit(1)
-                    
-        if args.overwrite_azure_results:
-            print_conditionally("Uploading results")
-            upload_results_to_azure(file_to_upload=curr_results_path, 
-                                file_name=curr_results_path, file_directory="")
-            # upload diff to Azure 
-        print_conditionally("Uploading diff results")
-        upload_results_to_azure(file_to_upload="diff" + curr_results_path, 
-                                    file_name="diff" + curr_results_path, file_directory="")
-        
     if not all(diff_results.isnull().all()) :
         print("Differences found in results!")
-        exit(1)
+        with pd.ExcelWriter("diff" + curr_results_path) as writer:
+            diff_results.to_excel(writer, sheet_name="Diff")
+            local_codeql_version_df.to_excel(writer, sheet_name="Local CodeQL Version")
+            local_codeql_packs_df.to_excel(writer, sheet_name="Local CodeQL Packs")
+            local_system_info_df.to_excel(writer, sheet_name="Local System Info")
+            prev_results_codeql_version_df.to_excel(writer, sheet_name="Last Stored CodeQL Version")
+            prev_results_codeql_packs_df.to_excel(writer, sheet_name="Last Stored CodeQL Packs")
+            prev_results_local_system_info_df.to_excel(writer, sheet_name="Last Stored System Info")
+        os.remove(prev_results)
     else:
         print("No differences found in results")
-    # delete downloaded file
-    os.remove(prev_results)
-    print_conditionally("Deleted previous results")
+        os.remove(prev_results)
+        exit(0)
     
-
 def run_tests(ql_tests_dict):
     """
     Run the given CodeQL tests.
@@ -957,7 +839,6 @@ def run_tests(ql_tests_dict):
         local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
-        compare_health_results(result_file)
     
 def find_g_template_dir(template):
     """
@@ -1011,14 +892,7 @@ if __name__ == "__main__":
     parser.add_argument('-i', '--individual_test', help='Run only the tests with <name> in the name', type=str, required=False)
     parser.add_argument('-m', '--compare_results', help='Compare results to previous run', action='store_true', required=False)
     parser.add_argument('--compare_results_no_build',help='Compare results to previous run',type=str,required=False,)
-    parser.add_argument('--container_name',help='Azure container name',type=str,required=False, )
-    parser.add_argument('--storage_account_name',help='Azure storage account name',type=str,required=False, )
-    parser.add_argument('--share_name', help='Azure share name',type=str,required=False,)
-    parser.add_argument('--storage_account_key',help='Azure storage account key',type=str,required=False, )
-    parser.add_argument('--connection_string', help='Azure connection string', type=str, required=False,)
-    parser.add_argument('--local_result_storage',help='Store results locally instead of in Azure',action='store_true',required=False,)
     parser.add_argument('--codeql_path', help='Path to the codeql executable',type=str,required=False,)
-    parser.add_argument('--overwrite_azure_results', help='Overwrite Azure results',action='store_true',required=False,)
     parser.add_argument('--build_database_only', help='Build database only',action='store_true',required=False,)
     args = parser.parse_args()
            

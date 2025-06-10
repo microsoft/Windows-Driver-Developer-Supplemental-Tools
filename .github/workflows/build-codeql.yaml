@@ -14,8 +14,8 @@ on:
   workflow_dispatch:
 
 env:
-  CODEQL_VERSION: 2.20.4
-  
+  CODEQL_VERSION: 2.21.2
+
 jobs:
   build:
     runs-on: windows-latest
@@ -65,17 +65,17 @@ jobs:
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
-      
+    
   test-query-health:
     runs-on: windows-latest
     needs: build
     permissions:
       contents: read
       packages: write
+      id-token: write
     env:
-      CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+      ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
-      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
     steps:
     - name: Enable long git paths
       shell: cmd
@@ -108,14 +108,33 @@ jobs:
           pip install -r .\src\drivers\test\requirements.txt
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: true
+    - name: Download previous results
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: latest
+        inlineScript: |
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
+          $destination = "azure-detailedfunctiontestresults.xlsx"
+          Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
       shell: pwsh
-      if: ${{ env.CONNECTION_STRING != '' }}
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" --container_name "$env:CONTAINER_NAME" -v
-    - name: Run test script without compare
-      shell: pwsh
-      if: ${{ env.CONNECTION_STRING == '' }}
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build -v
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+    - name: Upload result diff
+      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: latest
+        inlineScript: |
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
+          Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "health-diffdetailedfunctiontestresults.xlsx" -Context $context
+          exit 1 
     
       
   test-codeql-latest-vs-current:
@@ -126,15 +145,11 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write
     env:
-      CONNECTION_STRING: ${{ secrets.CONNECTION_STRING }}
+      ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
-      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
     steps:
-    - name: Check Env
-      shell: pwsh
-      if: ${{ env.CONNECTION_STRING == '' }}
-      run: exit 1
     - name: Check Prev Job
       if: ${{ needs.test-query-health.result == 'failure' }}
       shell: pwsh
@@ -148,11 +163,13 @@ jobs:
         path: .
         fetch-depth: 0
     - name: CodeQL Download
-      run:  
-        $latest=(((Invoke-WebRequest -Uri https://github.com/github/codeql-cli-binaries/releases/latest).links.href | Where-Object{$_ -like "/github/codeql-cli-binaries/releases/tag/v*"}[0]) -split "/")[-1];
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/$latest/codeql-win64.zip" -OutFile codeql-win64.zip;
-        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+      run: |
+        $latest=(((Invoke-WebRequest -Uri https://github.com/github/codeql-cli-binaries/releases/latest).links.href | Where-Object{$_ -like "/github/codeql-cli-binaries/releases/tag/v*"}[0]) -split "/")[-1]
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/$latest/codeql-win64.zip" -OutFile codeql-win64.zip
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+        New-Item LatestVersion -ItemType "Directory"
+        New-Item LatestVersion/$latest
     - name: Install CodeQL pack dependencies
       shell: cmd
       run: |
@@ -171,9 +188,40 @@ jobs:
           pip install -r .\src\drivers\test\requirements.txt
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: true
+    - name: Download previous results
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: latest
+        inlineScript: |
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
+          $destination = "azure-detailedfunctiontestresults.xlsx"
+          Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
       shell: pwsh
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results --connection_string "$env:CONNECTION_STRING" --share_name "$env:SHARE_NAME" -v
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+    - name: Upload result diff
+      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: latest
+        inlineScript: |
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
+          Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context
+          exit 1 
+    - name: Save Latest Version
+      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') == '' }} # Only if there were no differences
+      uses: actions/upload-artifact@v4
+      with:
+        name: latest-codeql-results
+        path: |
+          LatestVersion\*
           
   test-pack-version-update:
     runs-on: windows-latest
@@ -198,7 +246,7 @@ jobs:
         $qlpack_diff = git diff HEAD~1:src/qlpack.yml src/qlpack.yml;
         $rec_diff = git diff HEAD~1:src/windows-driver-suites/recommended.qls src/windows-driver-suites/recommended.qls;
         $mf_diff = git diff HEAD~1:src/windows-driver-suites/mustfix.qls src/windows-driver-suites/mustfix.qls;
-        if (!$qlpack_diff -and ($rec_diff -or $mf_diff)) { "Query suite file updated without updating qlpack version"; exit 1 }
+        if (!$qlpack_diff -and ($rec_diff -or $mf_diff)) { "Query suite file updated without updating qlpack version"; exit 2 }
 
         $last_qlpack_commit = git log -n 1 --pretty=format:%H -- src/qlpack.yml;
         $qlpack_changes =git show $last_qlpack_commit -- .\src\qlpack.yml;
@@ -209,13 +257,14 @@ jobs:
         $commits_since_mf_change = [int](git rev-list --count HEAD...$last_mf_commit);
         $commits_since_rec_change = [int](git rev-list --count HEAD...$last_rec_commit);
 
-        if ($commits_since_qlpack_change -gt $commits_since_mf_change) { "Mustfix query suite file modified without updating version"; exit 1 }; 
-        if ($commits_since_qlpack_change -gt $commits_since_rec_change) {"Recommended query suite file modified without updating version"; exit 1 };
+        if ($commits_since_qlpack_change -gt $commits_since_mf_change) { "Mustfix query suite file modified without updating version"; exit 3 }; 
+        if ($commits_since_qlpack_change -gt $commits_since_rec_change) {"Recommended query suite file modified without updating version"; exit 4 };
 
-        try{$old_qlpack_version = [version]($qlpack_changes -match "-version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 1 }
-        try{$new_qlpack_version = [version]($qlpack_changes -match "\+version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 1 }
-        if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { "qlpack.yml version not incremented. Previously updated to version $old_qlpack_version, current version $new_qlpack_version"; exit 1 }
-  
+        if($qlpack_changes -contains "version"){
+          try{$old_qlpack_version = [version]($qlpack_changes -match "-version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 5 }
+          try{$new_qlpack_version = [version]($qlpack_changes -match "\+version").Substring(10);} catch {"Changed qlpack.yml without updating version"; exit 6 }
+          if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { "qlpack.yml version not incremented. Previously updated to version $old_qlpack_version, current version $new_qlpack_version"; exit 7 }
+        }
   test-create-dvl:
     runs-on: windows-latest
     needs: build
