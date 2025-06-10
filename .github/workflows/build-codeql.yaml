@@ -141,7 +141,7 @@ jobs:
   # Tests if the latest codeql version produces the same results as the current version. 
     runs-on: windows-latest
     continue-on-error: true # Allow script to return non-zero exit code
-    # needs: [build,test-query-health]
+    needs: [build,test-query-health]
     permissions:
       contents: read
       packages: write
@@ -150,10 +150,10 @@ jobs:
       ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
     steps:
-    # - name: Check Prev Job
-    #   if: ${{ needs.test-query-health.result == 'failure' }}
-    #   shell: pwsh
-    #   run: exit 1  
+    - name: Check Prev Job
+      if: ${{ needs.test-query-health.result == 'failure' }}
+      shell: pwsh
+      run: exit 1  
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
@@ -170,51 +170,51 @@ jobs:
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
         New-Item LatestVersion -ItemType "Directory"
         New-Item LatestVersion/$latest
-    # - name: Install CodeQL pack dependencies
-    #   shell: cmd
-    #   run: |
-    #     pushd .\src 
-    #     ..\codeql-cli\codeql.cmd pack install 
-    #     popd
-    # - name: codeql version test
-    #   run: .\codeql-cli\codeql.exe version
-    # - name: Setup Python
-    #   uses: actions/setup-python@v5
-    #   with:
-    #     python-version: 3.11
-    # - name: Install Python Packages
-    #   run: |
-    #       python -m pip install --upgrade pip
-    #       pip install -r .\src\drivers\test\requirements.txt
-    # - name: Add msbuild to PATH
-    #   uses: microsoft/setup-msbuild@v2
-    # - name: Azure Login
-    #   uses: azure/login@v2
-    #   with:
-    #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
-    #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-    #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    #     enable-AzPSSession: true
-    # - name: Download previous results
-    #   uses: azure/powershell@v2
-    #   with:
-    #     azPSVersion: latest
-    #     inlineScript: |
-    #       $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
-    #       $destination = "azure-detailedfunctiontestresults.xlsx"
-    #       Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
-    # - name: Run test script
-    #   shell: pwsh
-    #   run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
-    # - name: Upload result diff
-    #   if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
-    #   uses: azure/powershell@v2
-    #   with:
-    #     azPSVersion: latest
-    #     inlineScript: |
-    #       $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
-    #       Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context
-    #       exit 1 
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
+    - name: codeql version test
+      run: .\codeql-cli\codeql.exe version
+    - name: Setup Python
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.11
+    - name: Install Python Packages
+      run: |
+          python -m pip install --upgrade pip
+          pip install -r .\src\drivers\test\requirements.txt
+    - name: Add msbuild to PATH
+      uses: microsoft/setup-msbuild@v2
+    - name: Azure Login
+      uses: azure/login@v2
+      with:
+        client-id: ${{ secrets.AZURE_CLIENT_ID }}
+        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+        enable-AzPSSession: true
+    - name: Download previous results
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: latest
+        inlineScript: |
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
+          $destination = "azure-detailedfunctiontestresults.xlsx"
+          Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
+    - name: Run test script
+      shell: pwsh
+      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+    - name: Upload result diff
+      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: latest
+        inlineScript: |
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
+          Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context
+          exit 1 
     - name: Save Latest Version
       if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') == '' }} # Only if there were no differences
       uses: actions/upload-artifact@v4

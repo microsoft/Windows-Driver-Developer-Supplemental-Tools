@@ -1,0 +1,44 @@
+
+name: Build and Publish Windows CodeQL queries
+on:
+  workflow_dispatch:
+    input:
+      version:
+        description: 'CodeQL version to use'
+        required: true
+        type: string
+jobs:
+  publish:
+    runs-on: windows-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+    - name: Enable long git paths
+      shell: cmd
+      run: git config --global core.longpaths true
+    
+    - name: Clone self (windows-driver-developer-supplemental-tools)
+      uses: actions/checkout@v4
+      with:
+        path: .
+        fetch-depth: 0
+
+    - name: CodeQL Download
+      run:  
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ github.event.inputs.version }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+        Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
+        
+    - name: Install CodeQL pack dependencies
+      shell: cmd
+      run: |
+        pushd .\src 
+        ..\codeql-cli\codeql.cmd pack install 
+        popd
+    - name: Publish New CodeQL Pack
+      shell: pwsh
+      env:
+        GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
+      run: 
+        .\codeql-cli\codeql.cmd pack publish ./src;
