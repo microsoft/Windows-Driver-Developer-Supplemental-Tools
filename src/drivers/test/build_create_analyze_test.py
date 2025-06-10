@@ -842,7 +842,6 @@ def run_tests(ql_tests_dict):
         local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
-        compare_health_results(result_file)
     
 def find_g_template_dir(template):
     """
