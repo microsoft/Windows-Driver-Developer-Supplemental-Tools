@@ -120,8 +120,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          Connect-AzAccount
-          $context = Get-AzContext
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
           $destination = "azure-detailedfunctiontestresults.xlsx"
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
@@ -133,8 +132,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          Connect-AzAccount
-          $context = Get-AzContext
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "health-diffdetailedfunctiontestresults.xlsx" -Context $context
           exit 1 
     
@@ -200,8 +198,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          Connect-AzAccount
-          $context = Get-AzContext
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
           $destination = "azure-detailedfunctiontestresults.xlsx"
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
@@ -213,8 +210,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          Connect-AzAccount
-          $context = Get-AzContext
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context
           exit 1 
           
