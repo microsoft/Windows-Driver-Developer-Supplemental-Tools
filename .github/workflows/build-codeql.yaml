@@ -163,10 +163,10 @@ jobs:
         path: .
         fetch-depth: 0
     - name: CodeQL Download
-      run:  
-        $latest=(((Invoke-WebRequest -Uri https://github.com/github/codeql-cli-binaries/releases/latest).links.href | Where-Object{$_ -like "/github/codeql-cli-binaries/releases/tag/v*"}[0]) -split "/")[-1];
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/$latest/codeql-win64.zip" -OutFile codeql-win64.zip;
-        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
+      run: |
+        $latest=(((Invoke-WebRequest -Uri https://github.com/github/codeql-cli-binaries/releases/latest).links.href | Where-Object{$_ -like "/github/codeql-cli-binaries/releases/tag/v*"}[0]) -split "/")[-1]
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/$latest/codeql-win64.zip" -OutFile codeql-win64.zip
+        Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
         New-Item LatestVersion -ItemType "Directory"
         New-Item LatestVersion/$latest
