@@ -718,7 +718,6 @@ def run_tests_external_drivers(ql_tests_dict):
         local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
-        compare_health_results(result_file)
     
 
 def find_last_xlsx_file(curr_results_path):
@@ -799,13 +798,12 @@ def compare_health_results(curr_results_path):
             prev_results_codeql_version_df.to_excel(writer, sheet_name="Last Stored CodeQL Version")
             prev_results_codeql_packs_df.to_excel(writer, sheet_name="Last Stored CodeQL Packs")
             prev_results_local_system_info_df.to_excel(writer, sheet_name="Last Stored System Info")
+        os.remove(prev_results)
     else:
         print("No differences found in results")
-    # delete downloaded file
-    os.remove(prev_results)
-    print_conditionally("Deleted previous results")
+        os.remove(prev_results)
+        exit(0)
     
-
 def run_tests(ql_tests_dict):
     """
     Run the given CodeQL tests.
