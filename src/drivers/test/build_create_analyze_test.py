@@ -400,7 +400,7 @@ def create_codeql_test_database(ql_test):
     source_dir=os.path.join(g_test_dir, "working\\"+ql_test.get_ql_name()+"\\")
     db_loc =   os.path.join(test_db_dir, ql_test.get_ql_name()+"\\")
     
-    codeql_command = [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ 
+    codeql_command = [codeql_path, "database", "create", "-l", "cpp", "-s", source_dir, "--threads=0", "-c", "msbuild /p:Platform=x64;UseNTIFS="+ql_test.get_use_ntifs()+ 
                            " /t:rebuild " + source_dir + ql_test.get_template().split("\\")[-1] + ".sln", db_loc]
     print_conditionally(" - Database location: " + db_loc)
     print_conditionally(" - Source directory: " + source_dir)
@@ -450,10 +450,9 @@ def analyze_codeql_database(ql_test, db_path=None):
         return None
 
     if args.use_codeql_repo:
-        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file,ql_test.get_ql_file(), "--additional-packs", args.use_codeql_repo]
-      
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file,ql_test.get_ql_file(), "--additional-packs", args.use_codeql_repo, "--threads=0"]
     else:
-        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_test.get_ql_file() ]
+        proc_command = [codeql_path, "database", "analyze", database_loc, "--format=sarifv2.1.0", "--output="+output_file, ql_test.get_ql_file(), "--threads=0"]
         
     print_conditionally("Sarif output location: " + output_file)
       
