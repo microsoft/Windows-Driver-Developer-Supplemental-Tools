@@ -68,7 +68,7 @@ jobs:
     
   test-query-health:
     runs-on: windows-latest
-    needs: build
+    # FIXME testing needs: build
     permissions:
       contents: read
       packages: write
