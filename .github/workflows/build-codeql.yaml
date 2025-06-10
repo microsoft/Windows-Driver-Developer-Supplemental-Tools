@@ -86,10 +86,10 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         enable-AzPSSession: true
     - name: Download previous results
-      shell: pwsh
-      run : |
-          Install-Module -Name Az.Storage -Force -Scope CurrentUser
-          Import-Module Az.Storage
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: latest
+        inlineScript: |
           $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           $destination = "azure-detailedfunctiontestresults.xlsx"
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
