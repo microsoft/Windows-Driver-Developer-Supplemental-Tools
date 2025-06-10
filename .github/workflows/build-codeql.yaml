@@ -66,35 +66,6 @@ jobs:
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
     
-
-  # FIXME testing only
-  test-azure:
-    runs-on: windows-latest
-    permissions:
-      contents: read
-      packages: write
-      id-token: write
-    env:
-      ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
-      SHARE_NAME: ${{ secrets.SHARE_NAME }}
-    steps:
-    - name: Azure Login
-      uses: azure/login@v2
-      with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-        enable-AzPSSession: true
-    - name: Download previous results
-      uses: azure/powershell@v2
-      with:
-        azPSVersion: latest
-        inlineScript: |
-          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
-          $destination = "azure-detailedfunctiontestresults.xlsx"
-          Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
-
-
   test-query-health:
     runs-on: windows-latest
     # FIXME testing needs: build
@@ -145,11 +116,11 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         enable-AzPSSession: true
     - name: Download previous results
-      shell: pwsh
-      run : |
-          Install-Module -Name Az.Storage -Force -Scope CurrentUser
-          Import-Module Az.Storage
-          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
+      uses: azure/powershell@v2
+      with:
+        azPSVersion: latest
+        inlineScript: |
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           $destination = "azure-detailedfunctiontestresults.xlsx"
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
@@ -161,7 +132,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "health-diffdetailedfunctiontestresults.xlsx" -Context $context
           exit 1 
     
@@ -227,7 +198,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           $destination = "azure-detailedfunctiontestresults.xlsx"
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
@@ -239,7 +210,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
-          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount
+          $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context
           exit 1 
           
