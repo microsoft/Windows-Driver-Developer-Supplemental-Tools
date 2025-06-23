@@ -132,6 +132,7 @@ jobs:
       with:
         azPSVersion: latest
         inlineScript: |
+          Update-AzConfig -DisplayBreakingChangeWarning $false
           $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "health-diffdetailedfunctiontestresults.xlsx" -Context $context
           exit 1 
