@@ -18,7 +18,7 @@
  *       security
 *        ca_ported
  * @scope generic
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
