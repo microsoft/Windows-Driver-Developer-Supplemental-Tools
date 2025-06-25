@@ -81,13 +81,13 @@ where
     safeFloatAccessFuncCall.getEnclosingFunction() = kernelFloatFunc
   ) and
   msg =
-    "Function annotated with _Kernel_float_saved_ but does not call a safe float access function for some path(s)"
+    "Function annotated with _Kernel_float_saved_ but may not call/check return values of safe float access function for some path(s)"
   or
   // Paths have call to safe float access function but return value is not used
   unusedFc instanceof SafeFloatAccessFuncCall and
   unusedFc.getEnclosingFunction() = kernelFloatFunc and
   msg =
-    "Function annotated with _Kernel_float_saved_ but does not check a safe float access function return value for some path(s)" and
+    "Function annotated with _Kernel_float_saved_ but may not call/check return values of safe float access function for some path(s)" and
   (
     // return value isn't used at all
     unused(unusedFc)
