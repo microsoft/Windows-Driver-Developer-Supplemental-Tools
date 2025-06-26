@@ -15,16 +15,16 @@
 # Temporary files
 **/temp/*
 
-src/drivers/test/**/driver/Debug/*
-src/drivers/test/**/driver/x64/*
-src/drivers/test/**/x64/*
-src/drivers/test/**/Debug/*
-src/drivers/test/TestDB/*
-src/drivers/test/working/*
-src/drivers/test/AnalysisFiles/*
-AnalysisFiles/*
-TestDB/*
-working/*
+**/src/drivers/test/**/driver/Debug/*
+**/src/drivers/test/**/driver/x64/*
+**/src/drivers/test/**/x64/*
+**/src/drivers/test/**/Debug/*
+**/src/drivers/test/TestDB/*
+**/src/drivers/test/working/*
+**/src/drivers/test/AnalysisFiles/*
+**/AnalysisFiles/*
+**/TestDB/*
+**/working/*
 #excel files
 **/*.xlsx
 
