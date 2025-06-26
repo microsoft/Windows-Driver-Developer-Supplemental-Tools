@@ -6,7 +6,14 @@
 # IDE folders
 .vscode/*
 **/.vs/*
-Debug/*
+**/Debug/*
+**/Release/*
+**/bin/*
+**/obj/*
+# Build directories
+**/build/*
+# Temporary files
+**/temp/*
 
 src/drivers/test/**/driver/Debug/*
 src/drivers/test/**/driver/x64/*
