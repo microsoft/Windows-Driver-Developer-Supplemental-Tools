@@ -22,7 +22,7 @@
 
   <!--The Commands section is where commands, menus, and menu groups are defined.
       This section uses a Guid to identify the package that provides the command defined inside it. -->
-  <Commands package="guidOpenSarifFileCommandPackage">
+  <Commands package="guidCodeQLCommandPackage">
     <!-- Inside this section we have different sub-sections: one for the menus, another
     for the menu groups, one for the buttons (the actual commands), one for the combos
     and the last one for the bitmaps used. Each element is identified by a command id that
@@ -180,21 +180,9 @@
   </VisibilityConstraints>
 	
   <Symbols>
-   
-    <GuidSymbol name="guidSarifErrorListResultSourceServiceCommandSet" value="{b04424d9-49bc-4e04-9ecc-ad5b68cce4bc}">
-      <!-- MENUS -->
-      <IDSymbol name="9655cb55-c0b8-4636-9d9a-6a8685f76ee0" value="0x5000"/>
-
-      <!-- GROUPS -->
-      <IDSymbol name="2ee78ada-af4b-4e2c-aaa8-0326ef12d611" value="0x6000"/>
-      <IDSymbol name="9abdbc25-a08d-49dd-9065-4eb669194441" value="0x6001"/>
-
-      <!-- BUTTONS -->
-      <IDSymbol name="c4883543-de09-4989-83c2-16e40d105831" value="0x8B67"/>
-    </GuidSymbol>
-
-    <!-- CodeQL -->
-	  <GuidSymbol name="guidCodeQLPkg" value="{3718ce5a-503f-4c55-8f70-3a4cc34fb1fb}" />
+	  <!-- This is the package guid. -->
+	  <!-- CodeQL -->
+	  <GuidSymbol name="guidCodeQLCommandPackage" value="{3718ce5a-503f-4c55-8f70-3a4cc34fb1fb}" />
 
 	  <!-- This is the guid used to group the menu commands together -->
 	  <GuidSymbol name="guidCodeQLCmdSet" value="{4fc96981-3ec2-43c7-acf0-96d73b1203e8}">

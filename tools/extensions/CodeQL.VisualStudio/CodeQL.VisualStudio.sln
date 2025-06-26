@@ -1,11 +1,9 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.14.36015.10 d17.14
+VisualStudioVersion = 17.14.36015.10
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CodeQL.VisualStudio", "CodeQL.VisualStudio\CodeQL.VisualStudio.csproj", "{A89159FF-1F39-4B8B-8F0F-4FD0C748EA99}"
-EndProject
-Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "CodeQL.VisualStudio.Core", "CodeQL.VisualStudio.Core\CodeQL.VisualStudio.Core.shproj", "{B700BD9E-9B3E-4E3F-B6DA-36591D7C83B8}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -35,9 +33,5 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {B4799894-7787-4965-A9FD-A18C3CD61EB5}
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		CodeQL.VisualStudio.Core\CodeQL.VisualStudio.Core.projitems*{a89159ff-1f39-4b8b-8f0f-4fd0c748ea99}*SharedItemsImports = 4
-		CodeQL.VisualStudio.Core\CodeQL.VisualStudio.Core.projitems*{b700bd9e-9b3e-4e3f-b6da-36591d7c83b8}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal

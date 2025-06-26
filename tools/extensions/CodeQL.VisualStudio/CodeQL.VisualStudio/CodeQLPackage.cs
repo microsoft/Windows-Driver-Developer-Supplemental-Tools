@@ -45,7 +45,7 @@ namespace Microsoft.CodeQL
         /// <summary>
         /// OpenSarifFileCommandPackage GUID string.
         /// </summary>
-        public const string PackageGuidString = "b97edb99-282e-444c-8f53-7de237f2ec5e";
+        public const string PackageGuidString = "3718ce5a-503f-4c55-8f70-3a4cc34fb1fb";
         public const string OptionCategoryName = "SARIF Viewer";
         public const string CodeQLCategoryName = "CodeQL";
         public const string OptionPageName = "General";
@@ -80,14 +80,8 @@ namespace Microsoft.CodeQL
         }
 
         //private CodeQLFileMonitor codeqlFileMonitor;
+        private OutputWindowTracerListener outputWindowTraceListener;
 
-        /// <summary>
-        /// Contains the list of services and their creator functions.
-        /// </summary>
-        private static readonly Dictionary<Type, ServiceInformation> ServiceTypeToServiceInformation = new Dictionary<Type, ServiceInformation>
-        {
-            
-        };
 
         /// <summary>
         /// Initialization of the package; this method is called right after the package is sited, so this is the place
@@ -107,12 +101,6 @@ namespace Microsoft.CodeQL
             // Mitigation for Newtonsoft.Json v12 vulnerability GHSA-5crp-9r3c-p9vr
             JsonConvert.DefaultSettings = () => new JsonSerializerSettings { MaxDepth = 64 };
 
-            var callback = new ServiceCreatorCallback(this.CreateService);
-            foreach (KeyValuePair<Type, ServiceInformation> serviceInformationKVP in ServiceTypeToServiceInformation)
-            {
-                ((IServiceContainer)this).AddService(serviceInformationKVP.Key, callback, promote: serviceInformationKVP.Value.Promote);
-            }
-
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
             // initialize Option first since other components may depends on options.
@@ -120,7 +108,7 @@ namespace Microsoft.CodeQL
 
             if (await this.GetServiceAsync(typeof(SVsOutputWindow)).ConfigureAwait(continueOnCapturedContext: true) is IVsOutputWindow output)
             {
-                //this.outputWindowTraceListener = new OutputWindowTracerListener(output, OutputPaneName);
+                this.outputWindowTraceListener = new OutputWindowTracerListener(output, OutputPaneName);
             }
 
             var componentModel = await this.GetServiceAsync(typeof(SComponentModel)) as IComponentModel;
@@ -168,11 +156,6 @@ namespace Microsoft.CodeQL
             this.menuCommands.Clear();
         }
 
-       
-        private object CreateService(IServiceContainer container, Type serviceType)
-        {
-            return ServiceTypeToServiceInformation.TryGetValue(serviceType, out ServiceInformation serviceInformation) ? serviceInformation.Creator(serviceType) : null;
-        }
 
         private static IVsShell vsShell;
 
@@ -188,20 +171,6 @@ namespace Microsoft.CodeQL
 
                 return vsShell;
             }
-        }
-
-        public static IVsPackage LoadViewerPackage()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            var serviceGuid = new Guid(PackageGuidString);
-
-            if (VsShell.IsPackageLoaded(ref serviceGuid, out IVsPackage package) == 0 && package != null)
-            {
-                return package;
-            }
-
-            VsShell.LoadPackage(ref serviceGuid, out package);
-            return package;
         }
 
         private async System.Threading.Tasks.Task<bool> IsSolutionLoadedAsync()

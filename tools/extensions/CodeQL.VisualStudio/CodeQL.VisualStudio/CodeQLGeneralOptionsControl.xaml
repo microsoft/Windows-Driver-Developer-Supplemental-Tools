@@ -7,7 +7,7 @@
     <UserControl.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="SarifViewerOptionsControlResources.xaml" />
+                <ResourceDictionary Source="CodeQLOptionsControlResources.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <Style x:Key="CheckBoxStyle"
                  TargetType="CheckBox">
