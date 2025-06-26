@@ -1,0 +1,25 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The function has been declared to be in a paged segment, but neither PAGED_CODE nor PAGED_CODE_LOCKED was found.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The functions in pageable code must contain a PAGED_CODE or PAGED_CODE_LOCKED macro at the beginning of the function.
+			
+			The PAGED_CODE macro ensures that the calling thread is running at an IRQL that is low enough to permit paging.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28170-pageable-code-macro-not-found">
+				C28170 warning - Windows Drivers
+			</a>
+		</li>
+	</references>
+</qhelp>

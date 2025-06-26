@@ -1,0 +1,91 @@
+﻿<UserControl x:Class="Microsoft.CodeQL.Options.CodeQLGeneralOptionsControl"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vsui="clr-namespace:Microsoft.VisualStudio.PlatformUI;assembly=Microsoft.VisualStudio.Shell.15.0"
+             Foreground="{DynamicResource {x:Static vsui:EnvironmentColors.DialogTextBrushKey}}"
+             Background="Transparent">
+    <UserControl.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="SarifViewerOptionsControlResources.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <Style x:Key="CheckBoxStyle"
+                 TargetType="CheckBox">
+                <Setter Property="Foreground"
+                    Value="{DynamicResource {x:Static vsui:EnvironmentColors.DialogTextBrushKey}}" />
+                <Style.Triggers>
+                    <Trigger Property="IsEnabled"
+                       Value="False">
+                        <Setter Property="Foreground"
+                        Value="{DynamicResource {x:Static vsui:EnvironmentColors.CommandBarTextInactiveBrushKey}}" />
+                    </Trigger>
+                </Style.Triggers>
+            </Style>
+        </ResourceDictionary>
+    </UserControl.Resources>
+    <Grid x:Name="OuterGeneralGrid">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <GroupBox x:Name="GeneralGroupBox">
+            <GroupBox.Header>
+                <Label x:Name="GeneralGroupBoxLabel"
+                       Content="{StaticResource SarifViewerOptionsControl_CodeQLBoxHeader}"
+                       AutomationProperties.AutomationId="GeneralGroupBoxLabel" />
+            </GroupBox.Header>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                    <Label Content="Exeutable path: "/>
+                    <TextBox x:Name="cliPathOptionTextBox" 
+                             TextWrapping="Wrap" 
+                             Text="{Binding CliPathOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Width="120" 
+                             ToolTip="Path to CodeQL executable that will be used instead of the default."
+                             AutomationProperties.AutomationId="cliPathOptionTextBox" />
+
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                    <Label Content="Additional CodeQL Pack Locations: "/>
+                    <TextBox x:Name="queryLocationsOptionTextBox" 
+                             TextWrapping="Wrap" 
+                             Text="{Binding QueryLocationsOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"
+                             Width="120" 
+                             ToolTip="Directories separated with semicolon where to search for additional CodeQL Packs."
+                             AutomationProperties.AutomationId="queryLocationsOptionTextBox" />
+
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                    <Label Content="Memory Usage: "/>
+                    <TextBox x:Name="memoryOptionTextBox" 
+                             TextWrapping="Wrap" 
+                             Text="{Binding MemoryOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             Width="120" 
+                             ToolTip="How much memory (MB) to use when running CodeQL. Leave blank to let CodeQL decide based on your system."
+                             AutomationProperties.AutomationId="memoryOptionTextBox" />
+
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                    <Label Content="Number of Threads: "/>
+                    <TextBox x:Name="threadsOptionTextBox" 
+                             TextWrapping="Wrap" 
+                             Text="{Binding ThreadsOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             Width="120" 
+                             ToolTip="Number of threads to use when running CodeQL. Use 0 to indicate one thread per core."
+                             AutomationProperties.AutomationId="threadsOptionTextBox" />
+
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Margin="5,5,5,5">
+                    <Label Content="Custom Build Command "/>
+                    <TextBox x:Name="buildCmdOptionTextBox" 
+                             TextWrapping="Wrap" 
+                             Text="{Binding BuildCmdOption, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" 
+                             Width="120" 
+                             ToolTip="Custom command to build the project." 
+                             AutomationProperties.AutomationId="buildCmdOptionTextBox" />
+
+                </StackPanel>
+            </StackPanel>
+        </GroupBox>
+    </Grid>
+</UserControl>

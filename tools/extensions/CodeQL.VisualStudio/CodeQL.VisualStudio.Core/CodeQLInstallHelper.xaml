@@ -1,0 +1,75 @@
+<Window x:Class="Microsoft.CodeQL.Views.CodeQLInstallHelper"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:Microsoft.CodeQL.Views"
+        mc:Ignorable="d"
+        Title="CodeQL Installer" WindowStyle="ToolWindow" ResizeMode="NoResize" Topmost="True" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
+    <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+        <StackPanel Orientation="Vertical" Grid.RowSpan="1" HorizontalAlignment="Stretch" Grid.ColumnSpan="1" >
+            <Expander x:Name="cliExpander" HorizontalAlignment="Left" Header="CodeQL CLI" VerticalAlignment="Stretch" IsExpanded="True" Grid.RowSpan="1" Margin="5,5,5,5">
+                <Grid Background="#FFE5E5E5" VerticalAlignment="Stretch" >
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" MinHeight="30"/>
+                        <RowDefinition Height="Auto" MaxHeight="30"/>
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "80"/>
+                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "80"/>
+                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "80"/>
+                    </Grid.ColumnDefinitions>
+                    <TextBlock TextWrapping="Wrap" Height="16"  Text="Install Path:" Grid.Column="0" HorizontalAlignment="Left" Grid.Row="0"/>
+                    <TextBox x:Name="___TextBoxPath_" TextWrapping="Wrap" Text="C:\codeql-home\"  Height="22" Grid.Column="1" HorizontalAlignment="Left" TextAlignment="Left" Grid.Row="0"/>
+                    <CheckBox x:Name="AddToPathCheckBox" Content="Add to PATH" Height="16"  Grid.Column="2" HorizontalAlignment="Left" Grid.Row="0">
+                        <CheckBox.ToolTip>
+                            <ToolTip>
+                                <TextBlock Background="Transparent" Text="If installing CodeQL to a non-default location, add it to your PATH environment variable"/>
+                            </ToolTip>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                    <TextBlock TextWrapping="Wrap" Text="Version:" HorizontalAlignment="Left" Width="44" Height="19" Grid.Column="0" Grid.Row="1"/>
+                    <TextBox x:Name="___TextBoxVersion_" HorizontalAlignment="Left" AutomationProperties.IsRequiredForForm="True" TextWrapping="Wrap" Text="" Width="90" Height="22" TextAlignment="Left" TextChanged="TextBoxVersion_TextChanged" Grid.Column="1" Grid.Row="1"/>
+                    <CheckBox x:Name="UseLatestCheckBox" Content="Use Latest" HorizontalAlignment="Left" Checked="UseLatest_Checked" Grid.Column="2" Grid.Row="1">
+                        <CheckBox.ToolTip>
+                            <ToolTip>
+                                <TextBlock Background="Transparent" Text="Use the latest available version of CodeQL CLI"/>
+                            </ToolTip>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                </Grid>
+            </Expander>
+            <Expander x:Name="packsExpander" HorizontalAlignment="Left" Header="CodeQL Packs"  VerticalAlignment="Top" Grid.Row ="2" Grid.RowSpan="1" Margin="5,5,5,5">
+                <Grid Background="#FFE5E5E5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel Orientation="Vertical" Grid.Row ="2" Grid.RowSpan="1" >
+                        <CheckBox x:Name="cppCheckBox" Content="C++" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked"  Height="15" Width="44" />
+                        <CheckBox x:Name="csharpCheckBox" Content="C#" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked" Height="15" Width="34"/>
+                        <CheckBox x:Name="swiftCheckBox" Content="Swift" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked" Height="15" Width="46"/>
+                        <CheckBox x:Name="jsCheckBox" Content="JavaScript" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked"  Height="15" Width="72"/>
+                        <CheckBox x:Name="pythohCheckBox" Content="Python" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked"  Height="15" Width="57"/>
+                        <CheckBox x:Name="rubyCheckBox" Content="Ruby" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked"  Height="15" Width="47"/>
+                        <CheckBox x:Name="javaCheckBox" Content="Java" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked"  Height="15" Width="42"/>
+                        <CheckBox x:Name="goCheckBox" Content="Go" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked"  Height="15" Width="35"/>
+                        <CheckBox x:Name="windowsDrivers" Content="Windows Drivers" HorizontalAlignment="Left" VerticalAlignment="Top" Checked="LanguagePack_Checked" Unchecked="LanguagePack_Checked"  Grid.Column="1" Height="15" Width="109"/>
+
+                    </StackPanel>
+                    <CheckBox x:Name="PreReleaseCheckBox" Content="Allow Prerelease Versions" HorizontalAlignment="Left" Grid.Column="2" VerticalAlignment="Top" Width="161" Height="17">
+                        <CheckBox.ToolTip>
+                            <ToolTip>
+                                <TextBlock Background="Transparent" Text="Allow prerelease versions of CodeQL Packs"/>
+                            </ToolTip>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                </Grid>
+            </Expander>
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" >
+                <Button Name="buttonInstall" Margin ="5,5,5,5" Click="ButtonInstall_Click" IsEnabled="False" VerticalAlignment="Bottom" Height="23"  Content="Install" HorizontalAlignment="Right" Width="75" Grid.Column="1" />
+                <Button Name="buttonCancel" Margin ="5,5,5,5" Click="ButtonCancel_Click" VerticalAlignment="Bottom" Height="23" Content="Cancel"  HorizontalAlignment="Right" Width="75" Grid.Column="1" />
+            </StackPanel>
+        </StackPanel>
+    </Grid>
+</Window>

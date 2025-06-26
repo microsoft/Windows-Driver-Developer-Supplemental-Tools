@@ -1,0 +1,235 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<CommandTable xmlns="http://schemas.microsoft.com/VisualStudio/2005-10-18/CommandTable" xmlns:xs="http://www.w3.org/2001/XMLSchema">
+
+  <!--  This is the file that defines the actual layout and type of the commands.
+        It is divided in different sections (e.g. command definition, command
+        placement, ...), with each defining a specific set of properties.
+        See the comment before each section for more details about how to
+        use it. -->
+
+  <!--  The VSCT compiler (the tool that translates this file into the binary
+        format that VisualStudio will consume) has the ability to run a preprocessor
+        on the vsct file; this preprocessor is (usually) the C++ preprocessor, so
+        it is possible to define includes and macros with the same syntax used
+        in C++ files. Using this ability of the compiler here, we include some files
+        defining some of the constants that we will use inside the file. -->
+
+  <!--This is the file that defines the IDs for all the commands exposed by VisualStudio. -->
+  <Extern href="stdidcmd.h" />
+
+  <!--This header contains the command ids for the menus provided by the shell. -->
+  <Extern href="vsshlids.h" />
+
+  <!--The Commands section is where commands, menus, and menu groups are defined.
+      This section uses a Guid to identify the package that provides the command defined inside it. -->
+  <Commands package="guidOpenSarifFileCommandPackage">
+    <!-- Inside this section we have different sub-sections: one for the menus, another
+    for the menu groups, one for the buttons (the actual commands), one for the combos
+    and the last one for the bitmaps used. Each element is identified by a command id that
+    is a unique pair of guid and numeric identifier; the guid part of the identifier is usually
+    called "command set" and is used to group different command inside a logically related
+    group; your package should define its own command set in order to avoid collisions
+    with command ids defined by other packages. -->
+
+    <Menus>
+      <!-- CodeQL -->
+      <Menu guid="guidCodeQLCmdSet" id="CodeQLSubMenu" priority="0x700" type="Menu">
+            <Parent guid="guidCodeQLCmdSet" id="CodeQLMenuGroup"/>
+            <CommandFlag>AlwaysCreate</CommandFlag>
+            <CommandFlag>DynamicVisibility</CommandFlag>
+            <Strings>
+              <ButtonText>CodeQ&amp;L</ButtonText>
+              <CommandName>CodeQ&amp;L</CommandName>
+            </Strings>
+      </Menu>
+		
+		<Menu guid="guidCodeQLCmdSet" id="CodeQLToolbar" type="Toolbar" priority="0x0100">
+        <CommandFlag>AlwaysCreate</CommandFlag>
+	    <CommandFlag>DynamicVisibility</CommandFlag>
+		  <Strings>
+          <CommandName>CodeQL</CommandName>
+          <ButtonText>CodeQL</ButtonText>
+          <MenuText>CodeQL</MenuText>
+          <ToolTipText>CodeQL Toolbar</ToolTipText>
+        </Strings>
+      </Menu>
+
+		
+	</Menus>
+
+
+    <!-- In this section you can define new menu groups. A menu group is a container for
+         other menus or buttons (commands); from a visual point of view you can see the
+         group as the part of a menu contained between two lines. The parent of a group
+         must be a menu. -->
+    <Groups>
+      <!-- CodeQL -->
+      <Group guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" priority="0x0600">
+        <Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenu" />
+	  </Group>
+	  <Group guid="guidCodeQLCmdSet" id="CodeQLMenuGroup" priority="0x0600">
+		 <Parent guid="guidSHLMainMenu" id="IDM_VS_MENU_TOOLS" />
+	  </Group>
+	  <Group guid="guidCodeQLCmdSet" id="CodeQLToolbarGroup"  priority="0x0000">
+		 <Parent guid="guidCodeQLCmdSet" id="CodeQLToolbar"/>
+	  </Group>
+
+    </Groups>
+
+    <!--Buttons section. -->
+    <!--This section defines the elements the user can interact with, like a menu command or a button
+        or combo box in a toolbar. -->
+    <Buttons>
+      <!--To define a menu group you have to specify its ID, the parent menu and its display priority.
+          The command is visible and enabled by default. If you need to change the visibility, status, etc, you can use
+          the CommandFlag node.
+          You can add more than one CommandFlag node e.g.:
+              <CommandFlag>DefaultInvisible</CommandFlag>
+              <CommandFlag>DynamicVisibility</CommandFlag>
+          If you do not want an image next to your command, remove the Icon node /> -->
+    
+    <!-- CodeQL -->
+	<!-- Add to menu -->
+
+	    <Button guid="guidCodeQLCmdSet" id="cmdidCodeQLAnalyzeCommand" priority="0x0101" type="Button">
+			<Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" />
+			<Icon guid="CodeQLIcons" id="CodeQLIconAnalyze" />
+	        <Strings>
+		        <CommandName>cmdidCodeQLAnalyzeCommand</CommandName>
+		        <ButtonText>Run Selected CodeQL Queries</ButtonText>
+		        <MenuText>Run Selected CodeQL CodeQL Queries</MenuText>
+		        <ToolTipText>Run Selected CodeQL CodeQL Queries...</ToolTipText>
+	        </Strings>
+	    </Button>
+     
+	    <Button guid="guidCodeQLCmdSet" id="cmdiCodeQLLoadQueriesCommand" priority="0x0122" type="Button">
+			<Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" />
+			<Icon guid="IconRefresh" id="IconRefresh16" />
+		    <Strings>
+			    <CommandName>cmdiCodeQLLoadQueriesCommand</CommandName>
+			    <ButtonText>Refresh Available Queries</ButtonText>
+			    <MenuText>Refresh Available Queries</MenuText>
+			    <ToolTipText>Search for all locally available queries and load them into the drop-down</ToolTipText>
+		    </Strings>
+	    </Button>
+		
+		<Button guid="guidCodeQLCmdSet" id="cmdidInstallPacksCommand" priority="0x0123" type="Button">
+			<Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" />
+			<Icon guid="IconGear" id="IconGear16" />
+			<Strings>
+				<CommandName>cmdidInstallPacksCommand</CommandName>
+				<ButtonText>Launch CodeQL Installer</ButtonText>
+				<MenuText>Launch CodeQL Installer</MenuText>
+				<ToolTipText>Download Additional CodeQL Packs or CodeQL CLI versions</ToolTipText>
+			</Strings>
+		</Button>
+		
+		<Button guid="guidCodeQLCmdSet" id="cmdidCodeQLStopCommand" priority="0x0133" type="Button">
+			<Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" />
+			<Icon guid="CodeQLIcons" id="CodeQLIconTrash" />
+			<Strings>
+				<CommandName>cmdidCodeQLStopCommand</CommandName>
+				<ButtonText>Stop CodeQL Process</ButtonText>
+				<MenuText>Stop CodeQL Process</MenuText>
+				<ToolTipText>Stop CodeQL Process</ToolTipText>
+			</Strings>
+		</Button>
+
+		<!-- Add to toolbar -->
+	    <Button guid="guidCodeQLCmdSet" id="cmdidCodeQLAnalyzeCommand" priority="0x0001" type="Button">
+		    <Parent guid="guidCodeQLCmdSet" id="CodeQLToolbarGroup" />
+		    <Icon guid="CodeQLIcons" id="CodeQLIconAnalyze" />
+		    <Strings>
+			    <CommandName>cmdidCodeQLAnalyzeCommand</CommandName>
+			    <ButtonText>Run Selected CodeQL Suites</ButtonText>
+			    <ToolTipText>Run Selected CodeQL Suites</ToolTipText>
+		    </Strings>
+	    </Button>
+	
+	</Buttons>
+
+	  
+	<Combos>
+		  <Combo guid="guidCodeQLCmdSet" id="cmidCodeQLCombo" priority="0x0000" idCommandList="cmdidComboGetList" defaultWidth="130">
+			  <Parent guid="guidCodeQLCmdSet" id="CodeQLToolbarGroup" />
+			  <CommandFlag>IconAndText</CommandFlag>
+			  <CommandFlag>StretchHorizontally</CommandFlag>
+			  <Strings>
+				  <CommandName>QuerySuite</CommandName>
+				  <ButtonText>CodeQL</ButtonText>
+			  </Strings>
+		  </Combo>
+	  </Combos>
+		
+      <!--The bitmaps section is used to define the bitmaps that are used for the commands.-->
+	  <Bitmaps>
+		  <!--  The bitmap id is defined in a way that is a little bit different from the others: 
+            the declaration starts with a guid for the bitmap strip, then there is the resource id of the 
+            bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
+            inside a button definition. An important aspect of this declaration is that the element id 
+            must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
+		  <Bitmap guid="CodeQLIcons" href="Icons\MenuItemsImages.png" usedList="CodeQLIconLogo, CodeQLIconRecommended, CodeQLIconAnalyze, CodeQLIconTrash, CodeQLIconDB"/>
+		  <Bitmap guid="IconRefresh" href="Icons\refresh.ico" usedList="IconRefresh16"/>
+		  <Bitmap guid="IconGear" href="Icons\Gear.ico" usedList="IconGear16"/>
+		  <Bitmap guid="IconLogo" href="Icons\certificate.png" usedList="IconLogo32"/>
+	  </Bitmaps>
+  </Commands>
+
+  <VisibilityConstraints>
+		<VisibilityItem guid="guidCodeQLCmdSet" id="CodeQLToolbar" context="UICONTEXT_SolutionExists"/>
+  </VisibilityConstraints>
+	
+  <Symbols>
+   
+    <GuidSymbol name="guidSarifErrorListResultSourceServiceCommandSet" value="{b04424d9-49bc-4e04-9ecc-ad5b68cce4bc}">
+      <!-- MENUS -->
+      <IDSymbol name="9655cb55-c0b8-4636-9d9a-6a8685f76ee0" value="0x5000"/>
+
+      <!-- GROUPS -->
+      <IDSymbol name="2ee78ada-af4b-4e2c-aaa8-0326ef12d611" value="0x6000"/>
+      <IDSymbol name="9abdbc25-a08d-49dd-9065-4eb669194441" value="0x6001"/>
+
+      <!-- BUTTONS -->
+      <IDSymbol name="c4883543-de09-4989-83c2-16e40d105831" value="0x8B67"/>
+    </GuidSymbol>
+
+    <!-- CodeQL -->
+	  <GuidSymbol name="guidCodeQLPkg" value="{3718ce5a-503f-4c55-8f70-3a4cc34fb1fb}" />
+
+	  <!-- This is the guid used to group the menu commands together -->
+	  <GuidSymbol name="guidCodeQLCmdSet" value="{4fc96981-3ec2-43c7-acf0-96d73b1203e8}">
+		  <IDSymbol name="CodeQLSubMenu" value="0x1101"/>
+		  <IDSymbol name="CodeQLSubMenuGroup" value="0x1110"/>
+		  <IDSymbol name="CodeQLMenuGroup" value="0x1111" />
+		  <IDSymbol name="CodeQLToolbar" value="0x000E" />
+		  <IDSymbol name="CodeQLToolbarGroup" value="0x1000" />
+		  <IDSymbol name="cmdidCodeQLAnalyzeCommand" value="0x0100" />
+		  <IDSymbol name="cmdidCodeQLStopCommand" value="0x0110" />
+		  <IDSymbol name="cmdiCodeQLLoadQueriesCommand" value="0x0111" />
+		  <IDSymbol name="cmdidInstallPacksCommand" value="0x0112" />
+		  <IDSymbol name="cmdidCodeQLDatabaseCommand" value="0x133"/>
+		  <IDSymbol name="cmidCodeQLCombo" value="0x155"/>
+		  <IDSymbol name="cmdidComboGetList" value="0x156"/>
+	  </GuidSymbol>
+
+	  <GuidSymbol name="CodeQLIcons" value="{0db8ff03-1550-490f-8c25-ddaeba988a75}" >
+		  <IDSymbol name="CodeQLIconLogo" value="1" />
+		  <IDSymbol name="CodeQLIconRecommended" value="2" />
+		  <IDSymbol name="CodeQLIconAnalyze" value="3" />
+		  <IDSymbol name="CodeQLIconTrash" value="4" />
+		  <IDSymbol name="CodeQLIconDB" value="5" />
+	  </GuidSymbol>
+
+	  <GuidSymbol name="IconRefresh" value="{FFA9D4AC-7B75-4117-AB06-D3D38E3B4388}">
+		  <IDSymbol name="IconRefresh16" value="1"/>
+	  </GuidSymbol>
+
+	  <GuidSymbol name="IconGear" value="{5A7774D1-B457-4104-AC02-C805070D5CFA}">
+		  <IDSymbol name="IconGear16" value="1"/>
+	  </GuidSymbol>
+
+	  <GuidSymbol name="IconLogo" value="{AFB0228D-93D1-4B9E-9A61-D78C90FC9918}">
+		  <IDSymbol name="IconLogo32" value="1"/>
+	  </GuidSymbol>
+  </Symbols>
+</CommandTable>
