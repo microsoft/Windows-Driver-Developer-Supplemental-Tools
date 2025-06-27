@@ -1,20 +1,22 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.VisualStudio.CodeAnalysis.CodeQL.Exceptions;
+using Microsoft.VisualStudio.Shell;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Management;
 using System.Net.Http;
 using System.Net.Http.Headers;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Documents;
-
-using Microsoft.VisualStudio.CodeAnalysis.CodeQL.Exceptions;
-
-using Newtonsoft.Json.Linq;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.TrackBar;
 
 namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
 {
@@ -144,6 +146,13 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
             }
         };
 
+        // Packs, queries, suites, etc that should not be used
+        private static readonly HashSet<string> ExclusionSet = new HashSet<string>()
+        {
+            "windows_mustfix_partial.qls", // deprecated
+            "windows_recommended_partial.qls", // deprecated
+        };
+
         public void Initialize(string sourceDir = "", string buildEnv = "", Action<string> outputFunc = null)
         {
             analysisDir = sourceDir;
@@ -200,7 +209,18 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
             }
         }
 
-  
+        
+        public bool IsExclusion(string item)
+        {
+            foreach (var exclusion in ExclusionSet)
+            {
+                if (item.Contains(exclusion))
+                {
+                    return true;
+                }
+            }
+            return false;
+        }
 
 
         /// <summary>
@@ -326,11 +346,12 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                 if (line.Trim().Trim(new char[] { ',', '\"' }).Trim().EndsWith(ext))
                 {
                     string query = line.Replace("\"", string.Empty).Replace("\\\\", "/").Replace("\\", "/").Trim(',').Trim();
-                    queries.Add(query);
+                    if (!IsExclusion(query))
+                    {
+                        queries.Add(query);
+                    }
                 }
-
             }
-
             return queries; // TODO do this with json
         }
 
@@ -355,7 +376,11 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
 
                 if (line.Contains("\"path\"") && line.Contains("qlpack.yml"))
                 {
-                    packs.Add(line.Replace("\"path\" : ", string.Empty).Replace("\"", string.Empty).Replace("\\\\", "/").Replace("\\", "/").Trim());
+                    string pack = line.Replace("\"path\" : ", string.Empty).Replace("\"", string.Empty).Replace("\\\\", "/").Replace("\\", "/").Trim();
+                    if (!IsExclusion(pack))
+                    {
+                        packs.Add(pack);
+                    }
                 }
             }
 
@@ -484,13 +509,12 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         public async Task RunCMDProcAsync(string strCmdText, Action<object, System.EventArgs> proccessExitedFunc, CancellationToken ct)
         {
             using (var codeqlProc = new System.Diagnostics.Process())
-            using (ct.Register(() =>
+            using (ct.Register( () =>
             {
-                if (codeqlProc != null)
-                {
-                    KillProcessAndChildren(codeqlProc.Id);
-                }
-                _ = eventHandled.TrySetCanceled();
+                codeqlProc.CancelOutputRead();
+                codeqlProc.CancelErrorRead();
+                codeqlProc.Close();
+                eventHandled.TrySetCanceled();
             }))
             {
                 codeqlProc.StartInfo.FileName = "cmd.exe";
@@ -535,54 +559,22 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                 }
 
                 _ = await Task.WhenAny(eventHandled.Task);
-
+                
+                if (ct != null && ct.IsCancellationRequested)
+                {
+                    if (outputFunc != null)
+                    {
+                        outputFunc("CodeQL process killed");
+                    }
+                    return;
+                }
                 if (codeqlProc.ExitCode != 0)
                 {
-                    if (ct != null && ct.IsCancellationRequested)
-                    {
-                        if (outputFunc != null)
-                        {
-                            outputFunc( "CodeQL process killed");
-                        }
-                    }
-                    else
-                    {
-                        throw new CodeQLException("CodeQL Error. Process exited with code " + codeqlProc.ExitCode);
-                    }
+                    throw new CodeQLException("CodeQL Error. Process exited with code " + codeqlProc.ExitCode);
                 }
             }
         }
 
-        /// <summary>
-        /// Kills a process and all its child processes.
-        /// </summary>
-        /// <param name="pid">The process ID to kill.</param>
-        private void KillProcessAndChildren(int pid)
-        {
-            // Cannot close 'system idle process'.
-            if (pid == 0)
-            {
-                return;
-            }
-
-            var searcher = new ManagementObjectSearcher(
-                    "Select * From Win32_Process Where ParentProcessID=" + pid);
-            ManagementObjectCollection moc = searcher.Get();
-            foreach (ManagementObject mo in moc)
-            {
-                KillProcessAndChildren(Convert.ToInt32(mo["ProcessID"]));
-            }
-
-            try
-            {
-                var proc = System.Diagnostics.Process.GetProcessById(pid);
-                proc.Kill();
-            }
-            catch (ArgumentException)
-            {
-                // Process already exited.
-            }
-        }
 
         /// <summary>
         /// Generates a CodeQL database for the specified project file.
@@ -627,6 +619,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
             }
 
             await RunCMDProcAsync(strCmdText, proccessExitedFunc, ct);
+            DatabasePath = dbPath;
 
         }
 
@@ -680,6 +673,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                 codeQLExe, "database",
                 "analyze", "\"" + dbPath + "\"",
                 "-v",
+                "--no-sarif-minify",
                 "--format=sarifv2.1.0",
                 "--output=" + "\"" + resultsPath + "\"",
                 useThreads, 

@@ -145,7 +145,16 @@
 			    <ToolTipText>Run Selected CodeQL Suites</ToolTipText>
 		    </Strings>
 	    </Button>
-	
+		<Button guid="guidCodeQLCmdSet" id="cmdidCodeQLStopCommand" priority="0x0133" type="Button">
+			<Parent guid="guidCodeQLCmdSet" id="CodeQLToolbarGroup" />
+			<Icon guid="CodeQLIcons" id="CodeQLIconTrash" />
+			<Strings>
+				<CommandName>cmdidCodeQLStopCommand</CommandName>
+				<ButtonText>Stop CodeQL Process</ButtonText>
+				<MenuText>Stop CodeQL Process</MenuText>
+				<ToolTipText>Stop CodeQL Process</ToolTipText>
+			</Strings>
+		</Button>
 	</Buttons>
 
 	  

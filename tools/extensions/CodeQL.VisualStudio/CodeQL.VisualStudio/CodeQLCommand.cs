@@ -1,6 +1,13 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.CodeQL.Controls;
+using Microsoft.CodeQL.Options;
+using Microsoft.CodeQL.Views;
+using Microsoft.Sarif.Viewer.Interop;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Threading;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
@@ -10,13 +17,7 @@ using System.Linq.Expressions;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Threading.Tasks;
-
-using Microsoft.CodeQL.Options;
-using Microsoft.CodeQL.Controls;
-using Microsoft.CodeQL.Views;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Threading;
+using System.Windows;
 
 
 namespace Microsoft.CodeQL.Core
@@ -191,6 +192,7 @@ namespace Microsoft.CodeQL.Core
                     catch (Exception ex)
                     {
                         CodeQLService.Instance.ClearTask();
+                        MessageBox.Show(ex.GetType().ToString());
                         VsShellUtilities.ShowMessageBox(Microsoft.VisualStudio.Shell.ServiceProvider.GlobalProvider,
                                                         $"CodeQL database create failed. " + ex.Message + " See output for details.",
                                                         null, // title
@@ -206,7 +208,22 @@ namespace Microsoft.CodeQL.Core
                         Trace.WriteLine($"Starting CodeQL analysis using {_currentDropDownComboChoice}");
                         try
                         {
-                            await CodeQLService.Instance.RunCodeQLQueryAsync(_currentDropDownComboChoice.Trim());
+                            var sarifResults = await CodeQLService.Instance.RunCodeQLQueryAsync(_currentDropDownComboChoice.Trim());
+                            var sarifViewer = new SarifViewerInterop(Package.GetGlobalService(typeof(SVsShell)) as IVsShell);
+                            if (false && sarifViewer.IsSariferExtensionInstalled)
+                            {
+                                if (!sarifViewer.IsViewerExtensionLoaded)
+                                {
+                                    sarifViewer.LoadSariferExtension();
+                                }
+                                await sarifViewer.OpenSarifLogAsync(sarifResults);
+                            }
+                            else
+                            {
+                                //TODO 
+                                //if (CodeQLGeneralOptions.Instance.AutomaticallyOpenResults) { }
+                                Microsoft.VisualStudio.Shell.VsShellUtilities.OpenDocument(this.ServiceProvider, sarifResults);
+                            }
                         }
                         catch (Exception ex)
                         {
@@ -223,7 +240,7 @@ namespace Microsoft.CodeQL.Core
 
                     break;
                 case CodeQLStopCommandId:
-                    CodeQLService.Instance.CancelIfRunning();
+                    CodeQLService.Instance.CancelIfRunningAsync().FileAndForget("Codeql.CancelIfRunning");
                     break;
                 case CodeQLDatabaseCommandId:
                     try

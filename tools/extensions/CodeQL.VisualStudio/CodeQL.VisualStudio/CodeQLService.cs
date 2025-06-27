@@ -1,6 +1,15 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using EnvDTE;
+using Microsoft.CodeAnalysis.Sarif;
+using Microsoft.CodeQL.Options;
+using Microsoft.Sarif.Viewer.Interop;
+using Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner;
+using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.Shell.Interop;
+using Microsoft.VisualStudio.Threading;
+using Microsoft.VisualStudio.VSHelp;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -10,15 +19,6 @@ using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-
-using EnvDTE;
-
-using Microsoft.CodeAnalysis.Sarif;
-using Microsoft.CodeQL.Options;
-using Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner;
-using Microsoft.VisualStudio.Shell;
-using Microsoft.VisualStudio.Shell.Interop;
-using Microsoft.VisualStudio.Threading;
 
 
 namespace Microsoft.CodeQL.Core
@@ -105,21 +105,18 @@ namespace Microsoft.CodeQL.Core
             _cancelToken = new CancellationTokenSource();
         }
 
-        public void CancelIfRunning()
+        public async Task CancelIfRunningAsync()
         {
-            if (_taskCompleted != null && _cancelToken != null)
+            if (_cancelToken != null && !_cancelToken.IsCancellationRequested)
             {
-                if (!_cancelToken.IsCancellationRequested)
-                {
-                    _cancelToken.Cancel();
-                }
-
-                if (!_taskCompleted.Task.IsCompleted)
-                {
-                    _ = _taskCompleted.TrySetCanceled();
-                }
+                _cancelToken.Cancel();
             }
-            ThreadHelper.JoinableTaskFactory.Run(() => ProjectHelper.HideProgressAsync());
+
+            if (_taskCompleted != null && !_taskCompleted.Task.IsCompleted)
+            {
+                _taskCompleted.TrySetCanceled();
+            }
+            await ProjectHelper.HideProgressAsync();
         }
         private void HandleKeyCollision(string existingKey, string newValue)
         {
@@ -274,7 +271,7 @@ namespace Microsoft.CodeQL.Core
            return CodeQLRunner.IsInstalled();
         }
 
-        public async System.Threading.Tasks.Task RunCodeQLQueryAsync(string query)
+        public async System.Threading.Tasks.Task<string> RunCodeQLQueryAsync(string query)
         {
             if (!_queryDict.TryGetValue(query, out string querySet)) 
             {
@@ -301,22 +298,9 @@ namespace Microsoft.CodeQL.Core
                 ram: CodeQLGeneralOptions.Instance.MemoryUsage, 
                 threads: CodeQLGeneralOptions.Instance.Threads, 
                 additionalSearchPath: CodeQLGeneralOptions.Instance.AdditionalQueryLocations);
-            try
-            {
-                //await ErrorListService.ProcessLogFileWithTracesAsync(sarifResults, ToolFormat.None, promptOnLogConversions: true, cleanErrors: true, openInEditor: false).ConfigureAwait(continueOnCapturedContext: false);
-                //new DataService().CloseEnhancedResultData(cookie: 0);
-            }
-            catch (InvalidOperationException)
-            {
-                VsShellUtilities.ShowMessageBox(Microsoft.VisualStudio.Shell.ServiceProvider.GlobalProvider,
-                                                string.Format(Resources.LogOpenFail_InvalidFormat_DialogMessage, Path.GetFileName(sarifResults)),
-                                                null, // title
-                                                OLEMSGICON.OLEMSGICON_CRITICAL,
-                                                OLEMSGBUTTON.OLEMSGBUTTON_OK,
-                                                OLEMSGDEFBUTTON.OLEMSGDEFBUTTON_FIRST);
-            }
 
-            _ = _taskCompleted.TrySetResult(true);
+             _ = _taskCompleted.TrySetResult(true);
+            return sarifResults;
         }
 
         private void CodeQLOutput(string message)
@@ -327,10 +311,15 @@ namespace Microsoft.CodeQL.Core
         public async System.Threading.Tasks.Task<bool> GenerateCodeQLDatabaseAsync()
         {
             await ProjectHelper.ShowProgressAsync("Generating CodeQL Database...");
+            // don't need to create again if the project is clean and a database exists. 
+            if (await ProjectHelper.IsProjectDirtyAsync() && Directory.Exists(CodeQLRunner.Instance.DatabasePath))
+            {
+                return true;
+            }
 
             string arch = "";
             string configName = "";
-
+            string projectName = "";
             await ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
@@ -342,7 +331,7 @@ namespace Microsoft.CodeQL.Core
 
                 arch = config.PlatformName;
                 configName = config.ConfigurationName;
-
+                projectName = activeProject.UniqueName;
                 string projectDir = ProjectHelper.GetProjectDirectory(activeProject);
                 string startCommand = "\"" + Path.Combine(ProjectHelper.GetVisualStudioFolder(), @"VC\Auxiliary\Build\vcvarsall.bat") + "\" " + arch + " && cd /d \"" + projectDir + "\" &&";
 
@@ -355,7 +344,7 @@ namespace Microsoft.CodeQL.Core
             }
             else
             {
-                buildCmd = "msbuild /t:rebuild /p:Configuration=" + configName + " /p:Platform=" + arch;
+                buildCmd = "msbuild "+projectName+" /t:rebuild /p:Configuration=" + configName + " /p:Platform=" + arch;
             }
 
 

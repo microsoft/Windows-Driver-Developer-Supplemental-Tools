@@ -291,6 +291,18 @@ namespace Microsoft.CodeQL
             return sc.GetInstanceForCurrentProcess().GetInstallationPath();
         }
 
+        internal static async System.Threading.Tasks.Task<bool> IsProjectDirtyAsync()
+        {
+            await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+
+            Project project = GetActiveProject();
+            if (project != null)
+            {
+                return project.IsDirty;
+            }
+            return true;
+        }
+
         internal static async System.Threading.Tasks.Task BuildProjectAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();

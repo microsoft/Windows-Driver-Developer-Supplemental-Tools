@@ -92,7 +92,7 @@ namespace Microsoft.CodeQL.Views
         private void ButtonCancel_Click(object sender, RoutedEventArgs e)
         {
             backgroundWorker.CancelAsync();
-            CodeQLService.Instance.CancelIfRunning();
+            ThreadHelper.JoinableTaskFactory.Run(() => CodeQLService.Instance.CancelIfRunningAsync());
             this.DialogResult = false;
             this.Close();
         }

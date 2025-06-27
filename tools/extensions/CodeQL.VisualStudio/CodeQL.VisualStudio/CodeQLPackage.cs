@@ -46,12 +46,11 @@ namespace Microsoft.CodeQL
         /// OpenSarifFileCommandPackage GUID string.
         /// </summary>
         public const string PackageGuidString = "3718ce5a-503f-4c55-8f70-3a4cc34fb1fb";
-        public const string OptionCategoryName = "SARIF Viewer";
         public const string CodeQLCategoryName = "CodeQL";
         public const string OptionPageName = "General";
         public const string CodeQLPageName = "General";
         public const string ColorsPageName = "Colors";
-        public const string OutputPaneName = "SARIF Viewer";
+        public const string OutputPaneName = "CodeQL";
 
         public const string CodeQLOptionCategoryName = "CodeQL";
         public const string CodeQLOptionPageName = "General";
