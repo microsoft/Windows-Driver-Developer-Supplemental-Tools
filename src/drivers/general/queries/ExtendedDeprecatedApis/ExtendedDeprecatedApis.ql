@@ -18,7 +18,7 @@
  *       security
 *        ca_ported
  * @scope generic
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -323,7 +323,7 @@ class ExtendedDeprecatedCall extends Element {
         or
         name.matches("swprintf") and
         replacement =
-          "swprintf_s StringCbPrintf, StringCbPrintf_l, StringCbPrintf_lEx, StringCbPrintf, StringCbPrintfEx"
+          "swprintf_s, StringCbPrintf, StringCbPrintf_l, StringCbPrintf_lEx, StringCbPrintf, StringCbPrintfEx"
         or
         name.matches("ualstrcpyW") and replacement = "None"
         or
@@ -447,11 +447,11 @@ class ExtendedDeprecatedCall extends Element {
       or
       // Functions marked deprecated in C28750
       (
-        name.matches("lstrlen") and replacement = "_tcslen"
+        name.matches("lstrlen") and replacement = "_tcslen if the data is trusted, or _tcsnlen or StringCchLength if the data is untrusted"
         or
-        name.matches("lstrlenA") and replacement = "strlen"
+        name.matches("lstrlenA") and replacement = "strlen if the data is trusted, or strnlen or StringCchLengthA if the data is untrusted"
         or
-        name.matches("lstrlenW") and replacement = "wcslen"
+        name.matches("lstrlenW") and replacement = "wcslen if the data is trusted, or wcsnlen or StringCchLengthW if the data is untrusted"
       )
 
       or
