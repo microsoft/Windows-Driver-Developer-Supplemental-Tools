@@ -62,7 +62,7 @@ namespace Microsoft.CodeQL.Core
         /// <summary>
         /// Command menu group (command set GUID).
         /// </summary>
-        public static readonly Guid CommandSet = new Guid("4fc96981-3ec2-43c7-acf0-96d73b1203e8");
+        public static readonly Guid CommandSet = new Guid("D62F3B56-93CF-4AC2-BCD7-ABDE6EF7FE25");
 
         /// <summary>
         /// VS Package that provides this command, not null.

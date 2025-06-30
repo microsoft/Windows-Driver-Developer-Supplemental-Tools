@@ -2,6 +2,7 @@
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
 using System;
+using System.IO;
 using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
@@ -12,6 +13,11 @@ using EnvDTE80;
 
 using Microsoft.VisualStudio.Setup.Configuration;
 using Microsoft.VisualStudio.Shell;
+using Microsoft.VisualStudio.VCProjectEngine;
+using System.Windows.Documents;
+using System.Collections.Generic;
+using System.Linq;
+
 
 namespace Microsoft.CodeQL
 {
@@ -199,6 +205,22 @@ namespace Microsoft.CodeQL
 
             return activeSolutionProjects.GetValue(0) as Project;
         }
+        internal static VCProject GetVCProject()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            Project activeProject = GetActiveProject();
+            if (activeProject != null && IsVCProject(activeProject))
+            {
+                return activeProject.Object as VCProject;
+            }
+            return null;
+        }
+
+        internal static string GetActiveProjectName()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            return GetActiveProject().UniqueName;
+        }
 
         internal static string GetProjectFileName(Project project)
         {
@@ -227,6 +249,30 @@ namespace Microsoft.CodeQL
             return fileName;
         }
 
+        /// <summary>
+        /// Creates a numerical hash from a string using FNV-1a algorithm.
+        /// </summary>
+        /// <param name="input">The input string to hash</param>
+        /// <returns>A 32-bit integer hash of the string</returns>
+        internal static int CreateNumericalHash(string input)
+        {
+            if (string.IsNullOrEmpty(input))
+                return 0;
+
+            // FNV-1a algorithm constants for 32-bit hash
+            const uint FNV_PRIME = 16777619;
+            const uint FNV_OFFSET_BASIS = 2166136261;
+
+            uint hash = FNV_OFFSET_BASIS;
+
+            foreach (char c in input)
+            {
+                hash ^= c;
+                hash *= FNV_PRIME;
+            }
+
+            return unchecked((int)hash);
+        }
         internal static string GetProjectDirectory(Project project)
         {
             ThreadHelper.ThrowIfNotOnUIThread();
@@ -291,17 +337,30 @@ namespace Microsoft.CodeQL
             return sc.GetInstanceForCurrentProcess().GetInstallationPath();
         }
 
+
+        /// <summary>
+        /// Is project dirty compared to associated codeql database 
+        /// </summary>
+        /// <returns></returns>
         internal static async System.Threading.Tasks.Task<bool> IsProjectDirtyAsync()
         {
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
 
-            Project project = GetActiveProject();
+            VCProject project = GetVCProject();
             if (project != null)
             {
-                return project.IsDirty;
+                string projectPath = GetProjectDirectory(GetActiveProject());
+                string dbPath = Path.Combine(projectPath, "codeql_db", "diagnostic");
+                List<string> dbFiles = new List<string>(Directory.GetFiles(dbPath, "cli-diagnostics-add-*", SearchOption.TopDirectoryOnly));
+                var lastBuildTime = dbFiles.Max(file => File.GetLastWriteTimeUtc(file));
+                var sourceFiles = Directory.GetFiles(projectPath, "*.c*", SearchOption.AllDirectories)
+                .Concat(Directory.GetFiles(projectPath, "*.h", SearchOption.AllDirectories));
+
+                return sourceFiles.Any(file => File.GetLastWriteTimeUtc(file) > lastBuildTime);
             }
             return true;
         }
+
 
         internal static async System.Threading.Tasks.Task BuildProjectAsync()
         {

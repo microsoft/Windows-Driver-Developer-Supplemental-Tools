@@ -1,16 +1,7 @@
 ﻿// Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
-using System.Configuration;
-using System.IO;
-using System.Runtime.InteropServices;
-using System.Threading;
-
 using EnvDTE80;
-
 using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.CodeQL.Core;
 using Microsoft.CodeQL.Options;
@@ -20,9 +11,14 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Events;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Text.Tagging;
-
 using Newtonsoft.Json;
-
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.Design;
+using System.Configuration;
+using System.IO;
+using System.Runtime.InteropServices;
+using System.Threading;
 using Task = System.Threading.Tasks.Task;
 
 namespace Microsoft.CodeQL
@@ -130,10 +126,20 @@ namespace Microsoft.CodeQL
             SolutionEvents.OnAfterCloseSolution += this.SolutionEvents_OnAfterCloseSolution;
             SolutionEvents.OnAfterBackgroundSolutionLoadComplete += this.SolutionEvents_OnAfterBackgroundSolutionLoadComplete;
             SolutionEvents.OnBeforeOpenProject += this.SolutionEvents_OnBeforeOpenProject;
-            
+
+            IVsSolutionBuildManager buildManager = (IVsSolutionBuildManager)ServiceProvider.GlobalProvider.GetService(typeof(SVsSolutionBuildManager));
+            buildManager.AdviseUpdateSolutionEvents(new MyBuildEventsHandler(), out _);
+
             return;
         }
 
+        private void OnBuildBegin()
+        {
+            ThreadHelper.ThrowIfNotOnUIThread();
+            // this is called when build starts.
+            // this can be used to start the codeql file watcher.
+            //this.codeqlFileMonitor?.StartWatching();
+        }
         private void SolutionEvents_OnBeforeOpenProject(object sender, EventArgs e)
         {
             // start watcher when the solution is opened.

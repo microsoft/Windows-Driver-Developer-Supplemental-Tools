@@ -10,6 +10,7 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
 using Microsoft.VisualStudio.VSHelp;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -20,14 +21,51 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-
 namespace Microsoft.CodeQL.Core
 {
+   
     internal class CodeQLService : IDisposable
     {
         private static CodeQLService _instance = null;
         private CancellationTokenSource _cancelToken;
         private TaskCompletionSource<bool> _taskCompleted;
+
+        // service per project? 
+
+
+        private class BuildInfo
+        {
+            public BuildInfo()
+            {
+                BuildGuid = "-1";
+                SourceId = -1;
+                ProjectName = null;
+            }
+            public int SourceId;
+            public string BuildGuid;
+            public string ProjectName;
+
+            public class LogEntry
+            {
+                public DateTime timestamp { get; set; }
+                public Source source { get; set; }
+                public string plaintextMessage { get; set; }
+                public string severity { get; set; }
+            }
+
+            public class Source
+            {
+                public string id { get; set; }
+                public string name { get; set; }
+            }
+            // override equals
+
+        }
+
+      
+
+
+        private BuildInfo _buildInfo;
 
         /// <summary>
         /// Dictionary of query names to be displayed in the UI, and their full path.
@@ -44,6 +82,21 @@ namespace Microsoft.CodeQL.Core
                 return new List<string>();
             }
             set { }
+        }
+
+        public void UpdateBuildInfo(string buildGuid, string projectName = null)
+        {
+            _buildInfo.BuildGuid = buildGuid;
+            if (projectName != null)
+            {
+                _buildInfo.ProjectName = projectName;
+                _buildInfo.SourceId = ProjectHelper.CreateNumericalHash(projectName);
+            }
+            else
+            {
+                _buildInfo.ProjectName = ProjectHelper.GetActiveProjectName();
+                _buildInfo.SourceId = ProjectHelper.CreateNumericalHash(_buildInfo.ProjectName);
+            }
         }
 
         public void Dispose()
@@ -80,6 +133,7 @@ namespace Microsoft.CodeQL.Core
             _taskCompleted = null;
             _cancelToken = null;
             _queryDict = new Dictionary<string, string>();
+            _buildInfo = new BuildInfo();
         }
 
         public bool IsCodeQLTaskRunning()
@@ -215,6 +269,29 @@ namespace Microsoft.CodeQL.Core
             }
         }
 
+        public async Task UpdateDatabaseBuildInfoAsync()
+        {
+            await CodeQLRunner.Instance.AddDBDiagInfoAsync(ProjectHelper.GetProjectDirectory(ProjectHelper.GetActiveProject()),
+                _buildInfo.BuildGuid, 
+                _buildInfo.SourceId);
+        }
+
+        private async Task<string> GetDatabaseBuildGuidAsync()
+        {
+            string dbInfo = await CodeQLRunner.Instance.GetDBDiagAsync();
+
+            var entries = JsonConvert.DeserializeObject<List<BuildInfo.LogEntry>>(dbInfo);
+            var ret = entries
+            .Where(e => e.source?.name == "CodeqlVSExt" && !string.IsNullOrEmpty(e.plaintextMessage))
+            .Select(e => e.plaintextMessage)
+            .ToList().FirstOrDefault();
+            if(ret == null)
+            {
+                return "";
+            }
+            return ret;
+        }
+
         public async System.Threading.Tasks.Task InstallCodeQLPacksAsync(HashSet<string> packs, bool prerelease)
         {
             await CodeQLRunner.Instance.InstallDefaultPacksAsync(packs, prerelease);
@@ -261,6 +338,7 @@ namespace Microsoft.CodeQL.Core
                 Environment.SetEnvironmentVariable("PATH", Environment.GetEnvironmentVariable("PATH", EnvironmentVariableTarget.User) + ";" + System.IO.Path.Combine(installPath, "codeql"), EnvironmentVariableTarget.User);
             }
         }
+
 
         public static void CodeQLUpateExePath()
         {
@@ -312,11 +390,12 @@ namespace Microsoft.CodeQL.Core
         {
             await ProjectHelper.ShowProgressAsync("Generating CodeQL Database...");
             // don't need to create again if the project is clean and a database exists. 
-            if (await ProjectHelper.IsProjectDirtyAsync() && Directory.Exists(CodeQLRunner.Instance.DatabasePath))
+        
+            if(!(await ProjectHelper.IsProjectDirtyAsync()) && _buildInfo.BuildGuid.Equals((await GetDatabaseBuildGuidAsync())))
             {
+                _taskCompleted.TrySetResult(true);
                 return true;
             }
-
             string arch = "";
             string configName = "";
             string projectName = "";
@@ -344,11 +423,13 @@ namespace Microsoft.CodeQL.Core
             }
             else
             {
-                buildCmd = "msbuild "+projectName+" /t:rebuild /p:Configuration=" + configName + " /p:Platform=" + arch;
+                buildCmd = "msbuild " + projectName + " /t:rebuild /p:Configuration=" + configName + " /p:Platform=" + arch;
             }
 
 
-            await CodeQLRunner.Instance.GenerateDatabaseAsync(buildCmd, _cancelToken.Token, ram: CodeQLGeneralOptions.Instance.MemoryUsage, threads: CodeQLGeneralOptions.Instance.Threads );
+            await CodeQLRunner.Instance.GenerateDatabaseAsync(buildCmd, _cancelToken.Token, ram: CodeQLGeneralOptions.Instance.MemoryUsage, threads: CodeQLGeneralOptions.Instance.Threads);
+
+            await UpdateDatabaseBuildInfoAsync();
             _taskCompleted.TrySetResult(true);
             return true;
         }

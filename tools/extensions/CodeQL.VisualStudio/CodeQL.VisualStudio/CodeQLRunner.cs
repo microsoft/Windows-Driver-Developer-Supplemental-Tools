@@ -156,6 +156,8 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         public void Initialize(string sourceDir = "", string buildEnv = "", Action<string> outputFunc = null)
         {
             analysisDir = sourceDir;
+            DatabaseDirectory = Path.Combine(analysisDir, "codeql_db");
+
             if (!Directory.Exists(analysisDir))
             {
                 throw new Exception("Analysis directory does not exist: " + analysisDir);
@@ -483,11 +485,30 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         /// Adds diagnostic information to the database.
         /// </summary>
         /// <param name="message"> Diagnostic info to add to database. </param>
-        /// <param name="sourceId"> SourceID to use. </param>
+        /// <param name="severity"> Severity of the diagnostic information ("error", "warning", "note"). </param>
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
-        public async Task AddDBDiagInfoAsync(string message, int sourceId)
+        public async Task AddDBDiagInfoAsync(string projectDir, string message, int sourceId, string severity="note", bool deletePrev = true)
         {
-            _ = await RunCodeQLProcAsync("database add-diagnostic --plaintext-message=\"" + message + "\" --source-id=" + sourceId.ToString() + " --source-name=CodeqlVSExt", workingDir: analysisDir);
+            try
+            {
+                if (deletePrev)
+                {
+                    foreach (string f in Directory.EnumerateFiles(Path.Combine(projectDir, "codeql_db", "diagnostic"), "cli-diagnostics-add-*.json"))
+                    {
+                        File.Delete(f);
+                    }
+                }
+
+                if (severity != "error" && severity != "warning" && severity != "note")
+                {
+                    throw new ArgumentException("Invalid severity level. Use 'error', 'warning', or 'note'.");
+                }
+                _ = await RunCodeQLProcAsync("database add-diagnostic --plaintext-message=\"" + message + "\" --source-id=" + sourceId.ToString() + " --source-name=CodeqlVSExt" + " --severity=" + severity + " codeql_db", workingDir: analysisDir);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception("Error adding diagnostic information to database: " + ex.Message, ex);
+            }
         }
 
         /// <summary>
@@ -597,7 +618,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
             }
 
             string strCmdText = string.Empty;
-            string dbPath = Path.Combine(analysisDir, "codeql_db");
+            string dbPath = System.IO.Path.Combine(analysisDir, "codeql_db");
             string useThreads = string.IsNullOrWhiteSpace(threads) ? "" : " --threads=" + threads + " ";
             string useRam = string.IsNullOrWhiteSpace(ram) ? "" : " --ram=" + ram + " " ;
 

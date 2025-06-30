@@ -48,6 +48,7 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="BuildEvents.cs" />
     <Compile Include="CodeQLCommand.cs" />
     <Compile Include="CodeQLExceptions.cs" />
     <Compile Include="CodeQLGeneralOptions.cs" />

@@ -194,7 +194,7 @@
 	  <GuidSymbol name="guidCodeQLCommandPackage" value="{3718ce5a-503f-4c55-8f70-3a4cc34fb1fb}" />
 
 	  <!-- This is the guid used to group the menu commands together -->
-	  <GuidSymbol name="guidCodeQLCmdSet" value="{4fc96981-3ec2-43c7-acf0-96d73b1203e8}">
+	  <GuidSymbol name="guidCodeQLCmdSet" value="{D62F3B56-93CF-4AC2-BCD7-ABDE6EF7FE25}">
 		  <IDSymbol name="CodeQLSubMenu" value="0x1101"/>
 		  <IDSymbol name="CodeQLSubMenuGroup" value="0x1110"/>
 		  <IDSymbol name="CodeQLMenuGroup" value="0x1111" />
