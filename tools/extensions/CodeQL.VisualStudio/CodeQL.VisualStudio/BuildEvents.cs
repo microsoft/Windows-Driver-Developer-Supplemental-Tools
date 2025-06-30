@@ -24,7 +24,6 @@ namespace Microsoft.CodeQL
 
         public int UpdateSolution_Done(int fSucceeded, int fModified, int fCancelCommand)
         {
-            //TODO check if build was successful
             bool isProjDirty = true;
             ThreadHelper.JoinableTaskFactory.Run(async () => isProjDirty = await ProjectHelper.IsProjectDirtyAsync());
 

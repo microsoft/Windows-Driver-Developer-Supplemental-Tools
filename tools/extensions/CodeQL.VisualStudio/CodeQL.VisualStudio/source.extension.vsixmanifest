@@ -1,7 +1,7 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <PackageManifest Version="2.0.0" xmlns="http://schemas.microsoft.com/developer/vsx-schema/2011" xmlns:d="http://schemas.microsoft.com/developer/vsx-schema-design/2011">
     <Metadata>
-        <Identity Id="CodeQL.VisualStudio.Extension.E3EB774A-A875-4A96-A257-E0ADF42A9FD6" Version="1.0.0.0" Language="en-US" Publisher="Jacob Ronstadt" />
+        <Identity Id="CodeQL.VisualStudio.Extension.34DD7857-F5F1-4960-B60F-4E9285157836" Version="1.0.0.0" Language="en-US" Publisher="Jacob Ronstadt" />
         <DisplayName>CodeQL Visual Studio Extension</DisplayName>
         <Description xml:space="preserve">CodeQL Visual Studio Extension</Description>
         <License>License.txt</License>

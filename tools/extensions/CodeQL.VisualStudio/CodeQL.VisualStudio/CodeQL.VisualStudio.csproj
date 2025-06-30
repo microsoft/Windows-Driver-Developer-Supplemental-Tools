@@ -183,7 +183,6 @@
   <Import Project="$(VSToolsPath)\VSSDK\Microsoft.VsSDK.targets" Condition="'$(VSToolsPath)' != ''" />
   <Import Project="$(MSBuildProjectExtensionsPath)$(_TargetAssemblyProjectName)$(MSBuildProjectExtension).nuget.g.targets" Condition=" '$(_TargetAssemblyProjectName)' != '' and '$(ImportProjectExtensionProps)' != 'false' and exists('$(MSBuildProjectExtensionsPath)$(_TargetAssemblyProjectName)$(MSBuildProjectExtension).nuget.g.targets')" />
   <ItemGroup>
-    <VSCTCompile Include="CodeQLPackage.vsct" />
     <None Include="source.extension.vsixmanifest">
       <Generator>VsixManifestGenerator</Generator>
     </None>

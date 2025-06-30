@@ -41,7 +41,7 @@ namespace Microsoft.CodeQL
         /// <summary>
         /// OpenSarifFileCommandPackage GUID string.
         /// </summary>
-        public const string PackageGuidString = "3718ce5a-503f-4c55-8f70-3a4cc34fb1fb";
+        public const string PackageGuidString = "19BD102D-9450-4BF2-A08A-DA4704F146AB";
         public const string CodeQLCategoryName = "CodeQL";
         public const string OptionPageName = "General";
         public const string CodeQLPageName = "General";
@@ -133,13 +133,6 @@ namespace Microsoft.CodeQL
             return;
         }
 
-        private void OnBuildBegin()
-        {
-            ThreadHelper.ThrowIfNotOnUIThread();
-            // this is called when build starts.
-            // this can be used to start the codeql file watcher.
-            //this.codeqlFileMonitor?.StartWatching();
-        }
         private void SolutionEvents_OnBeforeOpenProject(object sender, EventArgs e)
         {
             // start watcher when the solution is opened.

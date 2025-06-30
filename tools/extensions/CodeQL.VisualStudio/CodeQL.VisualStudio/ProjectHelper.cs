@@ -369,18 +369,15 @@ namespace Microsoft.CodeQL
             Project project = GetActiveProject();
             if (project != null )
             {
-                if (project.IsDirty)
+                TaskCompletionSource<bool> buildTcs = new TaskCompletionSource<bool>();
+                DTE2 dte = (DTE2)Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(DTE));
+                BuildEvents buildEvents = dte.Events.BuildEvents;
+                buildEvents.OnBuildDone += (scope, action) =>
                 {
-                    TaskCompletionSource<bool> buildTcs = new TaskCompletionSource<bool>();
-                    DTE2 dte = (DTE2)Microsoft.VisualStudio.Shell.Package.GetGlobalService(typeof(DTE));
-                    BuildEvents buildEvents = dte.Events.BuildEvents;
-                    buildEvents.OnBuildDone += (scope, action) =>
-                    {
-                        buildTcs.TrySetResult(true);
-                    };
-                    dte.ExecuteCommand("Build.BuildSelection");
-                    await buildTcs.Task;
-                }
+                    buildTcs.TrySetResult(true);
+                };
+                dte.ExecuteCommand("Build.BuildSelection");
+                await buildTcs.Task;
             }
             else
             {

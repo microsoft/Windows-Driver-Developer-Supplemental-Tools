@@ -191,7 +191,7 @@
   <Symbols>
 	  <!-- This is the package guid. -->
 	  <!-- CodeQL -->
-	  <GuidSymbol name="guidCodeQLCommandPackage" value="{3718ce5a-503f-4c55-8f70-3a4cc34fb1fb}" />
+	  <GuidSymbol name="guidCodeQLCommandPackage" value="{19BD102D-9450-4BF2-A08A-DA4704F146AB}" />
 
 	  <!-- This is the guid used to group the menu commands together -->
 	  <GuidSymbol name="guidCodeQLCmdSet" value="{D62F3B56-93CF-4AC2-BCD7-ABDE6EF7FE25}">
@@ -209,7 +209,7 @@
 		  <IDSymbol name="cmdidComboGetList" value="0x156"/>
 	  </GuidSymbol>
 
-	  <GuidSymbol name="CodeQLIcons" value="{0db8ff03-1550-490f-8c25-ddaeba988a75}" >
+	  <GuidSymbol name="CodeQLIcons" value="{382D3738-A38D-44C0-AE70-FD8D9A6CA1D1}" >
 		  <IDSymbol name="CodeQLIconLogo" value="1" />
 		  <IDSymbol name="CodeQLIconRecommended" value="2" />
 		  <IDSymbol name="CodeQLIconAnalyze" value="3" />
@@ -221,11 +221,11 @@
 		  <IDSymbol name="IconRefresh16" value="1"/>
 	  </GuidSymbol>
 
-	  <GuidSymbol name="IconGear" value="{5A7774D1-B457-4104-AC02-C805070D5CFA}">
+	  <GuidSymbol name="IconGear" value="{EE95FC9F-315C-40A0-9C78-0E48AB902F26}">
 		  <IDSymbol name="IconGear16" value="1"/>
 	  </GuidSymbol>
 
-	  <GuidSymbol name="IconLogo" value="{AFB0228D-93D1-4B9E-9A61-D78C90FC9918}">
+	  <GuidSymbol name="IconLogo" value="{77AA009B-B550-4D30-B48B-76BEEAB45C5F}">
 		  <IDSymbol name="IconLogo32" value="1"/>
 	  </GuidSymbol>
   </Symbols>
