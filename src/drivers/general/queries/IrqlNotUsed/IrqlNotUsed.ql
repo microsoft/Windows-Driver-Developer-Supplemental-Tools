@@ -15,6 +15,7 @@
  * @problem.severity warning
  * @precision medium
  * @tags correctness
+ *       ca_ported
  *       wddst
  * @scope domainspecific
  * @query-version v1
@@ -23,7 +24,6 @@
 import cpp
 import drivers.libraries.Irql
 import semmle.code.cpp.dataflow.new.DataFlow
-import semmle.code.cpp.dataflow.new.DataFlow2
 
 /**
  * A function that has at least one parameter annotated with "\_IRQL\_restores\_".
@@ -61,14 +61,12 @@ class FundamentalIrqlRestoreFunction extends IrqlRestoreFunction {
  * _IRQL_restores_-annotated parameter to an OS function that restores
  * the IRQL.
  */
-class IrqlFlowConfiguration extends DataFlow::Configuration {
-  IrqlFlowConfiguration() { this = "IrqlFlowConfiguration" }
-
-  override predicate isSource(DataFlow::Node source) {
+module IrqlFlowConfigurationConfig implements DataFlow::ConfigSig {
+   predicate isSource(DataFlow::Node source) {
     source.asParameter() instanceof IrqlRestoreParameter
   }
 
-  override predicate isSink(DataFlow::Node sink) {
+   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall fc, FundamentalIrqlRestoreFunction firf |
       fc.getTarget() = firf and
       (
@@ -79,21 +77,22 @@ class IrqlFlowConfiguration extends DataFlow::Configuration {
     )
   }
 }
+module IrqlFlowConfiguration = DataFlow::Global<IrqlFlowConfigurationConfig>;
 
-from IrqlRestoreFunction irf, IrqlFlowConfiguration ifc
+from IrqlRestoreFunction irf 
 where
   // Exclude OS functions
   not irf instanceof FundamentalIrqlRestoreFunction and
   (
     // Account for case where parameter is touched but has no path to restore the IRQL
-    exists(DataFlow::PathNode source |
-      source.getNode().asParameter() = irf.getRestoreParameter() and
-      not ifc.hasFlowPath(source, _)
+    exists(DataFlow::Node source |
+      source.asParameter() = irf.getRestoreParameter() and
+      not IrqlFlowConfiguration::flow(source, _)
     )
     or
     // Account for case where parameter is totally untouched
-    not exists(DataFlow::PathNode source |
-      source.getNode().asParameter() = irf.getRestoreParameter()
+    not exists(DataFlow::Node source |
+      source.asParameter() = irf.getRestoreParameter()
     )
   )
 select irf,

@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 /**
+ * @id cpp/paddingbyteinformationdisclosure
  * @name Possible information leakage from uninitialized padding bytes.
  * @description A newly allocated struct or class that is initialized member-by-member may
  *              leak information if it includes padding bytes.
@@ -9,9 +10,8 @@
  * @problem.severity warning
  * @tags security
  *       external/cwe/cwe-200
- * @opaque-id SM02320
+ * @opaqueid SM02320
  * @microsoft.severity Important
- * @id cpp/paddingbyteinformationdisclosure
  */
 
 import cpp

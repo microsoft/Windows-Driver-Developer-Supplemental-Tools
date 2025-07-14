@@ -2,6 +2,7 @@
 // Licensed under the MIT license.
 
 /**
+ * @id cpp/infiniteloop
  * @name Comparison of narrow type with wide type in loop condition
  * @description Comparisons between types of different widths in a loop
  *              condition can cause the loop to fail to terminate.
@@ -11,9 +12,8 @@
  *       security
  *       external/cwe/cwe-190
  *       external/cwe/cwe-197
- * @opaque-id SM02323
+ * @opaqueid SM02323
  * @microsoft.severity Important
- * @id cpp/infiniteloop
  */
 
 import cpp

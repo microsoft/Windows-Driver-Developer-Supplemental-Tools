@@ -7,14 +7,13 @@
  * @kind path-problem
  * @problem.severity error
  * @precision medium
- * @id cpp/windows/wdk/kmdf/DeviceInitApi
+ * @id cpp/windows/wdk/kmdf/device-init-api
  * @tags correctness
  * @query-version v1
  */
 
 import drivers.kmdf.libraries.KmdfDrivers
-import semmle.code.cpp.dataflow.DataFlow
-import DataFlow::PathGraph
+import semmle.code.cpp.dataflow.new.DataFlow
 
 /** A function that initializes or changes a WDFDEVICE_INIT struct, and which must not be called after WDFDeviceCreate. */
 class WdfInitializationApi extends Function {
@@ -73,24 +72,23 @@ predicate isChildExpr(Expr e, FunctionCall func) {
  * A data-flow model to determine if a use of a WDFDEVICE_INIT struct is
  * used in an initialization function after WdfDeviceCreate is called.
  */
-class InitAPIDataFlow extends DataFlow::Configuration {
-  InitAPIDataFlow() { this = "KMDFDeviceInitApiFlow" }
+module InitAPIDataFlowConfig implements DataFlow::ConfigSig {
 
-  override predicate isSource(DataFlow::Node source) {
+  predicate isSource(DataFlow::Node source) {
     exists(FunctionCall fc |
       fc.getTarget().getName().matches("WdfDeviceCreate") and
       fc.getArgument(0).getAChild*() = source.asExpr()
     )
   }
 
-  override predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall fc |
       fc.getTarget() instanceof WdfInitializationApi and
       fc.getArgument(0).getAChild*() = sink.asExpr()
     )
   }
 
-  override predicate isAdditionalFlowStep(DataFlow::Node source, DataFlow::Node sink) {
+  predicate isAdditionalFlowStep(DataFlow::Node source, DataFlow::Node sink) {
     exists(FunctionCall fc |
       fc.getTarget().getName().matches("WdfDeviceCreate") and
       fc.getTarget() = sink.getFunction() and
@@ -99,13 +97,16 @@ class InitAPIDataFlow extends DataFlow::Configuration {
   }
 }
 
-from InitAPIDataFlow iadf, DataFlow::PathNode e1, DataFlow::PathNode e2
+module InitAPIDataFlow = DataFlow::Global<InitAPIDataFlowConfig>;
+import InitAPIDataFlow::PathGraph
+
+from  InitAPIDataFlow::PathNode e1, InitAPIDataFlow::PathNode e2
 where
   exists(FunctionCall driverCreateCall, WdfInitiailzationApiCall apiCall |
     driverCreateCall.getAChild*() = e1.getNode().asExpr() and
     isChildExpr(e2.getNode().asExpr(), apiCall) and
     driverCreateCall.getASuccessor*() = apiCall
   ) and
-  iadf.hasFlowPath(e1, e2)
+  InitAPIDataFlow::flowPath(e1, e2)
 select e1.getNode(), e1, e2,
   "A WDF device object initialization method was called after WdfDeviceCreate was called on the same WDFDEVICE_INIT struct.  This can lead to system instability."

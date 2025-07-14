@@ -1,7 +1,7 @@
 {
     "all": {
-        "+": 0,
-        "-": 0
+        "+": 1,
+        "-": 1
     },
     "error": {
         "+": 0,
@@ -9,9 +9,20 @@
         "codes": []
     },
     "warning": {
-        "+": 0,
-        "-": 0,
-        "codes": []
+        "+": 1,
+        "-": 1,
+        "codes": [
+            [
+                "cpp/drivers/irql-set-too-low [IrqlMinDispatchLowerIrql_fail](1): IRQL potentially set too low at [{ ... }](2).  Minimum IRQL for this function: 2, IRQL at statement: 1",
+                0,
+                1
+            ],
+            [
+                "cpp/drivers/irql-set-too-low [IrqlMinDispatchLowerIrql_fail](1): IRQL potentially set too low at [{{ ... }}](2).  Minimum IRQL for this function: 2, IRQL at statement: 1",
+                1,
+                0
+            ]
+        ]
     },
     "note": {
         "+": 0,

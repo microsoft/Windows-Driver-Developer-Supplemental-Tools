@@ -1,0 +1,26 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			The DriverEntry routine should save a copy of the argument, not the pointer, because the I/O Manager frees the buffer
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The driver's DriverEntry routine is saving a copy of the pointer to the buffer instead of saving a copy of the buffer. Because the buffer is freed when the DriverEntry routine returns, the pointer to the buffer will soon be invalid.
+		</p>
+	</recommendation>
+	<example>
+		<sample src="driver_snippet.c" />
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28131-driverentry-saving-pointer-to-buffer">
+				C28131
+			</a>
+		</li>
+	</references>
+	<semmleNotes>
+		<p>This rule reports a false positive when the registry path pointer is saved for use in functions such as HidRegisterMinidriver</p>
+	</semmleNotes>
+</qhelp>

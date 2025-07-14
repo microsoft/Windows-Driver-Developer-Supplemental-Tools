@@ -14,11 +14,13 @@
  * @problem.severity warning
  * @precision medium
  * @tags correctness
+*        ca_ported
  * @scope domainspecific
  * @query-version v1
  */
+
 import cpp
-import semmle.code.cpp.dataflow.DataFlow
+import semmle.code.cpp.dataflow.new.DataFlow
 
 /** A pool allocation function (has a ULONG "Tag" field, a "Flags" field, and a size parameter.) */
 class PoolTypeFunction extends Function {
@@ -28,8 +30,8 @@ class PoolTypeFunction extends Function {
       p.getName().matches("Tag") and
       p.getType().getName().matches("ULONG")
     ) and
-    this.getAParameter().getName().matches("Flags")
-    and this.getAParameter().getType().getName().matches("SIZE_T")
+    this.getAParameter().getName().matches("Flags") and
+    this.getAParameter().getType().getName().matches("SIZE_T")
   }
 }
 
@@ -47,25 +49,24 @@ class GlobalDefaultPoolTag extends GlobalVariable {
 }
 
 /** An interprocedural data-flow analysis looking for flow from bad (default) pool tags. */
-class DefaultPoolTagFlow extends DataFlow::Configuration {
-  DefaultPoolTagFlow() { this = "DefaultPoolTagFlow" }
+module DefaultPoolTagFlowConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) { source.asExpr() instanceof DefaultPoolTag }
 
-  override predicate isSource(DataFlow::Node source) { source.asExpr() instanceof DefaultPoolTag }
-
-  override predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::ExprNode }
+  predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::ExprNode }
 }
+module DefaultPoolTagFlow = DataFlow::Global<DefaultPoolTagFlowConfig>;
+
 
 /** An interprocedural data-flow analysis looking for flow from good pool tags. */
-class ValidPoolTagFlow extends DataFlow::Configuration {
-  ValidPoolTagFlow() { this = "ValidPoolTagFlow" }
-
-  override predicate isSource(DataFlow::Node source) {
+module ValidPoolTagFlowConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) {
     source.asExpr() instanceof Literal and
     not source.asExpr() instanceof DefaultPoolTag
   }
 
-  override predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::ExprNode }
+  predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::ExprNode }
 }
+module ValidPoolTagFlow = DataFlow::Global<ValidPoolTagFlowConfig>;
 
 from FunctionCall fc, int i, GlobalDefaultPoolTag gdpt
 where
@@ -76,17 +77,17 @@ where
   // A bad tag is directly passed in
   fc.getArgument(i) instanceof DefaultPoolTag
   or
-  // A global tag variable is being passed in, and no path exists 
+  // A global tag variable is being passed in, and no path exists
   // where a good tag has been assigned instead
   fc.getArgument(i).(VariableAccess).getTarget() = gdpt and
-  not exists(ValidPoolTagFlow dataFlow, DataFlow::Node source, DataFlow::Node sink |
+  not exists(DataFlow::Node source, DataFlow::Node sink |
     sink.asExpr() = fc.getArgument(i) and
-    dataFlow.hasFlow(source, sink)
+    ValidPoolTagFlow::flow(source, sink)
   )
   or
   // A local variable with a bad tag is being passed in
-  exists(DefaultPoolTagFlow dataFlow, DataFlow::Node source, DataFlow::Node sink |
+  exists(DataFlow::Node source, DataFlow::Node sink |
     sink.asExpr() = fc.getArgument(i) and
-    dataFlow.hasFlow(source, sink)
+    DefaultPoolTagFlow::flow(source, sink)
   )
 select fc.getArgument(i), "Default pool tag used in function call"

@@ -1,0 +1,53 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+		The value is not a legal value for an IRQL
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			The IRQL should be within the range of valid values for an IRQL (0-31).
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			Example of a function with an OK IRQL requirement.
+		</p>
+		<sample language="c"> <![CDATA[
+		
+		_IRQL_requires_(PASSIVE_LEVEL)
+			VOID DoNothing_RequiresPassive(void)
+		{
+			__noop;
+		}
+
+		}]]>
+		</sample>
+		<p>
+			Exmaple of a function with an IRQL requirement that is too high.
+		</p>
+		<sample language="c"> <![CDATA[
+				
+		// This function has an IRQL requirement that is too high.
+		_IRQL_requires_(42)
+			VOID DoNothing_bad(void)
+		{
+			__noop;
+		}
+		}]]>
+		</sample>
+	</example>
+	<semmleNotes>
+		<p>
+		
+		</p>
+	</semmleNotes>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28151-illegal-irql-value">
+				Warning C28151
+			</a>
+		</li>
+	</references>
+</qhelp>

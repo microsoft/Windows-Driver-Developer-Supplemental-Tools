@@ -16,8 +16,9 @@
  * @precision high
  * @tags correctness
  *       security
+*        ca_ported
  * @scope generic
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -72,6 +73,9 @@ predicate matchesBannedApi(string input) {
   or
   // Functions marked deprecated in C28750
   input = any(["lstrlen", "lstrlenA", "lstrlenW"])
+  or
+  // Functions marked deprecated in C28727
+  input = any(["_itow", "_ultow", "strtok", "swscanf", "wcstok"])
 }
 
 /** A deprecated API. */
@@ -319,7 +323,7 @@ class ExtendedDeprecatedCall extends Element {
         or
         name.matches("swprintf") and
         replacement =
-          "swprintf_s StringCbPrintf, StringCbPrintf_l, StringCbPrintf_lEx, StringCbPrintf, StringCbPrintfEx"
+          "swprintf_s, StringCbPrintf, StringCbPrintf_l, StringCbPrintf_lEx, StringCbPrintf, StringCbPrintfEx"
         or
         name.matches("ualstrcpyW") and replacement = "None"
         or
@@ -443,11 +447,25 @@ class ExtendedDeprecatedCall extends Element {
       or
       // Functions marked deprecated in C28750
       (
-        name.matches("lstrlen") and replacement = "_tcslen"
+        name.matches("lstrlen") and replacement = "_tcslen if the data is trusted, or _tcsnlen or StringCchLength if the data is untrusted"
         or
-        name.matches("lstrlenA") and replacement = "strlen"
+        name.matches("lstrlenA") and replacement = "strlen if the data is trusted, or strnlen or StringCchLengthA if the data is untrusted"
         or
-        name.matches("lstrlenW") and replacement = "wcslen"
+        name.matches("lstrlenW") and replacement = "wcslen if the data is trusted, or wcsnlen or StringCchLengthW if the data is untrusted"
+      )
+
+      or
+      // Functions marked deprecated in C28727
+      (
+        name.matches("_itow") and replacement = "None"
+        or
+        name.matches("_ultow") and replacement = "None"
+        or
+        name.matches("strtok") and replacement = "None"
+        or
+        name.matches("swscanf") and replacement = "None"
+        or
+        name.matches("wcstok") and replacement = "None"
       )
     )
   }

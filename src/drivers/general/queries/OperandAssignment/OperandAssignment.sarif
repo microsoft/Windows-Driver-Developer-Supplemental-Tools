@@ -1,0 +1,219 @@
+{
+  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
+  "version" : "2.1.0",
+  "runs" : [ {
+    "tool" : {
+      "driver" : {
+        "name" : "CodeQL",
+        "organization" : "GitHub",
+        "semanticVersion" : "2.15.4",
+        "notifications" : [ {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "name" : "cpp/baseline/expected-extracted-files",
+          "shortDescription" : {
+            "text" : "Expected extracted files"
+          },
+          "fullDescription" : {
+            "text" : "Files appearing in the source archive that are expected to be extracted."
+          },
+          "defaultConfiguration" : {
+            "enabled" : true
+          },
+          "properties" : {
+            "tags" : [ "expected-extracted-files", "telemetry" ]
+          }
+        } ],
+        "rules" : [ {
+          "id" : "cpp/drivers/operand-assignment",
+          "name" : "cpp/drivers/operand-assignment",
+          "shortDescription" : {
+            "text" : "Operand Assignment"
+          },
+          "fullDescription" : {
+            "text" : "C28129: An assignment has been made to an operand, which should only be modified using bit sets and clears"
+          },
+          "defaultConfiguration" : {
+            "enabled" : true,
+            "level" : "warning"
+          },
+          "properties" : {
+            "tags" : [ "correctness", "wddst" ],
+            "description" : "C28129: An assignment has been made to an operand, which should only be modified using bit sets and clears",
+            "feature.area" : "Multiple",
+            "id" : "cpp/drivers/operand-assignment",
+            "impact" : "Exploitable Design",
+            "kind" : "problem",
+            "name" : "Operand Assignment",
+            "opaqueid" : "CQLD-D0006",
+            "owner.email" : "sdat@microsoft.com",
+            "platform" : "Desktop",
+            "precision" : "medium",
+            "problem.severity" : "warning",
+            "query-version" : "v1",
+            "repro.text" : "",
+            "scope" : "domainspecific",
+            "security.severity" : "Medium"
+          }
+        } ]
+      },
+      "extensions" : [ {
+        "name" : "microsoft/windows-drivers",
+        "semanticVersion" : "1.0.13+98d928b522fe299c4ef49ba9d67e17d43f15870f",
+        "locations" : [ {
+          "uri" : "file:///C:/codeql-home/WDDST/src/",
+          "description" : {
+            "text" : "The QL pack root directory."
+          }
+        }, {
+          "uri" : "file:///C:/codeql-home/WDDST/src/qlpack.yml",
+          "description" : {
+            "text" : "The QL pack definition file."
+          }
+        } ]
+      } ]
+    },
+    "invocations" : [ {
+      "toolExecutionNotifications" : [ {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/driver_snippet.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 0
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.c",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 1
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      }, {
+        "locations" : [ {
+          "physicalLocation" : {
+            "artifactLocation" : {
+              "uri" : "driver/fail_driver1.h",
+              "uriBaseId" : "%SRCROOT%",
+              "index" : 2
+            }
+          }
+        } ],
+        "message" : {
+          "text" : ""
+        },
+        "level" : "none",
+        "descriptor" : {
+          "id" : "cpp/baseline/expected-extracted-files",
+          "index" : 0
+        },
+        "properties" : {
+          "formattedMessage" : {
+            "text" : ""
+          }
+        }
+      } ],
+      "executionSuccessful" : true
+    } ],
+    "artifacts" : [ {
+      "location" : {
+        "uri" : "driver/driver_snippet.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 0
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.c",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 1
+      }
+    }, {
+      "location" : {
+        "uri" : "driver/fail_driver1.h",
+        "uriBaseId" : "%SRCROOT%",
+        "index" : 2
+      }
+    } ],
+    "results" : [ {
+      "ruleId" : "cpp/drivers/operand-assignment",
+      "ruleIndex" : 0,
+      "rule" : {
+        "id" : "cpp/drivers/operand-assignment",
+        "index" : 0
+      },
+      "message" : {
+        "text" : "An assignment has been made to an operand [Flags](1), which should only be modified using bit sets and clears."
+      },
+      "locations" : [ {
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 14,
+            "startColumn" : 10,
+            "endColumn" : 15
+          }
+        }
+      } ],
+      "partialFingerprints" : {
+        "primaryLocationLineHash" : "62fc3a0be3fd95f4:1",
+        "primaryLocationStartColumnFingerprint" : "5"
+      },
+      "relatedLocations" : [ {
+        "id" : 1,
+        "physicalLocation" : {
+          "artifactLocation" : {
+            "uri" : "driver/driver_snippet.c",
+            "uriBaseId" : "%SRCROOT%",
+            "index" : 0
+          },
+          "region" : {
+            "startLine" : 14,
+            "startColumn" : 10,
+            "endColumn" : 15
+          }
+        },
+        "message" : {
+          "text" : "Flags"
+        }
+      } ]
+    } ],
+    "columnKind" : "utf16CodeUnits",
+    "properties" : {
+      "semmle.formatSpecifier" : "sarifv2.1.0"
+    }
+  } ]
+}
