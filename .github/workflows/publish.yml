@@ -2,7 +2,7 @@
 name: Build and Publish Windows CodeQL queries
 on:
   workflow_dispatch:
-    input:
+    inputs:
       version:
         description: 'CodeQL version to use'
         required: true
