@@ -3,9 +3,8 @@
 
 - description: Recommended and required queries for Windows Drivers.
 - import: windows-driver-suites/mustfix.qls
-- queries: . 
-  from: microsoft/cpp-queries 
-  version: 0.0.4
+- queries: .
+  from: microsoft/windows-drivers
 - include:
     query path: 
       - drivers/general/queries/AnnotationSyntax/AnnotationSyntax.ql
@@ -61,7 +60,7 @@
       - microsoft/Security/Crytpography/HardcodedIVCNG.ql
 - queries: . 
   from: microsoft/cpp-queries 
-  version: 0.0.2
+  version: 0.0.4
 - include:
     query path: 
      - Best Practices/Likely Errors/OffsetUseBeforeRangeCheck.ql
