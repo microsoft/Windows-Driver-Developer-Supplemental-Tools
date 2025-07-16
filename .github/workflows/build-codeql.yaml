@@ -134,7 +134,7 @@ jobs:
         inlineScript: |
           Update-AzConfig -DisplayBreakingChangeWarning $false
           $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
-          Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "health-diffdetailedfunctiontestresults.xlsx" -Context $context
+          Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "health-diffdetailedfunctiontestresults.xlsx" -Context $context -Force
           exit 1 
     
       
@@ -214,7 +214,7 @@ jobs:
         azPSVersion: latest
         inlineScript: |
           $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
-          Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context
+          Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context -Force
           exit 1 
     - name: Save Latest Version
       if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') == '' }} # Only if there were no differences
