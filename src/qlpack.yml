@@ -2,7 +2,7 @@
 # Licensed under the MIT license.
 
 name: microsoft/windows-drivers
-version: 1.7.0
+version: 1.8.0
 dependencies:
     codeql/cpp-all: ^4.2.0
     microsoft/cpp-queries: ^0.0.4

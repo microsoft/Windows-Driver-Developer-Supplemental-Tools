@@ -12,7 +12,6 @@
       - drivers/general/queries/DefaultPoolTag/DefaultPoolTag.ql
       - drivers/general/queries/DriverEntrySaveBuffer/DriverEntrySaveBuffer.ql
       - drivers/general/queries/ExaminedValue/ExaminedValue.ql
-      - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - drivers/general/queries/IRPStackEntryCopy/IRPStackEntryCopy.ql
       - drivers/general/queries/ImportantFunctionCallOptimizedOut/ImportantFunctionCallOptimizedOut.ql
       - drivers/general/queries/ImproperNotOperatorOnZero/ImproperNotOperatorOnZero.ql

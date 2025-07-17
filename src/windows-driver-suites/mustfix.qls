@@ -7,6 +7,7 @@
 - include:
     query path: 
       - drivers/general/queries/WdkDeprecatedApis/wdk-deprecated-api.ql
+      - drivers/general/queries/ExtendedDeprecatedApis/ExtendedDeprecatedApis.ql
       - microsoft/Security/CWE/CWE-704/WcharCharConversionLimited.ql
 - queries: . 
   from: microsoft/cpp-queries 
