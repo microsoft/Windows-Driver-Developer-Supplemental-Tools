@@ -1,0 +1,5 @@
+# Copyright (c) Microsoft Corporation.
+# Licensed under the MIT license.
+
+ - description: The partial mustfix suite is deprecated. Please use the full mustfix suite instead.
+ - import: windows-driver-suites/mustfix.qls
