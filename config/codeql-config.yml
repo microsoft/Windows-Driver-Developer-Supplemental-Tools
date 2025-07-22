@@ -3,7 +3,7 @@ disable-default-queries: true
 
 packs:
   - microsoft/cpp-queries@0.0.2:codeql-suites/cpp-code-scanning.qls
-  - microsoft/windows-drivers@1.5.0-beta+5:windows-driver-suites/recommended.qls
-  - microsoft/windows-drivers@1.5.0-beta+5:drivers\general\queries\experimental\DriverIsolationZwViolation1\DriverIsolationZwViolation1.ql
-  - microsoft/windows-drivers@1.5.0-beta+5:drivers\general\queries\experimental\DriverIsolationZwViolation2\DriverIsolationZwViolation2.ql
-  - microsoft/windows-drivers@1.5.0-beta+5:drivers\general\queries\experimental\DriverIsolationRtlViolation\DriverIsolationRtlViolation.ql
+  - microsoft/windows-drivers@1.x:windows-driver-suites/recommended.qls
+  - microsoft/windows-drivers@1.x:drivers\general\queries\experimental\DriverIsolationZwViolation1\DriverIsolationZwViolation1.ql
+  - microsoft/windows-drivers@1.x:drivers\general\queries\experimental\DriverIsolationZwViolation2\DriverIsolationZwViolation2.ql
+  - microsoft/windows-drivers@1.x:drivers\general\queries\experimental\DriverIsolationRtlViolation\DriverIsolationRtlViolation.ql
