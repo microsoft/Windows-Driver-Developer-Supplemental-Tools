@@ -310,7 +310,14 @@ namespace Microsoft.CodeQL.Core
             if(Directory.Exists(System.IO.Path.Combine(installPath, "codeql")))
             {
                 // If codeql already exists, delete it
-                Directory.Delete(System.IO.Path.Combine(installPath, "codeql"), true);
+                try
+                {
+                    Directory.Delete(System.IO.Path.Combine(installPath, "codeql"), true);
+                }
+                catch(Exception ex)
+                {
+                    throw new Exception("Failed to delete existing CodeQL directory: " + ex.Message, ex);
+                }
             }
 
             if (!Version.TryParse(version, out _))
@@ -340,10 +347,11 @@ namespace Microsoft.CodeQL.Core
         }
 
 
-        public static void CodeQLUpateExePath()
+        public static void CodeQLUpdateExePath()
         {
             CodeQLRunner.UpdateCodeQLExePath( CodeQLGeneralOptions.Instance.CliPath ?? "" );
         }
+
         public static bool CodeQLIsInstalled()
         {
            return CodeQLRunner.IsInstalled();
@@ -432,6 +440,15 @@ namespace Microsoft.CodeQL.Core
             await UpdateDatabaseBuildInfoAsync();
             _taskCompleted.TrySetResult(true);
             return true;
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
+        public string GetCodeQLVersion()
+        {
+           return ThreadHelper.JoinableTaskFactory.Run( async ()=> await CodeQLRunner.Instance.GetCodeQLVersionAsync());
         }
     }
 }

@@ -224,6 +224,25 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
             return false;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        public async Task<string> GetCodeQLVersionAsync()
+        {
+            string output = await RunCodeQLProcAsync("version");
+            output = output.Replace("CodeQL command-line toolchain release", "").Replace(" ", "").Trim();
+            Version currVer;
+            Version.TryParse(output.Split('\r')[0].Trim('.'), out currVer);
+            if(currVer != null)
+            {
+                return currVer.ToString();
+            }
+            else
+            {
+                throw new Exception("Could not get CodeQL version");
+            }
+        }
+
 
         /// <summary>
         /// Installs a CodeQL pack asynchronously.

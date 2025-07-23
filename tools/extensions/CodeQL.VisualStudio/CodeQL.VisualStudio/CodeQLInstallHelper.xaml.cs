@@ -32,6 +32,11 @@ namespace Microsoft.CodeQL.Views
             DataContext = this;
             cliExpander.IsExpanded = true;
             packsExpander.IsExpanded = true;
+            if (CodeQLService.CodeQLIsInstalled())
+            {
+                OverwriteExistingCheckbox.IsEnabled = true;
+                CurrentVersionTextBlock.Text = CodeQLService.Instance.GetCodeQLVersion();
+            }
         }
 
         /// <summary>
@@ -45,16 +50,41 @@ namespace Microsoft.CodeQL.Views
         /// </param>
         private void ButtonInstall_Click(object sender, RoutedEventArgs e)
         {
-            InstallWindow iw = new InstallWindow(version: ___TextBoxVersion_.Text,
-              path: ___TextBoxPath_.Text,
-              addToPath: AddToPathCheckBox.IsChecked ?? false,
-              _languagePacks,
-              PreReleaseCheckBox.IsChecked ?? false);
-            iw.Owner = this;
-            iw.DataContext = this;
-            iw.backgroundWorker.RunWorkerAsync();
-            this.DialogResult = iw.ShowDialog();
-            Close();
+            bool overwrite = OverwriteExistingCheckbox.IsChecked ?? false;
+
+            // install codeql and packs
+            if (!string.IsNullOrEmpty(___TextBoxVersion_.Text) &&
+                (overwrite || CurrentVersionTextBlock.Text == "None" ))
+            {
+                InstallWindow iw = new InstallWindow(
+                  version: ___TextBoxVersion_.Text,
+                  path: ___TextBoxPath_.Text,
+                  addToPath: AddToPathCheckBox.IsChecked ?? false,
+                  _languagePacks,
+                  PreReleaseCheckBox.IsChecked ?? false
+              );
+                iw.Owner = this;
+                iw.DataContext = this;
+                iw.backgroundWorker.RunWorkerAsync();
+                this.DialogResult = iw.ShowDialog();
+                Close();
+            }
+            // just install packs
+            else if(_languagePacks.Count > 0)
+            {
+                InstallWindow iw = new InstallWindow(
+                    _languagePacks
+                );
+                iw.Owner = this;
+                iw.DataContext = this;
+                iw.backgroundWorker.RunWorkerAsync();
+                this.DialogResult = iw.ShowDialog();
+                Close();
+            }
+            else
+            {
+                throw new Exception("No Selection");
+            }
         }
 
 
@@ -97,25 +127,26 @@ namespace Microsoft.CodeQL.Views
         }
         private async Task SetVersionCheckBoxTextAsync()
         {
-            ___TextBoxVersion_.IsEnabled = !UseLatestCheckBox.IsChecked ?? true;
             ___TextBoxVersion_.Text = await GetLatestVersionAsync();
         }
 
+
+        private void UseLatestCheckBox_Unchecked(object sender, RoutedEventArgs e)
+        {
+            ___TextBoxVersion_.IsEnabled = !UseLatestCheckBox.IsChecked ?? true;
+            ___TextBoxVersion_.Text = "";
+        }
+
+
         private void UseLatest_Checked(object sender, RoutedEventArgs e)
         {
+            ___TextBoxVersion_.IsEnabled = !UseLatestCheckBox.IsChecked ?? true;
             _ = SetVersionCheckBoxTextAsync();
         }
 
         private void TextBoxVersion_TextChanged(object sender, TextChangedEventArgs e)
         {
-            if (_languagePacks.Count > 0 && Version.TryParse(___TextBoxVersion_.Text, out _))
-            {
-                buttonInstall.IsEnabled = true;
-            }
-            else
-            {
-                buttonInstall.IsEnabled = false;
-            }
+            UpdateInstallButton();
         }
 
         private void LanguagePack_Checked(object sender, RoutedEventArgs e)
@@ -130,10 +161,33 @@ namespace Microsoft.CodeQL.Views
                 _languagePacks.Remove(checkBox.Content.ToString());
             }
 
-            if (_languagePacks.Count > 0 &&
-                (!string.IsNullOrEmpty(___TextBoxVersion_.Text) || CodeQLService.CodeQLIsInstalled()))
+            UpdateInstallButton();
+        }
+
+        private void OverwriteExisting_Checked(object sender, RoutedEventArgs e)
+        {
+            UpdateInstallButton();
+        }
+
+        private void UpdateInstallButton()
+        {
+            if (_languagePacks.Count > 0 && CodeQLService.CodeQLIsInstalled())
             {
+                // just installing packs
                 buttonInstall.IsEnabled = true;
+            }
+            else if (Version.TryParse(___TextBoxVersion_.Text, out _))
+            {
+                // installing cli, maybe packs
+                bool overwrite = OverwriteExistingCheckbox.IsChecked ?? false;
+                if (overwrite || CurrentVersionTextBlock.Text == "None")
+                {
+                    buttonInstall.IsEnabled = true;
+                }
+                else
+                {
+                    buttonInstall.IsEnabled = false;
+                }
             }
             else
             {
@@ -141,7 +195,7 @@ namespace Microsoft.CodeQL.Views
             }
         }
     }
-   
+
     public partial class CodeQLPackInstallHelper : CodeQLInstallHelper
     {
         public CodeQLPackInstallHelper() : base()

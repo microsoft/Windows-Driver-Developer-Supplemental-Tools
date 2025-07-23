@@ -115,7 +115,7 @@ namespace Microsoft.CodeQL.Core
                     new CommandID(CommandSet, ComboGetListId));
                 commandService.AddCommand(oleCommand);
             }
-            CodeQLService.CodeQLUpateExePath();
+            CodeQLService.CodeQLUpdateExePath();
         }
 
         /// <summary>

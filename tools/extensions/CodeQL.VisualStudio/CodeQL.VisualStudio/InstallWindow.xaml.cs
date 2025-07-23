@@ -26,6 +26,7 @@ namespace Microsoft.CodeQL.Views
         private readonly bool _addToPath;
         private readonly bool _prerelease;
         private readonly HashSet<string> _packs;
+        private readonly bool _overwriteExisting;
 
         public InstallWindow(string version, string path, bool addToPath, HashSet<string> packs, bool prerelease)
         {

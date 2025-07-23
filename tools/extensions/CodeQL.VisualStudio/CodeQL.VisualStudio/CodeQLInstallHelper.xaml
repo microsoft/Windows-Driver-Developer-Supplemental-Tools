@@ -8,16 +8,17 @@
         Title="CodeQL Installer" WindowStyle="ToolWindow" ResizeMode="NoResize" Topmost="True" WindowStartupLocation="CenterScreen" SizeToContent="WidthAndHeight">
     <Grid HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
         <StackPanel Orientation="Vertical" Grid.RowSpan="1" HorizontalAlignment="Stretch" Grid.ColumnSpan="1" >
-            <Expander x:Name="cliExpander" HorizontalAlignment="Left" Header="CodeQL CLI" VerticalAlignment="Stretch" IsExpanded="True" Grid.RowSpan="1" Margin="5,5,5,5">
+            <Expander x:Name="cliExpander" HorizontalAlignment="Left" Header="CodeQL CLI" IsExpanded="True" Grid.RowSpan="1" Margin="5,5,5,5" Height="111">
                 <Grid Background="#FFE5E5E5" VerticalAlignment="Stretch" >
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" MinHeight="30"/>
                         <RowDefinition Height="Auto" MaxHeight="30"/>
+                        <RowDefinition Height="Auto" MaxHeight="30"/>
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "80"/>
-                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "80"/>
-                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "80"/>
+                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "100"/>
+                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "100"/>
+                        <ColumnDefinition Width="Auto" MaxWidth="200" MinWidth = "100"/>
                     </Grid.ColumnDefinitions>
                     <TextBlock TextWrapping="Wrap" Height="16"  Text="Install Path:" Grid.Column="0" HorizontalAlignment="Left" Grid.Row="0"/>
                     <TextBox x:Name="___TextBoxPath_" TextWrapping="Wrap" Text="C:\codeql-home\"  Height="22" Grid.Column="1" HorizontalAlignment="Left" TextAlignment="Left" Grid.Row="0"/>
@@ -29,16 +30,27 @@
                         </CheckBox.ToolTip>
                     </CheckBox>
                     <TextBlock TextWrapping="Wrap" Text="Version:" HorizontalAlignment="Left" Width="44" Height="19" Grid.Column="0" Grid.Row="1"/>
-                    <TextBox x:Name="___TextBoxVersion_" HorizontalAlignment="Left" AutomationProperties.IsRequiredForForm="True" TextWrapping="Wrap" Text="" Width="90" Height="22" TextAlignment="Left" TextChanged="TextBoxVersion_TextChanged" Grid.Column="1" Grid.Row="1"/>
-                    <CheckBox x:Name="UseLatestCheckBox" Content="Use Latest" HorizontalAlignment="Left" Checked="UseLatest_Checked" Grid.Column="2" Grid.Row="1">
+                    <TextBox x:Name="___TextBoxVersion_" HorizontalAlignment="Left" AutomationProperties.IsRequiredForForm="True" TextWrapping="Wrap" Text="" Width="96" Height="22" TextAlignment="Left" TextChanged="TextBoxVersion_TextChanged" Grid.Column="1" Grid.Row="1"/>
+                    <CheckBox x:Name="UseLatestCheckBox" Content="Use Latest" HorizontalAlignment="Left" Checked="UseLatest_Checked" Unchecked="UseLatestCheckBox_Unchecked" Grid.Column="2" Grid.Row="1">
                         <CheckBox.ToolTip>
                             <ToolTip>
                                 <TextBlock Background="Transparent" Text="Use the latest available version of CodeQL CLI"/>
                             </ToolTip>
                         </CheckBox.ToolTip>
                     </CheckBox>
+                    <CheckBox x:Name="OverwriteExistingCheckbox" IsEnabled="False" Content="Overwrite Existing Installation" Checked="OverwriteExisting_Checked" Unchecked="OverwriteExisting_Checked" Height="Auto" Grid.Column="2" Grid.Row="2">
+                        <CheckBox.ToolTip>
+                            <ToolTip>
+                                <TextBlock Background="Transparent" Text="Overwrite the existing CodeQL installation"/>
+                            </ToolTip>
+                        </CheckBox.ToolTip>
+                    </CheckBox>
+                    <TextBlock TextWrapping="Wrap" Text="Existing Version:" HorizontalAlignment="Left" Width="Auto" Grid.Row="2" />
+                    <TextBlock x:Name="CurrentVersionTextBlock" TextWrapping="Wrap" Text="Not Found" HorizontalAlignment="Left" Width="Auto" Grid.Row="2" Grid.Column="1"/>
+
                 </Grid>
             </Expander>
+
             <Expander x:Name="packsExpander" HorizontalAlignment="Left" Header="CodeQL Packs"  VerticalAlignment="Top" Grid.Row ="2" Grid.RowSpan="1" Margin="5,5,5,5">
                 <Grid Background="#FFE5E5E5">
                     <Grid.ColumnDefinitions>
