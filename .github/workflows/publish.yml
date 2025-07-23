@@ -1,12 +1,20 @@
 
-name: Build and Publish Windows CodeQL queries
+name: Publish CodeQL Pack
 on:
   workflow_dispatch:
     inputs:
-      version:
+      codeql-version:
         description: 'CodeQL version to use'
         required: true
         type: string
+      release-type:
+        description: 'Publish as a pre-release'
+        required: false
+        type: choice
+        options:
+          - alpha
+          - beta
+        
 jobs:
   publish:
     runs-on: windows-latest
@@ -26,7 +34,7 @@ jobs:
 
     - name: CodeQL Download
       run:  
-        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ github.event.inputs.version }}/codeql-win64.zip" -OutFile codeql-win64.zip;
+        Invoke-WebRequest -Uri "https://github.com/github/codeql-cli-binaries/releases/download/v${{ github.event.inputs.codeql-version }}/codeql-win64.zip" -OutFile codeql-win64.zip;
         Expand-Archive -Path codeql-win64.zip -DestinationPath .\codeql-zip -Force;
         Move-Item -Path  .\codeql-zip\codeql -Destination .\codeql-cli\
         
@@ -40,5 +48,12 @@ jobs:
       shell: pwsh
       env:
         GITHUB_TOKEN:  ${{ secrets.GITHUB_TOKEN }}
-      run: 
-        .\codeql-cli\codeql.cmd pack publish ./src;
+      run: |
+        if ("${{ github.event.inputs.release-type }}" -ne "") {
+          $version =( Select-String .\src\qlpack.yml -Pattern "version").line;
+          $new_ver = "$version-${{ github.event.inputs.release-type }}";
+          (Get-Content .\src\qlpack.yml).Replace($version, $new_ver) | Set-Content .\src\qlpack.yml;
+          .\codeql-cli\codeql.cmd pack publish --allow-prerelease ./src;
+        } else {
+          .\codeql-cli\codeql.cmd pack publish ./src
+        }
