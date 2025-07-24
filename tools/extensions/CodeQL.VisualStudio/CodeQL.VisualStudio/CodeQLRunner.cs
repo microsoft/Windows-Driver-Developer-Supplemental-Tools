@@ -229,10 +229,9 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         /// </summary>
         public async Task<string> GetCodeQLVersionAsync()
         {
-            string output = await RunCodeQLProcAsync("version");
-            output = output.Replace("CodeQL command-line toolchain release", "").Replace(" ", "").Trim();
+            string output = await RunCodeQLProcAsync("version -q");
             Version currVer;
-            Version.TryParse(output.Split('\r')[0].Trim('.'), out currVer);
+            Version.TryParse(output, out currVer);
             if(currVer != null)
             {
                 return currVer.ToString();
@@ -336,15 +335,25 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         public async Task<List<string>> FindQueriesAsync(List<string> qlpacks, bool queriesNSuites = true)
         {
             var queries = new List<string>();
-
+            Stack<string> packs = new Stack<string>(qlpacks);
             // make async
             var tasks = new List<Task>();
-            foreach (string pack in qlpacks)
+            do
             {
-                tasks.Add(Task.Run(async () => queries.AddRange(await FindQueriesAsync(pack, queriesNSuites))));
+                // Limit sequential tasks to 5
+                if (tasks.Count < 5)
+                {
+                    string pack = packs.Pop();
+                    tasks.Add(Task.Run(async () => queries.AddRange(await FindQueriesAsync(pack, queriesNSuites))));
+                }
+                else
+                {
+                    await Task.WhenAll(tasks);
+                    tasks.Clear();
+                }
             }
-
-            await Task.WhenAll(tasks);
+            while (packs.Count > 0);
+            
             return queries;
         }
 

@@ -58,6 +58,9 @@
     <Compile Include="CodeQLGeneralOptionsPage.cs">
       <SubType>Component</SubType>
     </Compile>
+    <Compile Include="CodeQLQuerySelectorPage.xaml.cs">
+      <DependentUpon>CodeQLQuerySelectorPage.xaml</DependentUpon>
+    </Compile>
     <Compile Include="CodeQLInstallHelper.xaml.cs">
       <DependentUpon>CodeQLInstallHelper.xaml</DependentUpon>
     </Compile>
@@ -189,6 +192,10 @@
   </ItemGroup>
   <ItemGroup>
     <Page Include="CodeQLGeneralOptionsControl.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="CodeQLQuerySelectorPage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>

@@ -349,9 +349,11 @@ namespace Microsoft.CodeQL
             VCProject project = GetVCProject();
             if (project != null)
             {
+                // TODO if no cli-diagnostics, check timestamp of all db files
                 string projectPath = GetProjectDirectory(GetActiveProject());
                 string dbPath = Path.Combine(projectPath, "codeql_db", "diagnostic");
                 List<string> dbFiles = new List<string>(Directory.GetFiles(dbPath, "cli-diagnostics-add-*", SearchOption.TopDirectoryOnly));
+                // could do this with all db files instead of using diagnostic files 
                 var lastBuildTime = dbFiles.Max(file => File.GetLastWriteTimeUtc(file));
                 var sourceFiles = Directory.GetFiles(projectPath, "*.c*", SearchOption.AllDirectories)
                 .Concat(Directory.GetFiles(projectPath, "*.h", SearchOption.AllDirectories));

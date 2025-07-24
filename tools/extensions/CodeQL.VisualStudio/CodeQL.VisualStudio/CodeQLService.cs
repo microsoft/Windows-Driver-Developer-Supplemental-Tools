@@ -13,6 +13,7 @@ using Microsoft.VisualStudio.VSHelp;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -228,7 +229,7 @@ namespace Microsoft.CodeQL.Core
             }
         }
 
-        public async Task<string[]> FindAvailableQueriesAsync()
+        public async Task<ObservableCollection<string>> FindAvailableQueriesAsync()
         {
             List<string> packList = await CodeQLRunner.Instance.FindPacksAsync(CodeQLGeneralOptions.Instance.AdditionalQueryLocations);
             List<string> queryList = await CodeQLRunner.Instance.FindQueriesAsync(packList, queriesNSuites: false);
@@ -245,7 +246,7 @@ namespace Microsoft.CodeQL.Core
                 }
             }
 
-            return _queryDict.Keys.ToArray();
+            return new ObservableCollection<string>(_queryDict.Keys);
         }
 
         public void AddAdditionalQueries(List<string> queries)

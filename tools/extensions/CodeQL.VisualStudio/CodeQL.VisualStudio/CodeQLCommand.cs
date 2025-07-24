@@ -163,7 +163,8 @@ namespace Microsoft.CodeQL.Core
         {
           
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
+            CodeQLQuerySelectorPage codeQLQueryPackSelector = new CodeQLQuerySelectorPage();
+            codeQLQueryPackSelector.ShowDialog();
             var menuCommand = (OleMenuCommand)sender;
             switch (menuCommand.CommandID.ID)
             {
@@ -334,14 +335,7 @@ namespace Microsoft.CodeQL.Core
 
         public async System.Threading.Tasks.Task CodeqlRefreshAvailableQueriesAsync()
         {
-            if (CodeQLService.CodeQLIsInstalled())
-            {
-                _discoveredComboChoices = await CodeQLService.Instance.FindAvailableQueriesAsync();
-                if (_discoveredComboChoices != null && _discoveredComboChoices.Length != 0)
-                {
-                    _currentDropDownComboChoice = _discoveredComboChoices[0];
-                }
-            }
+          
         }
 
         private static InfoBar noCodeQLInfoBar = null;
@@ -371,7 +365,7 @@ namespace Microsoft.CodeQL.Core
                         default);
                 }
             }
-            else if ((await CodeQLService.Instance.FindAvailableQueriesAsync()).Length == 0 )
+            else if ((await CodeQLService.Instance.FindAvailableQueriesAsync()).Count == 0 )
             {
                 if (noCodeQLInfoBar == null)
                 {
