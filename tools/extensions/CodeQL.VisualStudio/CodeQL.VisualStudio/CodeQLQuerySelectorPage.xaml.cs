@@ -23,7 +23,6 @@ namespace Microsoft.CodeQL.Views
     public partial class CodeQLQuerySelectorPage : INotifyPropertyChanged
     {
         private static ObservableCollection<string> _discoveredQueryPacks;
-        public static List<string> SelectedQueries { get; set; }
 
         public ObservableCollection<string> DiscoveredQueryPacks
         {
@@ -65,12 +64,9 @@ namespace Microsoft.CodeQL.Views
             }
             _hasActivated = true;
            
-            if(SelectedQueries != null)
+            if(!string.IsNullOrEmpty(CodeQLService.Instance.SelectedQuery))
             {
-                foreach(var item in SelectedQueries)
-                {
-                    queryListBox.SelectedItems.Add(item);
-                }
+                queryListBox.SelectedItem = CodeQLService.Instance.SelectedQuery;
             }
             if(_discoveredQueryPacks.Count == 0)
             {
@@ -87,11 +83,7 @@ namespace Microsoft.CodeQL.Views
 
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
-            if(SelectedQueries == null)
-            {
-                SelectedQueries = new List<string>();
-            }
-            SelectedQueries = ((System.Collections.IList)queryListBox.SelectedItems).Cast<string>().ToList() ;
+            CodeQLService.Instance.SelectedQuery = queryListBox.SelectedItem as string;
             this.DialogResult = true;
             this.Close();
         }

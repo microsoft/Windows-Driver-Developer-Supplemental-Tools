@@ -53,7 +53,6 @@ namespace Microsoft.CodeQL.Views
             try
             {
                 ThreadHelper.JoinableTaskFactory.Run(() => CodeQLService.Instance.InstallCodeQLPacksAsync(_packs, _prerelease));
-                ThreadHelper.JoinableTaskFactory.Run(() => CodeQLCommand.Instance.CodeqlRefreshAvailableQueriesAsync());
                 e.Result = true; // FIXME Probably a better way to do this
             }
             catch (Exception ex)
@@ -68,7 +67,6 @@ namespace Microsoft.CodeQL.Views
             try
             {
                 ThreadHelper.JoinableTaskFactory.Run(() => CodeQLService.Instance.InstallCodeQLAsync(_version, _path, _addToPath, _packs, _prerelease));
-                ThreadHelper.JoinableTaskFactory.Run(() => CodeQLCommand.Instance.CodeqlRefreshAvailableQueriesAsync());
                 e.Result = true;
             }
             catch (Exception ex)

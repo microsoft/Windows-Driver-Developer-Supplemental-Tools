@@ -17,6 +17,7 @@ using Microsoft.VisualStudio.VCProjectEngine;
 using System.Windows.Documents;
 using System.Collections.Generic;
 using System.Linq;
+using System.Web.Caching;
 
 
 namespace Microsoft.CodeQL
@@ -349,16 +350,26 @@ namespace Microsoft.CodeQL
             VCProject project = GetVCProject();
             if (project != null)
             {
-                // TODO if no cli-diagnostics, check timestamp of all db files
                 string projectPath = GetProjectDirectory(GetActiveProject());
-                string dbPath = Path.Combine(projectPath, "codeql_db", "diagnostic");
-                List<string> dbFiles = new List<string>(Directory.GetFiles(dbPath, "cli-diagnostics-add-*", SearchOption.TopDirectoryOnly));
-                // could do this with all db files instead of using diagnostic files 
-                var lastBuildTime = dbFiles.Max(file => File.GetLastWriteTimeUtc(file));
-                var sourceFiles = Directory.GetFiles(projectPath, "*.c*", SearchOption.AllDirectories)
-                .Concat(Directory.GetFiles(projectPath, "*.h", SearchOption.AllDirectories));
+                string dbPath = Path.Combine(projectPath, "codeql_db");
+                if (!Directory.Exists(dbPath))
+                {
+                    return true;
+                }
+                else
+                {
+                    if (!Directory.Exists(Path.Combine(dbPath, "diagnostic")) ||
+                        Directory.GetFiles(Path.Combine(dbPath, "diagnostic"), "cli-diagnostics-add-*", SearchOption.TopDirectoryOnly).Length == 0)
+                    {
+                        return true;
+                    }
+                    List<string> dbFiles = new List<string>(Directory.GetFiles(dbPath, "cli-diagnostics-add-*", SearchOption.TopDirectoryOnly));
+                    var lastBuildTime = dbFiles.Max(file => File.GetLastWriteTimeUtc(file));
+                    var sourceFiles = Directory.GetFiles(projectPath, "*.c*", SearchOption.AllDirectories)
+                        .Concat(Directory.GetFiles(projectPath, "*.h", SearchOption.AllDirectories));
+                    return sourceFiles.Any(file => File.GetLastWriteTimeUtc(file) > lastBuildTime);
 
-                return sourceFiles.Any(file => File.GetLastWriteTimeUtc(file) > lastBuildTime);
+                }
             }
             return true;
         }

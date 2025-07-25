@@ -69,9 +69,6 @@ namespace Microsoft.CodeQL.Core
         /// </summary>
         private readonly Package package;
 
-        private static string _currentDropDownComboChoice;
-        private static string[] _discoveredComboChoices;
-
         /// <summary>
         /// Initializes a new instance of the <see cref="CodeQLCommand"/> class.
         /// Adds our command handlers for menu (commands must exist in the command table file).
@@ -104,16 +101,6 @@ namespace Microsoft.CodeQL.Core
                     new CommandID(CommandSet, CodeQLInstallerCommandID));
                 commandService.AddCommand(oleCommand);
 
-                // Combo box
-                oleCommand = new OleMenuCommand(
-                    new EventHandler(this.OnMenuMyDropDownCombo),
-                    new CommandID(CommandSet, CodeQLComboId));
-                commandService.AddCommand(oleCommand);
-
-                oleCommand = new OleMenuCommand(
-                    new EventHandler(this.OnMenuMyDropDownComboGetList),
-                    new CommandID(CommandSet, ComboGetListId));
-                commandService.AddCommand(oleCommand);
             }
             CodeQLService.CodeQLUpdateExePath();
         }
@@ -163,8 +150,7 @@ namespace Microsoft.CodeQL.Core
         {
           
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-            CodeQLQuerySelectorPage codeQLQueryPackSelector = new CodeQLQuerySelectorPage();
-            codeQLQueryPackSelector.ShowDialog();
+
             var menuCommand = (OleMenuCommand)sender;
             switch (menuCommand.CommandID.ID)
             {
@@ -179,9 +165,9 @@ namespace Microsoft.CodeQL.Core
                     {
                         throw new Exception("CodeQL already running"); // FIXME
                     }
-                    if (string.IsNullOrEmpty(_currentDropDownComboChoice))
+                    if (string.IsNullOrEmpty(CodeQLService.Instance.SelectedQuery))
                     {
-                        throw new Exception("No query selected");
+                        CodeqlRefreshAvailableQueries();
                     }
                     CodeQLService.Instance.InitTask();
 
@@ -206,10 +192,10 @@ namespace Microsoft.CodeQL.Core
                         && CodeQLService.Instance.IsCodeQLTaskCompleted())
                     {
                         CodeQLService.Instance.InitTask(); // init again since starting a new CodeQL process
-                        Trace.WriteLine($"Starting CodeQL analysis using {_currentDropDownComboChoice}");
+                        Trace.WriteLine($"Starting CodeQL analysis using {CodeQLService.Instance.SelectedQuery}");
                         try
                         {
-                            var sarifResults = await CodeQLService.Instance.RunCodeQLQueryAsync(_currentDropDownComboChoice.Trim());
+                            var sarifResults = await CodeQLService.Instance.RunCodeQLQueryAsync(CodeQLService.Instance.SelectedQuery.Trim());
                             var sarifViewer = new SarifViewerInterop(Package.GetGlobalService(typeof(SVsShell)) as IVsShell);
                             if (false && sarifViewer.IsSariferExtensionInstalled)
                             {
@@ -263,7 +249,8 @@ namespace Microsoft.CodeQL.Core
 
                     break;
                 case CodeQLLoadQueriesCommandId:
-                    await CodeqlRefreshAvailableQueriesAsync();
+                
+                    CodeqlRefreshAvailableQueries();
                     break;
                 case CodeQLComboId:
                     break;
@@ -274,68 +261,10 @@ namespace Microsoft.CodeQL.Core
             }
         }
 
-        private void OnMenuMyDropDownCombo(object sender, EventArgs e)
+        public void CodeqlRefreshAvailableQueries()
         {
-            if (e is OleMenuCmdEventArgs eventArgs)
-            {
-                IntPtr vOut = eventArgs.OutValue;
-                if (vOut != IntPtr.Zero)
-                {
-                    // when vOut is non-NULL, the IDE is requesting the current value for the combo
-                    Marshal.GetNativeVariantForObject(_currentDropDownComboChoice, vOut);
-                }
-                else
-                {
-                    _currentDropDownComboChoice = eventArgs.InValue is string newChoice ? newChoice : throw new ArgumentException("Invalid Selection");
-                }
-            }
-            else
-            {
-                // We should never get here; EventArgs are required.
-                throw new ArgumentException("EventArgs are required"); // force an exception to be thrown
-            }
-        }
-
-
-        private void OnMenuMyDropDownComboGetList(object sender, EventArgs e)
-        {
-            if (e is OleMenuCmdEventArgs eventArgs)
-            {
-                object inParam = eventArgs.InValue;
-                IntPtr vOut = eventArgs.OutValue;
-
-                if (inParam != null)
-                {
-                    throw new ArgumentException("InParamIllegal"); // force an exception to be thrown
-                }
-                else if (vOut != IntPtr.Zero)
-                {
-                    _discoveredComboChoices = CodeQLService.Instance.AvailableQueries.ToArray();
-                    if (_discoveredComboChoices == null)
-                    {
-                        _ = ThreadHelper.JoinableTaskFactory.RunAsync(async () => await CodeqlRefreshAvailableQueriesAsync());
-                    }
-
-                    if (!_discoveredComboChoices.Contains(_currentDropDownComboChoice))
-                    {
-                        _currentDropDownComboChoice = _discoveredComboChoices[0];
-                    }
-                    Marshal.GetNativeVariantForObject(_discoveredComboChoices, vOut);
-                }
-                else
-                {
-                    throw new ArgumentException("OutParamRequired"); // force an exception to be thrown
-                }
-            }
-            else
-            {
-                throw new ArgumentException("InParamIllegal"); // force an exception to be thrown
-            }
-        }
-
-        public async System.Threading.Tasks.Task CodeqlRefreshAvailableQueriesAsync()
-        {
-          
+            CodeQLQuerySelectorPage codeQLQueryPackSelector = new CodeQLQuerySelectorPage();
+            codeQLQueryPackSelector.ShowDialog();
         }
 
         private static InfoBar noCodeQLInfoBar = null;
@@ -392,7 +321,6 @@ namespace Microsoft.CodeQL.Core
             {
                 await noCodeQLInfoBar.ShowAsync();
             }
-            await CodeQLCommand.Instance.CodeqlRefreshAvailableQueriesAsync();
         }
     }
 }

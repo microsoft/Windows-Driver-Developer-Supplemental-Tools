@@ -71,19 +71,22 @@ namespace Microsoft.CodeQL.Core
         /// <summary>
         /// Dictionary of query names to be displayed in the UI, and their full path.
         /// </summary>  
-        private readonly Dictionary<string, string> _queryDict;
-        public List<string> AvailableQueries 
-        { 
-            get 
-            {
-                if (_queryDict != null)
-                {
-                    return _queryDict.Keys.ToList();
-                }
-                return new List<string>();
-            }
-            set { }
-        }
+        private Dictionary<string, string> _queryDict;
+        //public List<string> AvailableQueries 
+        //{ 
+        //    get 
+        //    {
+        //        if (_queryDict != null)
+        //        {
+        //            return _queryDict.Keys.ToList();
+        //        }
+        //        return new List<string>();
+        //    }
+        //    set {  }
+        //}
+
+        public string SelectedQuery { get; set; }
+
 
         public void UpdateBuildInfo(string buildGuid, string projectName = null)
         {
@@ -419,7 +422,7 @@ namespace Microsoft.CodeQL.Core
 
                 arch = config.PlatformName;
                 configName = config.ConfigurationName;
-                projectName = activeProject.UniqueName;
+                projectName = Path.GetFileName(activeProject.UniqueName);
                 string projectDir = ProjectHelper.GetProjectDirectory(activeProject);
                 string startCommand = "\"" + Path.Combine(ProjectHelper.GetVisualStudioFolder(), @"VC\Auxiliary\Build\vcvarsall.bat") + "\" " + arch + " && cd /d \"" + projectDir + "\" &&";
 

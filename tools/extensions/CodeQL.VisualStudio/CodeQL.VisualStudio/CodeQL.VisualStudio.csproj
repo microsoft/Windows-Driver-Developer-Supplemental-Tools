@@ -151,29 +151,13 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="icon.png" />
-    <Content Include="Icons\Annotate_Default.ico" />
-    <Content Include="Icons\Annotate_Error.ico" />
-    <Content Include="Icons\Annotate_Help.ico" />
-    <Content Include="Icons\Annotate_info.ico" />
-    <Content Include="Icons\Annotate_Warning.ico" />
-    <Content Include="Icons\certificate.bmp" />
-    <Content Include="Icons\certificate.png" />
-    <Content Include="Icons\CodeQL.png" />
-    <Content Include="Icons\db.ico" />
-    <Content Include="Icons\db.png" />
-    <Content Include="Icons\delete.ico" />
-    <Content Include="Icons\delete.png" />
-    <Content Include="Icons\Gear.ico" />
-    <Content Include="Icons\Images_32bit.bmp" />
-    <Content Include="Icons\Images_32bit.png" />
-    <Content Include="Icons\magnify.ico" />
-    <Content Include="Icons\MenuItemsImages.png" />
-    <Content Include="Icons\rec.png" />
-    <Content Include="Icons\refresh.ico" />
-    <Content Include="Icons\sdv.ico" />
-    <Content Include="Icons\task.png" />
-    <Content Include="Icons\ToolWindow1Command.png" />
-    <Content Include="Icons\zoom.png" />
+    <Resource Include="Icons\db.ico" />
+    <Resource Include="Icons\Gear.ico" />
+    <Resource Include="Icons\magnify.ico" />
+    <Resource Include="Icons\refresh.ico" />
+    <Resource Include="Icons\stop.ico" />
+    <Resource Include="Icons\analyze.ico" />
+    <Resource Include="Icons\select.ico" />
     <Content Include="License.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
       <IncludeInVSIX>true</IncludeInVSIX>

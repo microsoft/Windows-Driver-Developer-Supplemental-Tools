@@ -93,7 +93,7 @@
 
 	    <Button guid="guidCodeQLCmdSet" id="cmdidCodeQLAnalyzeCommand" priority="0x0101" type="Button">
 			<Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" />
-			<Icon guid="CodeQLIcons" id="CodeQLIconAnalyze" />
+			<Icon guid="IconAnalyze" id="IconAnalyze16" />
 	        <Strings>
 		        <CommandName>cmdidCodeQLAnalyzeCommand</CommandName>
 		        <ButtonText>Run Selected CodeQL Queries</ButtonText>
@@ -107,15 +107,15 @@
 			<Icon guid="IconRefresh" id="IconRefresh16" />
 		    <Strings>
 			    <CommandName>cmdiCodeQLLoadQueriesCommand</CommandName>
-			    <ButtonText>Select Available Queries</ButtonText>
-			    <MenuText>Select Available Queries</MenuText>
+			    <ButtonText>Select Available Query</ButtonText>
+			    <MenuText>Select Available Query</MenuText>
 			    <ToolTipText>Search for all locally available queries and select which to run</ToolTipText>
 		    </Strings>
 	    </Button>
 		
 		<Button guid="guidCodeQLCmdSet" id="cmdidInstallPacksCommand" priority="0x0123" type="Button">
 			<Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" />
-			<Icon guid="IconGear" id="IconGear16" />
+			<Icon guid="IconGear" id="IconGear48" />
 			<Strings>
 				<CommandName>cmdidInstallPacksCommand</CommandName>
 				<ButtonText>Launch CodeQL Installer</ButtonText>
@@ -126,7 +126,7 @@
 		
 		<Button guid="guidCodeQLCmdSet" id="cmdidCodeQLStopCommand" priority="0x0133" type="Button">
 			<Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" />
-			<Icon guid="CodeQLIcons" id="CodeQLIconTrash" />
+			<Icon guid="IconStop" id="IconStop16" />
 			<Strings>
 				<CommandName>cmdidCodeQLStopCommand</CommandName>
 				<ButtonText>Stop CodeQL Process</ButtonText>
@@ -138,7 +138,7 @@
 		<!-- Add to toolbar -->
 	    <Button guid="guidCodeQLCmdSet" id="cmdidCodeQLAnalyzeCommand" priority="0x0001" type="Button">
 		    <Parent guid="guidCodeQLCmdSet" id="CodeQLToolbarGroup" />
-		    <Icon guid="CodeQLIcons" id="CodeQLIconAnalyze" />
+		    <Icon guid="IconAnalyze" id="IconAnalyze16" />
 		    <Strings>
 			    <CommandName>cmdidCodeQLAnalyzeCommand</CommandName>
 			    <ButtonText>Run Selected CodeQL Suites</ButtonText>
@@ -147,7 +147,7 @@
 	    </Button>
 		<Button guid="guidCodeQLCmdSet" id="cmdiCodeQLLoadQueriesCommand" priority="0x0132" type="Button">
 			<Parent guid="guidCodeQLCmdSet" id="CodeQLToolbarGroup" />
-			<Icon guid="CodeQLIcons" id="CodeQLIconTrash" />
+			<Icon guid="IconSelect" id="IconSelect16" />
 			<Strings>
 				<CommandName>cmdiCodeQLLoadQueriesCommand</CommandName>
 				<ButtonText>Select Available Queries</ButtonText>
@@ -157,7 +157,7 @@
 		</Button>
 		<Button guid="guidCodeQLCmdSet" id="cmdidCodeQLStopCommand" priority="0x0133" type="Button">
 			<Parent guid="guidCodeQLCmdSet" id="CodeQLToolbarGroup" />
-			<Icon guid="CodeQLIcons" id="CodeQLIconTrash" />
+			<Icon guid="IconStop" id="IconStop16" />
 			<Strings>
 				<CommandName>cmdidCodeQLStopCommand</CommandName>
 				<ButtonText>Stop CodeQL Process</ButtonText>
@@ -174,10 +174,11 @@
         bitmap strip containing the bitmaps and then there are the numeric ids of the elements used 
         inside a button definition. An important aspect of this declaration is that the element id 
         must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
-		<Bitmap guid="CodeQLIcons" href="Icons\MenuItemsImages.png" usedList="CodeQLIconLogo, CodeQLIconRecommended, CodeQLIconAnalyze, CodeQLIconTrash, CodeQLIconDB"/>
-		<Bitmap guid="IconRefresh" href="Icons\refresh.ico" usedList="IconRefresh16"/>
-		<Bitmap guid="IconGear" href="Icons\Gear.ico" usedList="IconGear16"/>
-		<Bitmap guid="IconLogo" href="Icons\certificate.png" usedList="IconLogo32"/>
+		<Bitmap guid="IconAnalyze" href="Icons\\analyze.ico" usedList="IconAnalyze16"/>
+		<Bitmap guid="IconRefresh" href="Icons\\refresh.ico" usedList="IconRefresh16"/>
+		<Bitmap guid="IconStop" href="Icons\\stop.ico" usedList="IconStop16"/>
+		<Bitmap guid="IconSelect" href="Icons\\select.ico" usedList="IconSelect16"/>
+		<Bitmap guid="IconGear" href="Icons\\Gear.ico" usedList="IconGear48"/>
 	</Bitmaps>
   </Commands>
 
@@ -206,24 +207,24 @@
 		  <IDSymbol name="cmdidComboGetList" value="0x156"/>
 	  </GuidSymbol>
 
-	  <GuidSymbol name="CodeQLIcons" value="{382D3738-A38D-44C0-AE70-FD8D9A6CA1D1}" >
-		  <IDSymbol name="CodeQLIconLogo" value="1" />
-		  <IDSymbol name="CodeQLIconRecommended" value="2" />
-		  <IDSymbol name="CodeQLIconAnalyze" value="3" />
-		  <IDSymbol name="CodeQLIconTrash" value="4" />
-		  <IDSymbol name="CodeQLIconDB" value="5" />
+	  <GuidSymbol name="IconAnalyze" value="{382D3738-A38D-44C0-AE70-FD8D9A6CA1D1}" >
+		  <IDSymbol name="IconAnalyze16" value="1" />
 	  </GuidSymbol>
 
 	  <GuidSymbol name="IconRefresh" value="{FFA9D4AC-7B75-4117-AB06-D3D38E3B4388}">
 		  <IDSymbol name="IconRefresh16" value="1"/>
 	  </GuidSymbol>
-
+	  
+	  <GuidSymbol name="IconStop" value="{7A6F12D2-D2BE-47FD-8B42-BDE56E0C03ED}">
+		  <IDSymbol name="IconStop16" value="1"/>
+	  </GuidSymbol>
+	  
 	  <GuidSymbol name="IconGear" value="{EE95FC9F-315C-40A0-9C78-0E48AB902F26}">
-		  <IDSymbol name="IconGear16" value="1"/>
+		  <IDSymbol name="IconGear48" value="1"/>
 	  </GuidSymbol>
 
-	  <GuidSymbol name="IconLogo" value="{77AA009B-B550-4D30-B48B-76BEEAB45C5F}">
-		  <IDSymbol name="IconLogo32" value="1"/>
+	  <GuidSymbol name="IconSelect" value="{5B212651-2B2E-4E69-8240-903EAD39B960}">
+		  <IDSymbol name="IconSelect16" value="1"/>
 	  </GuidSymbol>
   </Symbols>
 </CommandTable>
