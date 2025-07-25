@@ -13,9 +13,9 @@
                     <ColumnDefinition Width="Auto" />
                     <ColumnDefinition Width="Auto" />
                 </Grid.ColumnDefinitions>
-                <Button Content="OK" Height="22" Width="71" Margin="200,178,98,10" Click="ButtonOK_Click"/>
-                <Button Content="Cancel" Height="22" Width="71" Margin="276,178,22,10" Click="ButtonCancel_Click"/>
-                <Button Content="Refresh" Height="22" Width="71" Click="ButtonRefresh_Click" Margin="10,178,288,10"/>
+                <Button Content="OK" Height="22" Width="71" Margin="200,178,98,10"  HorizontalAlignment="Right" Click="ButtonOK_Click"/>
+                <Button Content="Cancel" Height="22" Width="71" Margin="276,178,22,10" HorizontalAlignment="Right" Click="ButtonCancel_Click"/>
+                <Button Content="Refresh" Height="22" Click="ButtonRefresh_Click" Margin="10,178,0,10" HorizontalAlignment="Left" Width="71"/>
                 <ListBox x:Name="queryListBox" ItemsSource="{Binding DiscoveredQueryPacks, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" SelectionMode="Multiple" 
                          SelectionChanged="ListBox_SelectionChanged" Margin="10,0,10,40" HorizontalAlignment="Stretch" Visibility="Visible"/>
                 <ProgressBar x:Name="RefreshBar" HorizontalAlignment="Left" Height="16" Margin="86,181,0,0" VerticalAlignment="Top" Width="78" IsIndeterminate="True" Visibility="Hidden"/>
