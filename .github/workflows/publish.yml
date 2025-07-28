@@ -8,12 +8,9 @@ on:
         required: true
         type: string
       release-type:
-        description: 'Publish as a pre-release'
+        description: 'Publish with pre-release version'
         required: false
-        type: choice
-        options:
-          - alpha
-          - beta
+        type: string
         
 jobs:
   publish:
