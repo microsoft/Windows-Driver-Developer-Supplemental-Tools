@@ -22,7 +22,7 @@ namespace Microsoft.CodeQL.Views
     /// </summary>
     public partial class CodeQLQuerySelectorPage : INotifyPropertyChanged
     {
-        private static ObservableCollection<string> _discoveredQueryPacks;
+        private static ObservableCollection<string> _discoveredQueryPacks = new ObservableCollection<string>();
 
         public ObservableCollection<string> DiscoveredQueryPacks
         {
@@ -40,8 +40,6 @@ namespace Microsoft.CodeQL.Views
         bool _hasActivated = false;
         public CodeQLQuerySelectorPage()
         {
-            _discoveredQueryPacks = new ObservableCollection<string>();
-            DiscoveredQueryPacks = new ObservableCollection<string>();
             Owner = Application.Current.MainWindow;
             InitializeComponent();
             DataContext = this;
@@ -95,6 +93,7 @@ namespace Microsoft.CodeQL.Views
         }
         private void ButtonRefresh_Click(object sender, RoutedEventArgs e)
         {
+            _discoveredQueryPacks = new ObservableCollection<string>();
             LoadAvailableQueriesAsync().FileAndForget("Microsoft/SARIF/Viewer/CodeQL/Failed");
         }
 
@@ -102,9 +101,12 @@ namespace Microsoft.CodeQL.Views
         {
             if (CodeQLService.CodeQLIsInstalled())
             {
-                RefreshBar.Visibility = Visibility.Visible;
-                DiscoveredQueryPacks = await CodeQLService.Instance.FindAvailableQueriesAsync();
-                RefreshBar.Visibility = Visibility.Hidden;
+                if(_discoveredQueryPacks.Count == 0)
+                {
+                    RefreshBar.Visibility = Visibility.Visible;
+                    DiscoveredQueryPacks = await CodeQLService.Instance.FindAvailableQueriesAsync();
+                    RefreshBar.Visibility = Visibility.Hidden;
+                }
             }
         }
     }
