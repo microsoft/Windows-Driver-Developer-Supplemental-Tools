@@ -63,27 +63,7 @@ namespace Microsoft.CodeQL.Core
 
         }
 
-      
-
-
         private BuildInfo _buildInfo;
-
-        /// <summary>
-        /// Dictionary of query names to be displayed in the UI, and their full path.
-        /// </summary>  
-        private Dictionary<string, string> _queryDict;
-        //public List<string> AvailableQueries 
-        //{ 
-        //    get 
-        //    {
-        //        if (_queryDict != null)
-        //        {
-        //            return _queryDict.Keys.ToList();
-        //        }
-        //        return new List<string>();
-        //    }
-        //    set {  }
-        //}
 
         public string SelectedQuery { get; set; }
 
@@ -136,7 +116,6 @@ namespace Microsoft.CodeQL.Core
         {
             _taskCompleted = null;
             _cancelToken = null;
-            _queryDict = new Dictionary<string, string>();
             _buildInfo = new BuildInfo();
         }
 
@@ -275,10 +254,6 @@ namespace Microsoft.CodeQL.Core
 
         public async System.Threading.Tasks.Task<string> RunCodeQLQueryAsync(string query)
         {
-            if (!_queryDict.TryGetValue(query, out string querySet)) 
-            {
-                throw new ArgumentException("Query file does not exist: " + query);
-            }
 
             await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
             string visualStudioShellPath = ProjectHelper.GetVisualStudioFolder();
@@ -289,14 +264,14 @@ namespace Microsoft.CodeQL.Core
             string startCommand = "\"" + Path.Combine(visualStudioShellPath, @"VC\Auxiliary\Build\vcvarsall.bat") + "\" " + projectArch + " && cd /d \"" + projectDirectory + "\" &&";
 
             List<string> queriesList;
-            if (querySet.EndsWith(".qls") || querySet.EndsWith("ql"))
+            if (query.EndsWith(".qls") || query.EndsWith("ql"))
             {
-                queriesList = File.Exists(querySet)
-                    ? new List<string>() { querySet }
-                    : throw new ArgumentException("Query file does not exist: " + querySet);
+                queriesList = File.Exists(query)
+                    ? new List<string>() { query }
+                    : throw new ArgumentException("Query file does not exist: " + query);
             }
             await ProjectHelper.ShowProgressAsync("Analyzing CodeQL Database...");
-            string sarifResults = await CodeQLRunner.Instance.RunCodeQLQuerySetAsync(querySet, _cancelToken.Token, 
+            string sarifResults = await CodeQLRunner.Instance.RunCodeQLQuerySetAsync(query, _cancelToken.Token, 
                 ram: CodeQLGeneralOptions.Instance.MemoryUsage, 
                 threads: CodeQLGeneralOptions.Instance.Threads, 
                 additionalSearchPath: CodeQLGeneralOptions.Instance.AdditionalQueryLocations);
@@ -314,19 +289,13 @@ namespace Microsoft.CodeQL.Core
         {
             await ProjectHelper.ShowProgressAsync("Generating CodeQL Database...");
             // don't need to create again if the project is clean and a database exists. 
-        
-            if(!(await ProjectHelper.IsProjectDirtyAsync()) && _buildInfo.BuildGuid.Equals((await GetDatabaseBuildGuidAsync())))
-            {
-                _taskCompleted.TrySetResult(true);
-                return true;
-            }
+          
             string arch = "";
             string configName = "";
             string projectName = "";
             await ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
             {
                 await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-
                 await ProjectHelper.BuildProjectAsync();
                 // TODO check if build failed 
                 Project activeProject = ProjectHelper.GetActiveProject();
@@ -340,20 +309,23 @@ namespace Microsoft.CodeQL.Core
 
                 CodeQLRunner.Instance.Initialize(projectDir, startCommand, CodeQLOutput);
             });
-            string buildCmd = string.Empty;
-            if (!string.IsNullOrWhiteSpace(CodeQLGeneralOptions.Instance.CustomBuildCommand))
+
+            if (await ProjectHelper.IsProjectDirtyAsync())
             {
-                buildCmd = CodeQLGeneralOptions.Instance.CustomBuildCommand;
+                // TODO check build guid //  _buildInfo.BuildGuid.Equals((await GetDatabaseBuildGuidAsync()))
+                string buildCmd = string.Empty;
+                if (!string.IsNullOrWhiteSpace(CodeQLGeneralOptions.Instance.CustomBuildCommand))
+                {
+                    buildCmd = CodeQLGeneralOptions.Instance.CustomBuildCommand;
+                }
+                else
+                {
+                    buildCmd = "msbuild " + projectName + " /t:rebuild /p:Configuration=" + configName + " /p:Platform=" + arch;
+                }
+
+                await CodeQLRunner.Instance.GenerateDatabaseAsync(buildCmd, _cancelToken.Token, ram: CodeQLGeneralOptions.Instance.MemoryUsage, threads: CodeQLGeneralOptions.Instance.Threads);
+                await UpdateDatabaseBuildInfoAsync();
             }
-            else
-            {
-                buildCmd = "msbuild " + projectName + " /t:rebuild /p:Configuration=" + configName + " /p:Platform=" + arch;
-            }
-
-
-            await CodeQLRunner.Instance.GenerateDatabaseAsync(buildCmd, _cancelToken.Token, ram: CodeQLGeneralOptions.Instance.MemoryUsage, threads: CodeQLGeneralOptions.Instance.Threads);
-
-            await UpdateDatabaseBuildInfoAsync();
             _taskCompleted.TrySetResult(true);
             return true;
         }

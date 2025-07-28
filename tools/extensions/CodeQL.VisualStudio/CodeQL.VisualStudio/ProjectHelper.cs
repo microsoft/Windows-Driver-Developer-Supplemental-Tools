@@ -363,7 +363,7 @@ namespace Microsoft.CodeQL
                     {
                         return true;
                     }
-                    List<string> dbFiles = new List<string>(Directory.GetFiles(dbPath, "cli-diagnostics-add-*", SearchOption.TopDirectoryOnly));
+                    List<string> dbFiles = new List<string>(Directory.GetFiles(Path.Combine(dbPath, "diagnostic"), "cli-diagnostics-add-*", SearchOption.TopDirectoryOnly));
                     var lastBuildTime = dbFiles.Max(file => File.GetLastWriteTimeUtc(file));
                     var sourceFiles = Directory.GetFiles(projectPath, "*.c*", SearchOption.AllDirectories)
                         .Concat(Directory.GetFiles(projectPath, "*.h", SearchOption.AllDirectories));

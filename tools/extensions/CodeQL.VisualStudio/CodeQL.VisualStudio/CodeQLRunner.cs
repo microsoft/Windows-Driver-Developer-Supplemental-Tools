@@ -1,6 +1,7 @@
 // Copyright (c) Microsoft. All rights reserved.
 // Licensed under the MIT license. See LICENSE file in the project root for full license information.
 
+using Microsoft.CodeAnalysis.Sarif;
 using Microsoft.VisualStudio.CodeAnalysis.CodeQL.Exceptions;
 using Microsoft.VisualStudio.Shell;
 using Newtonsoft.Json.Linq;
@@ -43,7 +44,18 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         /// <summary>
         /// Gets or sets where the databases will be placed.
         /// </summary>
-        public string DatabaseDirectory { get; set; }
+        public string DatabaseDirectory 
+        {
+            get
+            {
+                if(string.IsNullOrEmpty(AnalysisDirectory))
+                {
+                    throw new Exception("Analysis directory not set");
+                }
+                return Path.Combine(AnalysisDirectory, "codeql_db");
+            }
+            set { }
+        }
 
         /// <summary>
         /// Gets or sets where codeql will be installed.
@@ -53,7 +65,10 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         /// <summary>
         /// Directory where analysis is being performed.
         /// </summary>
-        private string analysisDir;
+        public string AnalysisDirectory
+        {
+            get; set;
+        }
 
         /// <summary>
         /// Optional output windows pane.
@@ -155,12 +170,14 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
 
         public void Initialize(string sourceDir = "", string buildEnv = "", Action<string> outputFunc = null)
         {
-            analysisDir = sourceDir;
-            DatabaseDirectory = Path.Combine(analysisDir, "codeql_db");
-
-            if (!Directory.Exists(analysisDir))
+            if(!string.IsNullOrEmpty(sourceDir))
             {
-                throw new Exception("Analysis directory does not exist: " + analysisDir);
+                AnalysisDirectory = sourceDir;
+            }
+
+            if (!Directory.Exists(AnalysisDirectory))
+            {
+                throw new Exception("Analysis directory does not exist: " + AnalysisDirectory);
             }
             this.outputFunc = outputFunc;
             this.buildEnv = buildEnv;
@@ -378,7 +395,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                     string query = line.Replace("\"", string.Empty).Replace("\\\\", "/").Replace("\\", "/").Trim(',').Trim();
                     if (!IsExclusion(query))
                     {
-                        queries.Add(query.Substring(query.IndexOf("packages"))); // display packages from root of pack, not from root of filesystem
+                        queries.Add(query);
                     }
                 }
             }
@@ -494,7 +511,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         /// <exception cref="Exception"> Exception </exception>
         public async Task<int> CountDBSourceCodeLinesAsync()
         {
-            string output = await RunCodeQLProcAsync("database print-baseline codeql_db", workingDir: analysisDir);
+            string output = await RunCodeQLProcAsync("database print-baseline codeql_db", workingDir: AnalysisDirectory);
             foreach (string line in output.Split(Environment.NewLine.ToCharArray()[0]))
             {
                 if (line.EndsWith("cpp."))
@@ -531,7 +548,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                 {
                     throw new ArgumentException("Invalid severity level. Use 'error', 'warning', or 'note'.");
                 }
-                _ = await RunCodeQLProcAsync("database add-diagnostic --plaintext-message=\"" + message + "\" --source-id=" + sourceId.ToString() + " --source-name=CodeqlVSExt" + " --severity=" + severity + " codeql_db", workingDir: analysisDir);
+                _ = await RunCodeQLProcAsync("database add-diagnostic --plaintext-message=\"" + message + "\" --source-id=" + sourceId.ToString() + " --source-name=CodeqlVSExt" + " --severity=" + severity + " codeql_db", workingDir: AnalysisDirectory);
             }
             catch (Exception ex)
             {
@@ -545,7 +562,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
         /// <returns>A <see cref="Task"/> representing the asynchronous operation.</returns>
         public async Task<string> GetDBDiagAsync()
         {
-            return await RunCodeQLProcAsync("database export-diagnostics .\\codeql_db\\ --format=raw", workingDir: analysisDir);
+            return await RunCodeQLProcAsync("database export-diagnostics .\\codeql_db\\ --format=raw", workingDir: AnalysisDirectory);
         }
 
         /// <summary>
@@ -646,7 +663,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
             }
 
             string strCmdText = string.Empty;
-            string dbPath = System.IO.Path.Combine(analysisDir, "codeql_db");
+            string dbPath = System.IO.Path.Combine(AnalysisDirectory, "codeql_db");
             string useThreads = string.IsNullOrWhiteSpace(threads) ? "" : " --threads=" + threads + " ";
             string useRam = string.IsNullOrWhiteSpace(ram) ? "" : " --ram=" + ram + " " ;
 
@@ -656,7 +673,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                 "create", "\"" + dbPath + "\"",
                 "--force-overwrite",
                 "--language=cpp",
-                "--source-root=" + "\"" + analysisDir + "\"",
+                "--source-root=" + "\"" + AnalysisDirectory + "\"",
                 "--command=" + "\"" + buildCommand + "\"",
                 useThreads,
                 useRam
@@ -692,7 +709,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                 proccessExitedFunc = ProcessExited;
             }
 
-            string dbPath = Path.Combine(analysisDir, "codeql_db");
+            string dbPath = Path.Combine(AnalysisDirectory, "codeql_db");
             if (!Directory.Exists(dbPath))
             {
                 throw new DatabaseNotFinalizedException("Database not created");
@@ -706,7 +723,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                 }
             }
 
-            string resultsDir = Path.Combine(analysisDir, ".sarif");
+            string resultsDir = Path.Combine(AnalysisDirectory, ".sarif");
             if (!Directory.Exists(resultsDir))
             {
                 _ = Directory.CreateDirectory(resultsDir);

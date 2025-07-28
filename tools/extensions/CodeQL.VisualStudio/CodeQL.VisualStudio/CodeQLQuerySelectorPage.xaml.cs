@@ -84,6 +84,7 @@ namespace Microsoft.CodeQL.Views
         private void ButtonOK_Click(object sender, RoutedEventArgs e)
         {
             CodeQLService.Instance.SelectedQuery = queryListBox.SelectedItem as string;
+
             this.DialogResult = true;
             this.Close();
         }
