@@ -378,7 +378,7 @@ namespace Microsoft.VisualStudio.CodeAnalysis.CodeQL.Runner
                     string query = line.Replace("\"", string.Empty).Replace("\\\\", "/").Replace("\\", "/").Trim(',').Trim();
                     if (!IsExclusion(query))
                     {
-                        queries.Add(query);
+                        queries.Add(query.Substring(query.IndexOf("packages"))); // display packages from root of pack, not from root of filesystem
                     }
                 }
             }

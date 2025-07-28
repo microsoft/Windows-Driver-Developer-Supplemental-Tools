@@ -153,8 +153,6 @@
     <Content Include="icon.png" />
     <Resource Include="Icons\db.ico" />
     <Resource Include="Icons\Gear.ico" />
-    <Resource Include="Icons\magnify.ico" />
-    <Resource Include="Icons\refresh.ico" />
     <Resource Include="Icons\stop.ico" />
     <Resource Include="Icons\analyze.ico" />
     <Resource Include="Icons\select.ico" />

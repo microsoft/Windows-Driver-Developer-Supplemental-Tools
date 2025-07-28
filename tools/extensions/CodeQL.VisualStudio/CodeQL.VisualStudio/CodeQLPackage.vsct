@@ -104,12 +104,12 @@
      
 	    <Button guid="guidCodeQLCmdSet" id="cmdiCodeQLLoadQueriesCommand" priority="0x0122" type="Button">
 			<Parent guid="guidCodeQLCmdSet" id="CodeQLSubMenuGroup" />
-			<Icon guid="IconRefresh" id="IconRefresh16" />
+			<Icon guid="IconSelect" id="IconSelect16" />
 		    <Strings>
 			    <CommandName>cmdiCodeQLLoadQueriesCommand</CommandName>
-			    <ButtonText>Select Available Query</ButtonText>
-			    <MenuText>Select Available Query</MenuText>
-			    <ToolTipText>Search for all locally available queries and select which to run</ToolTipText>
+			    <ButtonText>Select Available CodeQL Query Suites</ButtonText>
+			    <MenuText>Select Available CodeQL Query Suites</MenuText>
+			    <ToolTipText>Search for all locally available CodeQL query suites and select which to run</ToolTipText>
 		    </Strings>
 	    </Button>
 		
@@ -150,9 +150,9 @@
 			<Icon guid="IconSelect" id="IconSelect16" />
 			<Strings>
 				<CommandName>cmdiCodeQLLoadQueriesCommand</CommandName>
-				<ButtonText>Select Available Queries</ButtonText>
-				<MenuText>Select Available Queries</MenuText>
-				<ToolTipText>Select locally available queries to run</ToolTipText>
+				<ButtonText>Select Available CodeQL Suites</ButtonText>
+				<MenuText>Select Available CodeQL Suites</MenuText>
+				<ToolTipText>Select Locally Available CodeQL Query Suites to Run</ToolTipText>
 			</Strings>
 		</Button>
 		<Button guid="guidCodeQLCmdSet" id="cmdidCodeQLStopCommand" priority="0x0133" type="Button">
@@ -175,7 +175,6 @@
         inside a button definition. An important aspect of this declaration is that the element id 
         must be the actual index (1-based) of the bitmap inside the bitmap strip. -->
 		<Bitmap guid="IconAnalyze" href="Icons\\analyze.ico" usedList="IconAnalyze16"/>
-		<Bitmap guid="IconRefresh" href="Icons\\refresh.ico" usedList="IconRefresh16"/>
 		<Bitmap guid="IconStop" href="Icons\\stop.ico" usedList="IconStop16"/>
 		<Bitmap guid="IconSelect" href="Icons\\select.ico" usedList="IconSelect16"/>
 		<Bitmap guid="IconGear" href="Icons\\Gear.ico" usedList="IconGear48"/>
@@ -211,10 +210,6 @@
 		  <IDSymbol name="IconAnalyze16" value="1" />
 	  </GuidSymbol>
 
-	  <GuidSymbol name="IconRefresh" value="{FFA9D4AC-7B75-4117-AB06-D3D38E3B4388}">
-		  <IDSymbol name="IconRefresh16" value="1"/>
-	  </GuidSymbol>
-	  
 	  <GuidSymbol name="IconStop" value="{7A6F12D2-D2BE-47FD-8B42-BDE56E0C03ED}">
 		  <IDSymbol name="IconStop16" value="1"/>
 	  </GuidSymbol>

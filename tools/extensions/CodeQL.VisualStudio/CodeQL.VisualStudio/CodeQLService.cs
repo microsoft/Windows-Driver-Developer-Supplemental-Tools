@@ -176,102 +176,14 @@ namespace Microsoft.CodeQL.Core
             }
             await ProjectHelper.HideProgressAsync();
         }
-        private void HandleKeyCollision(string existingKey, string newValue)
-        {
-            if (_queryDict[existingKey].Equals(newValue))
-            {
-                return;
-            }
-            StringBuilder replacementKey = new StringBuilder();
-            StringBuilder newValueKey = new StringBuilder();
-            List<string> existingValueParts = _queryDict[existingKey].Split('/').ToList();
-            List<string> newValueParts = newValue.Split('/').ToList();
-            while ((existingValueParts.Count > 0 && newValueParts.Count > 0) && 
-                existingValueParts.Last().Equals(newValueParts.Last()))
-            {
-                replacementKey.Insert(0, "/" + existingValueParts.Last() );
-                existingValueParts.RemoveAt(existingValueParts.Count - 1);
-                newValueKey.Insert(0, "/" + newValueParts.Last());
-                newValueParts.RemoveAt(newValueParts.Count - 1); 
-            }
-
-            // add remaining unique value
-            if (newValueParts.Count > 0 && existingValueParts.Count > 0) {
-                newValueKey.Insert(0, newValueParts.Last());
-                replacementKey.Insert(0, existingValueParts.Last());
-
-                // if at a version, try to get the qlpack for it which should be the preceding two segments
-                if(Version.TryParse(newValueParts.Last(), out _) && newValueParts.Count > 2)
-                {
-                    newValueKey.Insert(0, newValueParts.ElementAt(newValueParts.Count - 3) +"/" + 
-                        newValueParts.ElementAt(newValueParts.Count - 2) + "/");
-                }
-                if (Version.TryParse(existingValueParts.Last(), out _) && existingValueParts.Count > 2)
-                {
-                    replacementKey.Insert(0, existingValueParts.ElementAt(existingValueParts.Count - 2) + "/" + 
-                        existingValueParts.ElementAt(existingValueParts.Count - 2) + "/");
-                }
-            }
-            else
-            {
-                throw new Exception("Unable to find new key");
-            }
-
-            if (newValueKey.ToString().Equals(replacementKey.ToString()))
-            {
-                throw new Exception("Unable to find new key");
-            }
-            _queryDict.Remove(existingKey);
-            if (!_queryDict.ContainsKey(replacementKey.ToString()))
-            {
-                _queryDict.Add(replacementKey.ToString(), string.Join("/", existingValueParts));
-            }
-            if (!_queryDict.ContainsKey(replacementKey.ToString()))
-            {
-                _queryDict.Add(newValueKey.ToString(), newValue);
-            }
-        }
-
+      
         public async Task<ObservableCollection<string>> FindAvailableQueriesAsync()
         {
             List<string> packList = await CodeQLRunner.Instance.FindPacksAsync(CodeQLGeneralOptions.Instance.AdditionalQueryLocations);
             List<string> queryList = await CodeQLRunner.Instance.FindQueriesAsync(packList, queriesNSuites: false);
-            foreach (string query in queryList)
-            {
-                string key = query.Replace("\\", "/").Split('/').Last();
-                if (_queryDict.ContainsKey(key))
-                {
-                    HandleKeyCollision(key, query);
-                }
-                else
-                {
-                    _queryDict.Add(key, query.Replace("\\", "/"));
-                }
-            }
-
-            return new ObservableCollection<string>(_queryDict.Keys);
+            return new ObservableCollection<string>(queryList.ToHashSet());
         }
 
-        public void AddAdditionalQueries(List<string> queries)
-        {
-            foreach (string query in queries)
-            {
-                string key = query.Replace("\\", "/").Split('/').Last();
-                if (!_queryDict.ContainsKey(key))
-                {
-                    _queryDict.Add(key, query.Replace("\\", "/"));
-                }
-            }
-        }
-
-        public void RemoveQuery(string query)
-        {
-            string key = query.Replace("\\", "/").Split('/').Last();
-            if (_queryDict.ContainsKey(key))
-            {
-                _queryDict.Remove(key);
-            }
-        }
 
         public async Task UpdateDatabaseBuildInfoAsync()
         {
