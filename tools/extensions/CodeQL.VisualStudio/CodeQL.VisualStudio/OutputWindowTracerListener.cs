@@ -27,11 +27,12 @@ namespace Microsoft.CodeQL
         {
             if (this.EnsurePane())
             {
-                    ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
-                    {
-                        await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
-                        this.pane.OutputStringThreadSafe(message);
-                    }).FileAndForget("OutputWindowEvent");
+                ThreadHelper.JoinableTaskFactory.RunAsync(async () =>
+                {
+                    await ThreadHelper.JoinableTaskFactory.SwitchToMainThreadAsync();
+                    this.pane.Activate();
+                    this.pane.OutputStringThreadSafe(message);
+                }).FileAndForget("OutputWindowEvent");
             }
         }
 

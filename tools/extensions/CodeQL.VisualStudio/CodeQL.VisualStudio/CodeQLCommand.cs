@@ -9,11 +9,13 @@ using Microsoft.VisualStudio.Shell;
 using Microsoft.VisualStudio.Shell.Interop;
 using Microsoft.VisualStudio.Threading;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.Diagnostics;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 using System.Runtime.InteropServices;
 using System.Security.Policy;
 using System.Threading.Tasks;
@@ -196,8 +198,13 @@ namespace Microsoft.CodeQL.Core
                         try
                         {
                             var sarifResults = await CodeQLService.Instance.RunCodeQLQueryAsync(CodeQLService.Instance.SelectedQuery.Trim());
-                            var sarifViewer = new SarifViewerInterop(Package.GetGlobalService(typeof(SVsShell)) as IVsShell);
-                            if (false && sarifViewer.IsSariferExtensionInstalled)
+                            var VsShell = Package.GetGlobalService(typeof(SVsShell)) as IVsShell;
+
+                            SarifViewerInterop sarifViewer = new SarifViewerInterop(Package.GetGlobalService(typeof(SVsShell)) as IVsShell);
+                            Guid extensionGuid = SarifViewerInterop.ViewerExtensionGuid;
+
+                            int status = VsShell.IsPackageInstalled(ref extensionGuid, out int installed);
+                            if (installed == 1)
                             {
                                 if (!sarifViewer.IsViewerExtensionLoaded)
                                 {
@@ -211,6 +218,7 @@ namespace Microsoft.CodeQL.Core
                                 //if (CodeQLGeneralOptions.Instance.AutomaticallyOpenResults) { }
                                 Microsoft.VisualStudio.Shell.VsShellUtilities.OpenDocument(this.ServiceProvider, sarifResults);
                             }
+                            
                         }
                         catch (Exception ex)
                         {
