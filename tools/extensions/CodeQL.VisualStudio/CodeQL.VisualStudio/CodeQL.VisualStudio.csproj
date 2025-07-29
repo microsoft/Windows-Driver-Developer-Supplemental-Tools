@@ -150,7 +150,10 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="icon.png" />
+    <Content Include="icon.ico">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+      <IncludeInVSIX>true</IncludeInVSIX>
+    </Content>
     <Resource Include="Icons\db.ico" />
     <Resource Include="Icons\Gear.ico" />
     <Resource Include="Icons\stop.ico" />

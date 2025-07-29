@@ -5,7 +5,7 @@
         <DisplayName>CodeQL Visual Studio Extension</DisplayName>
         <Description xml:space="preserve">CodeQL Visual Studio Extension</Description>
         <License>License.txt</License>
-        <Icon>icon.png</Icon>
+        <Icon>icon.ico</Icon>
         <Preview>true</Preview>
     </Metadata>
     <Installation>

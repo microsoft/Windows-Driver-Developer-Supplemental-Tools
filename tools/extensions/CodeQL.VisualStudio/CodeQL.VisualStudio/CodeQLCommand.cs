@@ -224,7 +224,7 @@ namespace Microsoft.CodeQL.Core
                         {
                             CodeQLService.Instance.ClearTask();
                             VsShellUtilities.ShowMessageBox(Microsoft.VisualStudio.Shell.ServiceProvider.GlobalProvider,
-                                                            $"CodeQL analysis failed. " + ex.Message + " See output for details.",
+                                                            $"CodeQL analysis failed with message: " + ex.Message,
                                                             null, // title
                                                             OLEMSGICON.OLEMSGICON_CRITICAL,
                                                             OLEMSGBUTTON.OLEMSGBUTTON_OK,
