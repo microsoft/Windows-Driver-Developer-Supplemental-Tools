@@ -110,6 +110,9 @@ abstract class CASuppression extends PreprocessorPragma {
     this.getRuleName() = any(["__WARNING_PROTOTYPE_MISMATCH", "28127"]) and
     result = "lgtm[cpp/drivers/routine-function-type-not-expected]"
     or
+    this.getRuleName() = any(["__WARNING_UNEXPECTED_IRQL_CHANGE", "28167"]) and
+    result = "lgtm[cpp/drivers/irql-function-not-annotated]"
+    or
     result = "lgtm[" + this.getRuleName() + "]"
   }
 }

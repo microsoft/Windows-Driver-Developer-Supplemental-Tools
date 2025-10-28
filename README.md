@@ -145,8 +145,8 @@ The versions below are the minumum required versions for WHCP certification. New
 | Windows 11, version 23H2 |  [2.6.3](https://github.com/github/codeql-cli-binaries/releases/tag/v2.6.3) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_22H2 |
 | Windows 11               |  [2.4.6](https://github.com/github/codeql-cli-binaries/releases/tag/v2.4.6) or [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)|  1.0.13 (If using codeql 2.15.4)| N/A |0.9.0 (If using codeql 2.15.4) | WHCP_21H2 |
 | Windows 11, version 24H2 |  [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)		                                                                        |  1.1.0                          | N/A |0.9.0                          | WHCP_24H2 |
-| Windows Server 2025      |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.6.0                          | 0.0.4 | N/A                          | <todo> |
-| Windows 11, version <todo> |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.6.0                          | 0.0.4 | N/A                          | <todo> |
+| Windows Server 2025      |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.8.0                          | 0.0.4 | N/A                          | WHCP_25H2 |
+| Windows 11, version 25H2 |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.8.0                          | 0.0.4 | N/A                          | WHCP_25H2 |
 
 
 ### Special instructions for for WHCP_21H2 and WHCP_22H2 branches:
