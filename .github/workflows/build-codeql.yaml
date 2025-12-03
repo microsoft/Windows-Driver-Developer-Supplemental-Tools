@@ -96,6 +96,8 @@ jobs:
         pushd .\src 
         ..\codeql-cli\codeql.cmd pack install 
         popd
+    - name: Install Nuget Packages
+      run: nuget restore .\src\drivers\test\packages.config -PackagesDirectory .\packages\
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
     - name: Setup Python
@@ -177,6 +179,8 @@ jobs:
         pushd .\src 
         ..\codeql-cli\codeql.cmd pack install 
         popd
+    - name: Install Nuget Packages
+      run: nuget restore .\src\drivers\test\packages.config -PackagesDirectory .\packages\
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
     - name: Setup Python
