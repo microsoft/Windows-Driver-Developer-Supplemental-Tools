@@ -11,10 +11,13 @@ This repository contains open-source components for supplemental use in developi
 #### Validated CodeQL Versions For Use with WHCP
 |  CodeQL CLI Version      |
 |--------------------------|
+|  2.23.3 |
 |  2.21.4 |
 |  2.21.2 |
 |  2.20.1 |
 |  2.15.4 |
+
+When using the precompiled pack, please use the most recent CodeQL CLI version listed above.
 
 *See appendix for more information
 
