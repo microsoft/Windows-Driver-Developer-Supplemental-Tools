@@ -96,10 +96,10 @@ jobs:
         pushd .\src 
         ..\codeql-cli\codeql.cmd pack install 
         popd
-    - name: Install Nuget Packages
-      run: nuget restore .\src\drivers\test\packages.config -PackagesDirectory .\packages\
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
+    - name: Install Nuget Packages
+      run: nuget restore .\src\drivers\test\packages.config -PackagesDirectory .\packages\
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
@@ -179,10 +179,10 @@ jobs:
         pushd .\src 
         ..\codeql-cli\codeql.cmd pack install 
         popd
-    - name: Install Nuget Packages
-      run: nuget restore .\src\drivers\test\packages.config -PackagesDirectory .\packages\
     - name: codeql version test
       run: .\codeql-cli\codeql.exe version
+    - name: Install Nuget Packages
+      run: nuget restore .\src\drivers\test\packages.config -PackagesDirectory .\packages\
     - name: Setup Python
       uses: actions/setup-python@v5
       with:
@@ -301,6 +301,9 @@ jobs:
         popd
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
+      
+    - name: Install Nuget Packages
+      run: nuget restore .\src\drivers\test\packages.config -PackagesDirectory .\packages\
 
     - name: Test DVL
       run: src\drivers\test\dvl_tests\dvl_tests.ps1
