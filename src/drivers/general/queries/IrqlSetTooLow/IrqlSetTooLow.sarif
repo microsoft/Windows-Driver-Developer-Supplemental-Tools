@@ -1,362 +1,533 @@
 {
-  "$schema" : "https://json.schemastore.org/sarif-2.1.0.json",
-  "version" : "2.1.0",
-  "runs" : [ {
-    "tool" : {
-      "driver" : {
-        "name" : "CodeQL",
-        "organization" : "GitHub",
-        "semanticVersion" : "2.14.4",
-        "notifications" : [ {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "name" : "cpp/baseline/expected-extracted-files",
-          "shortDescription" : {
-            "text" : "Expected extracted files"
-          },
-          "fullDescription" : {
-            "text" : "Files appearing in the source archive that are expected to be extracted."
-          },
-          "defaultConfiguration" : {
-            "enabled" : true
-          },
-          "properties" : {
-            "tags" : [ "expected-extracted-files", "telemetry" ]
-          }
-        } ],
-        "rules" : [ {
-          "id" : "cpp/drivers/irql-set-too-low",
-          "name" : "cpp/drivers/irql-set-too-low",
-          "shortDescription" : {
-            "text" : "IRQL set too low (C28124)"
-          },
-          "fullDescription" : {
-            "text" : "A function annotated with a minimum IRQL for execution lowers the IRQL below that amount."
-          },
-          "defaultConfiguration" : {
-            "enabled" : true,
-            "level" : "warning"
-          },
-          "properties" : {
-            "tags" : [ "correctness", "wddst" ],
-            "description" : "A function annotated with a minimum IRQL for execution lowers the IRQL below that amount.",
-            "feature.area" : "Multiple",
-            "id" : "cpp/drivers/irql-set-too-low",
-            "impact" : "Exploitable Design",
-            "kind" : "problem",
-            "name" : "IRQL set too low (C28124)",
-            "opaqueid" : "CQLD-C28124",
-            "owner.email" : "sdat@microsoft.com",
-            "platform" : "Desktop",
-            "precision" : "medium",
-            "problem.severity" : "warning",
-            "query-version" : "v1",
-            "repro.text" : "The following statement exits at an IRQL too low for the function it is contained in.",
-            "scope" : "domainspecific",
-            "security.severity" : "Low"
-          }
-        } ]
-      },
-      "extensions" : [ {
-        "name" : "microsoft/windows-drivers",
-        "semanticVersion" : "0.2.0+9e5ae32394a3e411584e20e992a697add48b30b5",
-        "locations" : [ {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/",
-          "description" : {
-            "text" : "The QL pack root directory."
-          }
-        }, {
-          "uri" : "file:///C:/codeql-home/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
-          "description" : {
-            "text" : "The QL pack definition file."
-          }
-        } ]
-      } ]
-    },
-    "invocations" : [ {
-      "toolExecutionNotifications" : [ {
-        "locations" : [ {
-          "physicalLocation" : {
-            "artifactLocation" : {
-              "uri" : "driver/driver_snippet.c",
-              "uriBaseId" : "%SRCROOT%",
-              "index" : 0
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "CodeQL",
+          "organization": "GitHub",
+          "semanticVersion": "2.23.3",
+          "notifications": [
+            {
+              "id": "cpp/baseline/expected-extracted-files",
+              "name": "cpp/baseline/expected-extracted-files",
+              "shortDescription": {
+                "text": "Expected extracted files"
+              },
+              "fullDescription": {
+                "text": "Files appearing in the source archive that are expected to be extracted."
+              },
+              "defaultConfiguration": {
+                "enabled": true
+              },
+              "properties": {
+                "tags": [
+                  "expected-extracted-files",
+                  "telemetry"
+                ]
+              }
+            },
+            {
+              "id": "cli/platform",
+              "name": "cli/platform",
+              "shortDescription": {
+                "text": "Platform"
+              },
+              "fullDescription": {
+                "text": "Platform"
+              },
+              "defaultConfiguration": {
+                "enabled": true
+              }
+            },
+            {
+              "id": "cpp/extractor/summary",
+              "name": "cpp/extractor/summary",
+              "shortDescription": {
+                "text": "C++ extractor telemetry"
+              },
+              "fullDescription": {
+                "text": "C++ extractor telemetry"
+              },
+              "defaultConfiguration": {
+                "enabled": true
+              }
             }
-          }
-        } ],
-        "message" : {
-          "text" : ""
-        },
-        "level" : "none",
-        "descriptor" : {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "index" : 0
-        },
-        "properties" : {
-          "formattedMessage" : {
-            "text" : ""
-          }
-        }
-      }, {
-        "locations" : [ {
-          "physicalLocation" : {
-            "artifactLocation" : {
-              "uri" : "driver/fail_driver1.c",
-              "uriBaseId" : "%SRCROOT%",
-              "index" : 1
+          ],
+          "rules": [
+            {
+              "id": "cpp/drivers/irql-set-too-low",
+              "name": "cpp/drivers/irql-set-too-low",
+              "shortDescription": {
+                "text": "IRQL set too low (C28124)"
+              },
+              "fullDescription": {
+                "text": "A function annotated with a minimum IRQL for execution lowers the IRQL below that amount."
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "warning"
+              },
+              "properties": {
+                "tags": [
+                  "correctness",
+                  "ca_ported",
+                  "wddst"
+                ],
+                "description": "A function annotated with a minimum IRQL for execution lowers the IRQL below that amount.",
+                "feature.area": "Multiple",
+                "id": "cpp/drivers/irql-set-too-low",
+                "impact": "Exploitable Design",
+                "kind": "problem",
+                "name": "IRQL set too low (C28124)",
+                "opaqueid": "CQLD-C28124",
+                "owner.email": "sdat@microsoft.com",
+                "platform": "Desktop",
+                "precision": "medium",
+                "problem.severity": "warning",
+                "query-version": "v1",
+                "repro.text": "The following statement exits at an IRQL too low for the function it is contained in.",
+                "scope": "domainspecific",
+                "security.severity": "Low"
+              }
             }
-          }
-        } ],
-        "message" : {
-          "text" : ""
+          ]
         },
-        "level" : "none",
-        "descriptor" : {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "index" : 0
-        },
-        "properties" : {
-          "formattedMessage" : {
-            "text" : ""
+        "extensions": [
+          {
+            "name": "microsoft/windows-drivers",
+            "semanticVersion": "1.8.1+801b2d9a470acb3a6f2beddebaff099855c9ac8e",
+            "locations": [
+              {
+                "uri": "file:///D:/source/repos/Windows-Driver-Developer-Supplemental-Tools/src/",
+                "description": {
+                  "text": "The QL pack root directory."
+                },
+                "properties": {
+                  "tags": [
+                    "CodeQL/LocalPackRoot"
+                  ]
+                }
+              },
+              {
+                "uri": "file:///D:/source/repos/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+                "description": {
+                  "text": "The QL pack definition file."
+                },
+                "properties": {
+                  "tags": [
+                    "CodeQL/LocalPackDefinitionFile"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "codeql/cpp-all",
+            "semanticVersion": "4.2.0+2409bcc0d62644acbc432900bc59c2e3ff33bd56",
+            "locations": [
+              {
+                "uri": "file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/4.2.0/",
+                "description": {
+                  "text": "The QL pack root directory."
+                },
+                "properties": {
+                  "tags": [
+                    "CodeQL/LocalPackRoot"
+                  ]
+                }
+              },
+              {
+                "uri": "file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/4.2.0/qlpack.yml",
+                "description": {
+                  "text": "The QL pack definition file."
+                },
+                "properties": {
+                  "tags": [
+                    "CodeQL/LocalPackDefinitionFile"
+                  ]
+                }
+              }
+            ]
           }
-        }
-      }, {
-        "locations" : [ {
-          "physicalLocation" : {
-            "artifactLocation" : {
-              "uri" : "driver/fail_driver1.h",
-              "uriBaseId" : "%SRCROOT%",
-              "index" : 2
+        ]
+      },
+      "invocations": [
+        {
+          "toolExecutionNotifications": [
+            {
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "driver/driver_snippet.c",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 0
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": ""
+              },
+              "level": "none",
+              "descriptor": {
+                "id": "cpp/baseline/expected-extracted-files",
+                "index": 0
+              },
+              "properties": {
+                "formattedMessage": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "driver/fail_driver1.h",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": ""
+              },
+              "level": "none",
+              "descriptor": {
+                "id": "cpp/baseline/expected-extracted-files",
+                "index": 0
+              },
+              "properties": {
+                "formattedMessage": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "driver/fail_driver1.c",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": ""
+              },
+              "level": "none",
+              "descriptor": {
+                "id": "cpp/baseline/expected-extracted-files",
+                "index": 0
+              },
+              "properties": {
+                "formattedMessage": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "On the Windows 11 (amd64; 10.0) platform.",
+                "markdown": "On the Windows 11 (amd64; 10.0) platform."
+              },
+              "level": "none",
+              "timeUtc": "2026-01-23T07:55:34.089258700Z",
+              "descriptor": {
+                "id": "cli/platform",
+                "index": 1
+              },
+              "properties": {
+                "attributes": {
+                  "arch": "amd64",
+                  "name": "Windows 11",
+                  "version": "10.0"
+                },
+                "visibility": {
+                  "statusPage": false,
+                  "telemetry": true
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "Internal telemetry for the C++ extractor.\n\nNo action needed.",
+                "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
+              },
+              "level": "note",
+              "timeUtc": "2026-01-23T15:55:45.403761Z",
+              "descriptor": {
+                "id": "cpp/extractor/summary",
+                "index": 2
+              },
+              "properties": {
+                "attributes": {
+                  "cache-hits": 0,
+                  "cache-misses": 1,
+                  "compilers": [
+                    {
+                      "program": "cl",
+                      "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.44.35222 for x64"
+                    }
+                  ],
+                  "extractor-failures": 1,
+                  "extractor-successes": 0,
+                  "trap-caching": "disabled"
+                },
+                "visibility": {
+                  "statusPage": false,
+                  "telemetry": true
+                }
+              }
             }
+          ],
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "driver/driver_snippet.c",
+            "uriBaseId": "%SRCROOT%",
+            "index": 0
           }
-        } ],
-        "message" : {
-          "text" : ""
         },
-        "level" : "none",
-        "descriptor" : {
-          "id" : "cpp/baseline/expected-extracted-files",
-          "index" : 0
+        {
+          "location": {
+            "uri": "driver/fail_driver1.h",
+            "uriBaseId": "%SRCROOT%",
+            "index": 1
+          }
         },
-        "properties" : {
-          "formattedMessage" : {
-            "text" : ""
+        {
+          "location": {
+            "uri": "driver/fail_driver1.c",
+            "uriBaseId": "%SRCROOT%",
+            "index": 2
           }
         }
-      } ],
-      "executionSuccessful" : true
-    } ],
-    "artifacts" : [ {
-      "location" : {
-        "uri" : "driver/driver_snippet.c",
-        "uriBaseId" : "%SRCROOT%",
-        "index" : 0
+      ],
+      "results": [
+        {
+          "ruleId": "cpp/drivers/irql-set-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-set-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[IrqlAlwaysMinAPC_fail](1): IrqlAlwaysMinAPC_fail is annotated that it should never lower the IRQL below 1, but the statement [call to KeLowerIrql](2) may set the IRQL to 0"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 92,
+                  "startColumn": 5,
+                  "endColumn": 16
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "8a19ae2477ed23d3:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 90,
+                  "startColumn": 10,
+                  "endColumn": 31
+                }
+              },
+              "message": {
+                "text": "IrqlAlwaysMinAPC_fail"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 92,
+                  "startColumn": 5,
+                  "endColumn": 16
+                }
+              },
+              "message": {
+                "text": "call to KeLowerIrql"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/drivers/irql-set-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-set-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[IrqlMinDispatchLowerIrql_fail1](1): IrqlMinDispatchLowerIrql_fail1 is annotated that it should never lower the IRQL below 2, but the statement [call to KeLowerIrql](2) may set the IRQL to 1"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 59,
+                  "startColumn": 5,
+                  "endColumn": 16
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "c6798a9b4760c05b:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 57,
+                  "startColumn": 10,
+                  "endColumn": 40
+                }
+              },
+              "message": {
+                "text": "IrqlMinDispatchLowerIrql_fail1"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 59,
+                  "startColumn": 5,
+                  "endColumn": 16
+                }
+              },
+              "message": {
+                "text": "call to KeLowerIrql"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/drivers/irql-set-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-set-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[IrqlMinDispatchLowerIrql_fail](1): IrqlMinDispatchLowerIrql_fail is annotated that it should never lower the IRQL below 2, but the statement [{ ... }](2) may set the IRQL to 1"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 42,
+                  "endLine": 44,
+                  "endColumn": 2
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "83574f45ab0b5d97:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 10,
+                  "endColumn": 39
+                }
+              },
+              "message": {
+                "text": "IrqlMinDispatchLowerIrql_fail"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 42,
+                  "endLine": 44,
+                  "endColumn": 2
+                }
+              },
+              "message": {
+                "text": "{{ ... }}"
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits",
+      "properties": {
+        "semmle.formatSpecifier": "sarifv2.1.0"
       }
-    }, {
-      "location" : {
-        "uri" : "driver/fail_driver1.c",
-        "uriBaseId" : "%SRCROOT%",
-        "index" : 1
-      }
-    }, {
-      "location" : {
-        "uri" : "driver/fail_driver1.h",
-        "uriBaseId" : "%SRCROOT%",
-        "index" : 2
-      }
-    } ],
-    "results" : [ {
-      "ruleId" : "cpp/drivers/irql-set-too-low",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/drivers/irql-set-too-low",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "[IrqlAlwaysMinAPC_fail](1): IRQL potentially set too low at [call to KeLowerIrql](2).  Minimum IRQL for this function: 1, IRQL at statement: 0"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 92,
-            "startColumn" : 5,
-            "endColumn" : 16
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "8a19ae2477ed23d3:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      },
-      "relatedLocations" : [ {
-        "id" : 1,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 90,
-            "startColumn" : 10,
-            "endColumn" : 31
-          }
-        },
-        "message" : {
-          "text" : "IrqlAlwaysMinAPC_fail"
-        }
-      }, {
-        "id" : 2,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 92,
-            "startColumn" : 5,
-            "endColumn" : 16
-          }
-        },
-        "message" : {
-          "text" : "call to KeLowerIrql"
-        }
-      } ]
-    }, {
-      "ruleId" : "cpp/drivers/irql-set-too-low",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/drivers/irql-set-too-low",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "[IrqlMinDispatchLowerIrql_fail1](1): IRQL potentially set too low at [call to KeLowerIrql](2).  Minimum IRQL for this function: 2, IRQL at statement: 1"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 59,
-            "startColumn" : 5,
-            "endColumn" : 16
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "c6798a9b4760c05b:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      },
-      "relatedLocations" : [ {
-        "id" : 1,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 57,
-            "startColumn" : 10,
-            "endColumn" : 40
-          }
-        },
-        "message" : {
-          "text" : "IrqlMinDispatchLowerIrql_fail1"
-        }
-      }, {
-        "id" : 2,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 59,
-            "startColumn" : 5,
-            "endColumn" : 16
-          }
-        },
-        "message" : {
-          "text" : "call to KeLowerIrql"
-        }
-      } ]
-    }, {
-      "ruleId" : "cpp/drivers/irql-set-too-low",
-      "ruleIndex" : 0,
-      "rule" : {
-        "id" : "cpp/drivers/irql-set-too-low",
-        "index" : 0
-      },
-      "message" : {
-        "text" : "[IrqlMinDispatchLowerIrql_fail](1): IRQL potentially set too low at [{{ ... }}](2).  Minimum IRQL for this function: 2, IRQL at statement: 1"
-      },
-      "locations" : [ {
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 42,
-            "endLine" : 44,
-            "endColumn" : 2
-          }
-        }
-      } ],
-      "partialFingerprints" : {
-        "primaryLocationLineHash" : "83574f45ab0b5d97:1",
-        "primaryLocationStartColumnFingerprint" : "0"
-      },
-      "relatedLocations" : [ {
-        "id" : 1,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 41,
-            "startColumn" : 10,
-            "endColumn" : 39
-          }
-        },
-        "message" : {
-          "text" : "IrqlMinDispatchLowerIrql_fail"
-        }
-      }, {
-        "id" : 2,
-        "physicalLocation" : {
-          "artifactLocation" : {
-            "uri" : "driver/driver_snippet.c",
-            "uriBaseId" : "%SRCROOT%",
-            "index" : 0
-          },
-          "region" : {
-            "startLine" : 42,
-            "endLine" : 44,
-            "endColumn" : 2
-          }
-        },
-        "message" : {
-          "text" : "{{ ... }}"
-        }
-      } ]
-    } ],
-    "columnKind" : "utf16CodeUnits",
-    "properties" : {
-      "semmle.formatSpecifier" : "sarifv2.1.0"
     }
-  } ]
+  ]
 }
