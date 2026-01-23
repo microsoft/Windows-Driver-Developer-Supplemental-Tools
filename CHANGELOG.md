@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file.
 ### Fixed
  - Fixed a bug where IrqlTooLow.ql could report potential false positives.
 
-## [1.8.1] - 2026-01-23
+## [1.8.1] - 2025-12-04
 
 ### Fixed
  - Fixed a bug where CA suppressions for C28167 were not honored for the IrqlFunctionNotAnnotated query.
