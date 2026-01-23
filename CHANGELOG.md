@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file.
 ### Changed
  - IrqlSetTooHigh.ql and IrqlSetTooLow.ql now provide clearer explanations when a defect is found.
 ### Fixed
- - Fixed a bug where IrqlTooLow.ql did not report only when certain that the IRQL at an offending statement was too low.
+ - Fixed a bug where IrqlTooLow.ql could report potential false positives.
 
 ## [1.8.1] - 2026-01-23
 
