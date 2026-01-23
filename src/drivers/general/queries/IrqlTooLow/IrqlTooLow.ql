@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v2
+ * @query-version v3
  */
 
 import cpp
@@ -34,7 +34,7 @@ where
     irqlFunc.(IrqlRequiresAnnotatedFunction).getIrqlLevel() = irqlRequirement
   ) and
   irqlRequirement != -1 and
-  irqlRequirement > getPotentialExitIrqlAtCfn(prior)
+  irqlRequirement > max(getPotentialExitIrqlAtCfn(prior))
 select call,
   "$@: IRQL potentially too low at call to $@.  Minimum IRQL for this call: " + irqlRequirement +
     ", IRQL at preceding node: " + max(getPotentialExitIrqlAtCfn(prior)), call.getControlFlowScope(),
