@@ -44,6 +44,7 @@ where
     tooLowForFunc(irqlFunc, otherNode, irqlRequirement)
   )
 select statement,
-  "$@: IRQL potentially set too low at $@.  Minimum IRQL for this function: " + irqlRequirement +
-    ", IRQL at statement: " + max(getPotentialExitIrqlAtCfn(statement)), irqlFunc,
-  irqlFunc.getQualifiedName(), statement, statement.toString()
+  "$@: " + irqlFunc.getQualifiedName() + " is annotated that it should never lower the IRQL below " +
+    irqlRequirement + ", but the statement $@ may set the IRQL to " +
+    max(getPotentialExitIrqlAtCfn(statement)), irqlFunc, irqlFunc.getQualifiedName(), statement,
+  statement.toString()
