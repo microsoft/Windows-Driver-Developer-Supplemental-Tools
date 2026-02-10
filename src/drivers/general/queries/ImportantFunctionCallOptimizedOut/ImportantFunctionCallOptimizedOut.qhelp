@@ -28,7 +28,6 @@
 			* the following
 			*/
 			ZeroMemory(Password, sizeof(Password));
-		}
 		}]]>
 		</sample>
 		<p>
@@ -40,7 +39,6 @@
 			char Password[100];
 
 			RtlSecureZeroMemory(Password, sizeof(Password));
-		}
 		}]]>
 		</sample>
 	</example>

@@ -12,7 +12,6 @@ A call to IoQueueWorkItem is expecting a function pointer annotated with __drv_f
 ```c
  
     	IoQueueWorkItem(IoWorkItem, badAnnotationFunc1, DelayedWorkQueue, Context);
-		}
 		
 ```
 

@@ -17,15 +17,13 @@
 			The following example shows an incorrect use of IoReleaseCncelSpinLock within a cancel routine
 		</p>
 		<sample language="c"> <![CDATA[
-			IoReleaseCancelSpinLock(PASSIVE_LEVEL);
-		}]]>
+			IoReleaseCancelSpinLock(PASSIVE_LEVEL);]]>
 		</sample>
 		<p>
 			Correct use of IoReleaseCncelSpinLock within a cancel routine
 		</p>
 		<sample language="c"> <![CDATA[
-			IoReleaseCancelSpinLock(Irp->CancelIrql);
-		}]]>
+			IoReleaseCancelSpinLock(Irp->CancelIrql);]]>
 		</sample>
 	</example>
 	<references>

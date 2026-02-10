@@ -28,7 +28,6 @@
 			{
 				KeRaiseIrql(DISPATCH_LEVEL, oldIrql); // Function exits at DISPATCH_LEVEL
 			}
-		}
 		}]]>
 		</sample>
 	</example>

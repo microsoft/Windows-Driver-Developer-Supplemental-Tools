@@ -18,7 +18,6 @@ _IRQL_saves_global_ not applied to entire function
 			// ...
 			;
 		}
-		}
 		
 ```
 _Kernel_clear_do_init_ not used with either "yes" or "no"
@@ -37,7 +36,6 @@ _Kernel_clear_do_init_ not used with either "yes" or "no"
 
 		{
 			; // do nothing
-		}
 		}
 		
 ```

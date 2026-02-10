@@ -23,7 +23,6 @@ Function which potentially raises the IRQL level but is not annotated to reflect
 				KeRaiseIrql(DISPATCH_LEVEL, oldIrql); // Function exits at DISPATCH_LEVEL
 			}
 		}
-		}
 		
 ```
 

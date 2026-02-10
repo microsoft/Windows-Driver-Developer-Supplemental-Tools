@@ -16,7 +16,6 @@ Example of incorrect assignment of '\\0' to a pointer
 				char x = 0;
 				char y = '0';
 				p = '\0'; // should be *p = '\0';
-			}
 		
 ```
 Example of correct assignment of '\\0' to where the pointer is pointing
@@ -26,7 +25,6 @@ Example of correct assignment of '\\0' to where the pointer is pointing
 			char a[8];
    			char *p = a;
     		*p = '\0'; // correct!
-		}
 		
 ```
 

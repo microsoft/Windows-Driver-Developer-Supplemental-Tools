@@ -19,7 +19,6 @@
 		NTSTATUS test_func()
 		{
 			return !0;
-		}
 		}]]>
 		</sample>
 	</example>

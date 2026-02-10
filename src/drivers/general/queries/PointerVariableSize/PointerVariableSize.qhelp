@@ -18,8 +18,7 @@
 			void bad(){
 				char* b = 0;
 				memset(b, 0, sizeof(b));
-			}
-		}]]>
+			}]]>
 		</sample>
 		<p>
 			The following code example avoids this warning.
@@ -28,8 +27,7 @@
 			void good(){
 				char* b = 0;
 				memset(b, 0, sizeof(*b));
-			}
-		}]]>
+			}]]>
 		</sample>
 	</example>
 	

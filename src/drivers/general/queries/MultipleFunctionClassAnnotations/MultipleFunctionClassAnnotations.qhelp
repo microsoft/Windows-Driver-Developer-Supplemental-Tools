@@ -36,7 +36,6 @@
 				__in struct _DEVICE_OBJECT *PhysicalDeviceObject)
 		{
 			return STATUS_SUCCESS;
-		}
 		}]]>
 		</sample>
 		

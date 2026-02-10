@@ -47,7 +47,6 @@
 					break;
 			}
 			return TRUE;  // Successful DLL_PROCESS_ATTACH.
-		}
 		}]]>
 		</sample>
 	</example>

@@ -17,7 +17,6 @@ The following code example elicits this warning.
 			Executive,
 			FALSE,
 			NULL);
-		}
 		
 ```
 The following code example avoids this warning.
@@ -30,7 +29,6 @@ The following code example avoids this warning.
 			KernelMode,
 			FALSE,
 			NULL);
-		}
 		
 ```
 

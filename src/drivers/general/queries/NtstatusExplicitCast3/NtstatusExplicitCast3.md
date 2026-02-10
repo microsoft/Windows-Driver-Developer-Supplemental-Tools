@@ -18,7 +18,6 @@ Example of SomeMemAllocFunction that has a Boolean return value but is being ret
 			void *MyPtr;
 			return SomeMemAllocFunction(&MyPtr);
 		}
-		}
 		
 ```
 This example avoids the warning
@@ -31,7 +30,6 @@ This example avoids the warning
 		return STATUS_SUCCESS;
 		} else {
 		return STATUS_NO_MEMORY;
-		}
 		}
 		
 ```

@@ -15,7 +15,6 @@ The following code example elicits this warning.
 				char* b = 0;
 				memset(b, 0, sizeof(b));
 			}
-		}
 		
 ```
 The following code example avoids this warning.
@@ -26,7 +25,6 @@ The following code example avoids this warning.
 				char* b = 0;
 				memset(b, 0, sizeof(*b));
 			}
-		}
 		
 ```
 

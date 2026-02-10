@@ -44,7 +44,6 @@ DLLMain function
 			}
 			return TRUE;  // Successful DLL_PROCESS_ATTACH.
 		}
-		}
 		
 ```
 

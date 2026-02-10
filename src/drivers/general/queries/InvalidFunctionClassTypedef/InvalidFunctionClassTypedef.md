@@ -27,7 +27,6 @@ Example where typedef of one type is used to declare the function but typedef of
 	{
 		; // Don't need to do anything heres
 	}
-		}
 		
 ```
 

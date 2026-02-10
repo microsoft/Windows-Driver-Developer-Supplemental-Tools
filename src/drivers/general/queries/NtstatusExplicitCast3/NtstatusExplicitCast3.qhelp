@@ -21,7 +21,6 @@
 		{
 			void *MyPtr;
 			return SomeMemAllocFunction(&MyPtr);
-		}
 		}]]>
 		</sample>
 		<p>
@@ -34,7 +33,6 @@
 		return STATUS_SUCCESS;
 		} else {
 		return STATUS_NO_MEMORY;
-		}
 		}]]>
 		</sample>
 	</example>

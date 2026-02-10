@@ -17,8 +17,6 @@ If statement with explicit cast from NTSTATUS to Boolean
 			;
 		}
 		
-		}
-		
 ```
 Use of NT_SUCCESS macro
 
@@ -31,7 +29,6 @@ Use of NT_SUCCESS macro
 				;
 				// handle error
 			}
-		}
 		
 ```
 

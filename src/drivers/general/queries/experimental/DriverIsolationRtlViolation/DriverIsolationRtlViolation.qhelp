@@ -20,8 +20,7 @@
                           ValueName,
                           REG_SZ,
                           ValueValue,
-                          sizeof ValueValue);
-		}]]>
+                          sizeof ValueValue);]]>
 		</sample>
 		<p>
 			TODO example 2
@@ -32,8 +31,7 @@
                     L"Serenum",
                     QueryTable,
                     NULL,
-                    NULL)
-		}]]>
+                    NULL)]]>
 		</sample>
 	</example>
 	<references>

@@ -20,8 +20,6 @@
 			VOID DoNothing_RequiresPassive(void)
 		{
 			__noop;
-		}
-
 		}]]>
 		</sample>
 		<p>
@@ -34,7 +32,6 @@
 			VOID DoNothing_bad(void)
 		{
 			__noop;
-		}
 		}]]>
 		</sample>
 	</example>

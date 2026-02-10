@@ -23,7 +23,6 @@ Function annotated with _IRQL_requires_same_ but can possibly exit at a differen
 				KeRaiseIrql(DISPATCH_LEVEL, oldIrql); // Function exits at DISPATCH_LEVEL
 			}
 		}
-		}
 		
 ```
 

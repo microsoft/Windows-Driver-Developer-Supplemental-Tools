@@ -29,16 +29,13 @@
 
     	status = ZwOpenKey(&parametersKey,
                        KEY_READ,
-                       &objectAttributes);
-		}]]>
+                       &objectAttributes);]]>
 		</sample>
 		<p>
 			Example of no violation
 		</p>
 		<sample language="c"> <![CDATA[
-			TODO
-        }
-		}]]>
+			TODO]]>
 		</sample>
 	</example>
 	<references>

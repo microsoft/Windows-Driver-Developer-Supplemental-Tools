@@ -12,7 +12,6 @@ The following example shows an incorrect use of IoReleaseCncelSpinLock within a 
 ```c
  
 			IoReleaseCancelSpinLock(PASSIVE_LEVEL);
-		}
 		
 ```
 Correct use of IoReleaseCncelSpinLock within a cancel routine
@@ -20,7 +19,6 @@ Correct use of IoReleaseCncelSpinLock within a cancel routine
 ```c
  
 			IoReleaseCancelSpinLock(Irp->CancelIrql);
-		}
 		
 ```
 

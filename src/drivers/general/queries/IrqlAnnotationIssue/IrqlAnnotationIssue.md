@@ -12,7 +12,6 @@ Incorrect IRQL annotation
 ```c
  
 			_IRQL_requires_(65)
-		}
 		
 ```
 Incorrect IRQL annotation
@@ -20,7 +19,6 @@ Incorrect IRQL annotation
 ```c
  
 			_IRQL_always_function_max_(irql_variable)
-		}
 		
 ```
 

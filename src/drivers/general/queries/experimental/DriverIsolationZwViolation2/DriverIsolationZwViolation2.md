@@ -19,7 +19,6 @@ Example of a driver isolation violation where the OBJECT_ATTRIBUTES-&gt;ObjectNa
                                NULL);
 
     	ntstatus = ZwOpenKey(&handleRegKey, KEY_READ, &ObjectAttributes);
-		}
 		
 ```
 Example of a driver isolation violation where the OBJECT_ATTRIBUTES-&gt;ObjectName value is valid but with write access
@@ -34,7 +33,6 @@ Example of a driver isolation violation where the OBJECT_ATTRIBUTES-&gt;ObjectNa
                                NULL);
 
     	ntstatus = ZwOpenKey(&handleRegKey, KEY_ALL_ACCESS, &ObjectAttributes);
-		}
 		
 ```
 

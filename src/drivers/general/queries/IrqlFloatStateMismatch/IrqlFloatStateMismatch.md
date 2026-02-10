@@ -25,8 +25,6 @@ Example of incorrect code. Floating point state was saved at APC_LEVEL but resto
 				KeRestoreFloatingPointState(&FloatBuf);
 			}
 		}
-
-		}
 		
 ```
 Correct example
@@ -49,7 +47,6 @@ Correct example
 					KeRestoreFloatingPointState(&FloatBuf);
 				}
 			}
-		}
 		
 ```
 
