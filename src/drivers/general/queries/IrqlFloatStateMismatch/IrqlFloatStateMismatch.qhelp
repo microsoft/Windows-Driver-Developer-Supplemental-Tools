@@ -56,15 +56,10 @@
 		}]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-			TODO notes
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
-			<a href="example.com">
-				Example link
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28111-floating-point-irql-mismatch">
+				C28111
 			</a>
 		</li>
 	</references>

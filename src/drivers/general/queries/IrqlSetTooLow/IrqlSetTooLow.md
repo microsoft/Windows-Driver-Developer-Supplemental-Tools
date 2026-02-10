@@ -1,0 +1,30 @@
+# IRQL set too low (C28124)
+The function has lowered the IRQL to a level below what is allowed.
+
+
+## Recommendation
+A function has been annotated as having a minimum IRQL, but the execution of that function lowers the IRQL below that minimum. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate. If your function is a dispatch routine or callback, review the expected IRQL levels for that role.
+
+
+## Example
+In this example, the driver tries to lower the IRQL to PASSIVE_LEVEL within a KEDEFERRED_ROUTINE callback, which must run at DISPATCH_LEVEL or higher. This should be avoided.
+
+```c
+
+			// Within a KDEFERRED_ROUTINE callback
+			KeLowerIrql(PASSIVE_LEVEL, &oldIRQL);
+			
+		
+```
+
+## References
+* [ C28124 warning - Windows Drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28124-call-below-minimum-irq-level)
+* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)
+
+## Semmle-specific notes
+This query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.
+
+This query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.
+
+For information on how to annotate your functions with information about how they adjust the IRQL, see "IRQL annotations for drivers" in the references section.
+
