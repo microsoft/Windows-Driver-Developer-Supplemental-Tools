@@ -46,9 +46,5 @@ Good code:
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28651 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28651-member-function-pointers-cause-write-pages-copy)

@@ -26,9 +26,5 @@ The following code example avoids this warning.
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28141 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28141-argument-lowers-irq-level)

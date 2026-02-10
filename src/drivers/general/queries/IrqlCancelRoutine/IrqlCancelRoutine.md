@@ -24,9 +24,5 @@ Correct use of IoReleaseCncelSpinLock within a cancel routine
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28144 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28144-cancelirql-should-be-current-irql)

@@ -52,9 +52,5 @@ Example of function with multiple issues
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28162 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28162-exiting-while-holding-right-to-use-floating-hardware)

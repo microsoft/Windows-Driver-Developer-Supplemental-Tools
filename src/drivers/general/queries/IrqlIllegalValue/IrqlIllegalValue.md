@@ -36,9 +36,5 @@ Exmaple of a function with an IRQL requirement that is too high.
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28151 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28151-illegal-irql-value)

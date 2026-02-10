@@ -27,9 +27,5 @@ Function annotated with _IRQL_requires_same_ but can possibly exit at a differen
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28166 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28166-function-does-not-restore-irql-value)

@@ -35,9 +35,5 @@ Use of NT_SUCCESS macro
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28714 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28714-ntstatus-cast-between-semantically-different-integer-types)

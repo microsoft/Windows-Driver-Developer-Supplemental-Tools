@@ -19,9 +19,5 @@ Returning !0 instead of a proper error code.
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28650 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28650-generic-value-is-not-treated-as-failure)

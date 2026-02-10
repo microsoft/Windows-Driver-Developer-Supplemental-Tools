@@ -31,9 +31,5 @@ Example where typedef of one type is used to declare the function but typedef of
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28268 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28268-function-class-does-not-match-typedef)

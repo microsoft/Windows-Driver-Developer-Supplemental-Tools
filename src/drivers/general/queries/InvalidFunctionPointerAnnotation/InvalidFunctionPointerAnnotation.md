@@ -16,9 +16,5 @@ A call to IoQueueWorkItem is expecting a function pointer annotated with __drv_f
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28165 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28165-class-function-pointer-mismatch)

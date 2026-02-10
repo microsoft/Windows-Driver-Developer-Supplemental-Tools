@@ -34,9 +34,5 @@ The following code example avoids this warning.
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28139 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28139-argument-operand-should-exactly-match)

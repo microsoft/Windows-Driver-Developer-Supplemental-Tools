@@ -36,9 +36,5 @@ Function that uses float with protected floating-point hardware state
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28110 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28110-floating-point-hardware-protect)

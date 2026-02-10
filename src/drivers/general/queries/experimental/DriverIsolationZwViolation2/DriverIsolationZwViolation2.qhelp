@@ -40,11 +40,6 @@
 		}]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-			
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation">

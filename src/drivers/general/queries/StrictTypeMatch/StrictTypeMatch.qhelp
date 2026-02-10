@@ -36,10 +36,6 @@
 		}]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28139-argument-operand-should-exactly-match">
