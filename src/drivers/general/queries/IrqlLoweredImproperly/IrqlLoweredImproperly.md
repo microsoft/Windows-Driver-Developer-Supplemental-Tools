@@ -13,7 +13,6 @@ The following code example elicits this warning.
  
 			KeRaiseIrql(DISPATCH_LEVEL, &OldIrql);
 			KeRaiseIrql(PASSIVE_LEVEL, &OldIrql);
-		}
 		
 ```
 The following code example avoids this warning.
@@ -22,7 +21,6 @@ The following code example avoids this warning.
  
 			KeRaiseIrql(DISPATCH_LEVEL, &OldIrql);
 			KeLowerIrql(OldIrql);
-		}
 		
 ```
 

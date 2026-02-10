@@ -33,7 +33,6 @@ Example function with multiple __drv_functionClass annotations
 		{
 			return STATUS_SUCCESS;
 		}
-		}
 		
 ```
 

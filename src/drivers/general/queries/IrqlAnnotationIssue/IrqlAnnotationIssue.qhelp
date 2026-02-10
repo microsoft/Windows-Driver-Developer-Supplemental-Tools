@@ -17,15 +17,13 @@
 			Incorrect IRQL annotation
 		</p>
 		<sample language="c"> <![CDATA[
-			_IRQL_requires_(65)
-		}]]>
+			_IRQL_requires_(65)]]>
 		</sample>
 		<p>
 			Incorrect IRQL annotation
 		</p>
 		<sample language="c"> <![CDATA[
-			_IRQL_always_function_max_(irql_variable)
-		}]]>
+			_IRQL_always_function_max_(irql_variable)]]>
 		</sample>
 	</example>
 	<references>

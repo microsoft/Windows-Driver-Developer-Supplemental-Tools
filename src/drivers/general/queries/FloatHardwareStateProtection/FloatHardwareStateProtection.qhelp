@@ -19,7 +19,6 @@
 		{
 			float f = 0.0f;
 			f = f + 1.0f;
-		}
 		}]]>
 		</sample>
 		<p>
@@ -34,8 +33,7 @@
 		{
 			f = f + 1.0f;
 		}
-		KeRestoreFloatingPointState(&saveData);
-		}]]>
+		KeRestoreFloatingPointState(&saveData);]]>
 		</sample>
 	</example>
 	<references>

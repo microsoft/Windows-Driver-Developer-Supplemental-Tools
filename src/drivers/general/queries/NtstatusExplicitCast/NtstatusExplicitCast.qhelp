@@ -20,8 +20,6 @@
 		...  
 		if (!((BOOLEAN)status)){
 			;
-		}
-		
 		}]]>
 		</sample>
 		<p>
@@ -34,8 +32,7 @@
 			{
 				;
 				// handle error
-			}
-		}]]>
+			}]]>
 		</sample>
 	</example>
 	<references>

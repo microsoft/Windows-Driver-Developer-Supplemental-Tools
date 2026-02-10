@@ -15,7 +15,6 @@ Returning !0 instead of a proper error code.
 		{
 			return !0;
 		}
-		}
 		
 ```
 

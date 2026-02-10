@@ -17,8 +17,6 @@ Example of a function with an OK IRQL requirement.
 		{
 			__noop;
 		}
-
-		}
 		
 ```
 Exmaple of a function with an IRQL requirement that is too high.
@@ -31,7 +29,6 @@ Exmaple of a function with an IRQL requirement that is too high.
 			VOID DoNothing_bad(void)
 		{
 			__noop;
-		}
 		}
 		
 ```

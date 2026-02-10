@@ -26,7 +26,6 @@ Example of Driver Isolation violation: ZwOpenKey call with an ObjectAttributes p
     	status = ZwOpenKey(&parametersKey,
                        KEY_READ,
                        &objectAttributes);
-		}
 		
 ```
 Example of no violation
@@ -34,8 +33,6 @@ Example of no violation
 ```c
  
 			TODO
-        }
-		}
 		
 ```
 

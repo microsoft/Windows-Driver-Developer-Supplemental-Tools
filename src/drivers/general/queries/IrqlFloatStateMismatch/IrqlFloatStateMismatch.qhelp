@@ -29,8 +29,6 @@
 				// ...
 				KeRestoreFloatingPointState(&FloatBuf);
 			}
-		}
-
 		}]]>
 		</sample>
 		<p>
@@ -52,8 +50,7 @@
 					KeRaiseIrql(APC_LEVEL, &oldIRQL);
 					KeRestoreFloatingPointState(&FloatBuf);
 				}
-			}
-		}]]>
+			}]]>
 		</sample>
 	</example>
 	<references>

@@ -19,8 +19,7 @@
 				char *p = a;
 				char x = 0;
 				char y = '0';
-				p = '\0'; // should be *p = '\0';
-			}]]>
+				p = '\0'; // should be *p = '\0';]]>
 		</sample>
 		<p>
 			Example of correct assignment of '\0' to where the pointer is pointing
@@ -28,8 +27,7 @@
 		<sample language="c"> <![CDATA[
 			char a[8];
    			char *p = a;
-    		*p = '\0'; // correct!
-		}]]>
+    		*p = '\0'; // correct!]]>
 		</sample>
 	</example>
 	<references>

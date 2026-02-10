@@ -17,7 +17,6 @@ Example of a driver isolation violation. A call to RtlWriteRegistryValue with Re
                           REG_SZ,
                           ValueValue,
                           sizeof ValueValue);
-		}
 		
 ```
 TODO example 2
@@ -30,7 +29,6 @@ TODO example 2
                     QueryTable,
                     NULL,
                     NULL)
-		}
 		
 ```
 

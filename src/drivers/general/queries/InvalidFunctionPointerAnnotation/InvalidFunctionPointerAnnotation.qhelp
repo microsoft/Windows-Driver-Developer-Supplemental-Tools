@@ -15,8 +15,7 @@
 			A call to IoQueueWorkItem is expecting a function pointer annotated with __drv_functionClass(IO_WORKITEM_ROUTINE) but in this example, badAnnotationFunc1 is annotated with __drv_functionClass(IO_TIMER_ROUTINE).
 		</p>
 		<sample language="c"> <![CDATA[
-    	IoQueueWorkItem(IoWorkItem, badAnnotationFunc1, DelayedWorkQueue, Context);
-		}]]>
+    	IoQueueWorkItem(IoWorkItem, badAnnotationFunc1, DelayedWorkQueue, Context);]]>
 		</sample>
 		
 	</example>

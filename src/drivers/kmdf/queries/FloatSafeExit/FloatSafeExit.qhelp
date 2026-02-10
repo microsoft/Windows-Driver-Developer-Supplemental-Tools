@@ -51,7 +51,6 @@
 				// doesn't check the return value of KeRestoreFloatingPointState
 				status = KeRestoreFloatingPointState(&saveData);
 			}
-		}
 		}]]>
 		</sample>
 	</example>

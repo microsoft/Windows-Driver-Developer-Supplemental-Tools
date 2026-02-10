@@ -13,7 +13,7 @@ In this example, the driver has a parameter annotated to restore the IRQL, but i
  
 		VOID ReleaseMyLock(_IRQL_restores_ KIRQL inIrql, PKSPIN_LOCK myLock) {
 			KeReleaseSpinLock(myLock, PASSIVE_LEVEL);
-		}}
+		}
 		
 ```
 The driver should make sure to restore the IRQL from this parameter, or adjust its annotations:

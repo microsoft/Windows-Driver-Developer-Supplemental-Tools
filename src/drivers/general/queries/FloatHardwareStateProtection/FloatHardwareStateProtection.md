@@ -16,7 +16,6 @@ Function that uses float without protecting floating-point hardware state
 			float f = 0.0f;
 			f = f + 1.0f;
 		}
-		}
 		
 ```
 Function that uses float with protected floating-point hardware state
@@ -32,7 +31,6 @@ Function that uses float with protected floating-point hardware state
 			f = f + 1.0f;
 		}
 		KeRestoreFloatingPointState(&saveData);
-		}
 		
 ```
 

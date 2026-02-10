@@ -22,7 +22,6 @@ Example of instance where function call may be optimized away
 			*/
 			ZeroMemory(Password, sizeof(Password));
 		}
-		}
 		
 ```
 Using SecureZeroMemory or RtlSecureZeroMemory will prevent the compiler from optimizing away the function call.
@@ -34,7 +33,6 @@ Using SecureZeroMemory or RtlSecureZeroMemory will prevent the compiler from opt
 			char Password[100];
 
 			RtlSecureZeroMemory(Password, sizeof(Password));
-		}
 		}
 		
 ```

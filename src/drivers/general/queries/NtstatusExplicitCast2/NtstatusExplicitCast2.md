@@ -19,7 +19,6 @@ Bad cast from Boolean to NTSTATUS
 		{
 			return -1;
 		}
-		}
 		
 ```
 Correct use of Boolean
@@ -33,7 +32,6 @@ Correct use of Boolean
 		else
 		{
 			return -1;
-		}
 		}
 		
 ```

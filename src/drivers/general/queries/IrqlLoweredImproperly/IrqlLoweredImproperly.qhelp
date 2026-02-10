@@ -16,16 +16,14 @@
 		</p>
 		<sample language="c"> <![CDATA[
 			KeRaiseIrql(DISPATCH_LEVEL, &OldIrql);
-			KeRaiseIrql(PASSIVE_LEVEL, &OldIrql);
-		}]]>
+			KeRaiseIrql(PASSIVE_LEVEL, &OldIrql);]]>
 		</sample>
 		<p>
 			The following code example avoids this warning.
 		</p>
 		<sample language="c"> <![CDATA[
 			KeRaiseIrql(DISPATCH_LEVEL, &OldIrql);
-			KeLowerIrql(OldIrql);
-		}]]>
+			KeLowerIrql(OldIrql);]]>
 		</sample>
 	</example>
 	<references>

@@ -38,7 +38,6 @@ Function has _Kernel_float_saved_ annotation but has a path where the floating p
 				}
 			}
 		}
-		}
 		
 ```
 Good example
@@ -61,7 +60,6 @@ Good example
 				f = f + 1.0f;
 			}
 			KeRestoreFloatingPointState(&saveData);
-		}
 		}
 		
 ```

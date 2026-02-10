@@ -20,8 +20,7 @@
 			Executive,
 			Executive,
 			FALSE,
-			NULL);
-		}]]>
+			NULL);]]>
 		</sample>
 		<p>
 			The following code example avoids this warning.
@@ -32,8 +31,7 @@
 			Executive,
 			KernelMode,
 			FALSE,
-			NULL);
-		}]]>
+			NULL);]]>
 		</sample>
 	</example>
 	<references>

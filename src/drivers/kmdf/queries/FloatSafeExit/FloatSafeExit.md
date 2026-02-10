@@ -48,7 +48,6 @@ Example of function with multiple issues
 				status = KeRestoreFloatingPointState(&saveData);
 			}
 		}
-		}
 		
 ```
 
