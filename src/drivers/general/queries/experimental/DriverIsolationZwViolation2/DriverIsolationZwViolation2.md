@@ -38,9 +38,5 @@ Example of a driver isolation violation where the OBJECT_ATTRIBUTES-&gt;ObjectNa
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Driver package isolation ](https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation)

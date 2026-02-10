@@ -38,9 +38,5 @@ Correct use of Boolean
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28715 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28715-boolean-cast-between-semantically-different-integer-types)

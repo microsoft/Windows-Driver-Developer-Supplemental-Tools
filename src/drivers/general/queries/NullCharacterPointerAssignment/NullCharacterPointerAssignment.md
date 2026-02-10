@@ -30,9 +30,5 @@ Example of correct assignment of '\\0' to where the pointer is pointing
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28730 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28730-possible-null-character-assignment)

@@ -38,10 +38,6 @@
 		}]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28716-compiler-inserted-cast-between-semantically-different-integral">

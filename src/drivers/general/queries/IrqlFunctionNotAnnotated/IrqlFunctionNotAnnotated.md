@@ -27,9 +27,5 @@ Function which potentially raises the IRQL level but is not annotated to reflect
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28167 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28167-function-changes-irql-without-restore)

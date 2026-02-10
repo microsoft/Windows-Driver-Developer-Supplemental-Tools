@@ -39,9 +39,5 @@ Using SecureZeroMemory or RtlSecureZeroMemory will prevent the compiler from opt
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28625 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28625-sensitive-data-may-be-retained)

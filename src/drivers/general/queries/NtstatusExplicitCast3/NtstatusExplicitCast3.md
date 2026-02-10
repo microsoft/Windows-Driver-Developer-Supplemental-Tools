@@ -36,9 +36,5 @@ This example avoids the warning
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28716 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28716-compiler-inserted-cast-between-semantically-different-integral)

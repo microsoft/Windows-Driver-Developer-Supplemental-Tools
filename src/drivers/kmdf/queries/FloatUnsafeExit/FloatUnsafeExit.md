@@ -66,9 +66,5 @@ Good example
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Warning C28161 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28161-exiting-without-right-to-use-floating-hardware)

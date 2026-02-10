@@ -45,11 +45,8 @@ DLLMain function
 			return TRUE;  // Successful DLL_PROCESS_ATTACH.
 		}
 		}
+		
 ```
-
-## Semmle-specific notes
-
-
 
 ## References
 * [ C28637 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28637-calling-function-in-a-global-initializer-is-unsafe)

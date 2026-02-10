@@ -37,9 +37,5 @@ Example function with multiple __drv_functionClass annotations
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28177 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28177-function-annotated-with-more-than-one-class)

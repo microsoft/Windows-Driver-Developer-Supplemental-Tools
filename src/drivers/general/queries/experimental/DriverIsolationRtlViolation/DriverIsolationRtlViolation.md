@@ -34,9 +34,5 @@ TODO example 2
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ Driver package isolation ](https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation)

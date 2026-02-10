@@ -24,9 +24,5 @@ Incorrect IRQL annotation
 		
 ```
 
-## Semmle-specific notes
-
-
-
 ## References
 * [ C28153 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28153-irql-annotation-eval-context)

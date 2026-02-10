@@ -68,10 +68,6 @@
 		}]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28161-exiting-without-right-to-use-floating-hardware">

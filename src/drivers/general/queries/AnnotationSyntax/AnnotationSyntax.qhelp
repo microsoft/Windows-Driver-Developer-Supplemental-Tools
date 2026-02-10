@@ -44,10 +44,6 @@
 		}]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28266-function-property-syntax-error">
