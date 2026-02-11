@@ -1,34 +1,28 @@
 # Windows Driver Developer Supplemental Tools
-
 This repository contains open-source components for supplemental use in developing device drivers for Windows, as well as driver specific [CodeQL](https://codeql.github.com/) query suites used for the [Windows Hardware Compatibility Program](https://learn.microsoft.com/en-us/windows-hardware/design/compatibility/). The quickstart below will get you set up to build your database and analyze your driver using CodeQL. For the full documentation, troubleshooting, and more details about the Static Tools Logo test within the WHCP Program, please visit [CodeQL and the Static Tools Logo Test](https://docs.microsoft.com/windows-hardware/drivers/devtest/static-tools-and-codeql).
 
-### For General Use or Windows Hardware Compatibility Program Use
-
+### For General Use
 |  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
 |--------------------------|------------------------------------------|-------------------------------|-----------------------------|
-|  2.15.4 or greater* | [Latest Stable Version](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers) | 0.0.4 | Main |
+|  2.24.1 or greater* | [Latest Stable Version](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers) | 0.0.4 | Main |
 
-#### Validated CodeQL Versions For Use with WHCP
-|  CodeQL CLI Version      |
-|--------------------------|
-|  2.23.3 |
-|  2.21.4 |
-|  2.21.2 |
-|  2.20.1 |
-|  2.15.4 |
 
 When using the precompiled pack, please use the most recent CodeQL CLI version listed above.
 
-*See appendix for more information
+### For WHCP Use (26H1)
+|  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
+|--------------------------|------------------------------------------|-------------------------------|-----------------------------|
+|  2.24.1 | [1.8.2](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers/655126590?tag=1.8.2) | 0.0.4 | Main |
+
+See appendix for information on CLI+query version combinations for previous Windows releases and WHCP programs.
+
 
 ### For Testing the Latest in Development
-
 |  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
 |--------------------------|------------------------------------------|-------------------------------|-----------------------------|
 | [Latest](https://github.com/github/codeql-cli-binaries/releases/latest) | [Latest Beta Version](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers)             | [Latest](https://github.com/orgs/microsoft/packages/container/package/cpp-queries)                                             | Development |
 
 ## Quickstart
-
 1. Create a directory where you can place the CodeQL CLI and the queries you want to use:
     ```
     mkdir codeql-home
@@ -98,9 +92,7 @@ Windows drivers queries are in the `src/drivers` directory.
 
 Non-driver Microsoft-specific queries provided by Microsoft are in the `src/microsoft` directory.
 
-Query suites are located in the `windows-driver-suites` directory and contain the Must-Fix and Recommended suites used by the WHCP Program.
-
-
+Query suites are located in the `windows-driver-suites` directory and contain the Must-Fix, Must-Run, and Recommended suites used by the WHCP Program.
 
 ## Contributing
 This project welcomes contributions, feedback, and suggestions!
@@ -114,6 +106,7 @@ We are in the process of setting up pull request checks, but to ensure our requi
 1. Add a .qhelp file for any new queries or update the existing one if there is new functionality for the end user.
 
 #### Note
+
 All "Must-Fix" suite queries must have been run on the Windows Drivers Samples, and any bugs found as a result must be filed prior to being merged into the suite.
 
 Most contributions require you to agree to a
@@ -150,7 +143,16 @@ The versions below are the minumum required versions for WHCP certification. New
 | Windows 11, version 24H2 |  [2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4)		                                                                        |  1.1.0                          | N/A |0.9.0                          | WHCP_24H2 |
 | Windows Server 2025      |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.8.0                          | 0.0.4 | N/A                          | WHCP_25H2 |
 | Windows 11, version 25H2 |  [2.20.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.20.1)		                                                                        |  1.8.0                          | 0.0.4 | N/A                          | WHCP_25H2 |
+| Windows 11, version 26H1 |  [2.24.1](https://github.com/github/codeql-cli-binaries/releases/tag/v2.24.1)		                                                                        |  1.8.2                          | 0.0.4 | N/A                          | WHCP_26H1 |
 
+#### Previously validated CodeQL Versions For Use with WHCP
+|  CodeQL CLI Version      |
+|--------------------------|
+|  2.23.3 |
+|  2.21.4 |
+|  2.21.2 |
+|  2.20.1 |
+|  2.15.4 |
 
 ### Special instructions for for WHCP_21H2 and WHCP_22H2 branches:
 Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in the WHCP_21H2 and WHCP_22H2 branches. [CodeQL CLI version 2.15.4](https://github.com/github/codeql-cli-binaries/releases/tag/v2.15.4) has been validated for use with WHCP 21H2 and WHCP 22H2 when using Visual Studio 17.8 or greater. 
@@ -165,10 +167,7 @@ Visual Studio 17.8 broke compatibility with the older versions of CodeQL used in
     Follow special instructions for WHCP_21H2 and WHCP_22H2 using VS17.7 at the end of this readme
  
 ### Special instructions for WHCP_21H2 and WHCP_22H2 using VS17.7 or below
-   
-    
 These instructions only apply when using both Visual Studio 17.7 or below along with CodeQL 2.6.3 or 2.4.6
-
 
 1. Install CodeQL version as indicated in above steps.
 
