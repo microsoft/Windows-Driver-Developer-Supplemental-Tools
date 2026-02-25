@@ -3,7 +3,7 @@ library: false
 warnOnImplicitThis: false
 compileForOverlayEval: false
 name: microsoft/windows-drivers
-version: 1.8.2
+version: 1.8.3
 description: CodeQL queries designed for Windows device driver development.
 dependencies:
   codeql/cpp-all: ^7.0.0
