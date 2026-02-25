@@ -17,7 +17,7 @@
 		<sample language="c"> <![CDATA[
 		VOID ReleaseMyLock(_IRQL_restores_ KIRQL inIrql, PKSPIN_LOCK myLock) {
 			KeReleaseSpinLock(myLock, PASSIVE_LEVEL);
-		}}]]>
+		}]]>
 		</sample>
 		<p>
 			The driver should make sure to restore the IRQL from this parameter, or adjust its annotations:

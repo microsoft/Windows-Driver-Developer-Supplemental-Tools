@@ -42,8 +42,7 @@
 		//
 		PnpPowerCallbacks.EvtDevicePrepareHardware = FdoDevPrepareHardware;
 
-	}
-		}]]>
+	}]]>
 		</sample>
 		<p>
 			The driver annotate the FdoDevPrepareHardware function with the appropriate role type.
@@ -76,8 +75,7 @@
 		//
 		PnpPowerCallbacks.EvtDevicePrepareHardware = FdoDevPrepareHardware;
 
-	}
-		}]]>
+	}]]>
 		</sample>
 	</example>
 	<semmleNotes>

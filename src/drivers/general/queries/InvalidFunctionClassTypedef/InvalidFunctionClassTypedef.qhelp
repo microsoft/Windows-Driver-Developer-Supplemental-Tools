@@ -30,15 +30,10 @@
 			VOID)
 	{
 		; // Don't need to do anything heres
-	}
-		}]]>
+	}]]>
 		</sample>
 		
 	</example>
-	<semmleNotes>
-		<p>
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28268-function-class-does-not-match-typedef">

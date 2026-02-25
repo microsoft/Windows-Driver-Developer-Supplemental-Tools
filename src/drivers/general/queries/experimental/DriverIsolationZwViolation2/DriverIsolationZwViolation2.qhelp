@@ -22,8 +22,7 @@
                                NULL,    // handle
                                NULL);
 
-    	ntstatus = ZwOpenKey(&handleRegKey, KEY_READ, &ObjectAttributes);
-		}]]>
+    	ntstatus = ZwOpenKey(&handleRegKey, KEY_READ, &ObjectAttributes);]]>
 		</sample>
 		<p>
 			Example of a driver isolation violation where the OBJECT_ATTRIBUTES->ObjectName value is valid but with write access
@@ -36,15 +35,9 @@
                                NULL,    // handle
                                NULL);
 
-    	ntstatus = ZwOpenKey(&handleRegKey, KEY_ALL_ACCESS, &ObjectAttributes);
-		}]]>
+    	ntstatus = ZwOpenKey(&handleRegKey, KEY_ALL_ACCESS, &ObjectAttributes);]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-			
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation">

@@ -1,0 +1,47 @@
+# Multithreaded Access Violation Condition
+This warning indicates that a thread has potential to access deleted objects if preempted. Unlike the Code Analysis version of this query, this query does not currently verify the use of any synchronization mechanisms, so it may produce false positives.
+
+
+## Recommendation
+There should be no access to a reference-counted object after the reference count is at zero
+
+
+## Example
+In this example, m_cRef is a member of this. A thread T1 executes the if condition, decrements m_cRef to 1, and is then preempted. Another thread T2 executes the if condition, decrements m_cRef to 0, executes the if body (where this is deleted), and returns NULL.
+
+```c
+
+			ULONG Release_bad()
+			{
+				if (0 == InterlockedDecrement(&m_cRef))
+				{
+					delete this;
+					return NULL;
+				}
+				/* this.m_cRef isn't thread safe */
+				return m_cRef;
+			}
+			
+		
+```
+The following code does not reference any heap memory after the object is deleted.
+
+```c
+
+		ULONG CObject::Release()
+		{
+			ASSERT(0 != m_cRef);
+			ULONG cRef = InterlockedDecrement(&m_cRef);
+			if (0 == cRef)
+			{
+				delete this;
+				return NULL;
+			}
+			return cRef;
+		}
+		
+		
+```
+
+## References
+* [ Warning C28616 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28616-multithreaded-av-condition)

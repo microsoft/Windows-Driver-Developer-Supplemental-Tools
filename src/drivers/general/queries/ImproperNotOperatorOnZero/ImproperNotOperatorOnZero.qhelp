@@ -19,14 +19,9 @@
 		NTSTATUS test_func()
 		{
 			return !0;
-		}
 		}]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28650-generic-value-is-not-treated-as-failure">

@@ -23,7 +23,6 @@
 		else
 		{
 			return -1;
-		}
 		}]]>
 		</sample>
 		<p>
@@ -37,14 +36,9 @@
 		else
 		{
 			return -1;
-		}
 		}]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28715-boolean-cast-between-semantically-different-integer-types">
