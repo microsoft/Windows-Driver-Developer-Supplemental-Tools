@@ -36,16 +36,10 @@
 				__in struct _DEVICE_OBJECT *PhysicalDeviceObject)
 		{
 			return STATUS_SUCCESS;
-		}
 		}]]>
 		</sample>
 		
 	</example>
-	<semmleNotes>
-		<p>
-			
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28177-function-annotated-with-more-than-one-class">

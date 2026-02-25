@@ -19,7 +19,6 @@
 		{
 			float f = 0.0f;
 			f = f + 1.0f;
-		}
 		}]]>
 		</sample>
 		<p>
@@ -34,14 +33,9 @@
 		{
 			f = f + 1.0f;
 		}
-		KeRestoreFloatingPointState(&saveData);
-		}]]>
+		KeRestoreFloatingPointState(&saveData);]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28110-floating-point-hardware-protect">

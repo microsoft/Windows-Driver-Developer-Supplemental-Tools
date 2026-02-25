@@ -29,23 +29,15 @@
 
     	status = ZwOpenKey(&parametersKey,
                        KEY_READ,
-                       &objectAttributes);
-		}]]>
+                       &objectAttributes);]]>
 		</sample>
 		<p>
 			Example of no violation
 		</p>
 		<sample language="c"> <![CDATA[
-			TODO
-        }
-		}]]>
+			TODO]]>
 		</sample>
 	</example>
-	<semmleNotes>
-		<p>
-			
-		</p>
-	</semmleNotes>
 	<references>
 		<li>
 			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/develop/driver-isolation">
