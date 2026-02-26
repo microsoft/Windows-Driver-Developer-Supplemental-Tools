@@ -4,7 +4,7 @@ This repository contains open-source components for supplemental use in developi
 ### For General Use
 |  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
 |--------------------------|------------------------------------------|-------------------------------|-----------------------------|
-|  2.24.1 or greater* | [Latest Stable Version](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers) | 0.0.4 | Main |
+|  2.24.1 or greater* | [Latest Stable Version](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers) | 0.0.5 | Main |
 
 
 When using the precompiled pack, please use the most recent CodeQL CLI version listed above.

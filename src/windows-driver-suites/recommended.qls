@@ -59,7 +59,7 @@
       - microsoft/Security/Crytpography/HardcodedIVCNG.ql
 - queries: . 
   from: microsoft/cpp-queries 
-  version: 0.0.4
+  version: 0.0.5
 - include:
     query path: 
      - Best Practices/Likely Errors/OffsetUseBeforeRangeCheck.ql
