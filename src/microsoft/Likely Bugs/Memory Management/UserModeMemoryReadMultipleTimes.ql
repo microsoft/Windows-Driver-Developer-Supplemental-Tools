@@ -7,7 +7,7 @@
  * @problem.severity error
  * @tags security
  *       external/cwe/cwe-672
- * @id cpp/usermodememoryreadmultipletimes
+ * @id cpp/microsoft/public/likely-bugs/memory-management/usermodememoryreadmultipletimes
  */
 
 import cpp

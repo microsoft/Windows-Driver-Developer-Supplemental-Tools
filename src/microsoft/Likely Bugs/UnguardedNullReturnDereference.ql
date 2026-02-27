@@ -6,7 +6,7 @@
  * @problem.severity error
  * @tags security
  *       external/cwe/cwe-476
- * @id cpp/unguardednullreturndereference
+ * @id cpp/microsoft/public/likely-bugs/unguardednullreturndereference
  */
 
 import microsoft.code.cpp.commons.Literals

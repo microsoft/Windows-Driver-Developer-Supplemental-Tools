@@ -7,7 +7,7 @@
  * @problem.severity warning
  * @tags security
  *       external/cwe/cwe-755
- * @id cpp/usermodememoryoutsidetry
+ * @id cpp/microsoft/public/likely-bugs/memory-management/usermodememoryoutsidetry
  */
 
 import cpp

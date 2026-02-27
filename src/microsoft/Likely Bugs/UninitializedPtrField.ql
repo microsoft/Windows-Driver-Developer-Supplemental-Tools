@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/uninitializedptrfield
+ * @id cpp/microsoft/public/likely-bugs/uninitializedptrfield
  * @name Dereference of potentially uninitialized pointer field
  * @description A pointer field which was not initialized during or since class
  *              construction will cause a null pointer dereference.

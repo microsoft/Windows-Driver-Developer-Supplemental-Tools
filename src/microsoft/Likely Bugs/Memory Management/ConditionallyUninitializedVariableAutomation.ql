@@ -1,5 +1,5 @@
 /**
-* @id cpp/likely-bugs/memory-management/v2/conditionally-uninitialized-variable
+* @id cpp/microsoft/public/likely-bugs/memory-management/v2/conditionally-uninitialized-variable
 * @name Conditionally uninitialized variable
 * @description When an initialization function is used to initialize a local variable,
 *              but the returned status code is not checked, reading the variable may

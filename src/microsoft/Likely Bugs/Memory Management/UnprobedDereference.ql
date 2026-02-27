@@ -7,7 +7,7 @@
  * @problem.severity error
  * @tags security
  *       external/cwe/cwe-668
- * @id cpp/unprobeddereference
+ * @id cpp/microsoft/public/likely-bugs/memory-management/unprobeddereference
  */
 import microsoft.code.cpp.windows.kernel.SystemCalls
 import microsoft.code.cpp.windows.kernel.MemoryOriginDereferences
