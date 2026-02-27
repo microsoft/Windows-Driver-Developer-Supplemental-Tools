@@ -3,8 +3,8 @@
  */
 import cpp
 import external.ExternalArtifact
-private import microsoft.code.cpp.dispatch.VirtualDispatch
-import microsoft.code.cpp.NestedFields
+private import microsoft.code.cpp.public.dispatch.VirtualDispatch
+import microsoft.code.cpp.public.NestedFields
 import drivers.libraries.SAL
 import semmle.code.cpp.controlflow.Guards
 

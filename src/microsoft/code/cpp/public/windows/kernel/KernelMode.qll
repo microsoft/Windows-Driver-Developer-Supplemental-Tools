@@ -2,7 +2,7 @@
  * Provides classes and predicates for Windows kernel mode features.
  */
 import cpp
-import microsoft.code.cpp.controlflow.Dereferences
+import microsoft.code.cpp.public.controlflow.Dereferences
 
 /**
  * A call that frees memory.

@@ -3,9 +3,9 @@
  * flowing from memory origins.
  */
 
-private import microsoft.code.cpp.controlflow.Dereferences
+private import microsoft.code.cpp.public.controlflow.Dereferences
 private import semmle.code.cpp.dataflow.new.DataFlow
-private import microsoft.code.cpp.windows.kernel.SystemCalls as SystemCalls
+private import microsoft.code.cpp.public.windows.kernel.SystemCalls as SystemCalls
 import MemoryOrigins
 private import KernelMode
 

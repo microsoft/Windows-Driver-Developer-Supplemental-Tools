@@ -11,8 +11,8 @@
  */
 
 import cpp
-import microsoft.code.cpp.windows.kernel.SystemCalls
-import microsoft.code.cpp.windows.kernel.MemoryOriginDereferences
+import microsoft.code.cpp.public.windows.kernel.SystemCalls
+import microsoft.code.cpp.public.windows.kernel.MemoryOriginDereferences
 
 /**
  * Ignore dereferencing accesses that occur within Microsoft try-except blocks.

@@ -2,11 +2,11 @@
  * Provides classes for identifying double fetch problems, and common mitigations.
  */
 import cpp
-import microsoft.code.cpp.windows.kernel.MemoryOrigins
-import microsoft.code.cpp.windows.kernel.MemoryOriginDereferences
-import microsoft.code.cpp.windows.kernel.KernelMode
-import microsoft.code.cpp.controlflow.Reachability
-import microsoft.code.cpp.controlflow.Dereferences
+import microsoft.code.cpp.public.windows.kernel.MemoryOrigins
+import microsoft.code.cpp.public.windows.kernel.MemoryOriginDereferences
+import microsoft.code.cpp.public.windows.kernel.KernelMode
+import microsoft.code.cpp.public.controlflow.Reachability
+import microsoft.code.cpp.public.controlflow.Dereferences
 
 /**
  * An expression that dereferences a pointer that may point to

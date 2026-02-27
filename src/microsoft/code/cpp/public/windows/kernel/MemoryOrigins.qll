@@ -4,8 +4,8 @@
 
 import cpp
 private import semmle.code.cpp.dataflow.new.DataFlow
-private import microsoft.code.cpp.windows.kernel.IRP
-private import microsoft.code.cpp.windows.kernel.SystemCalls
+private import microsoft.code.cpp.public.windows.kernel.IRP
+private import microsoft.code.cpp.public.windows.kernel.SystemCalls
 
 private module NestedBufferDataFlowTrace = DataFlow::Global<NestedBufferDataFlowConfig>;
 

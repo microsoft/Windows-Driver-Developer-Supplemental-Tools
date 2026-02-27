@@ -7,8 +7,8 @@
  */
 import cpp
 import drivers.libraries.SAL
-import microsoft.code.cpp.windows.kernel.KernelMode
-import microsoft.code.cpp.controlflow.Dereferences
+import microsoft.code.cpp.public.windows.kernel.KernelMode
+import microsoft.code.cpp.public.controlflow.Dereferences
 
 /**
  * A function that can be invoked by user mode through a system call.

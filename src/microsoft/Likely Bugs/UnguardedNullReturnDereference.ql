@@ -9,10 +9,10 @@
  * @id cpp/microsoft/public/likely-bugs/unguardednullreturndereference
  */
 
-import microsoft.code.cpp.commons.Literals
-import microsoft.code.cpp.commons.MemoryAllocation
-import microsoft.code.cpp.controlflow.Dereferences
-import microsoft.code.cpp.controlflow.Reachability
+import microsoft.code.cpp.public.commons.Literals
+import microsoft.code.cpp.public.commons.MemoryAllocation
+import microsoft.code.cpp.public.controlflow.Dereferences
+import microsoft.code.cpp.public.controlflow.Reachability
 import drivers.libraries.SAL
 import semmle.code.cpp.controlflow.StackVariableReachability
 

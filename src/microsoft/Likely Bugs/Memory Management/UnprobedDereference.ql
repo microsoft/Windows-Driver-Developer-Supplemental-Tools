@@ -9,9 +9,9 @@
  *       external/cwe/cwe-668
  * @id cpp/microsoft/public/likely-bugs/memory-management/unprobeddereference
  */
-import microsoft.code.cpp.windows.kernel.SystemCalls
-import microsoft.code.cpp.windows.kernel.MemoryOriginDereferences
-import microsoft.code.cpp.controlflow.Reachability
+import microsoft.code.cpp.public.windows.kernel.SystemCalls
+import microsoft.code.cpp.public.windows.kernel.MemoryOriginDereferences
+import microsoft.code.cpp.public.controlflow.Reachability
 
 /**
  * A dereferencing access that should be ignored because it is either within a probe call, or is
