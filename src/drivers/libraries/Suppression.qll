@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 import cpp
 
 // Reference: https://learn.microsoft.com/en-us/cpp/preprocessor/warning?view=msvc-170

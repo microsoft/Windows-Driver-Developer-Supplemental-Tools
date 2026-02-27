@@ -8,6 +8,7 @@
  * @repro.text The following function calls both FwpsStreamContinue and FwpsStreamInjectAsync
  * @kind problem
  * @id cpp/windows/wdk/kmdf/wfp/stream-inspection-call-violation
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @precision medium
  * @tags correctness

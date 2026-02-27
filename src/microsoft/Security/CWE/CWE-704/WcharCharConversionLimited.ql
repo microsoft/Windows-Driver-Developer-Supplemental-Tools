@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name Cast from char* to wchar_t* (ignore PUCHAR casts)
  * @description Casting a byte string to a wide-character string is likely
@@ -6,6 +8,7 @@
  *              This query is a specilized version of `cpp/incorrect-string-type-conversion` that ignores casting to `PUCHAR`
  * @kind problem
  * @id cpp/incorrect-string-type-conversion-ignore-puchar-casts
+ * @owner.email sdat@microsoft.com
  * @problem.severity error
  * @security-severity 8.8
  * @precision high

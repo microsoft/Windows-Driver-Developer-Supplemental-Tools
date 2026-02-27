@@ -9,7 +9,7 @@
  * @feature.area Multiple
  * @impact Insecure Coding Practice
  * @repro.text This warning can be generated when there is a chain of typedefs.
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-c28177
  * @problem.severity warning
  * @precision medium

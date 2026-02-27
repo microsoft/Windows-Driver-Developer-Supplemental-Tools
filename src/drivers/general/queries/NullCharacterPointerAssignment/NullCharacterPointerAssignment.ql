@@ -9,7 +9,7 @@
  * @feature.area Multiple
  * @impact Insecure Coding Practice
  * @repro.text
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28730
  * @problem.severity warning
  * @precision medium

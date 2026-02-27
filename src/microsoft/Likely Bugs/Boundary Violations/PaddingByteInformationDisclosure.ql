@@ -7,6 +7,7 @@
  * @description A newly allocated struct or class that is initialized member-by-member may
  *              leak information if it includes padding bytes.
  * @kind problem
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @tags security
  *       external/cwe/cwe-200

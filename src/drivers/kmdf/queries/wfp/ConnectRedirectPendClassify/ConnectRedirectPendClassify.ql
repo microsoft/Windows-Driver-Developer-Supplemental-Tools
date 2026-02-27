@@ -10,6 +10,7 @@
  * @repro.text The following function does not FWP_ACTION_BLOCK and/or clear the FWPS_RIGHT_ACTION_WRITE flag before calling FwpsPendClassify0
  * @kind problem
  * @id cpp/windows/wdk/kmdf/wfp/connect-redirect-pend-classify
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @precision low
  * @tags correctness

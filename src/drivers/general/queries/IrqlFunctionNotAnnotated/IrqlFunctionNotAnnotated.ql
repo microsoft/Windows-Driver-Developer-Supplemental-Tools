@@ -9,7 +9,7 @@
  * @feature.area Multiple
  * @impact Insecure Coding Practice
  * @repro.text This warning occurs when an IRQL annotation on a function is required, but one doesn't exist.
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28167
  * @problem.severity warning
  * @precision medium

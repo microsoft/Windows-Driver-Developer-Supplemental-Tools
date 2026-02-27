@@ -6,6 +6,7 @@
  * @description An allocated memory block is used after it has been freed. Behavior in such cases is undefined and can cause memory corruption.
  * @kind problem
  * @id cpp/use-after-free
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @tags reliability
  *       security

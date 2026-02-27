@@ -5,6 +5,7 @@
  * @description Finds usage of a static (hardcoded) IV. (CNG)
  * @kind problem
  * @id cpp/weak-crypto/cng/hardcoded-iv
+ * @owner.email sdat@microsoft.com
  * @problem.severity error
  * @precision high
  * @tags security

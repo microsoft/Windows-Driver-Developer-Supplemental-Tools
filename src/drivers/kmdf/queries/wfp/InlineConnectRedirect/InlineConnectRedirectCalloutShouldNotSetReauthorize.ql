@@ -8,6 +8,7 @@
  * @repro.text The following function asks for reauthorization and is an inline callout this is a contract violation
  * @kind problem
  * @id cpp/windows/wdk/kmdf/wfp/inline-connect-redirect
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @precision medium
  * @tags correctness

@@ -5,6 +5,7 @@
  * @description Calling a WDF init API on a WDFDEVICE_INIT structure after calling WdfDeviceCreate can cause system instability, as the framework takes ownership of the structure.
  * Partially ported from the Static Driver Verifier (SDV) rule DeviceInitAPI; see https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/kmdf-deviceinitapi for details.
  * @kind path-problem
+ * @owner.email sdat@microsoft.com
  * @problem.severity error
  * @precision medium
  * @id cpp/windows/wdk/kmdf/device-init-api

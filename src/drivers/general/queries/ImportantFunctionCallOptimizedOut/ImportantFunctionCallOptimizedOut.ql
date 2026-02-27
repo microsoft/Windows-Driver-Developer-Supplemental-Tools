@@ -9,7 +9,7 @@
  * @feature.area Multiple
  * @impact Insecure Coding Practice
  * @repro.text The current function call might be optimized during compilation, which could make sensitive data stay in memory. Use the SecureZeroMemory or RtlSecureZeroMemory functions instead. A heuristic looks for identifier names that contain items such as "key" or "pass" to trigger this warning.
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28625
  * @problem.severity warning
  * @precision medium

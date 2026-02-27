@@ -1,11 +1,12 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * This QL library defines classes and predicates for analyzing NDIS drivers.
  * It provides definitions for NDIS dispatch routines, callback routines, and role types.
  * The library also includes a typedef for the standard NDIS callback routines.
  */
 
-// Copyright (c) Microsoft Corporation.
-// Licensed under the MIT license.
+
 import cpp
 import drivers.libraries.SAL
 

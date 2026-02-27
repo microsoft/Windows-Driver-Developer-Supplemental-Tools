@@ -10,7 +10,7 @@
  * @platform Desktop
  * @feature.area Multiple
  * @impact Insecure Coding Practice
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-D0008
  * @problem.severity warning
  * @precision medium

@@ -1,8 +1,11 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name Driver alert suppression
  * @description Suppresses alerts in Windows Drivers based on Code Analysis syntax.
  * @kind alert-suppression
  * @id cpp/windows/drivers/driver-alert-suppression
+ * @owner.email sdat@microsoft.com
  * 
  * This query is a suppression query designed to identify existing PREFast-style suppressions
  * in Windows driver code and honor them through LGTM's suppression system.  It cannot be run
