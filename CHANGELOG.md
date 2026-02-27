@@ -14,6 +14,7 @@ All notable changes to this project will be documented in this file.
 
 ### Changed
  - Standardized the rule ID of UninitializedPtrField.ql to "cpp/microsoft/public/likely-bugs/uninitializedptrfield" and updated accuracy.
+ - Standardized owner emails for all queries.
 
 ## [1.8.3] - 2026-02-25
 
