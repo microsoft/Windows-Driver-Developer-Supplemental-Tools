@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.8.3] - 2026-02-25
+
+### Changed
+ - Updated the C/C++ CodeQL libraries we depend on to version 7.0.0.
+ - Updated the cpp-queries pack we depend on to version 0.0.5.
 
 ## [1.8.2] - 2026-01-23
 

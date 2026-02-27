@@ -34,11 +34,11 @@ predicate areExpressionsGuardedBySimilarConditionsThatMayCallReturnStatement( Ex
 		gc1.controls(e1.getBasicBlock(), _) and
 		gc2.controls(exitExpr.getBasicBlock(), b) and
 		gc2.controls(e2.getBasicBlock(), b.booleanNot()) and
-		gc1.getEnclosingFunction() = gc2.getEnclosingFunction() and
-		gc1.getASuccessor*() = gc2 and
+		gc1.(Expr).getEnclosingFunction() = gc2.(Expr).getEnclosingFunction() and
+		gc1.(Expr).getASuccessor*() = gc2.(Expr) and
 		forall( Variable v | 
-		  	v.getAnAccess() = gc1.getAChild() |
-		  	v.getAnAccess() = gc2.getAChild() ) and
+		  	v.getAnAccess() = gc1.(Expr).getAChild() |
+		  	v.getAnAccess() = gc2.(Expr).getAChild() ) and
 		exitExpr.getEnclosingElement() instanceof ReturnStmt
 	)
 }
