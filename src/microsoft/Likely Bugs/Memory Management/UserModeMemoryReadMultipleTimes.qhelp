@@ -1,0 +1,26 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+  <overview>
+    <p>User mode memory should always be transferred to kernel memory before being read repeatedly, to avoid its content changing based on user actions ("double fetch" vulnerability).</p>
+  </overview>
+
+  <recommendation>
+    <p>Transfer user mode memory to kernel memory.</p>
+  </recommendation>
+
+  <example>
+    <p>The following examples show scenarios where double fetch may occur.</p>
+    <sample src="UserModeMemoryReadMultipleTimes1.c" />
+
+    <p>To correct the problem, be sure to read from user memory only once.</p>
+    <sample src="UserModeMemoryReadMultipleTimes2.c" />
+
+  </example>
+
+  <references>
+    <li> MSRC: <a href="https://msrc-blog.microsoft.com/2008/10/14/ms08-061-the-case-of-the-kernel-mode-double-fetch/#:~:text=When%20accessing%20user%20mode%20data%2C%20kernel%20mode%20code,type%20of%20problem%20known%20as%20a%20%E2%80%9Cdouble%20fetch%E2%80%9D.">MS08-061: The case of the kernel mode double-fetch</a>.</li>
+  </references>
+
+</qhelp>
