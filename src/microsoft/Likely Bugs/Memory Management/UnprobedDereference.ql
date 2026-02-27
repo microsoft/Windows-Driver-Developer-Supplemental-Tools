@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name User provided pointer dereferenced without a probe.
  * @description If a user provided pointer is dereferenced without first being
@@ -7,6 +9,7 @@
  * @problem.severity error
  * @tags security
  *       external/cwe/cwe-668
+ * @owner.email sdat@microsoft.com
  * @id cpp/microsoft/public/likely-bugs/memory-management/unprobeddereference
  */
 import microsoft.code.cpp.public.windows.kernel.SystemCalls

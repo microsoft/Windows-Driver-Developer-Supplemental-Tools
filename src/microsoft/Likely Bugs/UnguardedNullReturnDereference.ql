@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name Result of call that may return NULL dereferenced unconditionally
  * @description If a call is known to return NULL, the result should be checked
@@ -6,6 +8,7 @@
  * @problem.severity error
  * @tags security
  *       external/cwe/cwe-476
+ * @owner.email sdat@microsoft.com
  * @id cpp/microsoft/public/likely-bugs/unguardednullreturndereference
  */
 

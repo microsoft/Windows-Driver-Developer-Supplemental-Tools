@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name User mode memory read outside a try block
  * @description Reading user memory outside a try/catch block is discouraged, as
@@ -7,6 +9,7 @@
  * @problem.severity warning
  * @tags security
  *       external/cwe/cwe-755
+ * @owner.email sdat@microsoft.com
  * @id cpp/microsoft/public/likely-bugs/memory-management/usermodememoryoutsidetry
  */
 

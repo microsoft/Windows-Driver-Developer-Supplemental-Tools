@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * @name Double fetch of user memory
  * @description User mode memory should always be transferred to kernel memory before
@@ -7,6 +9,7 @@
  * @problem.severity error
  * @tags security
  *       external/cwe/cwe-672
+ * @owner.email sdat@microsoft.com
  * @id cpp/microsoft/public/likely-bugs/memory-management/usermodememoryreadmultipletimes
  */
 

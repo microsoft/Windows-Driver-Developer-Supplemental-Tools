@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * Provides classes and predicates for identifying functions that initialize their arguments.
  */

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * Provides classes for identifying dereferences of data
  * flowing from memory origins.

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * Provides classes and predicates for identifying expressions that are dereferences of a pointer.
  *

@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
 * @id cpp/microsoft/public/likely-bugs/memory-management/v2/conditionally-uninitialized-variable
 * @name Conditionally uninitialized variable
@@ -9,7 +11,7 @@
 * @impact Insecure Coding Practice
 * @feature.area Multiple 
 * @repro.text The following code locations potentially contain uninitialized variables
-* @owner.email pabrooke@microsoft.com
+* @owner.email sdat@microsoft.com
 * @kind problem
 * @problem.severity error
 * @query-version 2.0
