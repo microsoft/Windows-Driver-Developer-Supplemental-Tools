@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 import cpp
 import drivers.libraries.SAL
 // import drivers.libraries.Irql // TODO: add this back in 

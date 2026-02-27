@@ -6,6 +6,7 @@
  * @description A pointer field which was not initialized during or since class
  *              construction will cause a null pointer dereference.
  * @kind problem
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @tags security
  *       external/cwe/cwe-476

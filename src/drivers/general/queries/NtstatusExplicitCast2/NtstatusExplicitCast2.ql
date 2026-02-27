@@ -10,6 +10,7 @@
  * @impact Insecure Coding Practice
  * @repro.text This warning indicates that a Boolean is being cast to NTSTATUS. This is likely to give undesirable results. For example, the typical failure value for functions that return a Boolean (FALSE) is a success status when tested as an NTSTATUS.
  * @opaqueid CQLD-C28715
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @precision medium
  * @tags correctness

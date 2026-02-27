@@ -9,7 +9,7 @@
  * @feature.area Multiple
  * @impact Annotations
  * @repro.text
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28266
  * @problem.severity warning
  * @precision medium

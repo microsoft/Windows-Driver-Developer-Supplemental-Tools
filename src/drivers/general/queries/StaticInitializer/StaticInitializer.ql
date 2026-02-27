@@ -17,7 +17,7 @@
  * static initializer are not pointer-to-member-function.  If a
  * pointer-to-member-function is required, write a simple static
  * member function that wraps a call to the actual member function.
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28651
  * @problem.severity warning
  * @precision medium

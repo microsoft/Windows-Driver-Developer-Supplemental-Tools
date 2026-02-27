@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 import cpp
 import semmle.code.cpp.dataflow.new.DataFlow
 import semmle.code.cpp.dataflow.new.TaintTracking
