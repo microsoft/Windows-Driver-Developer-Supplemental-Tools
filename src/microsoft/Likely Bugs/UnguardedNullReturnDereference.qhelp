@@ -1,0 +1,24 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+  <overview>
+    <p>A null pointer dereference can cause program crash or exit.</p>
+  </overview>
+
+  <recommendation>
+    <p>Make sure to initialize all pointer fields before usage.</p>
+  </recommendation>
+
+  <example>
+    <p>The following examples show scenarios where a pointer is dereferenced without a null check.</p>
+    <sample src="UnguardedNullReturnDereferenceBad.c" />
+
+    <p>To correct the problem, check the pointer before dereferencing.</p>
+    <sample src="UnguardedNullReturnDereferenceGood.c" />
+  </example>
+  <references>
+    <li> CWE: <a href="https://cwe.mitre.org/data/definitions/476.html">CWE-476: NULL Pointer Dereference</a>.</li>
+  </references>
+
+</qhelp>

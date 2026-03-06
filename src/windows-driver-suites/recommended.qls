@@ -54,7 +54,12 @@
       - microsoft/Likely Bugs/Boundary Violations/PaddingByteInformationDisclosure.ql
       - microsoft/Likely Bugs/Conversion/BadOverflowGuard.ql
       - microsoft/Likely Bugs/Conversion/InfiniteLoop.ql
+      - microsoft/Likely Bugs/Memory Management/ConditionallyUninitializedVariable.ql
+      - microsoft/Likely Bugs/Memory Management/UnprobedDereference.ql
+      - microsoft/Likely Bugs/Memory Management/UserModeMemoryOutsideTry.ql
+      - microsoft/Likely Bugs/Memory Management/UserModeMemoryReadMultipleTimes.ql
       - microsoft/Likely Bugs/Memory Management/UseAfterFree/UseAfterFree.ql
+      - microsoft/Likely Bugs/UnguardedNullReturnDereference.ql
       - microsoft/Likely Bugs/UninitializedPtrField.ql
       - microsoft/Security/Crytpography/HardcodedIVCNG.ql
 - queries: . 

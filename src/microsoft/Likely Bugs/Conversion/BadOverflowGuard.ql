@@ -9,6 +9,7 @@
  *              argument types are smaller than 4 bytes. This is because the
  *              result of the addition is promoted to a 4 byte int.
  * @kind problem
+ * @owner.email sdat@microsoft.com
  * @problem.severity error
  * @tags security
  *       external/cwe/cwe-190

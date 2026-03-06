@@ -1,0 +1,21 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+  <overview>
+    <p>Reading user memory outside a try/catch block is discouraged, as unexpected exceptions can occur if untrusted code changes memory protections.</p>
+  </overview>
+
+  <recommendation>
+    <p>Move all reads to user memory to inside a try-catch block.</p>
+  </recommendation>
+
+  <example>
+    <p>The following examples show scenarios where uncaught exceptions can occur.</p>
+    <sample src="UserModeMemoryOutsideTry1.c" />
+
+    <p>To correct the problem, transfer user mode memory use to inside a try-catch block.</p>
+    <sample src="UserModeMemoryOutsideTry2.c" />
+  </example>
+
+</qhelp>

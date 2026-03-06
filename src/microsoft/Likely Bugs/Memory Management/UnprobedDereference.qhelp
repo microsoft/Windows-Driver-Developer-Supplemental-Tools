@@ -1,0 +1,24 @@
+<!DOCTYPE qhelp PUBLIC
+  "-//Semmle//qhelp//EN"
+  "qhelp.dtd">
+<qhelp>
+  <overview>
+    <p>In low-level Windows kernel code, dereferencing a pointer originating from user mode is dangerous if the pointer has not been validated (probed). 
+    An unvalidated pointer may point to privileged kernel memory or invalid addresses.
+    Using proper user-mode accessors such as <code>ReadULongFromUser</code> or probing via APIs such as <code>ProbeForRead</code> ensures that invalid or malicious user-supplied addresses do not compromise the kernel.</p>
+  </overview>
+
+  <recommendation>
+    <p>Before dereferencing pointers from user memory in kernel-mode code, always validate them.</p>
+  </recommendation>
+    <references>
+    <li>
+    Microsoft Learn:
+    <a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/kernel/user-mode-accessors">User-mode accessors</a>.
+    </li>
+    <li>
+    Microsoft Learn:
+    <a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/ddi/wdm/nf-wdm-probeforread">ProbeForRead</a>.
+    </li>
+    </references>
+</qhelp>

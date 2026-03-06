@@ -1,3 +1,5 @@
+// Copyright (c) Microsoft Corporation.
+// Licensed under the MIT license.
 /**
  * Provides classes for identifying and reasoning about Microsoft Windows Filtering Platform Callout
  * (WFP) Annotation

@@ -10,7 +10,7 @@
  * @impact Attack Surface Reduction
  * @feature.area Multiple
  * @repro.text The following code locations contain calls to an unsafe, deprecated function or macro.
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28719
  * @problem.severity warning
  * @precision high

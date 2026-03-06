@@ -11,7 +11,7 @@
  * @repro.text When the driver's Cancel routine exits, the value of the Irp->CancelIrql member is not the current IRQL. 
  * Typically, this error occurs when the driver does not call IoReleaseCancelSpinLock with the IRQL that was supplied by 
  * the most recent call to IoAcquireCancelSpinLock.
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28144
  * @problem.severity warning
  * @precision medium

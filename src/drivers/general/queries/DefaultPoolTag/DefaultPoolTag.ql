@@ -9,7 +9,7 @@
  * @feature.area Multiple
  * @impact Insecure Coding Practice
  * @repro.text The following code locations call a pool allocation function with one of the default tags (' mdW' or ' kdD').
- * @owner.email: sdat@microsoft.com
+ * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28147
  * @problem.severity warning
  * @precision high

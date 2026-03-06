@@ -8,6 +8,7 @@
  * @repro.text The following function does not correctly set an action type for non-inspection Stream callouts
  * @kind problem
  * @id cpp/windows/wdk/kmdf/wfp/stream-callout-set-action-type
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @precision medium
  * @tags correctness

@@ -7,6 +7,7 @@
  * @description Comparisons between types of different widths in a loop
  *              condition can cause the loop to fail to terminate.
  * @kind problem
+ * @owner.email sdat@microsoft.com
  * @problem.severity error
  * @tags reliability
  *       security

@@ -8,6 +8,7 @@
  * @repro.text One or more WDM dispatch routines is incorrectly annotated.
  * @kind problem
  * @id cpp/windows/wdk/inconsistent-dispatch-annotation
+ * @owner.email sdat@microsoft.com
  * @problem.severity warning
  * @query-version v1
  */
