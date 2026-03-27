@@ -27,7 +27,7 @@ DeclStmt declWithNoInit(LocalVariable v) {
 }
 
 /**
- * Control flow reachability from a buffer that is not not null terminated to a
+ * Control flow reachability from a buffer that is not null terminated to a
  * sink that requires null termination.
  */
 class ImproperNullTerminationReachability extends StackVariableReachabilityWithReassignment {
