@@ -1,0 +1,57 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			WDF drivers should not drain, stop, or purge I/O queues from the
+			<code>EvtDeviceSurpriseRemoval</code> callback. This callback is not synchronized
+			with the power-down path, so manipulating queues here can cause race conditions
+			and system instability.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Move queue drain, stop, or purge operations to self-managed I/O callbacks such as
+			<code>EvtDeviceSelfManagedIoCleanup</code> or <code>EvtDeviceSelfManagedIoSuspend</code>,
+			which are properly synchronized with the power-down path.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			The following example shows incorrect code that purges a queue from the surprise
+			removal callback, followed by the correct approach using a self-managed I/O callback.
+		</p>
+		<sample language="c"> <![CDATA[
+// INCORRECT: Purging queue from EvtDeviceSurpriseRemoval
+EVT_WDF_DEVICE_SURPRISE_REMOVAL EvtDeviceSurpriseRemoval;
+VOID EvtDeviceSurpriseRemoval(
+    _In_ WDFDEVICE Device)
+{
+    PFDO_DATA fdoData = GetDeviceContext(Device);
+    // BUG: Not synchronized with power-down path
+    WdfIoQueuePurgeSynchronously(fdoData->Queue);
+}
+
+// CORRECT: Use self-managed I/O cleanup instead
+EVT_WDF_DEVICE_SELF_MANAGED_IO_CLEANUP EvtDeviceSelfManagedIoCleanup;
+VOID EvtDeviceSelfManagedIoCleanup(
+    _In_ WDFDEVICE Device)
+{
+    PFDO_DATA fdoData = GetDeviceContext(Device);
+    // OK: Properly synchronized with power-down path
+    WdfIoQueuePurgeSynchronously(fdoData->Queue);
+}]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/kmdf-evtsurpriseremovenosuspendqueue">
+				KMDF Rule: EvtSurpriseRemoveNoSuspendQueue
+			</a>
+		</li>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/surprise-removal-sequence">
+				Surprise Removal Sequence
+			</a>
+		</li>
+	</references>
+</qhelp>

@@ -845,3 +845,96 @@ class NdisProtocolCoSendNetBufferListsComplete extends NdisCallbackRoutine {
 class NdisProtocolCoStatusEx extends NdisCallbackRoutine {
   NdisProtocolCoStatusEx() { callbackType.getName().matches("PROTOCOL_CO_STATUS_EX") }
 }
+
+// ============================================================================
+// Struct-field-based callback detection for old NDIS drivers
+// ============================================================================
+// Older NDIS drivers don't use role type annotations. Instead, they assign
+// callback functions to fields of NDIS_MINIPORT_DRIVER_CHARACTERISTICS.
+// These classes detect callbacks by both methods.
+
+/**
+ * A function assigned to a field of an NDIS characteristics struct.
+ * Matches patterns like:
+ *   MPChar.InitializeHandlerEx = MPInitialize;
+ *   MPChar.HaltHandlerEx = MPHalt;
+ */
+private Function getCharacteristicsFieldTarget(string fieldName) {
+  exists(AssignExpr ae, FieldAccess fa |
+    ae.getLValue() = fa and
+    fa.getTarget().getName() = fieldName and
+    ae.getRValue().(FunctionAccess).getTarget() = result
+  )
+}
+
+/**
+ * A function serving as MiniportInitializeEx, detected by role type OR
+ * by assignment to `InitializeHandlerEx` in the characteristics struct.
+ */
+class NdisMiniportInitializeFunction extends Function {
+  NdisMiniportInitializeFunction() {
+    this instanceof NdisMiniportInitialize
+    or
+    this = getCharacteristicsFieldTarget("InitializeHandlerEx")
+  }
+}
+
+/**
+ * A function serving as MiniportHaltEx, detected by role type OR
+ * by assignment to `HaltHandlerEx` in the characteristics struct.
+ */
+class NdisMiniportHaltFunction extends Function {
+  NdisMiniportHaltFunction() {
+    this instanceof NdisMiniportHalt
+    or
+    this = getCharacteristicsFieldTarget("HaltHandlerEx")
+  }
+}
+
+/**
+ * A function serving as MiniportPause, detected by role type OR
+ * by assignment to `PauseHandler` in the characteristics struct.
+ */
+class NdisMiniportPauseFunction extends Function {
+  NdisMiniportPauseFunction() {
+    this instanceof NdisMiniportPause
+    or
+    this = getCharacteristicsFieldTarget("PauseHandler")
+  }
+}
+
+/**
+ * A function serving as MiniportRestart, detected by role type OR
+ * by assignment to `RestartHandler` in the characteristics struct.
+ */
+class NdisMiniportRestartFunction extends Function {
+  NdisMiniportRestartFunction() {
+    this instanceof NdisMiniportRestart
+    or
+    this = getCharacteristicsFieldTarget("RestartHandler")
+  }
+}
+
+/**
+ * A function serving as FilterAttach, detected by role type OR
+ * by assignment to `AttachHandler` in the characteristics struct.
+ */
+class NdisFilterAttachFunction extends Function {
+  NdisFilterAttachFunction() {
+    this instanceof NdisFilterAttach
+    or
+    this = getCharacteristicsFieldTarget("AttachHandler")
+  }
+}
+
+/**
+ * A function serving as FilterDetach, detected by role type OR
+ * by assignment to `DetachHandler` in the characteristics struct.
+ */
+class NdisFilterDetachFunction extends Function {
+  NdisFilterDetachFunction() {
+    this instanceof NdisFilterDetach
+    or
+    this = getCharacteristicsFieldTarget("DetachHandler")
+  }
+}

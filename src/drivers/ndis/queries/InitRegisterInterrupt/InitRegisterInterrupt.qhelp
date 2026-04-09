@@ -1,0 +1,50 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			If an NDIS miniport driver calls <code>NdisMRegisterInterruptEx</code> during
+			initialization (<code>MiniportInitializeEx</code>), it must call
+			<code>NdisMDeregisterInterruptEx</code> during halt (<code>MiniportHaltEx</code>)
+			to properly release the interrupt resource. Failing to deregister causes resource
+			leaks and potential system instability.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Ensure that <code>NdisMDeregisterInterruptEx</code> is called in your
+			<code>MiniportHaltEx</code> callback for every interrupt registered during
+			initialization. Also ensure it is called on the error cleanup path if
+			initialization fails after registering the interrupt.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			The following example shows the correct pattern for registering and
+			deregistering an interrupt.
+		</p>
+		<sample language="c"> <![CDATA[
+// In MiniportInitializeEx:
+status = NdisMRegisterInterruptEx(
+    MiniportAdapterHandle,
+    Adapter,
+    &InterruptCharacteristics,
+    &Adapter->InterruptHandle);
+if (status != NDIS_STATUS_SUCCESS) {
+    goto cleanup;
+}
+
+// In MiniportHaltEx:
+if (Adapter->InterruptHandle != NULL) {
+    NdisMDeregisterInterruptEx(Adapter->InterruptHandle);
+    Adapter->InterruptHandle = NULL;
+}]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/ndis-init-registerinterrupt">
+				NDIS Rule: Init_RegisterInterrupt
+			</a>
+		</li>
+	</references>
+</qhelp>

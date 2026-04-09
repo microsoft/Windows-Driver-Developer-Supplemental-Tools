@@ -1,0 +1,61 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			KMDF drivers that use power-managed I/O queues must handle pending requests
+			during power transitions. If the driver does not register an
+			<code>EvtIoStop</code> callback on its power-managed queues and does not
+			register <code>EvtDeviceSelfManagedIoSuspend</code>, pending requests will
+			block the power-down sequence, potentially causing Bug Check 0x9F
+			(DRIVER_POWER_STATE_FAILURE).
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Either register an <code>EvtIoStop</code> callback in the
+			<code>WDF_IO_QUEUE_CONFIG</code> for each power-managed queue, or register
+			<code>EvtDeviceSelfManagedIoSuspend</code> via
+			<code>WdfDeviceInitSetPnpPowerEventCallbacks</code>.
+		</p>
+		<p>
+			If the driver completes all requests synchronously in its queue handlers
+			(never holds or forwards them), you can suppress this warning using
+			<code>__analysis_assume</code>.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			The following example shows incorrect code that creates a power-managed
+			queue without EvtIoStop, followed by the corrected version.
+		</p>
+		<sample language="c"> <![CDATA[
+// INCORRECT: Power-managed queue without EvtIoStop
+WDF_IO_QUEUE_CONFIG queueConfig;
+WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchSequential);
+queueConfig.EvtIoRead = EvtIoRead;
+queueConfig.EvtIoWrite = EvtIoWrite;
+// Missing: queueConfig.EvtIoStop = EvtIoStop;
+WdfIoQueueCreate(device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);
+
+// CORRECT: Register EvtIoStop
+WDF_IO_QUEUE_CONFIG queueConfig;
+WDF_IO_QUEUE_CONFIG_INIT_DEFAULT_QUEUE(&queueConfig, WdfIoQueueDispatchSequential);
+queueConfig.EvtIoRead = EvtIoRead;
+queueConfig.EvtIoWrite = EvtIoWrite;
+queueConfig.EvtIoStop = EvtIoStop;
+WdfIoQueueCreate(device, &queueConfig, WDF_NO_OBJECT_ATTRIBUTES, &queue);]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/kmdf-drvackiostop">
+				KMDF Rule: DrvAckIoStop
+			</a>
+		</li>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/using-power-managed-i-o-queues">
+				Using Power-Managed I/O Queues
+			</a>
+		</li>
+	</references>
+</qhelp>

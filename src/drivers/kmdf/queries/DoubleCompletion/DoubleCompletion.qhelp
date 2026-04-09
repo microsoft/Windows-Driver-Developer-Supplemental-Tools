@@ -1,0 +1,91 @@
+<!DOCTYPE qhelp PUBLIC "-//Semmle//qhelp//EN" "qhelp.dtd">
+<qhelp>
+	<overview>
+		<p>
+			WDF drivers must not complete the same I/O request twice. Calling
+			<code>WdfRequestComplete</code>, <code>WdfRequestCompleteWithInformation</code>,
+			or <code>WdfRequestCompleteWithPriorityBoost</code> a second time on a request
+			that has already been completed causes a double-free of the framework's internal
+			request object, which can corrupt memory, crash the system, or create an
+			exploitable vulnerability.
+		</p>
+	</overview>
+	<recommendation>
+		<p>
+			Ensure each code path through an I/O callback completes the request exactly once.
+			Common patterns that lead to double completion include:
+		</p>
+		<ul>
+			<li>Completing in both an error-handling block and a fall-through path.</li>
+			<li>Completing before calling a helper function that also completes.</li>
+			<li>Completing both before and after a conditional branch.</li>
+		</ul>
+		<p>
+			Use a local boolean flag or restructure branching logic to guarantee single completion.
+		</p>
+	</recommendation>
+	<example>
+		<p>
+			The following example shows incorrect code that completes a request twice,
+			followed by the corrected version.
+		</p>
+		<sample language="c"> <![CDATA[
+// INCORRECT: Request is completed twice
+VOID EvtIoDeviceControl(
+    _In_ WDFQUEUE Queue,
+    _In_ WDFREQUEST Request,
+    _In_ size_t OutputBufferLength,
+    _In_ size_t InputBufferLength,
+    _In_ ULONG IoControlCode)
+{
+    NTSTATUS status = STATUS_INVALID_DEVICE_REQUEST;
+
+    switch (IoControlCode) {
+    case IOCTL_DO_SOMETHING:
+        status = DoSomething(Request);
+        WdfRequestComplete(Request, status); // First completion
+        break;
+    default:
+        status = STATUS_INVALID_DEVICE_REQUEST;
+        break;
+    }
+
+    WdfRequestComplete(Request, status); // BUG: second completion
+}
+
+// CORRECT: Each path completes exactly once
+VOID EvtIoDeviceControl(
+    _In_ WDFQUEUE Queue,
+    _In_ WDFREQUEST Request,
+    _In_ size_t OutputBufferLength,
+    _In_ size_t InputBufferLength,
+    _In_ ULONG IoControlCode)
+{
+    NTSTATUS status = STATUS_INVALID_DEVICE_REQUEST;
+
+    switch (IoControlCode) {
+    case IOCTL_DO_SOMETHING:
+        status = DoSomething(Request);
+        break;
+    default:
+        status = STATUS_INVALID_DEVICE_REQUEST;
+        break;
+    }
+
+    WdfRequestComplete(Request, status); // Single completion
+}]]>
+		</sample>
+	</example>
+	<references>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/kmdf-doublecompletion">
+				KMDF Rule: DoubleCompletion
+			</a>
+		</li>
+		<li>
+			<a href="https://learn.microsoft.com/en-us/windows-hardware/drivers/wdf/completing-i-o-requests">
+				Completing I/O Requests
+			</a>
+		</li>
+	</references>
+</qhelp>
