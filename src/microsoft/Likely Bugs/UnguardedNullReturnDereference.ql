@@ -79,7 +79,14 @@ class UnguardedNullReturnDereferenceReachability extends StackVariableReachabili
         .getDereferencingOperation()
         .(FunctionCall)
         .getTarget()
-        .hasGlobalName("free")
+        .hasGlobalName("free") and
+    not exists(FunctionCall fc, int i |
+      fc = node.(Dereference).getDereferencingOperation() and
+      fc.getArgument(i) = v.getAnAccess() and
+      exists(SALMaybeNull sa |
+        sa.getDeclaration() = fc.getTarget().getParameter(i)
+      )
+    )
   }
 
   override predicate isBarrier(ControlFlowNode node, StackVariable v) {
