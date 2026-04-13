@@ -1,0 +1,8 @@
+# Query Suite for SDV-ported NDIS rules
+
+- description: SDV-ported NDIS rules
+- queries: .
+  from: microsoft/windows-drivers
+- include:
+    query path:
+      - drivers/ndis/queries/InitRegisterInterrupt/InitRegisterInterrupt.ql

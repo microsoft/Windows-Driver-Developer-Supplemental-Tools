@@ -1,0 +1,10 @@
+# Query Suite for SDV-ported WDM rules
+
+- description: SDV-ported WDM rules
+- queries: .
+  from: microsoft/windows-drivers
+- include:
+    query path:
+      - drivers/wdm/queries/DanglingDeviceObjectReference/DanglingDeviceObjectReference.ql
+      - drivers/wdm/queries/MarkIrpPending/MarkIrpPending.ql
+      - drivers/wdm/queries/WdmDoubleCompletion/WdmDoubleCompletion.ql

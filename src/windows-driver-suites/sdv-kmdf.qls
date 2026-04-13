@@ -1,0 +1,10 @@
+# Query Suite for SDV-ported KMDF rules
+
+- description: SDV-ported KMDF rules
+- queries: .
+  from: microsoft/windows-drivers
+- include:
+    query path:
+      - drivers/kmdf/queries/DoubleCompletion/DoubleCompletion.ql
+      - drivers/kmdf/queries/DrvAckIoStop/DrvAckIoStop.ql
+      - drivers/kmdf/queries/EvtSurpriseRemoveNoSuspendQueue/EvtSurpriseRemoveNoSuspendQueue.ql
