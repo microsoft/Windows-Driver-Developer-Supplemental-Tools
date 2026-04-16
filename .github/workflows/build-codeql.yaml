@@ -111,6 +111,7 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
     - name: Azure Login
+      if: github.event_name != 'pull_request'
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -118,6 +119,7 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         enable-AzPSSession: true
     - name: Download previous results
+      if: github.event_name != 'pull_request'
       uses: azure/powershell@v2
       with:
         azPSVersion: latest
@@ -127,9 +129,14 @@ jobs:
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
       shell: pwsh
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+      run: |
+        $compareFlag = ""
+        if ("${{ github.event_name }}" -ne "pull_request") {
+          $compareFlag = "--compare_results"
+        }
+        python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build $compareFlag -v
     - name: Upload result diff
-      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
       uses: azure/powershell@v2
       with:
         azPSVersion: latest
@@ -137,7 +144,12 @@ jobs:
           Update-AzConfig -DisplayBreakingChangeWarning $false
           $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "health-diffdetailedfunctiontestresults.xlsx" -Context $context -Force
-          exit 1 
+    - name: Fail if result diff detected
+      if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
+      shell: pwsh
+      run: |
+        Write-Host "::error::Test results differ from the stored baseline. The diff has been uploaded to Azure Storage as 'health-diffdetailedfunctiontestresults.xlsx'. Please review."
+        exit 1
     
       
   test-codeql-latest-vs-current:
@@ -194,6 +206,7 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
     - name: Azure Login
+      if: github.event_name != 'pull_request'
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -201,6 +214,7 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         enable-AzPSSession: true
     - name: Download previous results
+      if: github.event_name != 'pull_request'
       uses: azure/powershell@v2
       with:
         azPSVersion: latest
@@ -210,16 +224,26 @@ jobs:
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
       shell: pwsh
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+      run: |
+        $compareFlag = ""
+        if ("${{ github.event_name }}" -ne "pull_request") {
+          $compareFlag = "--compare_results"
+        }
+        python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build $compareFlag -v
     - name: Upload result diff
-      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
       uses: azure/powershell@v2
       with:
         azPSVersion: latest
         inlineScript: |
           $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context -Force
-          exit 1 
+    - name: Fail if result diff detected
+      if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
+      shell: pwsh
+      run: |
+        Write-Host "::error::Test results from latest CodeQL version differ from the stored baseline. The diff has been uploaded to Azure Storage as 'version-diffdetailedfunctiontestresults.xlsx'. Please review."
+        exit 1
     - name: Save Latest Version
       if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') == '' }} # Only if there were no differences
       uses: actions/upload-artifact@v4
