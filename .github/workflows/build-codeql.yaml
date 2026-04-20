@@ -130,11 +130,11 @@ jobs:
     - name: Run test script
       shell: pwsh
       run: |
-        $compareFlag = ""
+        $pyArgs = @('src\drivers\test\build_create_analyze_test.py', '--codeql_path', '.\codeql-cli\codeql.exe', '--no_build', '-v')
         if ("${{ github.event_name }}" -ne "pull_request") {
-          $compareFlag = "--compare_results"
+          $pyArgs += '--compare_results'
         }
-        python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build $compareFlag -v
+        python @pyArgs
     - name: Upload result diff
       if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
       uses: azure/powershell@v2
@@ -225,11 +225,11 @@ jobs:
     - name: Run test script
       shell: pwsh
       run: |
-        $compareFlag = ""
+        $pyArgs = @('src\drivers\test\build_create_analyze_test.py', '--codeql_path', '.\codeql-cli\codeql.exe', '--no_build', '-v')
         if ("${{ github.event_name }}" -ne "pull_request") {
-          $compareFlag = "--compare_results"
+          $pyArgs += '--compare_results'
         }
-        python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build $compareFlag -v
+        python @pyArgs
     - name: Upload result diff
       if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
       uses: azure/powershell@v2
