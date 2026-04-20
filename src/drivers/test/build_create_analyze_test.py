@@ -25,6 +25,12 @@ print_mutex = threading.Lock()
 health_df = pd.DataFrame()
 detailed_health_df = pd.DataFrame()
 
+# Names of tests for which `codeql database create` failed. Tracked here
+# (rather than only in `run_tests`) so failures are still surfaced when the
+# script is invoked with --build_database_only, which legitimately returns
+# None from `run_test` on success.
+db_create_failures = []
+
 
 def print_conditionally(*message):
     """
@@ -363,13 +369,18 @@ def db_create_for_external_driver(sln_file, config, platform):
     out2 = subprocess.run([codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
             cwd=workdir, 
-            shell=True, capture_output=no_output  )
+            shell=True, capture_output=True  )
     if out2.returncode != 0:
         print("Error in codeql database create: " + db_loc)
+        print("Return code: " + str(out2.returncode))
         try:
-            print(out2.stderr.decode())
-        except:
-            print(out2.stderr)
+            print("STDOUT:\n" + out2.stdout.decode(errors="replace"))
+        except Exception:
+            print("STDOUT:", out2.stdout)
+        try:
+            print("STDERR:\n" + out2.stderr.decode(errors="replace"))
+        except Exception:
+            print("STDERR:", out2.stderr)
 
         return None
     else:
@@ -405,16 +416,32 @@ def create_codeql_test_database(ql_test):
     print_conditionally(" - Database location: " + db_loc)
     print_conditionally(" - Source directory: " + source_dir)
     print_conditionally(" - Command to run: " + str(codeql_command))
+    # Always capture output so that on failure we can surface the underlying
+    # msbuild / tracer diagnostics (which CodeQL writes mostly to stdout).
     out2 = subprocess.run(codeql_command,
-                            shell=True, capture_output=no_output  ) 
+                            shell=True, capture_output=True  )
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
+        print("Command: " + str(codeql_command))
+        print("Return code: " + str(out2.returncode))
         try:
-            print("ERROR MESSAGE:", out2.stderr.decode()  )
-        except:
-            print("ERROR MESSAGE:", out2.stderr)
+            print("STDOUT:\n" + out2.stdout.decode(errors="replace"))
+        except Exception:
+            print("STDOUT:", out2.stdout)
+        try:
+            print("STDERR:\n" + out2.stderr.decode(errors="replace"))
+        except Exception:
+            print("STDERR:", out2.stderr)
 
+        db_create_failures.append(ql_test.get_ql_name())
         return None
+    elif not no_output:
+        # In more_verbose mode, still echo the captured output for parity
+        # with previous behaviour.
+        try:
+            print(out2.stdout.decode(errors="replace"))
+        except Exception:
+            pass
     return db_loc
 
 
@@ -814,12 +841,17 @@ def run_tests(ql_tests_dict):
         None
     """
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
-    
+
+    total_tests = 0
+    failed_tests = []
+
     for ql_test in ql_tests_with_attributes:
+        total_tests += 1
         result_sarif = run_test(ql_test)
         if not args.build_database_only:
             if not result_sarif:
                 print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
+                failed_tests.append(ql_test.get_ql_name())
                 continue
             analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
             health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
@@ -839,7 +871,31 @@ def run_tests(ql_tests_dict):
         local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
-    
+
+    # Surface failures so the CI job no longer reports green when nothing
+    # actually ran. Database-creation failures are tracked globally so they
+    # are reported even in --build_database_only mode where `run_test`
+    # legitimately returns None on success.
+    if not args.build_database_only and failed_tests:
+        print("\n==== Test summary ====")
+        print("Total tests:   " + str(total_tests))
+        print("Failed tests:  " + str(len(failed_tests)))
+        for name in failed_tests:
+            print("  - " + name)
+        if len(failed_tests) == total_tests:
+            print("ERROR: All tests failed or were skipped. Failing the job.")
+        else:
+            print("ERROR: One or more tests failed or were skipped. Failing the job.")
+        sys.exit(1)
+
+    if db_create_failures:
+        print("\n==== Database creation summary ====")
+        print("Failed database creations: " + str(len(db_create_failures)))
+        for name in db_create_failures:
+            print("  - " + name)
+        print("ERROR: One or more `codeql database create` invocations failed. Failing the job.")
+        sys.exit(1)
+
 def find_g_template_dir(template):
     """
     Finds the directory of the given template.
