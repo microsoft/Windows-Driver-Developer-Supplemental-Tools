@@ -22,6 +22,7 @@ except ImportError as e:
 
 
 print_mutex = threading.Lock()
+results_mutex = threading.Lock()
 health_df = pd.DataFrame()
 detailed_health_df = pd.DataFrame()
 
@@ -830,6 +831,36 @@ def compare_health_results(curr_results_path):
         os.remove(prev_results)
         exit(0)
     
+def _run_single_test(ql_test):
+    """
+    Run a single ql_test and update the shared results DataFrames.
+    Returns the test name on failure, or None on success.  Designed to be
+    safe to invoke concurrently from a thread pool: each ql_test uses its
+    own working/, TestDB/, and AnalysisFiles/<name>.sarif paths, and shared
+    DataFrame mutations are guarded by ``results_mutex``.
+    """
+    result_sarif = run_test(ql_test)
+    if args.build_database_only:
+        return None
+    if not result_sarif:
+        with print_mutex:
+            print("Error running test: " + ql_test.get_ql_name(), "Skipping...")
+        return ql_test.get_ql_name()
+    try:
+        analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
+    except Exception as e:
+        with print_mutex:
+            print("Error reading sarif results for " + ql_test.get_ql_name() + ": " + str(e))
+        return ql_test.get_ql_name()
+    with results_mutex:
+        health_df.at[ql_test.get_ql_name(), "Result"] = str(
+            int(analysis_results['error']) +
+            int(analysis_results['warning']) +
+            int(analysis_results['note']))
+        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
+    return None
+
+
 def run_tests(ql_tests_dict):
     """
     Run the given CodeQL tests.
@@ -842,20 +873,32 @@ def run_tests(ql_tests_dict):
     """
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
 
-    total_tests = 0
+    total_tests = len(ql_tests_with_attributes)
     failed_tests = []
 
-    for ql_test in ql_tests_with_attributes:
-        total_tests += 1
-        result_sarif = run_test(ql_test)
-        if not args.build_database_only:
-            if not result_sarif:
-                print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
-                failed_tests.append(ql_test.get_ql_name())
-                continue
-            analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
-            health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
-            detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results) 
+    # Each ql_test runs against its own isolated working/, TestDB/, and
+    # AnalysisFiles/<name>.sarif paths, so it is safe to execute multiple
+    # tests concurrently.  ``--jobs`` controls the worker count; the default
+    # of ``os.cpu_count()`` mirrors what `msbuild` and `codeql` do internally
+    # for their own parallelism.  Use jobs=1 to fall back to the legacy
+    # sequential behaviour (useful when debugging a single test).
+    jobs = max(1, args.jobs) if args.jobs is not None else (os.cpu_count() or 1)
+    if jobs == 1:
+        for ql_test in ql_tests_with_attributes:
+            failed = _run_single_test(ql_test)
+            if failed is not None:
+                failed_tests.append(failed)
+    else:
+        with print_mutex:
+            print("Running " + str(total_tests) + " tests with " + str(jobs) + " parallel workers")
+        pool = ThreadPool(jobs)
+        try:
+            for failed in pool.imap_unordered(_run_single_test, ql_tests_with_attributes):
+                if failed is not None:
+                    failed_tests.append(failed)
+        finally:
+            pool.close()
+            pool.join()
       
     # save results
     result_file = "functiontestresults.xlsx"
@@ -950,6 +993,7 @@ if __name__ == "__main__":
     parser.add_argument('--compare_results_no_build',help='Compare results to previous run',type=str,required=False,)
     parser.add_argument('--codeql_path', help='Path to the codeql executable',type=str,required=False,)
     parser.add_argument('--build_database_only', help='Build database only',action='store_true',required=False,)
+    parser.add_argument('-j', '--jobs', help='Number of tests to run in parallel (default: number of CPU cores). Use 1 to disable parallelism.', type=int, required=False)
     args = parser.parse_args()
            
     if args.codeql_path:

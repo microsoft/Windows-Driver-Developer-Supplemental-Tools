@@ -14,14 +14,6 @@
   -->
   <PropertyGroup>
     <WdkNuGetPackagesDir>$(MSBuildThisFileDirectory)..\..\..\packages\</WdkNuGetPackagesDir>
-    <!--
-      ApiValidator.exe is not shipped in the WDK NuGet packages used by this
-      repo's CI (it requires a full WDK install).  Disable the post-build API
-      validation step so that builds using the WindowsApplicationForDrivers10.0
-      toolset (e.g. ApplicationForDriversTestTemplate) can succeed without it.
-      The validation is irrelevant for the CodeQL analysis we are performing.
-    -->
-    <ApiValidatorEnabled>false</ApiValidatorEnabled>
   </PropertyGroup>
   <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.x64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.x64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.x64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.x64.props') and '$(Platform)' == 'x64'" />
   <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.arm64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.arm64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.arm64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.arm64.props') and '$(Platform)' == 'ARM64'" />
