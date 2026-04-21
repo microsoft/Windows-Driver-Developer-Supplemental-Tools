@@ -22,7 +22,9 @@ $configurations = @("Debug", "Release")
 # Locate Dvl.exe: prefer the copy shipped inside the WDK NuGet package so that
 # the test works in CI environments that have the NuGet packages restored but no
 # system-wide WDK installation.  Fall back to the traditional WDK install path
-# for developer machines that have the full WDK installed.
+# for developer machines that have the full WDK installed.  If Dvl.exe cannot be
+# found in either location the test fails -- the dvl command-type tests are
+# required and silently skipping them would let regressions slip through.
 $dvl_exe_path = "C:\Program Files (x86)\Windows Kits\10\Tools\dvl\Dvl.exe"
 $nuget_dvl = Get-ChildItem -Path "$starting_location\packages" -Filter "Dvl.exe" `
     -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
@@ -32,8 +34,8 @@ if ($nuget_dvl) {
 } elseif (Test-Path $dvl_exe_path) {
     Write-Host "Using Dvl.exe from system WDK: $dvl_exe_path"
 } else {
-    Write-Host "WARNING: Dvl.exe not found in NuGet packages or system WDK. 'dvl' command-type tests will be skipped."
-    $dvl_exe_path = $null
+    Write-Host "FAIL -- Dvl.exe not found in NuGet packages ($starting_location\packages) or system WDK ($dvl_exe_path)."
+    exit 1
 }
 function Test-DVL {
     param (
@@ -102,11 +104,6 @@ function Test-DVL {
             $global:LASTEXITCODE = 1234567891
             if ($command_type -eq "dvl") {
                 if ($configuration -eq "Release") {
-                    if (-not $dvl_exe_path) {
-                        Write-Host "SKIP -- Dvl.exe not available; skipping dvl command-type test for $platform $configuration"
-                        continue
-                    }
-
                     $command = "& `"$dvl_exe_path`" /manualCreate $vcxproj_name $platform"
                     $output = Invoke-Expression $command
                     if ($LastExitCode -eq 1234567891) {
