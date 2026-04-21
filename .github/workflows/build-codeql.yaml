@@ -58,17 +58,12 @@ jobs:
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only recommended.qls
     
-    - name: Build CA ported queries
-      shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
-    
     - name: Build all Windows queries
       shell: cmd
       run: .\codeql-cli\codeql.cmd query compile --check-only .\src
     
   test-query-health:
     runs-on: windows-latest
-    needs: build
     permissions:
       contents: read
       packages: write
@@ -156,7 +151,7 @@ jobs:
   # Tests if the latest codeql version produces the same results as the current version. 
     runs-on: windows-latest
     continue-on-error: true # Allow script to return non-zero exit code
-    needs: [build,test-query-health]
+    needs: test-query-health
     permissions:
       contents: read
       packages: write
@@ -254,7 +249,6 @@ jobs:
           
   test-pack-version-update:
     runs-on: windows-latest
-    needs: build
     permissions:
       contents: read
       packages: write
@@ -296,7 +290,6 @@ jobs:
         }
   test-create-dvl:
     runs-on: windows-latest
-    needs: build
     permissions:
       contents: read
       packages: write
