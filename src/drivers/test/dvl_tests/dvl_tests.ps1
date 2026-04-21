@@ -18,6 +18,23 @@ param(
 $starting_location = Get-Location
 $platforms = @("x64", "arm64")
 $configurations = @("Debug", "Release")
+
+# Locate Dvl.exe: prefer the copy shipped inside the WDK NuGet package so that
+# the test works in CI environments that have the NuGet packages restored but no
+# system-wide WDK installation.  Fall back to the traditional WDK install path
+# for developer machines that have the full WDK installed.
+$dvl_exe_path = "C:\Program Files (x86)\Windows Kits\10\Tools\dvl\Dvl.exe"
+$nuget_dvl = Get-ChildItem -Path "$starting_location\packages" -Filter "Dvl.exe" `
+    -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1
+if ($nuget_dvl) {
+    $dvl_exe_path = $nuget_dvl.FullName
+    Write-Host "Using Dvl.exe from NuGet package: $dvl_exe_path"
+} elseif (Test-Path $dvl_exe_path) {
+    Write-Host "Using Dvl.exe from system WDK: $dvl_exe_path"
+} else {
+    Write-Host "WARNING: Dvl.exe not found in NuGet packages or system WDK. 'dvl' command-type tests will be skipped."
+    $dvl_exe_path = $null
+}
 function Test-DVL {
     param (
         [string]$command_type = "msbuild",
@@ -85,8 +102,12 @@ function Test-DVL {
             $global:LASTEXITCODE = 1234567891
             if ($command_type -eq "dvl") {
                 if ($configuration -eq "Release") {
+                    if (-not $dvl_exe_path) {
+                        Write-Host "SKIP -- Dvl.exe not available; skipping dvl command-type test for $platform $configuration"
+                        continue
+                    }
 
-                    $command = "& `"C:\Program Files (x86)\Windows Kits\10\Tools\dvl\Dvl.exe`" /manualCreate $vcxproj_name $platform"
+                    $command = "& `"$dvl_exe_path`" /manualCreate $vcxproj_name $platform"
                     $output = Invoke-Expression $command
                     if ($LastExitCode -eq 1234567891) {
                         Write-Host "FAIL -- Unexpected error creating DVL with $platform $configuration using $command"
@@ -174,7 +195,7 @@ function Test-Driver {
 
     #Test DVL
     Test-DVL "msbuild" -test_empty $false
-    Test-DVL "dvl" -test_emtpy $false
+    Test-DVL "dvl" -test_empty $false
     
     Set-Location -Path $starting_location
 }
