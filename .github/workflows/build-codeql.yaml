@@ -148,10 +148,13 @@ jobs:
     
       
   test-codeql-latest-vs-current:
-  # Tests if the latest codeql version produces the same results as the current version. 
+  # Tests if the latest codeql version produces the same results as the current version.
+  # Runs in parallel with `test-query-health` (no `needs:` dependency) to halve the
+  # pipeline's wall-clock time. It is independent: it downloads its own (latest)
+  # CodeQL CLI and runs the same per-test build/analyze cycle. `continue-on-error`
+  # below means failures here never block the workflow regardless of order.
     runs-on: windows-latest
     continue-on-error: true # Allow script to return non-zero exit code
-    needs: test-query-health
     permissions:
       contents: read
       packages: write
@@ -160,10 +163,6 @@ jobs:
       ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
     steps:
-    - name: Check Prev Job
-      if: ${{ needs.test-query-health.result == 'failure' }}
-      shell: pwsh
-      run: exit 1  
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
