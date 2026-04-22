@@ -52,15 +52,15 @@ jobs:
       
     - name: Build must-fix driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only mustfix.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only --threads=0 mustfix.qls
     
     - name: Build recommended driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only recommended.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only --threads=0 recommended.qls
     
     - name: Build all Windows queries
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only .\src
+      run: .\codeql-cli\codeql.cmd query compile --check-only --threads=0 .\src
     
   test-query-health:
     runs-on: windows-latest
@@ -254,6 +254,13 @@ jobs:
           
   test-pack-version-update:
     runs-on: windows-latest
+    # Only enforce qlpack version bumps when the change is actually heading to
+    # `main`. We routinely stage many commits in `development` and bump the
+    # qlpack version once when promoting to `main`, so requiring a bump on
+    # every `development`-targeted PR/push is noise.
+    if: |
+      (github.event_name == 'pull_request' && github.base_ref == 'main') ||
+      (github.event_name != 'pull_request' && github.ref == 'refs/heads/main')
     permissions:
       contents: read
       packages: write
@@ -341,7 +348,19 @@ jobs:
   publish:
     runs-on: windows-latest
     continue-on-error: true 
-    needs: [build, test-pack-version-update, test-query-health]
+    needs: [build, test-pack-version-update, test-query-health, test-codeql-latest-vs-current, test-create-dvl]
+    # Run when all required gates pass. `test-pack-version-update` is skipped
+    # for non-`main` targets (see its `if:` above), so allow `success` *or*
+    # `skipped`. `test-codeql-latest-vs-current` is `continue-on-error: true`,
+    # which already produces a `success` result for `needs`, so we don't need
+    # special handling for it here -- listing it in `needs` just makes publish
+    # wait for it to finish before running.
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      needs.test-query-health.result == 'success' &&
+      needs.test-create-dvl.result == 'success' &&
+      (needs.test-pack-version-update.result == 'success' || needs.test-pack-version-update.result == 'skipped')
     permissions:
       contents: read
       packages: write

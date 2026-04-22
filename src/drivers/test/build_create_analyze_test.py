@@ -26,6 +26,23 @@ results_mutex = threading.Lock()
 health_df = pd.DataFrame()
 detailed_health_df = pd.DataFrame()
 
+# Progress reporting for run_tests().  ``_progress_total`` is the total number
+# of tests being executed in the current run; ``_progress_started`` is the
+# number of tests for which a worker has begun execution.  Both are guarded by
+# ``_progress_mutex`` so the "[N/total]" prefix is consistent across parallel
+# workers.
+_progress_mutex = threading.Lock()
+_progress_started = 0
+_progress_total = 0
+
+
+def _next_progress_label():
+    """Return a "[N/total]" string and atomically advance the counter."""
+    global _progress_started
+    with _progress_mutex:
+        _progress_started += 1
+        return "[{}/{}]".format(_progress_started, _progress_total)
+
 # Names of tests for which `codeql database create` failed. Tracked here
 # (rather than only in `run_tests`) so failures are still surfaced when the
 # script is invoked with --build_database_only, which legitimately returns
@@ -598,7 +615,7 @@ def run_test(ql_test):
   
     # Print test attributes
     print_mutex.acquire()
-    print("\nRunning test: " + ql_test.get_ql_name())
+    print("\n" + _next_progress_label() + " Running test: " + ql_test.get_ql_name())
     
     print_conditionally(" - Template: ", ql_test.get_template(), "\n",  
           "- Driver Framework: ", ql_test.get_ql_type(), "\n",  
@@ -908,6 +925,13 @@ def run_tests(ql_tests_dict):
 
     total_tests = len(ql_tests_with_attributes)
     failed_tests = []
+
+    # Reset the shared "[N/total]" progress counter for this run so each
+    # invocation of run_tests starts at [1/total].
+    global _progress_started, _progress_total
+    with _progress_mutex:
+        _progress_started = 0
+        _progress_total = total_tests
 
     # Each ql_test runs against its own isolated working/, TestDB/, and
     # AnalysisFiles/<name>.sarif paths, so it is safe to execute multiple
