@@ -125,7 +125,10 @@ jobs:
     - name: Run test script
       shell: pwsh
       run: |
-        $pyArgs = @('src\drivers\test\build_create_analyze_test.py', '--codeql_path', '.\codeql-cli\codeql.exe', '--no_build', '-v')
+        # Run per-test build/analyze in parallel inside the script. Default is
+        # one worker per logical CPU (--jobs <N>); each worker is isolated to
+        # its own working/, TestDB/, and AnalysisFiles/<name>.sarif paths.
+        $pyArgs = @('src\drivers\test\build_create_analyze_test.py', '--codeql_path', '.\codeql-cli\codeql.exe', '--no_build', '-v', '--jobs', "$env:NUMBER_OF_PROCESSORS")
         if ("${{ github.event_name }}" -ne "pull_request") {
           $pyArgs += '--compare_results'
         }
@@ -219,7 +222,10 @@ jobs:
     - name: Run test script
       shell: pwsh
       run: |
-        $pyArgs = @('src\drivers\test\build_create_analyze_test.py', '--codeql_path', '.\codeql-cli\codeql.exe', '--no_build', '-v')
+        # Run per-test build/analyze in parallel inside the script. Default is
+        # one worker per logical CPU (--jobs <N>); each worker is isolated to
+        # its own working/, TestDB/, and AnalysisFiles/<name>.sarif paths.
+        $pyArgs = @('src\drivers\test\build_create_analyze_test.py', '--codeql_path', '.\codeql-cli\codeql.exe', '--no_build', '-v', '--jobs', "$env:NUMBER_OF_PROCESSORS")
         if ("${{ github.event_name }}" -ne "pull_request") {
           $pyArgs += '--compare_results'
         }

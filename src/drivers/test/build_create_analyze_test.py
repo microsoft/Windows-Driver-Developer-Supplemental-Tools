@@ -33,6 +33,37 @@ detailed_health_df = pd.DataFrame()
 db_create_failures = []
 
 
+def _build_subprocess_env():
+    """
+    Build an environment dict for subprocess invocations of msbuild/link.exe so
+    that each concurrent invocation talks to its own private ``mspdbsrv.exe``
+    PDB server.
+
+    When the parallel test runner spawns multiple `codeql database create` ->
+    `msbuild` -> `link.exe` chains concurrently, all link.exe processes
+    inherit the same per-user `_MSPDBSRV_ENDPOINT_` and contend on a single
+    `mspdbsrv.exe` for PDB RPC. Under load this races and the RPC server
+    occasionally becomes unavailable, producing:
+
+        LINK : fatal error LNK1318: Unexpected PDB error; RPC (23) '(0x000006BA)'
+
+    Setting a unique `_MSPDBSRV_ENDPOINT_` per invocation makes link.exe
+    spawn its own dedicated mspdbsrv with a unique RPC endpoint, eliminating
+    cross-worker contention. This is the Microsoft-recommended fix for parallel
+    MSVC builds. See https://learn.microsoft.com/cpp/error-messages/tool-errors/linker-tools-error-lnk1318.
+    """
+    env = os.environ.copy()
+    env["_MSPDBSRV_ENDPOINT_"] = "wddst_{pid}_{tid}_{n}".format(
+        pid=os.getpid(),
+        tid=threading.get_ident(),
+        n=next(_endpoint_counter),
+    )
+    return env
+
+
+_endpoint_counter = itertools.count()
+
+
 def print_conditionally(*message):
     """
     Prints the message if the verbose flag is set.
@@ -370,7 +401,7 @@ def db_create_for_external_driver(sln_file, config, platform):
     out2 = subprocess.run([codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
             cwd=workdir, 
-            shell=True, capture_output=True  )
+            shell=True, capture_output=True, env=_build_subprocess_env()  )
     if out2.returncode != 0:
         print("Error in codeql database create: " + db_loc)
         print("Return code: " + str(out2.returncode))
@@ -419,8 +450,10 @@ def create_codeql_test_database(ql_test):
     print_conditionally(" - Command to run: " + str(codeql_command))
     # Always capture output so that on failure we can surface the underlying
     # msbuild / tracer diagnostics (which CodeQL writes mostly to stdout).
+    # ``env=`` injects a unique ``_MSPDBSRV_ENDPOINT_`` so concurrent workers
+    # do not race on a shared mspdbsrv.exe (LNK1318 RPC errors).
     out2 = subprocess.run(codeql_command,
-                            shell=True, capture_output=True  )
+                            shell=True, capture_output=True, env=_build_subprocess_env()  )
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
         print("Command: " + str(codeql_command))
