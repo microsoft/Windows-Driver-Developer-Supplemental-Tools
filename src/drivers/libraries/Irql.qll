@@ -690,6 +690,48 @@
   * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations applied to this function.
   * - Failing all this, we set the IRQL to 0.
   *
+ import semmle.code.cpp.controlflow.Dominance
+
+ /** Utility function to get all exit points of a function. */
+ pragma[nomagic]
+ private ControlFlowNode getAnExitPointOfFunction(Function f) {
+   result.getControlFlowScope() = f and
+   functionExit(result)
+ }
+
+ /**
+  * Pre-computed summary: the potential exit IRQL of function `f`,
+  * computed once per function rather than re-discovered per call site.
+  */
+ pragma[nomagic]
+ private int functionExitIrql(Function f) {
+   result = getPotentialExitIrqlAtCfn(getAnExitPointOfFunction(f))
+ }
+
+ /**
+  * Gets the set of predecessor nodes from callers for function `callee`.
+  * This pre-computes the reverse call-graph edge for interprocedural analysis
+  * and is restricted to actual call sites.
+  */
+ pragma[nomagic]
+ private ControlFlowNode callerPredecessor(Function callee) {
+   result.getASuccessor().(FunctionCall).getTarget() = callee
+ }
+
+ /**
+  * Attempt to provide the IRQL **once this control flow node exits**, based on annotations and direct calls to raising/lowering functions.
+  * This predicate functions as follows:
+  * - If calling a "Raise IRQL" function, then it returns the value of the argument passed in (the target IRQL).
+  * - If calling a "Lower IRQL" function, then it returns the value of the argument passed in (the target IRQL).
+  * - If calling a function annotated to restore the IRQL from a previously saved spot, then the result is the IRQL before that save call.
+  * - If calling a function annotated to raise the IRQL, then it returns the annotated value (the target IRQL).
+  * - If calling a function annotated to maintain the same IRQL, then the result is the IRQL at the previous CFN.
+  * - If this node is calling a function with no annotations, the result is the IRQL that function exits at (pre-computed per function).
+  * - If there is a prior CFN in the CFG, the result is the result for that prior CFN.
+  * - If there is no prior CFN, then the result is whatever the IRQL was at a statement prior to a function call to this function (a lazy interprocedural analysis.)
+  * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations applied to this function.
+  * - Failing all this, we set the IRQL to 0.
+  *
   * Not implemented: _IRQL_limited_to_
   */
  
@@ -714,33 +756,22 @@
              if
                cfn instanceof FunctionCall and
                cfn.(FunctionCall).getTarget() instanceof IrqlRequiresSameAnnotatedFunction
-             then result = any(getPotentialExitIrqlAtCfn(cfn.getAPredecessor()))
+             then result = getPotentialExitIrqlAtCfn(cfn.getAPredecessor())
              else
+               // Key optimization: use pre-computed function exit IRQL summary
+               // instead of re-scanning exit points per call site
                if cfn instanceof FunctionCall
-               then
-                 result =
-                   any(getPotentialExitIrqlAtCfn(getExitPointsOfFunction(cfn.(FunctionCall)
-                               .getTarget()))
-                   )
+               then result = functionExitIrql(cfn.(FunctionCall).getTarget())
                else
                  if exists(ControlFlowNode cfn2 | cfn2 = cfn.getAPredecessor())
-                 then result = any(getPotentialExitIrqlAtCfn(cfn.getAPredecessor()))
+                 then result = getPotentialExitIrqlAtCfn(cfn.getAPredecessor())
                  else
-                   if
-                     exists(FunctionCall fc, ControlFlowNode cfn2 |
-                       fc.getTarget() = cfn.getControlFlowScope() and
-                       cfn2.getASuccessor() = fc
-                     )
+                   // Key optimization: use pre-computed callerPredecessor instead of
+                   // inline reverse call-graph query
+                   if exists(callerPredecessor(cfn.getControlFlowScope()))
                    then
-                     // TODO: Check that this node is actually a function entry point and not just
-                     // an isolated part of the CFN.  Sometimes we get nodes that are "in" a function's
-                     // CFN, but have no predecessors, but are not function entry.  (Why?)
                      result =
-                       any(getPotentialExitIrqlAtCfn(any(ControlFlowNode cfn2 |
-                               cfn2.getASuccessor().(FunctionCall).getTarget() =
-                                 cfn.getControlFlowScope()
-                             ))
-                       )
+                       getPotentialExitIrqlAtCfn(callerPredecessor(cfn.getControlFlowScope()))
                    else
                      if
                        cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
@@ -748,13 +779,13 @@
                      then result = getAllowableIrqlLevel(cfn.getControlFlowScope())
                      else result = 0
  }
- 
- 
+
+
  /*
   * Similar to above, but only exit points where the Irql is explicit
   */
- 
- 
+
+
  int getExplicitExitIrqlAtCfn(ControlFlowNode cfn) {
    if cfn instanceof KeRaiseIrqlCall
    then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
@@ -776,30 +807,17 @@
              if
                cfn instanceof FunctionCall and
                cfn.(FunctionCall).getTarget() instanceof IrqlRequiresSameAnnotatedFunction
-             then result = any(getExplicitExitIrqlAtCfn(cfn.getAPredecessor()))
+             then result = getExplicitExitIrqlAtCfn(cfn.getAPredecessor())
              else (
                if exists(ControlFlowNode cfn2 | cfn2 = cfn.getAPredecessor())
-               then result = any(getExplicitExitIrqlAtCfn(cfn.getAPredecessor()))
+               then result = getExplicitExitIrqlAtCfn(cfn.getAPredecessor())
                else
                  result =
-                   any(getExplicitExitIrqlAtCfn(any(ControlFlowNode cfn2 |
-                           cfn2.getASuccessor().(FunctionCall).getTarget() =
-                             cfn.getControlFlowScope()
-                         ))
-                   )
+                   getExplicitExitIrqlAtCfn(callerPredecessor(cfn.getControlFlowScope()))
              )
  }
  
- import semmle.code.cpp.controlflow.Dominance
- 
- /** Utility function to get exit points of a function. */
- private ControlFlowNode getExitPointsOfFunction(Function f) {
-   result =
-     any(ControlFlowNode cfn |
-       cfn.getControlFlowScope() = f and
-       functionExit(cfn)
-     )
- }
+
  
  /**
   * Attempt to find the range of valid IRQL values when **entering** a given IRQL-annotated function.
