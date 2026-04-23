@@ -16,7 +16,7 @@
  * @tags correctness
  *       ca_ported
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -73,6 +73,11 @@ where
   not (
     funcClass.matches("EVT_WDF_DEVICE_%ARM_WAKE_FROM_S%") and
     declTypedef.matches("EVT_WDF_DEVICE_%ARM_WAKE_FROM_S%")
+  ) and
+  not (
+    declTypedef = funcClass + "_PAGED"
+    or
+    funcClass = declTypedef + "_PAGED"
   )
 select af, "The function class " + funcClass + " on the function does not match the function class " +
     declTypedef + " on the typedef used here"

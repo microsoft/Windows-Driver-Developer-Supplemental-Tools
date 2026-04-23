@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -88,6 +88,19 @@ class IllegalDeviceObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
 }
 
 /**
+ * Holds if `f` is `DriverEntry` itself or is transitively called from
+ * `DriverEntry`.
+ */
+predicate calledFromDriverEntry(Function f) {
+  f instanceof WdmDriverEntry
+  or
+  exists(Function caller |
+    calledFromDriverEntry(caller) and
+    f.getACallToThisFunction().getEnclosingFunction() = caller
+  )
+}
+
+/**
  * A potentially illegal access to a DriverObject field, namely:
  * - Accesses to a DriverObject's DriverStartIo, DriverUnload, MajorFunction, and DriverExtension fields outside DriverEntry
  * - Accesses to generally unavailable DriverObject fields
@@ -119,15 +132,14 @@ class IllegalDriverObjectFieldAccess extends FieldAccess, PotentiallyIllegalFiel
 
   override predicate isIllegalAccess() {
     /*
-     * Below fields are illegal iff we're not in a DriverEntry function.
-     * Possible future improvement: do flow analysis to figure out if we're in
-     * a call from a DriverEntry routine.
+     * Below fields are illegal iff we're not in a DriverEntry function or a
+     * function transitively called from DriverEntry.
      */
 
     this.getTarget()
         .getName()
         .matches(["DriverStartIo", "DriverUnload", "MajorFunction", "DriverExtension"]) and
-    not this.getControlFlowScope() instanceof WdmDriverEntry
+    not calledFromDriverEntry(this.getControlFlowScope())
     or
     not this.getTarget()
         .getName()
