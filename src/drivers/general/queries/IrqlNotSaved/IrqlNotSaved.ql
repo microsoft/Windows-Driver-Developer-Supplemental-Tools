@@ -78,11 +78,11 @@ class FundamentalIrqlSaveFunction extends IrqlSavesFunction {
  */
 module IrqlSaveParameterFlowConfigurationConfig implements DataFlow::ConfigSig {
 
-   predicate isSource(DataFlow::Node source) {
+  predicate isSource(DataFlow::Node source) {
     source.asParameter() instanceof IrqlSaveParameter
   }
 
-   predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     // Only track flow to assignment targets or parameters — not every node
     exists(Variable v | v.getAnAssignedValue() = sink.asExpr())
     or
