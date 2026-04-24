@@ -235,6 +235,24 @@
          // "Param == 0" is false when arg is nonzero
          paramName = cond.regexpCapture("(\\w+)\\s*==\\s*0", 1) and
          call.getArgument(paramIdx).getValue() != "0"
+          or
+          // "Param != NULL" is false when arg is 0/NULL
+          paramName = cond.regexpCapture("(\\w+)\\s*!=\\s*NULL", 1) and
+          call.getArgument(paramIdx).getValue() = "0"
+          or
+          // "((Param&0x1))!=0" -- bitwise mask check, false when arg has bit 0 clear
+          paramName = cond.regexpCapture(".*\\(\\s*(\\w+)\\s*&\\s*0x1\\s*\\).*!=\\s*0.*", 1) and
+          exists(int argVal |
+            argVal = call.getArgument(paramIdx).getValue().toInt() and
+            argVal.bitAnd(1) = 0
+          )
+          or
+          // "((Param&0x1))==0" -- bitwise mask check, false when arg has bit 0 set
+          paramName = cond.regexpCapture(".*\\(\\s*(\\w+)\\s*&\\s*0x1\\s*\\).*==\\s*0.*", 1) and
+          exists(int argVal |
+            argVal = call.getArgument(paramIdx).getValue().toInt() and
+            argVal.bitAnd(1) != 0
+          )
        )
      )
    }
@@ -932,3 +950,36 @@
    )
  }
  
+/**
+ * Holds if `call` is located inside the "then" branch of an `if` statement
+ * whose condition is a compile-time-constant `FALSE` (0) value, or a variable
+ * that is singly defined with value 0/FALSE.
+ *
+ * This detects patterns like:
+ * ```
+ * BOOLEAN bFalse = FALSE;
+ * if (bFalse) { KeAcquireSpinLockAtDpcLevel(...); }  // dead branch
+ * ```
+ * Common in NDIS macros (FILTER_ACQUIRE_LOCK, NPROT_ACQUIRE_LOCK, etc.).
+ */
+predicate isInConstantFalseBranch(FunctionCall call) {
+  exists(IfStmt ifStmt |
+    // The call is in the "then" block of the if statement
+    ifStmt.getThen().getAChild*() = call and
+    (
+      // Condition is a literal 0 / false
+      ifStmt.getCondition().getValue() = "0"
+      or
+      // Condition is a variable access to a variable initialized to 0/FALSE
+      // with no subsequent reassignment in the function
+      exists(Variable v |
+        ifStmt.getCondition().(VariableAccess).getTarget() = v and
+        v.getInitializer().getExpr().getValue() = "0" and
+        not exists(AssignExpr ae |
+          ae.getLValue().(VariableAccess).getTarget() = v and
+          ae.getEnclosingFunction() = call.getEnclosingFunction()
+        )
+      )
+    )
+  )
+}
