@@ -208,6 +208,36 @@
          then result = this.getIrqlLevelString().toInt()
          else result = -1
    }
+
+   /**
+    * Holds if this is a `_When_` annotation whose condition is demonstrably
+    * false at call site `call`.
+    *
+    * Callers should only pass the annotation that supplied the IRQL
+    * requirement being checked -- otherwise an unrelated `_When_` clause on
+    * the same function (e.g. the `Wait==1` clause when we are evaluating the
+    * `Wait==0` clause on `KeSetEvent`) would suppress legitimate findings.
+    */
+   predicate whenConditionIsFalseAtCallSite(FunctionCall call) {
+     this.getMacroName() = "_When_" and
+     exists(string cond, string paramName, int paramIdx |
+       cond = this.getUnexpandedArgument(0) and
+       call.getTarget().getParameter(paramIdx).getName() = paramName and
+       (
+         // "Param != 0" is false when arg is 0
+         paramName = cond.regexpCapture("(\\w+)\\s*!=\\s*0", 1) and
+         call.getArgument(paramIdx).getValue() = "0"
+         or
+         // "Param == N" (N>0) is false when arg is 0
+         paramName = cond.regexpCapture("(\\w+)\\s*==\\s*([1-9]\\d*)", 1) and
+         call.getArgument(paramIdx).getValue() = "0"
+         or
+         // "Param == 0" is false when arg is nonzero
+         paramName = cond.regexpCapture("(\\w+)\\s*==\\s*0", 1) and
+         call.getArgument(paramIdx).getValue() != "0"
+       )
+     )
+   }
  }
  
  /** Represents an "\_IRQL\_requires\_same\_" annotation. */

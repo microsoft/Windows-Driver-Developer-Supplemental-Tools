@@ -18,12 +18,14 @@
  * @tags correctness
  *       ca_ported
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
 import drivers.libraries.Irql
 
 from IrqlFunctionAnnotation ifa
-where not ifa.getIrqlLevel() instanceof IrqlValue
+where
+  not ifa.getIrqlLevel() instanceof IrqlValue and
+  ifa.getIrqlLevel() != -1
 select ifa, "Invalid IRQL annotation: " + ifa.getIrqlLevel()

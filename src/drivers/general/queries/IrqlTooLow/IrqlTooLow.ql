@@ -18,23 +18,24 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v3
+ * @query-version v4
  */
 
 import cpp
 import drivers.libraries.Irql
 
-from FunctionCall call, IrqlRestrictsFunction irqlFunc, ControlFlowNode prior, int irqlRequirement
+from
+  FunctionCall call, IrqlRestrictsFunction irqlFunc, ControlFlowNode prior, int irqlRequirement,
+  IrqlFunctionAnnotation ifa
 where
   call.getTarget() = irqlFunc and
   prior = call.getAPredecessor() and
-  (
-    irqlFunc.(IrqlMinAnnotatedFunction).getIrqlLevel() = irqlRequirement
-    or
-    irqlFunc.(IrqlRequiresAnnotatedFunction).getIrqlLevel() = irqlRequirement
-  ) and
+  ifa = irqlFunc.getFuncIrqlAnnotation() and
+  (ifa instanceof IrqlMinAnnotation or ifa instanceof IrqlRequiresAnnotation) and
+  irqlRequirement = ifa.getIrqlLevel() and
   irqlRequirement != -1 and
-  irqlRequirement > max(getPotentialExitIrqlAtCfn(prior))
+  irqlRequirement > max(getPotentialExitIrqlAtCfn(prior)) and
+  not ifa.whenConditionIsFalseAtCallSite(call)
 select call,
   "$@: IRQL potentially too low at call to $@.  Minimum IRQL for this call: " + irqlRequirement +
     ", IRQL at preceding node: " + max(getPotentialExitIrqlAtCfn(prior)), call.getControlFlowScope(),
