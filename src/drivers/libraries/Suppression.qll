@@ -282,9 +282,7 @@ class DisablePragma extends CASuppression {
     (
       exists(SuppressionPushPopSegment spps |
         disableInSegment(this, spps) and
-        l.getFile() = spps.getFile() and
-        l.getStartLine() >= spps.getSegmentStartLine() and
-        l.getEndLine() <= spps.getSegmentEndLine()
+        spps.isInPushPopSegment(l)
       )
       or
       not disableHasSegment(this) and
