@@ -72,3 +72,7 @@ DispatchShutdown (
 
 ## References
 * [ C28171 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28171-function-has-more-than-one-page-macro-instance)
+
+## Semmle-specific notes
+**Function templates: known false negative.** The query excludes `FunctionTemplateInstantiation` functions when locating the enclosing function for each `PAGED_CODE` / `PAGED_CODE_LOCKED` macro invocation. The exclusion was added to avoid duplicate findings caused by per-instantiation line attribution drift. As a side effect, a duplicate `PAGED_CODE` inside the body of a C++ function template that is only ever observed as instantiations (and not as a non-instantiated template entity in the extracted AST) will not be reported. C++ function templates are uncommon in WDM / KMDF drivers, but if you do use them and need this check, lift the duplicated `PAGED_CODE` macro into a non-templated helper or split the body so each path enters a distinct paged function.
+

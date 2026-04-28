@@ -36,5 +36,26 @@
 		<p>This query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.</p>
 		<p>This query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.</p>
 		<p>For information on how to annotate your functions with information about how they adjust the IRQL, see "IRQL annotations for drivers" in the references section.</p>
+		<p>
+			<b>Lower-on-exit pattern: known false negative.</b> When a function has
+			no <code>_IRQL_always_function_max_</code> but does carry an
+			<code>_IRQL_raises_(R)</code> annotation, the query treats <code>R</code>
+			as the implicit ceiling for the function body. A function annotated as
+			both <code>_IRQL_requires_min_(M)</code> and
+			<code>_IRQL_raises_(R)</code> with <code>M &gt; R</code> is interpreted
+			as a "lower IRQL on exit" pattern (for example a wrapper around a mutex
+			or spin-lock release that runs at <code>DISPATCH_LEVEL</code> on entry
+			and returns at <code>PASSIVE_LEVEL</code>). For these functions the
+			implicit ceiling is suppressed entirely, because <code>R</code> describes
+			the exit IRQL rather than a maximum.
+		</p>
+		<p>
+			This means that a buggy "lower-on-exit" function whose body raises the
+			IRQL above <code>M</code> at some intermediate point will <i>not</i> be
+			flagged. If the function actually has a maximum that should be enforced
+			along the body, declare it explicitly with
+			<code>_IRQL_always_function_max_(MAX)</code> so the query has a concrete
+			ceiling to check against.
+		</p>
 	</semmleNotes>
 </qhelp>

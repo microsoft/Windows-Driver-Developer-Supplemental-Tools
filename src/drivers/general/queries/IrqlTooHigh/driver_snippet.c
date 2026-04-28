@@ -74,3 +74,80 @@ passForIrqlTooHigh(PKIRQL oldIrql){
     KeLowerIrql(*oldIrql);
     return status;
 }
+
+// =====================================================================
+// Adversarial cases for `isInConstantFalseBranch` (Irql.qll).
+//
+// These cases probe a known limitation of the predicate that
+// suppresses calls inside `if (b)` for variables that look
+// "constantly FALSE": it only inspects plain `=` AssignExpr in
+// the same enclosing function.  Compound assignments, increments,
+// pass-by-reference mutation, and globals reassigned in other
+// functions all bypass this check, causing the call to be
+// silently suppressed (a false negative).
+//
+// Each adversarial case below should, in principle, be flagged as
+// IRQL-too-high; under the current predicate they are not.
+// =====================================================================
+
+_IRQL_requires_(PASSIVE_LEVEL)
+NTSTATUS PassiveOnly_TooHigh(void){
+    return STATUS_SUCCESS;
+}
+
+static BOOLEAN g_DispatchSafe_TooHigh = FALSE;
+
+void initialize_global_dispatch_safe_TooHigh(void){
+    g_DispatchSafe_TooHigh = TRUE;
+}
+
+static void mutate_flag_by_pointer_TooHigh(PBOOLEAN pb){
+    *pb = TRUE;
+}
+
+// Adversarial: `bFalse |= 1` is `AssignBitwiseOrExpr`, which
+// extends `AssignOperation` and not `AssignExpr`.
+void failForIrqlTooHigh_compoundAssignment(PKIRQL oldIrql){
+    BOOLEAN bFalse = FALSE;
+    bFalse |= 1;
+    KeRaiseIrql(DISPATCH_LEVEL, oldIrql);
+    if (bFalse) {
+        PassiveOnly_TooHigh();
+    }
+    KeLowerIrql(*oldIrql);
+}
+
+// Adversarial: `bFalse++` is `CrementOperation`.
+void failForIrqlTooHigh_increment(PKIRQL oldIrql){
+    BOOLEAN bFalse = FALSE;
+    bFalse++;
+    KeRaiseIrql(DISPATCH_LEVEL, oldIrql);
+    if (bFalse) {
+        PassiveOnly_TooHigh();
+    }
+    KeLowerIrql(*oldIrql);
+}
+
+// Adversarial: variable mutated by reference; no AssignExpr to
+// `bFalse` exists in this function.
+void failForIrqlTooHigh_byReference(PKIRQL oldIrql){
+    BOOLEAN bFalse = FALSE;
+    mutate_flag_by_pointer_TooHigh(&bFalse);
+    KeRaiseIrql(DISPATCH_LEVEL, oldIrql);
+    if (bFalse) {
+        PassiveOnly_TooHigh();
+    }
+    KeLowerIrql(*oldIrql);
+}
+
+// Adversarial: file-scope global, reassigned only from other
+// functions.  The constant-FALSE branch check looks for
+// AssignExprs only inside `failForIrqlTooHigh_globalReassigned`
+// and finds none.
+void failForIrqlTooHigh_globalReassigned(PKIRQL oldIrql){
+    KeRaiseIrql(DISPATCH_LEVEL, oldIrql);
+    if (g_DispatchSafe_TooHigh) {
+        PassiveOnly_TooHigh();
+    }
+    KeLowerIrql(*oldIrql);
+}

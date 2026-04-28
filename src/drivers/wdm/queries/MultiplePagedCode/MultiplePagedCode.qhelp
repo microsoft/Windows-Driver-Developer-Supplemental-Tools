@@ -21,4 +21,20 @@
 			</a>
 		</li>
 	</references>
+	<semmleNotes>
+		<p>
+			<b>Function templates: known false negative.</b> The query excludes
+			<code>FunctionTemplateInstantiation</code> functions when locating the
+			enclosing function for each <code>PAGED_CODE</code> /
+			<code>PAGED_CODE_LOCKED</code> macro invocation. The exclusion was added
+			to avoid duplicate findings caused by per-instantiation line attribution
+			drift. As a side effect, a duplicate <code>PAGED_CODE</code> inside the
+			body of a C++ function template that is only ever observed as
+			instantiations (and not as a non-instantiated template entity in the
+			extracted AST) will not be reported. C++ function templates are uncommon
+			in WDM / KMDF drivers, but if you do use them and need this check, lift
+			the duplicated <code>PAGED_CODE</code> macro into a non-templated helper
+			or split the body so each path enters a distinct paged function.
+		</p>
+	</semmleNotes>
 </qhelp>

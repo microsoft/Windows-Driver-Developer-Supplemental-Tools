@@ -88,3 +88,39 @@ void driver_utility_nested_block_good(void)
         KeRestoreFloatingPointState(&FloatBuf);
     }
 }
+
+// =====================================================================
+// Adversarial: cross-function save / restore via thin wrappers.
+//
+// `irqlChangesBetween` requires `saveCall` and `restoreCall` to
+// share an enclosing function, so when the save and the restore
+// are routed through helper wrappers and the IRQL change happens
+// in the caller, the source-position filter never finds a `mid`
+// candidate.  No finding is produced even though the IRQL at the
+// save (PASSIVE_LEVEL) differs from the IRQL at the restore
+// (DISPATCH_LEVEL).  This is a known false negative of the
+// current intraprocedural filter.
+// =====================================================================
+
+static void save_fp_helper(PKFLOATING_SAVE pfs)
+{
+    KeSaveFloatingPointState(pfs);
+}
+
+static void restore_fp_helper(PKFLOATING_SAVE pfs)
+{
+    KeRestoreFloatingPointState(pfs);
+}
+
+_IRQL_requires_(PASSIVE_LEVEL)
+void driver_utility_cross_function_bad(void)
+{
+    KFLOATING_SAVE FloatBuf;
+    KIRQL oldIRQL;
+
+    save_fp_helper(&FloatBuf);
+    KeRaiseIrql(DISPATCH_LEVEL, &oldIRQL);
+    // ... do work at DISPATCH ...
+    restore_fp_helper(&FloatBuf);
+    KeLowerIrql(oldIRQL);
+}
