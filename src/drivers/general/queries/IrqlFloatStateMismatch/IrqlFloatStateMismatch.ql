@@ -17,7 +17,7 @@
  * @tags correctness
  *       ca_ported
  * @scope domainspecific
- * @query-version v3
+ * @query-version v4
  */
 
 import cpp
@@ -43,11 +43,26 @@ module FloatStateFlowConfig implements DataFlow::ConfigSig {
 module FloatStateFlow = DataFlow::Global<FloatStateFlowConfig>;
 
 /**
- * Holds if `cfn` is a call to a function that may change the IRQL.
- * This includes KeRaiseIrql, KeLowerIrql, functions annotated with
- * _IRQL_raises_, and functions annotated with _IRQL_saves_global_ /
- * _IRQL_restores_global_ (which imply spinlock acquire/release patterns).
+ * Holds if `fc` is a call that may change the IRQL.  This includes the
+ * IRQL primitives (KeRaiseIrql, KeLowerIrql, KfRaiseIrql, KfLowerIrql,
+ * etc.), functions annotated with _IRQL_raises_ or
+ * _IRQL_saves_global_ / _IRQL_restores_global_, and functions whose
+ * body itself transitively contains an IRQL-changing call (i.e.,
+ * unannotated wrapper helpers).
+ *
+ * The transitive closure over the call graph is necessary to avoid
+ * false negatives where a driver wraps the IRQL primitives in a helper
+ * function without the appropriate SAL annotations.
  */
+predicate isIrqlChangingFunction(Function f) {
+  f instanceof IrqlChangesFunction
+  or
+  exists(FunctionCall inner |
+    inner.getEnclosingFunction() = f and
+    isIrqlChangingCall(inner)
+  )
+}
+
 predicate isIrqlChangingCall(FunctionCall fc) {
   fc instanceof KeRaiseIrqlCall
   or
@@ -57,7 +72,7 @@ predicate isIrqlChangingCall(FunctionCall fc) {
   or
   fc instanceof SavesGlobalIrqlCall
   or
-  fc.getTarget() instanceof IrqlChangesFunction
+  isIrqlChangingFunction(fc.getTarget())
 }
 
 /**
