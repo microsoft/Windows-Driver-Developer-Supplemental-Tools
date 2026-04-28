@@ -104,3 +104,42 @@ class PagedFunctionDeclaration extends Function {
     isAllocUsedToLocatePagedFunc(this)
   }
 }
+
+/**
+ * A `PAGED_CODE` or `PAGED_CODE_LOCKED` macro invocation that sits inside
+ * a `PagedFunctionDeclaration`. Pre-filtering the population at the class
+ * level (rather than as joined `where`-clause predicates) lets the optimizer
+ * materialize a small relation and avoid the full
+ * `MacroInvocation × MacroInvocation` Cartesian product on large corpora.
+ */
+class PagedCodeMacro extends MacroInvocation {
+  PagedCodeMacro() {
+    this.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"]
+  }
+
+  /**
+   * Gets the enclosing `PagedFunctionDeclaration` for this macro invocation,
+   * if any. Excludes template instantiations: each function-template
+   * instantiation produces its own AST and its own `MacroInvocation` records,
+   * with line attribution that may shift by ±1 relative to the source-level
+   * `PAGED_CODE()` call. Counting those instantiation-level MIs as separate
+   * invocations causes false positives in templated headers. The source-level
+   * (uninstantiated) function template still satisfies this predicate, so
+   * real duplicate `PAGED_CODE`s in the source are still reported.
+   *
+   * Performance/correctness note: routed through `getStmt()` (which is built
+   * on the cheap `getAnExpandedElement`/`inmacroexpansion` relation) rather
+   * than the stock `MacroInvocation.getEnclosingFunction()` which uses
+   * `getAnAffectedElement` (a much larger
+   * `inmacroexpansion ∪ macrolocationbind` join that scales poorly on large
+   * codebases and can cause analysis timeouts). `getStmt()` returns the
+   * unique outermost `Stmt` produced by the macro expansion.
+   * `PAGED_CODE`/`PAGED_CODE_LOCKED` always expand to a statement-form
+   * `NT_ASSERT_ASSUME(...)`, so `getStmt()` is well-defined.
+   */
+  Function getEnclosingPagedFunction() {
+    result = this.getStmt().getEnclosingFunction() and
+    result instanceof PagedFunctionDeclaration and
+    not result instanceof FunctionTemplateInstantiation
+  }
+}

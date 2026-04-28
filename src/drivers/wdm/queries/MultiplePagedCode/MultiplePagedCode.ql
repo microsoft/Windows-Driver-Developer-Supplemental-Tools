@@ -24,13 +24,24 @@
 import cpp
 import drivers.libraries.Page
 
-// Selects functions that have at least two instances of a PAGED_CODE macro.
-from MacroInvocation mi, MacroInvocation mi2
+// Selects functions that have at least two PAGED_CODE/PAGED_CODE_LOCKED
+// macro invocations on distinct source lines.
+//
+// Implementation note: ranges over the pre-filtered `PagedCodeMacro` class
+// and uses `getEnclosingPagedFunction()` (defined in `Page.qll`), which
+// routes through `MacroInvocation.getStmt().getEnclosingFunction()`. The
+// stock `MacroInvocation.getEnclosingFunction()` is built on
+// `getAnAffectedElement()` and materializes a relation that scales poorly
+// on large codebases, causing analysis timeouts. `getStmt()` uses only the
+// cheaper `inmacroexpansion` relation and returns the unique outermost
+// `Stmt`, which gives a well-defined enclosing function without fanning
+// out across template instantiations.
+from PagedCodeMacro mi2, Function f
 where
-  mi.getEnclosingFunction() = mi2.getEnclosingFunction() and
-  mi.getEnclosingFunction() instanceof PagedFunctionDeclaration and
-  mi.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"] and
-  mi2.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"] and
-  mi.getLocation().getStartLine() < mi2.getLocation().getStartLine()
+  f = mi2.getEnclosingPagedFunction() and
+  exists(PagedCodeMacro mi |
+    mi.getEnclosingPagedFunction() = f and
+    mi.getLocation().getStartLine() < mi2.getLocation().getStartLine()
+  )
 select mi2,
   "Functions in a paged section must have exactly one instance of the PAGED_CODE or PAGED_CODE_LOCKED macro"
