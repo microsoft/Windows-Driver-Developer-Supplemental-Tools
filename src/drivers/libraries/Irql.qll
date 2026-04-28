@@ -927,8 +927,11 @@
  
 /**
  * Holds if `call` is located inside the "then" branch of an `if` statement
- * whose condition is a compile-time-constant `FALSE` (0) value, or a variable
- * that is singly defined with value 0/FALSE.
+ * whose condition is a compile-time-constant `FALSE` (0) value, or a
+ * non-`static` local variable that is initialized to `0` / `FALSE`,
+ * never assigned (with any assignment operator) or incremented /
+ * decremented in the enclosing function, and whose address is never
+ * taken.
  *
  * This detects patterns like:
  * ```
@@ -936,23 +939,49 @@
  * if (bFalse) { KeAcquireSpinLockAtDpcLevel(...); }  // dead branch
  * ```
  * Common in NDIS macros (FILTER_ACQUIRE_LOCK, NPROT_ACQUIRE_LOCK, etc.).
+ *
+ * The conservative-by-default conditions on the variable case avoid
+ * silently dropping legitimate findings when the runtime value of the
+ * variable cannot be proven to remain `FALSE`:
+ *
+ *   - `LocalVariable v` excludes file-scope and namespace globals,
+ *     which can be reassigned from any other function in the
+ *     translation unit (or even another TU).
+ *   - `not v.isStatic()` excludes function-static variables, whose
+ *     value persists across calls and could be set by a previous
+ *     invocation.
+ *   - The `Assignment` predicate matches plain `=` (`AssignExpr`) and
+ *     all compound operators (`AssignOperation`: `|=`, `&=`, `+=`,
+ *     etc.); the original `AssignExpr`-only check was too narrow.
+ *   - `CrementOperation` covers `++` and `--`, which are not modeled
+ *     as assignments in the cpp library.
+ *   - Bailing out when the variable's address is taken
+ *     (`AddressOfExpr`) prevents missing mutations performed by
+ *     callees through a pointer (e.g., `SetFlag(&bFalse)`).
  */
 predicate isInConstantFalseBranch(FunctionCall call) {
   exists(IfStmt ifStmt |
-    // The call is in the "then" block of the if statement
     ifStmt.getThen().getAChild*() = call and
     (
-      // Condition is a literal 0 / false
+      // Condition is a literal 0 / false (or any compile-time constant 0).
       ifStmt.getCondition().getValue() = "0"
       or
-      // Condition is a variable access to a variable initialized to 0/FALSE
-      // with no subsequent reassignment in the function
-      exists(Variable v |
+      // Condition is a variable access to a non-static local variable
+      // that is initialized to 0/FALSE and never mutated.
+      exists(LocalVariable v |
         ifStmt.getCondition().(VariableAccess).getTarget() = v and
+        not v.isStatic() and
         v.getInitializer().getExpr().getValue() = "0" and
-        not exists(AssignExpr ae |
-          ae.getLValue().(VariableAccess).getTarget() = v and
-          ae.getEnclosingFunction() = call.getEnclosingFunction()
+        not exists(Assignment a |
+          a.getLValue().(VariableAccess).getTarget() = v and
+          a.getEnclosingFunction() = call.getEnclosingFunction()
+        ) and
+        not exists(CrementOperation co |
+          co.getOperand().(VariableAccess).getTarget() = v and
+          co.getEnclosingFunction() = call.getEnclosingFunction()
+        ) and
+        not exists(AddressOfExpr ao |
+          ao.getOperand().(VariableAccess).getTarget() = v
         )
       )
     )

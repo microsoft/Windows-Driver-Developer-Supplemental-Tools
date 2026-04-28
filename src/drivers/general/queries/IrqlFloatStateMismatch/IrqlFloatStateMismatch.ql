@@ -17,7 +17,7 @@
  * @tags correctness
  *       ca_ported
  * @scope domainspecific
- * @query-version v4
+ * @query-version v5
  */
 
 import cpp
@@ -76,26 +76,62 @@ predicate isIrqlChangingCall(FunctionCall fc) {
 }
 
 /**
- * Holds if there is an IRQL-changing call in the same function as
- * `saveCall` and `restoreCall` whose source location lies (textually)
- * between them. This is intentionally a source-position check rather
- * than a CFG reachability check: the cpp control-flow graph in some
- * extracted databases does not transitively connect calls across
- * statement boundaries, which would silently eliminate true positives.
+ * Gets a source line in `f` that anchors `fc` from `f`'s perspective:
  *
- * The intent of the filter is to suppress mismatches in functions
- * that have no IRQL transition at all (where the apparent
- * save/restore IRQL difference is purely a may-analysis artifact
- * from multiple hypothetical entry IRQLs).
+ *   - If `fc`'s enclosing function is `f`, the anchor is `fc`'s own
+ *     start line.
+ *   - Otherwise, if `f` contains a call site whose static target is
+ *     `fc`'s enclosing function, the anchor is that call site's start
+ *     line. (One-level wrapper case.)
+ *
+ * This lets `irqlChangesBetween` reason about the relative source
+ * position of the save and the restore in any function that either
+ * directly contains the call or calls the helper that does.
+ */
+private int anchorLineForCall(Function f, FunctionCall fc) {
+  f = fc.getEnclosingFunction() and
+  result = fc.getLocation().getStartLine()
+  or
+  exists(FunctionCall site |
+    site.getEnclosingFunction() = f and
+    site.getTarget() = fc.getEnclosingFunction() and
+    f != fc.getEnclosingFunction() and
+    result = site.getLocation().getStartLine()
+  )
+}
+
+/**
+ * Holds if there is an IRQL-changing call in some function `f` whose
+ * source line lies between the save anchor and the restore anchor in
+ * `f`. The anchor mechanism (see `anchorLineForCall`) lets `f` be:
+ *
+ *   - the enclosing function of both `saveCall` and `restoreCall`
+ *     (the original same-function case),
+ *   - the common caller that calls thin save / restore helper
+ *     wrappers,
+ *   - the enclosing function of one of the two calls when the other
+ *     is in a one-level helper called from it (asymmetric case).
+ *
+ * The dataflow library has already established that the floating-
+ * point buffer flows from `saveCall` to `restoreCall`; this predicate
+ * is purely a sanity filter to suppress the pure may-analysis
+ * artifact where two save / restore sites are compared at different
+ * hypothetical entry IRQLs but no IRQL transition can actually happen
+ * at runtime between them.
+ *
+ * The position-based check (rather than a CFG-reachability check) is
+ * required because the cpp control-flow graph in some extracted
+ * databases does not transitively connect calls across statement
+ * boundaries, which would silently eliminate true positives.
  */
 predicate irqlChangesBetween(FunctionCall saveCall, FunctionCall restoreCall) {
-  exists(FunctionCall mid, Function f |
-    f = saveCall.getEnclosingFunction() and
-    f = restoreCall.getEnclosingFunction() and
-    f = mid.getEnclosingFunction() and
+  exists(Function f, int saveLine, int restoreLine, FunctionCall mid |
+    saveLine = anchorLineForCall(f, saveCall) and
+    restoreLine = anchorLineForCall(f, restoreCall) and
+    mid.getEnclosingFunction() = f and
     isIrqlChangingCall(mid) and
-    mid.getLocation().getStartLine() >= saveCall.getLocation().getStartLine() and
-    mid.getLocation().getStartLine() <= restoreCall.getLocation().getStartLine() and
+    mid.getLocation().getStartLine() >= saveLine and
+    mid.getLocation().getStartLine() <= restoreLine and
     mid != saveCall and
     mid != restoreCall
   )

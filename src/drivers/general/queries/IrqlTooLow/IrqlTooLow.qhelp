@@ -51,28 +51,19 @@
 		<p>This query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.</p>
 		<p>For information on how to annotate your functions with information about how they adjust the IRQL, see "IRQL annotations for drivers" in the references section.</p>
 		<p>
-			<b>Known false negatives.</b> The query suppresses calls inside an
-			<code>if (b)</code> block when <code>b</code> is a variable initialized to
-			<code>FALSE</code> / <code>0</code> with no plain <code>=</code> assignment
-			to it visible in the same enclosing function. This suppression is intended
-			to silence dead-branch patterns produced by NDIS macros such as
-			<code>FILTER_ACQUIRE_LOCK(lock, bFalse)</code>, but it is too lax. The
-			following mutations of <code>b</code> all bypass the check, so the call
-			inside the branch may be silently dropped even when <code>b</code> is in
-			fact true at runtime:
-		</p>
-		<ul>
-			<li>compound assignments such as <code>b |= 1</code>, <code>b &amp;= mask</code>, <code>b += value</code> (the predicate looks only for <code>AssignExpr</code>, which represents plain <code>=</code> assignments; compound forms are <code>AssignOperation</code>);</li>
-			<li>increment / decrement (<code>b++</code>, <code>--b</code>) which is <code>CrementOperation</code>, not an assignment;</li>
-			<li>pass-by-reference helpers such as <code>SetFlag(&amp;b)</code>, where the mutation is invisible to a syntactic scan of the enclosing function;</li>
-			<li>file-scope or global flags whose only mutation lives in a different function (such as a one-time initialization routine).</li>
-		</ul>
-		<p>
-			If you rely on a runtime flag to gate IRQL-sensitive code and the call is
-			incorrectly suppressed, work around the limitation by replacing the gated
-			call with a direct, annotated call site or by rewriting the condition so
-			the predicate fails (for example, use <code>!= 0</code> against a value
-			the predicate cannot constant-fold).
+			<b>Dead-branch suppression.</b> The query suppresses calls inside an
+			<code>if (b)</code> block when <code>b</code> is a non-<code>static</code>
+			local variable initialized to <code>FALSE</code> / <code>0</code> that is
+			never mutated (no <code>=</code>, no compound assignment, no
+			<code>++</code> / <code>--</code>) and whose address is never taken.
+			Compile-time constant <code>0</code> conditions are also suppressed.
+			This is intended to silence dead-branch patterns produced by NDIS
+			macros such as <code>FILTER_ACQUIRE_LOCK(lock, bFalse)</code>; the
+			conditions on the variable case are deliberately conservative to
+			avoid silently dropping legitimate findings when the runtime value
+			of the variable cannot be proven to remain <code>FALSE</code>
+			(globals reassigned in another function, address-taken locals
+			mutated through a pointer, compound mutation, etc.).
 		</p>
 	</semmleNotes>
 </qhelp>

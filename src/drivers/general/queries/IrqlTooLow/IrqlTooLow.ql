@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v5
+ * @query-version v6
  */
 
 import cpp
