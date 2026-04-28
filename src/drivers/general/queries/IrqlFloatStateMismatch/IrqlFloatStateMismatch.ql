@@ -17,7 +17,7 @@
  * @tags correctness
  *       ca_ported
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
