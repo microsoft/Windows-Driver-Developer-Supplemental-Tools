@@ -17,7 +17,7 @@
  * @tags correctness
  *       ca_ported
  * @scope domainspecific
- * @query-version v2
+ * @query-version v3
  */
 
 import cpp
@@ -48,44 +48,62 @@ module FloatStateFlow = DataFlow::Global<FloatStateFlowConfig>;
  * _IRQL_raises_, and functions annotated with _IRQL_saves_global_ /
  * _IRQL_restores_global_ (which imply spinlock acquire/release patterns).
  */
-predicate isIrqlChangingCfn(ControlFlowNode cfn) {
-  cfn instanceof KeRaiseIrqlCall
+predicate isIrqlChangingCall(FunctionCall fc) {
+  fc instanceof KeRaiseIrqlCall
   or
-  cfn instanceof KeLowerIrqlCall
+  fc instanceof KeLowerIrqlCall
   or
-  cfn instanceof RestoresGlobalIrqlCall
+  fc instanceof RestoresGlobalIrqlCall
   or
-  cfn instanceof SavesGlobalIrqlCall
+  fc instanceof SavesGlobalIrqlCall
   or
-  (
-    cfn instanceof FunctionCall and
-    cfn.(FunctionCall).getTarget() instanceof IrqlChangesFunction
-  )
+  fc.getTarget() instanceof IrqlChangesFunction
 }
 
 /**
- * Holds if there is an IRQL-changing call on some CFG path between
- * `save` and `restore` within the same function.
+ * Holds if there is an IRQL-changing call in the same function as
+ * `saveCall` and `restoreCall` whose source location lies (textually)
+ * between them. This is intentionally a source-position check rather
+ * than a CFG reachability check: the cpp control-flow graph in some
+ * extracted databases does not transitively connect calls across
+ * statement boundaries, which would silently eliminate true positives.
+ *
+ * The intent of the filter is to suppress mismatches in functions
+ * that have no IRQL transition at all (where the apparent
+ * save/restore IRQL difference is purely a may-analysis artifact
+ * from multiple hypothetical entry IRQLs).
  */
-predicate irqlChangesBetween(ControlFlowNode save, ControlFlowNode restore) {
-  exists(ControlFlowNode mid |
-    mid.getControlFlowScope() = save.getControlFlowScope() and
-    isIrqlChangingCfn(mid) and
-    save.getASuccessor+() = mid and
-    mid.getASuccessor+() = restore
+predicate irqlChangesBetween(FunctionCall saveCall, FunctionCall restoreCall) {
+  exists(FunctionCall mid, Function f |
+    f = saveCall.getEnclosingFunction() and
+    f = restoreCall.getEnclosingFunction() and
+    f = mid.getEnclosingFunction() and
+    isIrqlChangingCall(mid) and
+    mid.getLocation().getStartLine() >= saveCall.getLocation().getStartLine() and
+    mid.getLocation().getStartLine() <= restoreCall.getLocation().getStartLine() and
+    mid != saveCall and
+    mid != restoreCall
   )
 }
 
-from DataFlow::Node source, DataFlow::Node sink, int irqlSink, int irqlSource
+from
+  DataFlow::Node source, DataFlow::Node sink, int irqlSink, int irqlSource,
+  FunctionCall saveCall, FunctionCall restoreCall
 where
   FloatStateFlow::flow(source, sink) and
+  saveCall.getTarget().getName().matches("KeSaveFloatingPointState") and
+  source.asIndirectExpr() = saveCall.getArgument(0) and
+  restoreCall.getTarget().getName().matches("KeRestoreFloatingPointState") and
+  sink.asIndirectExpr() = restoreCall.getArgument(0) and
   irqlSource = getPotentialExitIrqlAtCfn(source.asIndirectExpr()) and
   irqlSink = getPotentialExitIrqlAtCfn(sink.asIndirectExpr()) and
   irqlSink != irqlSource and
-  // Only flag if there is an actual IRQL-changing operation between save and restore.
-  // If no IRQL-changing call exists, the IRQL is invariant within a single invocation
-  // and the mismatch is a may-analysis artifact from different hypothetical entry IRQLs.
-  irqlChangesBetween(source.asIndirectExpr(), sink.asIndirectExpr())
+  // Only flag if there is an actual IRQL-changing call in the same function
+  // between save and restore (in source order). If no IRQL-changing call
+  // exists between them, the IRQL is invariant within a single invocation
+  // and the mismatch is a may-analysis artifact from different hypothetical
+  // entry IRQLs.
+  irqlChangesBetween(saveCall, restoreCall)
 select sink.asIndirectExpr(),
   "The irql level where the floating-point state was saved (" + irqlSource +
     ") does not match the irql level for the restore operation (" + irqlSink + ")."
