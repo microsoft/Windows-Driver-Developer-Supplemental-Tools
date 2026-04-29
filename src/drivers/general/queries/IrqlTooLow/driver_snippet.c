@@ -56,13 +56,12 @@ IrqlHighTestFunction(){
 // =====================================================================
 // Adversarial cases for `isInConstantFalseBranch` (Irql.qll).
 //
-// Symmetric to the IrqlTooHigh cases: the enclosing function is
-// at PASSIVE_LEVEL but the call inside `if (b)` requires
-// DISPATCH_LEVEL.  The predicate suppresses these calls because
-// the variable looks constantly FALSE, even when in fact it has
-// been mutated through a compound assignment, an increment, a
-// pass-by-reference helper, or in a separate function (for a
-// global).
+// Symmetric to the IrqlTooHigh cases: the enclosing function is at
+// PASSIVE_LEVEL but the call inside `if (b)` requires DISPATCH_LEVEL.
+// Each case mutates `b` in a way that a naive constant-FALSE check
+// can miss (compound assignment, increment, pass-by-reference, or a
+// file-scope global reassigned in another function), so the predicate
+// must not blindly suppress the inner call.
 // =====================================================================
 
 _IRQL_requires_(DISPATCH_LEVEL)

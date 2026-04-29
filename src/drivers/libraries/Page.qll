@@ -110,7 +110,7 @@ class PagedFunctionDeclaration extends Function {
  * a `PagedFunctionDeclaration`. Pre-filtering the population at the class
  * level (rather than as joined `where`-clause predicates) lets the optimizer
  * materialize a small relation and avoid the full
- * `MacroInvocation × MacroInvocation` Cartesian product on large corpora.
+ * `MacroInvocation x MacroInvocation` Cartesian product on large corpora.
  */
 class PagedCodeMacro extends MacroInvocation {
   PagedCodeMacro() {

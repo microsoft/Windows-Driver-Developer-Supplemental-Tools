@@ -83,8 +83,8 @@
                 "level": "warning"
               },
               "help": {
-                "text": "# IRQL too low (C28120)\nThe function is not permitted to be called at the current IRQ level. The current level is too low.\n\n\n## Recommendation\nThe driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.\n\n\n## Example\nIn this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:\n\n```c\n\n\t\t\t// Within a standard thread running at APC_LEVEL:\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\nThe driver should be careful to only call from a DISPATCH_LEVEL context:\n\n```c\n\n\t\t\t// Within a work loop running at DISPATCH_LEVEL\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\n\n## References\n* [ C28120 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low)\n* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)\n\n## Semmle-specific notes\nThis query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.\n\nThis query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.\n\nFor information on how to annotate your functions with information about how they adjust the IRQL, see \"IRQL annotations for drivers\" in the references section.\n\n**Known false negatives.** The query suppresses calls inside an `if (b)` block when `b` is a variable initialized to `FALSE` / `0` with no plain `=` assignment to it visible in the same enclosing function. This suppression is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`, but it is too lax. The following mutations of `b` all bypass the check, so the call inside the branch may be silently dropped even when `b` is in fact true at runtime:\n\n* compound assignments such as `b |= 1`, `b &= mask`, `b += value` (the predicate looks only for `AssignExpr`, which represents plain `=` assignments; compound forms are `AssignOperation`);\n* increment / decrement (`b++`, `--b`) which is `CrementOperation`, not an assignment;\n* pass-by-reference helpers such as `SetFlag(&b)`, where the mutation is invisible to a syntactic scan of the enclosing function;\n* file-scope or global flags whose only mutation lives in a different function (such as a one-time initialization routine).\nIf you rely on a runtime flag to gate IRQL-sensitive code and the call is incorrectly suppressed, work around the limitation by replacing the gated call with a direct, annotated call site or by rewriting the condition so the predicate fails (for example, use `!= 0` against a value the predicate cannot constant-fold).\n\n",
-                "markdown": "# IRQL too low (C28120)\nThe function is not permitted to be called at the current IRQ level. The current level is too low.\n\n\n## Recommendation\nThe driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.\n\n\n## Example\nIn this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:\n\n```c\n\n\t\t\t// Within a standard thread running at APC_LEVEL:\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\nThe driver should be careful to only call from a DISPATCH_LEVEL context:\n\n```c\n\n\t\t\t// Within a work loop running at DISPATCH_LEVEL\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\n\n## References\n* [ C28120 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low)\n* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)\n\n## Semmle-specific notes\nThis query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.\n\nThis query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.\n\nFor information on how to annotate your functions with information about how they adjust the IRQL, see \"IRQL annotations for drivers\" in the references section.\n\n**Known false negatives.** The query suppresses calls inside an `if (b)` block when `b` is a variable initialized to `FALSE` / `0` with no plain `=` assignment to it visible in the same enclosing function. This suppression is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`, but it is too lax. The following mutations of `b` all bypass the check, so the call inside the branch may be silently dropped even when `b` is in fact true at runtime:\n\n* compound assignments such as `b |= 1`, `b &= mask`, `b += value` (the predicate looks only for `AssignExpr`, which represents plain `=` assignments; compound forms are `AssignOperation`);\n* increment / decrement (`b++`, `--b`) which is `CrementOperation`, not an assignment;\n* pass-by-reference helpers such as `SetFlag(&b)`, where the mutation is invisible to a syntactic scan of the enclosing function;\n* file-scope or global flags whose only mutation lives in a different function (such as a one-time initialization routine).\nIf you rely on a runtime flag to gate IRQL-sensitive code and the call is incorrectly suppressed, work around the limitation by replacing the gated call with a direct, annotated call site or by rewriting the condition so the predicate fails (for example, use `!= 0` against a value the predicate cannot constant-fold).\n\n"
+                "text": "# IRQL too low (C28120)\nThe function is not permitted to be called at the current IRQ level. The current level is too low.\n\n\n## Recommendation\nThe driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.\n\n\n## Example\nIn this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:\n\n```c\n\n\t\t\t// Within a standard thread running at APC_LEVEL:\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\nThe driver should be careful to only call from a DISPATCH_LEVEL context:\n\n```c\n\n\t\t\t// Within a work loop running at DISPATCH_LEVEL\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\n\n## References\n* [ C28120 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low)\n* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)\n\n## Semmle-specific notes\nThis query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.\n\nThis query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.\n\nFor information on how to annotate your functions with information about how they adjust the IRQL, see \"IRQL annotations for drivers\" in the references section.\n\n**Dead-branch suppression.** The query suppresses calls inside an `if (b)` block when `b` is a non-`static` local variable initialized to `FALSE` / `0` that is never mutated (no `=`, no compound assignment, no `++` / `--`) and whose address is never taken. Compile-time constant `0` conditions are also suppressed. This is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`; the conditions on the variable case are deliberately conservative to avoid silently dropping legitimate findings when the runtime value of the variable cannot be proven to remain `FALSE` (globals reassigned in another function, address-taken locals mutated through a pointer, compound mutation, etc.).\n\n",
+                "markdown": "# IRQL too low (C28120)\nThe function is not permitted to be called at the current IRQ level. The current level is too low.\n\n\n## Recommendation\nThe driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.\n\n\n## Example\nIn this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:\n\n```c\n\n\t\t\t// Within a standard thread running at APC_LEVEL:\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\nThe driver should be careful to only call from a DISPATCH_LEVEL context:\n\n```c\n\n\t\t\t// Within a work loop running at DISPATCH_LEVEL\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\n\n## References\n* [ C28120 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low)\n* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)\n\n## Semmle-specific notes\nThis query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.\n\nThis query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.\n\nFor information on how to annotate your functions with information about how they adjust the IRQL, see \"IRQL annotations for drivers\" in the references section.\n\n**Dead-branch suppression.** The query suppresses calls inside an `if (b)` block when `b` is a non-`static` local variable initialized to `FALSE` / `0` that is never mutated (no `=`, no compound assignment, no `++` / `--`) and whose address is never taken. Compile-time constant `0` conditions are also suppressed. This is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`; the conditions on the variable case are deliberately conservative to avoid silently dropping legitimate findings when the runtime value of the variable cannot be proven to remain `FALSE` (globals reassigned in another function, address-taken locals mutated through a pointer, compound mutation, etc.).\n\n"
               },
               "properties": {
                 "tags": [
@@ -114,7 +114,7 @@
         "extensions": [
           {
             "name": "microsoft/windows-drivers",
-            "semanticVersion": "1.9.0+2515238ad8912d03a18aab75fcacace2a4f4d307",
+            "semanticVersion": "1.9.0+a76f8551b47f01adada99ddc44a5ea4fa9839fca",
             "locations": [
               {
                 "uri": "file:///F:/source/repos/Windows-Driver-Developer-Supplemental-Tools/src/",
@@ -256,14 +256,14 @@
                 "text": ""
               },
               "level": "none",
-              "timeUtc": "2026-04-28T23:23:11.908037200Z",
+              "timeUtc": "2026-04-29T04:35:27.144286700Z",
               "descriptor": {
                 "id": "cli/file-coverage-baseline",
                 "index": 1
               },
               "properties": {
                 "attributes": {
-                  "durationMilliseconds": 308
+                  "durationMilliseconds": 271
                 },
                 "visibility": {
                   "statusPage": false,
@@ -276,7 +276,7 @@
                 "text": ""
               },
               "level": "none",
-              "timeUtc": "2026-04-28T23:23:11.915033800Z",
+              "timeUtc": "2026-04-29T04:35:27.147284600Z",
               "descriptor": {
                 "id": "cli/platform",
                 "index": 2
@@ -299,7 +299,7 @@
                 "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
               },
               "level": "note",
-              "timeUtc": "2026-04-28T23:23:50.604873300Z",
+              "timeUtc": "2026-04-29T04:36:08.306667Z",
               "descriptor": {
                 "id": "cpp/extractor/summary",
                 "index": 3
@@ -371,7 +371,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 113,
+                  "startLine": 112,
                   "startColumn": 9,
                   "endColumn": 28
                 }
@@ -392,7 +392,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 111,
+                  "startLine": 110,
                   "startColumn": 6,
                   "endColumn": 40
                 }
@@ -410,7 +410,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 113,
+                  "startLine": 112,
                   "startColumn": 9,
                   "endColumn": 28
                 }
@@ -440,7 +440,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 106,
+                  "startLine": 105,
                   "startColumn": 9,
                   "endColumn": 28
                 }
@@ -461,7 +461,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 102,
+                  "startLine": 101,
                   "startColumn": 6,
                   "endColumn": 35
                 }
@@ -479,7 +479,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 106,
+                  "startLine": 105,
                   "startColumn": 9,
                   "endColumn": 28
                 }
@@ -509,7 +509,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 97,
+                  "startLine": 96,
                   "startColumn": 9,
                   "endColumn": 28
                 }
@@ -530,7 +530,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 93,
+                  "startLine": 92,
                   "startColumn": 6,
                   "endColumn": 33
                 }
@@ -548,7 +548,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 97,
+                  "startLine": 96,
                   "startColumn": 9,
                   "endColumn": 28
                 }
@@ -578,7 +578,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 88,
+                  "startLine": 87,
                   "startColumn": 9,
                   "endColumn": 28
                 }
@@ -599,7 +599,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 84,
+                  "startLine": 83,
                   "startColumn": 6,
                   "endColumn": 42
                 }
@@ -617,7 +617,7 @@
                   "index": 0
                 },
                 "region": {
-                  "startLine": 88,
+                  "startLine": 87,
                   "startColumn": 9,
                   "endColumn": 28
                 }

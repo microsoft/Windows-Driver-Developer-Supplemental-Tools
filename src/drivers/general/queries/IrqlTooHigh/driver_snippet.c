@@ -78,16 +78,16 @@ passForIrqlTooHigh(PKIRQL oldIrql){
 // =====================================================================
 // Adversarial cases for `isInConstantFalseBranch` (Irql.qll).
 //
-// These cases probe a known limitation of the predicate that
-// suppresses calls inside `if (b)` for variables that look
-// "constantly FALSE": it only inspects plain `=` AssignExpr in
-// the same enclosing function.  Compound assignments, increments,
-// pass-by-reference mutation, and globals reassigned in other
-// functions all bypass this check, causing the call to be
-// silently suppressed (a false negative).
+// These cases ensure the predicate that suppresses calls inside
+// `if (b)` for variables that look "constantly FALSE" does not
+// accidentally drop legitimate findings when `b` is in fact mutated
+// at runtime via:
+//   - a compound assignment (|=, &=, +=, ...);
+//   - an increment / decrement (++, --);
+//   - a pass-by-reference helper that takes its address;
+//   - a separate function (when `b` is a file-scope global).
 //
-// Each adversarial case below should, in principle, be flagged as
-// IRQL-too-high; under the current predicate they are not.
+// Each adversarial case below should be flagged as IRQL-too-high.
 // =====================================================================
 
 _IRQL_requires_(PASSIVE_LEVEL)
@@ -141,9 +141,9 @@ void failForIrqlTooHigh_byReference(PKIRQL oldIrql){
 }
 
 // Adversarial: file-scope global, reassigned only from other
-// functions.  The constant-FALSE branch check looks for
-// AssignExprs only inside `failForIrqlTooHigh_globalReassigned`
-// and finds none.
+// functions.  A naive intra-function-only mutation check would
+// fail to see the reassignment in the initialiser routine and
+// silently drop the finding.
 void failForIrqlTooHigh_globalReassigned(PKIRQL oldIrql){
     KeRaiseIrql(DISPATCH_LEVEL, oldIrql);
     if (g_DispatchSafe_TooHigh) {

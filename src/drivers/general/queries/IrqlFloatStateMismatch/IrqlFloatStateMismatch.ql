@@ -142,18 +142,23 @@ from
   FunctionCall saveCall, FunctionCall restoreCall
 where
   FloatStateFlow::flow(source, sink) and
-  saveCall.getTarget().getName().matches("KeSaveFloatingPointState") and
+  // FloatStateFlow's source/sink predicates already restrict the flow's
+  // endpoints to be the first arguments of KeSaveFloatingPointState /
+  // KeRestoreFloatingPointState. The two arg(0) equalities below
+  // uniquely bind `saveCall` and `restoreCall` (each Expr has exactly
+  // one parent FunctionCall), without re-stating the function-name
+  // constraints.
   source.asIndirectExpr() = saveCall.getArgument(0) and
-  restoreCall.getTarget().getName().matches("KeRestoreFloatingPointState") and
   sink.asIndirectExpr() = restoreCall.getArgument(0) and
   irqlSource = getPotentialExitIrqlAtCfn(source.asIndirectExpr()) and
   irqlSink = getPotentialExitIrqlAtCfn(sink.asIndirectExpr()) and
   irqlSink != irqlSource and
-  // Only flag if there is an actual IRQL-changing call in the same function
-  // between save and restore (in source order). If no IRQL-changing call
-  // exists between them, the IRQL is invariant within a single invocation
-  // and the mismatch is a may-analysis artifact from different hypothetical
-  // entry IRQLs.
+  // Only flag if there is an actual IRQL-changing call between the save
+  // and the restore (in source order), in either the directly enclosing
+  // function or a one-level wrapper / common-caller. If no IRQL-changing
+  // call exists between them, the IRQL is invariant within a single
+  // invocation and the mismatch is a may-analysis artifact from
+  // different hypothetical entry IRQLs.
   irqlChangesBetween(saveCall, restoreCall)
 select sink.asIndirectExpr(),
   "The irql level where the floating-point state was saved (" + irqlSource +

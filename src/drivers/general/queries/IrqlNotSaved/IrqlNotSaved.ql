@@ -83,10 +83,10 @@ module IrqlSaveParameterFlowConfigurationConfig implements DataFlow::ConfigSig {
   }
 
   predicate isSink(DataFlow::Node sink) {
-    // Only track flow to assignment targets or parameters — not every node
+    // Only track flow to assignment targets or parameters, not every node.
     exists(Variable v | v.getAnAssignedValue() = sink.asExpr())
     or
-    exists(sink.asParameter())
+    sink.asParameter() instanceof Parameter
   }
 }
 module IrqlSaveParameterFlowConfiguration = DataFlow::Global<IrqlSaveParameterFlowConfigurationConfig>;

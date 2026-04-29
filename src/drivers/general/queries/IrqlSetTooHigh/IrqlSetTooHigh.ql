@@ -39,7 +39,7 @@ where
     irqlFunc.(IrqlAlwaysMaxFunction).getIrqlLevel() = irqlRequirement
     or
     // If we don't have an explicit max annotation but do raise the IRQL,
-    // we treat the raised-to level as the implicit max —
+    // we treat the raised-to level as the implicit max --
     // UNLESS the function has a _requires_min_ above the raises-to level,
     // which indicates a "lower IRQL on exit" pattern (e.g. mutex release),
     // not a ceiling.

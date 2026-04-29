@@ -92,14 +92,13 @@ void driver_utility_nested_block_good(void)
 // =====================================================================
 // Adversarial: cross-function save / restore via thin wrappers.
 //
-// `irqlChangesBetween` requires `saveCall` and `restoreCall` to
-// share an enclosing function, so when the save and the restore
-// are routed through helper wrappers and the IRQL change happens
-// in the caller, the source-position filter never finds a `mid`
-// candidate.  No finding is produced even though the IRQL at the
-// save (PASSIVE_LEVEL) differs from the IRQL at the restore
-// (DISPATCH_LEVEL).  This is a known false negative of the
-// current intraprocedural filter.
+// `irqlChangesBetween` projects each call to an anchor line in either
+// the directly enclosing function or a one-level wrapper / common
+// caller, so when the save and the restore are routed through helper
+// wrappers and the IRQL change happens in the caller, the caller's
+// anchor lines bracket the `KeRaiseIrql` call and the mismatch is
+// flagged.  The IRQL at the save (PASSIVE_LEVEL) differs from the IRQL
+// at the restore (DISPATCH_LEVEL) for this case.
 // =====================================================================
 
 static void save_fp_helper(PKFLOATING_SAVE pfs)
