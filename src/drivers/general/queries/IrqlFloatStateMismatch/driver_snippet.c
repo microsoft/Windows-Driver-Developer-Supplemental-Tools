@@ -123,3 +123,39 @@ void driver_utility_cross_function_bad(void)
     restore_fp_helper(&FloatBuf);
     KeLowerIrql(oldIRQL);
 }
+
+// =====================================================================
+// Documentation: a loop where the restore is textually above the save.
+//
+// At runtime, each iteration's `KeRestoreFloatingPointState` is preceded
+// by the previous iteration's `KeSaveFloatingPointState` via the loop
+// back-edge, with `KeLowerIrql` in between, so the IRQL at the save
+// (PASSIVE_LEVEL) does not match the IRQL at the restore (APC_LEVEL).
+// Source-line position alone cannot see this because the half-open
+// range [saveLine, restoreLine] is empty when the restore is textually
+// earlier than the save in the function body.  The AST-loop branch of
+// `irqlChangesBetween` recognises this case and would fire here, but
+// in our currently extracted DBs the upstream IRQL analysis library
+// does not bind `getPotentialExitIrqlAtCfn` at the argument expression
+// of `KeSaveFloatingPointState` when the save is inside a loop body,
+// so the source-IRQL filter still rejects this case and the finding
+// is suppressed.  This function is retained as a documented known
+// false negative; recovering it requires improvements to the IRQL
+// analysis library and not just to this query.
+// =====================================================================
+_IRQL_requires_(PASSIVE_LEVEL)
+void driver_utility_loop_bad(void)
+{
+    KFLOATING_SAVE FloatBuf;
+    KIRQL oldIRQL;
+
+    KeRaiseIrql(APC_LEVEL, &oldIRQL);
+
+    for (int i = 0; i < 2; i++)
+    {
+        KeRestoreFloatingPointState(&FloatBuf);
+        KeLowerIrql(PASSIVE_LEVEL);
+        KeSaveFloatingPointState(&FloatBuf);
+        KeRaiseIrql(APC_LEVEL, &oldIRQL);
+    }
+}

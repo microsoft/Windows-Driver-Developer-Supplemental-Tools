@@ -75,8 +75,8 @@
 			where one side is a helper and the other is direct).
 		</p>
 		<p>
-			<b>Remaining limitations.</b> The position-based filter still does
-			not detect:
+			<b>Remaining limitations.</b> Despite the source-position and
+			AST-loop branches, the predicate still does not detect:
 		</p>
 		<ul>
 			<li>
@@ -96,11 +96,18 @@
 			</li>
 			<li>
 				<b>Loops where the restore is textually before the save.</b>
-				The filter compares source line numbers; in a loop body
-				whose first statement is the restore and last statement is
-				the save (with the IRQL change after the save), the line
-				range becomes empty and no intermediate IRQL change is
-				seen.
+				The AST-loop branch of <code>irqlChangesBetween</code>
+				correctly recognises that all three calls (save, restore,
+				and an IRQL-changing call) sit inside the same loop body and
+				would fire on this pattern. However, the upstream IRQL
+				analysis library used to compute the IRQL at the save and
+				restore sites does not consistently bind a value at the
+				argument expression of <code>KeSaveFloatingPointState</code>
+				when the call is inside a loop body, so the
+				<code>irqlSource != irqlSink</code> filter rejects these
+				cases before <code>irqlChangesBetween</code> is consulted.
+				Recovering this true positive requires improvements to the
+				IRQL analysis library and not just to this query.
 			</li>
 			<li>
 				<b>Wrapper chains longer than one level.</b> Only one level

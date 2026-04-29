@@ -17,7 +17,7 @@
  * @tags correctness
  *       ca_ported
  * @scope domainspecific
- * @query-version v5
+ * @query-version v6
  */
 
 import cpp
@@ -101,30 +101,66 @@ private int anchorLineForCall(Function f, FunctionCall fc) {
 }
 
 /**
- * Holds if there is an IRQL-changing call in some function `f` whose
- * source line lies between the save anchor and the restore anchor in
- * `f`. The anchor mechanism (see `anchorLineForCall`) lets `f` be:
+ * Holds if there is an IRQL-changing call between `saveCall` and
+ * `restoreCall` in some function `f`. This predicate is a sanity filter
+ * applied on top of the dataflow result: dataflow has already shown the
+ * floating-point buffer flows from `saveCall` to `restoreCall`, and this
+ * predicate ensures there is at least one IRQL transition that could
+ * actually run between them.  Without it the query would emit the pure
+ * may-analysis artifact where two save / restore sites are compared at
+ * different hypothetical entry IRQLs but no IRQL transition can happen
+ * between them at runtime.
  *
- *   - the enclosing function of both `saveCall` and `restoreCall`
- *     (the original same-function case),
- *   - the common caller that calls thin save / restore helper
- *     wrappers,
- *   - the enclosing function of one of the two calls when the other
- *     is in a one-level helper called from it (asymmetric case).
+ * Two complementary disjuncts cooperate:
  *
- * The dataflow library has already established that the floating-
- * point buffer flows from `saveCall` to `restoreCall`; this predicate
- * is purely a sanity filter to suppress the pure may-analysis
- * artifact where two save / restore sites are compared at different
- * hypothetical entry IRQLs but no IRQL transition can actually happen
- * at runtime between them.
+ *  1. **Source-position branch.** For some `f`, an IRQL-changing call
+ *     `mid` in `f` lies on a source line bracketed by the anchor lines
+ *     of `saveCall` and `restoreCall` (see `anchorLineForCall`).  The
+ *     anchor mechanism lets `f` be the directly enclosing function of
+ *     both calls or a one-level wrapper / common caller, which covers
+ *     the cross-function case that intra-procedural CFG cannot reach.
  *
- * The position-based check (rather than a CFG-reachability check) is
- * required because the cpp control-flow graph in some extracted
- * databases does not transitively connect calls across statement
- * boundaries, which would silently eliminate true positives.
+ *  2. **AST-loop branch.** All three calls (`saveCall`, `restoreCall`,
+ *     `mid`) sit inside the body of the same loop in their common
+ *     enclosing function.  The loop back-edge means that at runtime
+ *     each iteration's `restoreCall` can be preceded by the previous
+ *     iteration's `saveCall` with `mid` between them, so an
+ *     IRQL-changing `mid` anywhere in the loop body is a real
+ *     transition between save and restore even when `restoreCall` is
+ *     textually above `saveCall`.  Source-line position alone cannot
+ *     express this: when the restore is textually earlier than the
+ *     save the bracketing line range is empty and branch (1) trivially
+ *     fails.
+ *
+ * The two branches are disjoint in spirit: branch (1) handles
+ * cross-function and acyclic in-function cases; branch (2) handles
+ * intra-function loops and re-entrant patterns.  Combining them is
+ * strictly additive (can only enable more findings, never suppress one
+ * that branch (1) would have flagged), so existing true positives are
+ * preserved.
+ *
+ * Why not full intra-procedural CFG reachability instead of branch (1)?
+ * The cpp control-flow graph in some extracted databases does not
+ * transitively connect calls across certain statement boundaries (in
+ * particular, forward reachability across `if (call(...))` conditions
+ * is unreliable in our extracted DBs), which would silently eliminate
+ * true positives that branch (1) catches via source-line bracketing.
+ * AST-loop containment in branch (2) sidesteps this by relying on the
+ * AST `Loop.getStmt().getAChild*()` relation, which is densely
+ * populated and reflects the syntactic loop body directly.
+ *
+ * Caveat: branch (2) cooperates with `irqlSource != irqlSink` only when
+ * the IRQL-analysis library binds `getPotentialExitIrqlAtCfn` at the
+ * argument expression of `KeSaveFloatingPointState`. In our current
+ * extracted DBs that binding is not always produced for `save` calls
+ * inside loop bodies, so some real-world loop true positives may
+ * still be filtered out by the upstream IRQL filter even when this
+ * predicate fires; recovering those will require improvements to
+ * the IRQL analysis library itself.
  */
 predicate irqlChangesBetween(FunctionCall saveCall, FunctionCall restoreCall) {
+  // Branch 1: source-line bracketing in a function `f` that anchors
+  // both calls (directly enclosing or one-level wrapper / common caller).
   exists(Function f, int saveLine, int restoreLine, FunctionCall mid |
     saveLine = anchorLineForCall(f, saveCall) and
     restoreLine = anchorLineForCall(f, restoreCall) and
@@ -134,6 +170,23 @@ predicate irqlChangesBetween(FunctionCall saveCall, FunctionCall restoreCall) {
     mid.getLocation().getStartLine() <= restoreLine and
     mid != saveCall and
     mid != restoreCall
+  )
+  or
+  // Branch 2: all three calls live inside the body of the same loop in
+  // their shared enclosing function. The loop back-edge makes any
+  // IRQL-changing call in the body a real transition between save and
+  // restore on a subsequent iteration, even when source-line position
+  // would put restore before save.
+  exists(Function f, Loop l, FunctionCall mid |
+    f = saveCall.getEnclosingFunction() and
+    f = restoreCall.getEnclosingFunction() and
+    f = mid.getEnclosingFunction() and
+    isIrqlChangingCall(mid) and
+    mid != saveCall and
+    mid != restoreCall and
+    l.getStmt().getAChild*() = saveCall.getEnclosingStmt() and
+    l.getStmt().getAChild*() = restoreCall.getEnclosingStmt() and
+    l.getStmt().getAChild*() = mid.getEnclosingStmt()
   )
 }
 
