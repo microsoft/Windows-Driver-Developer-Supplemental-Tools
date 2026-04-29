@@ -1,0 +1,23 @@
+<Project>
+  <!--
+    Auto-imported by MSBuild for every project under src\drivers\test\ (both the
+    TestTemplates\ originals and the generated working\ copies used by
+    build_create_analyze_test.py). Wires the WDK and Windows SDK CPP NuGet
+    packages restored by the workflow's `nuget restore ... -PackagesDirectory
+    .\packages\` step into the driver template projects so they can find wdm.h,
+    ntifs.h, wdf.h, etc.
+
+    Mirrors the pattern used by microsoft/Windows-driver-samples
+    (see https://github.com/microsoft/Windows-driver-samples/blob/main/Directory.Build.props),
+    keeping the package set and versions in sync with packages.config in this
+    same directory.
+  -->
+  <PropertyGroup>
+    <WdkNuGetPackagesDir>$(MSBuildThisFileDirectory)..\..\..\packages\</WdkNuGetPackagesDir>
+  </PropertyGroup>
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.x64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.x64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.x64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.x64.props') and '$(Platform)' == 'x64'" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.arm64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.arm64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.arm64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.arm64.props') and '$(Platform)' == 'ARM64'" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.x64.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.x64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.x64.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.x64.props') and '$(Platform)' == 'x64'" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.arm64.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.arm64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.arm64.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.arm64.props') and '$(Platform)' == 'ARM64'" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.props')" />
+</Project>

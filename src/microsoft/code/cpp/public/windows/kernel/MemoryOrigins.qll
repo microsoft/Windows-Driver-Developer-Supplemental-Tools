@@ -177,8 +177,6 @@ class MdlOrigin extends DirectMemoryOrigin, FunctionCall {
   }
   
   override Expr getABufferSizeExpression() { none() }
-
-  override predicate originCanWrite() { any() }
 }
 
 /**

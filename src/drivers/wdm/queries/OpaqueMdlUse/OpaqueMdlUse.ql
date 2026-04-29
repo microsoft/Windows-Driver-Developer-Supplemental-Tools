@@ -17,7 +17,7 @@
  * @tags correctness
  *       wddst
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -42,6 +42,10 @@ class IncorrectMdlFieldAccess extends FieldAccess {
       exists(SafeMdlAccessMacro safeMacro |
         safeMacro.getAnInvocation().getAnExpandedElement() = this
       )
+    ) and
+    not exists(LocalVariable lv |
+      lv.getType().getUnspecifiedType() instanceof Mdl and
+      this.getQualifier().(VariableAccess).getTarget() = lv
     )
   }
 

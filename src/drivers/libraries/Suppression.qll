@@ -2,6 +2,57 @@
 // Licensed under the MIT license.
 import cpp
 
+/**
+ * Gets the minimum start line of a non-suppression Locatable in `f` that is
+ * strictly after `afterLine`. Pre-computing distinct lines avoids iterating
+ * over every Locatable individually in the aggregate.
+ */
+pragma[nomagic]
+private int nextNonSuppressionLine(File f, int afterLine) {
+  afterLine = any(SuppressPragma sp | sp.getFile() = f).getLocation().getEndLine() and
+  result =
+    min(int line |
+      exists(Locatable l |
+        l.getFile() = f and
+        not l instanceof CASuppression and
+        line = l.getLocation().getStartLine() and
+        line > afterLine
+      )
+    )
+}
+
+/**
+ * Holds if `d` is a DisablePragma that falls within SuppressionPushPopSegment `s`.
+ */
+pragma[nomagic]
+private predicate disableInSegment(DisablePragma d, SuppressionPushPopSegment s) {
+  d.getFile() = s.getFile() and
+  d.getLocation().getStartLine() >= s.getSegmentStartLine() and
+  d.getLocation().getEndLine() <= s.getSegmentEndLine()
+}
+
+/**
+ * Holds if `d` is a DisablePragma that is inside at least one push/pop segment.
+ */
+pragma[nomagic]
+private predicate disableHasSegment(DisablePragma d) {
+  exists(SuppressionPushPopSegment s | disableInSegment(d, s))
+}
+
+/**
+ * Holds if a Location in file `f` spanning `startLine` to `endLine`
+ * falls inside at least one push/pop segment.
+ */
+bindingset[f, startLine, endLine]
+pragma[inline_late]
+private predicate locationInAnySegment(File f, int startLine, int endLine) {
+  exists(SuppressionPushPopSegment s |
+    f = s.getFile() and
+    startLine >= s.getSegmentStartLine() and
+    endLine <= s.getSegmentEndLine()
+  )
+}
+
 // Reference: https://learn.microsoft.com/en-us/cpp/preprocessor/warning?view=msvc-170
 /**
  * Represents a Code Analysis-style suppression using #pragma commands.
@@ -22,6 +73,13 @@ abstract class CASuppression extends PreprocessorPragma {
 
   /** Evaluates if the given location is suppressed by this suppression. */
   abstract predicate appliesToLocation(Location l);
+
+  /**
+   * Gets the scope of this suppression as a line range within a file.
+   * This is used by `hasLocationInfo` to define where the suppression applies
+   * without enumerating every Location in the database.
+   */
+  abstract predicate scopeCovers(File f, int startLine, int endLine);
 
   /** Returns the scope covered by this suppression. */
   CASuppressionScope getScope() { result = this }
@@ -121,16 +179,19 @@ abstract class CASuppression extends PreprocessorPragma {
 
 /** Represents the scope covered by a given CA supression. */
 class CASuppressionScope extends ElementBase instanceof CASuppression {
+  /**
+   * Defines the location range covered by this suppression scope.
+   * Instead of iterating all Location objects, this uses pre-computed scope bounds
+   * to return the bounding box of the suppression region directly.
+   */
   predicate hasLocationInfo(
     string filepath, int startline, int startcolumn, int endline, int endcolumn
   ) {
-    exists(Location l |
-      l.getFile().getAbsolutePath() = filepath and
-      l.getStartLine() = startline and
-      l.getStartColumn() = startcolumn and
-      l.getEndLine() = endline and
-      l.getEndColumn() = endcolumn and
-      super.appliesToLocation(l)
+    exists(File f |
+      super.scopeCovers(f, startline, endline) and
+      filepath = f.getAbsolutePath() and
+      startcolumn = 1 and
+      endcolumn = 1
     )
   }
 }
@@ -171,20 +232,21 @@ class SuppressPragma extends CASuppression {
     this.getLocation().getEndLine() + this.getMinimumLocationOffset() = l.getStartLine()
   }
 
+  /** The scope of a suppress pragma is just the single next code line. */
+  pragma[nomagic]
+  override predicate scopeCovers(File f, int startLine, int endLine) {
+    f = this.getFile() and
+    startLine = this.getLocation().getEndLine() + this.getMinimumLocationOffset() and
+    endLine = startLine
+  }
+
   /** Finds the offset (in line count) to the closest non-pragma element after this suppression. */
   pragma[nomagic]
-  
   int getMinimumLocationOffset() {
-    result =
-      min(int i |
-        i > 0 and
-        exists(Locatable l |
-          l.getFile() = this.getFile() and
-          l.getLocation().getStartLine() > this.getLocation().getEndLine() and
-          not l instanceof CASuppression and
-          this.getLocation().getEndLine() + i = l.getLocation().getStartLine()
-        )
-      )
+    exists(int nextLine |
+      nextLine = nextNonSuppressionLine(this.getFile(), this.getLocation().getEndLine()) and
+      result = nextLine - this.getLocation().getEndLine()
+    )
   }
 }
 
@@ -219,12 +281,34 @@ class DisablePragma extends CASuppression {
     // If we're in a pragma push/pop, ensure the disable is too
     (
       exists(SuppressionPushPopSegment spps |
-        spps.getADisablePragma() = this and
+        disableInSegment(this, spps) and
         spps.isInPushPopSegment(l)
       )
       or
-      not exists(SuppressionPushPopSegment spps | spps.getADisablePragma() = this) and
-      not exists(SuppressionPushPopSegment spps | spps.isInPushPopSegment(l))
+      not disableHasSegment(this) and
+      not locationInAnySegment(l.getFile(), l.getStartLine(), l.getEndLine())
+    )
+  }
+
+  /**
+   * The scope of a disable pragma: from the disable line to either the end of the
+   * enclosing push/pop segment, or the end of the file.
+   * Returns a single bounding range rather than enumerating every Location.
+   */
+  pragma[nomagic]
+  override predicate scopeCovers(File f, int startLine, int endLine) {
+    f = this.getFile() and
+    startLine = this.getLocation().getEndLine() and
+    (
+      // If in a push/pop segment, scope ends at the segment end
+      exists(SuppressionPushPopSegment spps |
+        disableInSegment(this, spps) and
+        endLine = spps.getSegmentEndLine()
+      )
+      or
+      // If not in any segment, scope covers to end of file
+      not disableHasSegment(this) and
+      endLine = max(int line | exists(Location l | l.getFile() = f and line = l.getEndLine()))
     )
   }
 }
@@ -277,8 +361,14 @@ class SuppressionPushPopSegment extends Location {
     )
   }
 
+  /** Gets the end line of the push (start of the segment content). */
+  int getSegmentStartLine() { result = start.getEndLine() }
+
+  /** Gets the start line of the pop (end of the segment content). */
+  int getSegmentEndLine() { result = end.getStartLine() }
+
   /** Determines if a given location is in this push/pop segment. */
-  pragma[inline]
+  pragma[nomagic]
   predicate isInPushPopSegment(Location l) {
     l.getFile() = this.getFile() and
     l.getStartLine() >= start.getEndLine() and
@@ -286,8 +376,7 @@ class SuppressionPushPopSegment extends Location {
   }
 
   /** Returns a disable pragma within this push/pop segment. */
-  
   DisablePragma getADisablePragma() {
-    result = any(DisablePragma p | this.isInPushPopSegment(p.getLocation()))
+    disableInSegment(result, this)
   }
 }

@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -43,6 +43,10 @@ class IncorrectMdlWrite extends Assignment {
       exists(SafeMdlWriteMacro safeWriteMacro |
         safeWriteMacro.getAnInvocation().getAnExpandedElement() = this
       )
+    ) and
+    not exists(LocalVariable lv |
+      lv.getType().getUnspecifiedType() instanceof Mdl and
+      access.getQualifier().(VariableAccess).getTarget() = lv
     )
   }
 

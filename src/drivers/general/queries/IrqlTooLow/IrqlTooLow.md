@@ -43,3 +43,5 @@ This query may provide false positives in cases where functions are not annotate
 
 For information on how to annotate your functions with information about how they adjust the IRQL, see "IRQL annotations for drivers" in the references section.
 
+**Dead-branch suppression.** The query suppresses calls inside an `if (b)` block when `b` is a non-`static` local variable initialized to `FALSE` / `0` that is never mutated (no `=`, no compound assignment, no `++` / `--`) and whose address is never taken. Compile-time constant `0` conditions are also suppressed. This is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`; the conditions on the variable case are deliberately conservative to avoid silently dropping legitimate findings when the runtime value of the variable cannot be proven to remain `FALSE` (globals reassigned in another function, address-taken locals mutated through a pointer, compound mutation, etc.).
+
