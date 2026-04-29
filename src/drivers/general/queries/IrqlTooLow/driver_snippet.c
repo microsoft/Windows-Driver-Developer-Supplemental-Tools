@@ -52,3 +52,63 @@ NTSTATUS
 IrqlHighTestFunction(){
     return STATUS_SUCCESS;
 }
+
+// =====================================================================
+// Adversarial cases for `isInConstantFalseBranch` (Irql.qll).
+//
+// Symmetric to the IrqlTooHigh cases: the enclosing function is at
+// PASSIVE_LEVEL but the call inside `if (b)` requires DISPATCH_LEVEL.
+// Each case mutates `b` in a way that a naive constant-FALSE check
+// can miss (compound assignment, increment, pass-by-reference, or a
+// file-scope global reassigned in another function), so the predicate
+// must not blindly suppress the inner call.
+// =====================================================================
+
+_IRQL_requires_(DISPATCH_LEVEL)
+NTSTATUS DispatchOnly_TooLow(void){
+    return STATUS_SUCCESS;
+}
+
+static BOOLEAN g_DispatchSafe_TooLow = FALSE;
+
+void initialize_global_dispatch_safe_TooLow(void){
+    g_DispatchSafe_TooLow = TRUE;
+}
+
+static void mutate_flag_by_pointer_TooLow(PBOOLEAN pb){
+    *pb = TRUE;
+}
+
+_IRQL_requires_(PASSIVE_LEVEL)
+void failForIrqlTooLow_compoundAssignment(void){
+    BOOLEAN bFalse = FALSE;
+    bFalse |= 1;
+    if (bFalse) {
+        DispatchOnly_TooLow();
+    }
+}
+
+_IRQL_requires_(PASSIVE_LEVEL)
+void failForIrqlTooLow_increment(void){
+    BOOLEAN bFalse = FALSE;
+    bFalse++;
+    if (bFalse) {
+        DispatchOnly_TooLow();
+    }
+}
+
+_IRQL_requires_(PASSIVE_LEVEL)
+void failForIrqlTooLow_byReference(void){
+    BOOLEAN bFalse = FALSE;
+    mutate_flag_by_pointer_TooLow(&bFalse);
+    if (bFalse) {
+        DispatchOnly_TooLow();
+    }
+}
+
+_IRQL_requires_(PASSIVE_LEVEL)
+void failForIrqlTooLow_globalReassigned(void){
+    if (g_DispatchSafe_TooLow) {
+        DispatchOnly_TooLow();
+    }
+}

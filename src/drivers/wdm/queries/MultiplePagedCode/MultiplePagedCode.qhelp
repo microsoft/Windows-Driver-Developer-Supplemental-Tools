@@ -21,4 +21,17 @@
 			</a>
 		</li>
 	</references>
+	<semmleNotes>
+		<p>
+			<b>C++ function template support.</b> When the same source-level
+			<code>PAGED_CODE</code> macro is expanded into multiple
+			<code>FunctionTemplateInstantiation</code> bodies, the query
+			collapses all instantiations of a single source-level template
+			into one match key (via the underlying
+			<code>TemplateFunction</code>) so duplicates inside a templated
+			paged function body are reported once at the source-level
+			location. Specialisations and non-template-paged functions are
+			excluded.
+		</p>
+	</semmleNotes>
 </qhelp>

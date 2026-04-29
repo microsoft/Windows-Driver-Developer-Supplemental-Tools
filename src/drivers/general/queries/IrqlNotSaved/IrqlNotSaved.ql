@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 import cpp
@@ -74,15 +74,20 @@ class FundamentalIrqlSaveFunction extends IrqlSavesFunction {
 }
 
 /**
- * A simple data flow from any IrqlSaveParameter.
+ * A data flow from any IrqlSaveParameter to variables that receive its value.
  */
 module IrqlSaveParameterFlowConfigurationConfig implements DataFlow::ConfigSig {
 
-   predicate isSource(DataFlow::Node source) {
+  predicate isSource(DataFlow::Node source) {
     source.asParameter() instanceof IrqlSaveParameter
   }
 
-   predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::Node }
+  predicate isSink(DataFlow::Node sink) {
+    // Only track flow to assignment targets or parameters, not every node.
+    exists(Variable v | v.getAnAssignedValue() = sink.asExpr())
+    or
+    sink.asParameter() instanceof Parameter
+  }
 }
 module IrqlSaveParameterFlowConfiguration = DataFlow::Global<IrqlSaveParameterFlowConfigurationConfig>;
 

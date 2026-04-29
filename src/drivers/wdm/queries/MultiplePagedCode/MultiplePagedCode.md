@@ -72,3 +72,7 @@ DispatchShutdown (
 
 ## References
 * [ C28171 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28171-function-has-more-than-one-page-macro-instance)
+
+## Semmle-specific notes
+**C++ function template support.** When the same source-level `PAGED_CODE` macro is expanded into multiple `FunctionTemplateInstantiation` bodies, the query collapses all instantiations of a single source-level template into one match key (via the underlying `TemplateFunction`) so duplicates inside a templated paged function body are reported once at the source-level location. Specialisations and non-template-paged functions are excluded.
+

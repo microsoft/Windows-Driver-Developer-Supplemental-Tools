@@ -60,4 +60,62 @@
 			</a>
 		</li>
 	</references>
+	<semmleNotes>
+		<p>
+			<b>Wrapper / common-caller pattern.</b> The query reasons about
+			IRQL-changing calls between save and restore not only when both
+			calls share an enclosing function, but also when they sit inside
+			one-level helper wrappers that are called from a common caller
+			(for example, thin <code>save_fp_helper</code> /
+			<code>restore_fp_helper</code> functions that simply forward to
+			<code>KeSaveFloatingPointState</code> /
+			<code>KeRestoreFloatingPointState</code>). In those cases the
+			intermediate IRQL transition is searched in the common caller
+			(or in either helper's enclosing function for the asymmetric case
+			where one side is a helper and the other is direct).
+		</p>
+		<p>
+			<b>Remaining limitations.</b> Despite the source-position and
+			AST-loop branches, the predicate still does not detect:
+		</p>
+		<ul>
+			<li>
+				<b>IRQL changes performed deep inside helper bodies.</b>
+				If the helper function itself raises or lowers the IRQL after
+				the save (or before the restore), the change is not visible
+				from the common caller's source-position view, and no
+				intermediate IRQL change is found. Annotating the helper with
+				<code>_IRQL_raises_</code> or <code>_IRQL_saves_global_</code>
+				makes its IRQL behavior visible without body inspection.
+			</li>
+			<li>
+				<b>Indirect calls.</b> IRQL changes performed by an indirect
+				call (function pointer or dispatch-table call) between save
+				and restore are not detected, because the predicate only
+				inspects the static call target.
+			</li>
+			<li>
+				<b>Loops where the restore is textually before the save.</b>
+				The AST-loop branch of <code>irqlChangesBetween</code>
+				correctly recognises that all three calls (save, restore,
+				and an IRQL-changing call) sit inside the same loop body and
+				would fire on this pattern. However, the upstream IRQL
+				analysis library used to compute the IRQL at the save and
+				restore sites does not consistently bind a value at the
+				argument expression of <code>KeSaveFloatingPointState</code>
+				when the call is inside a loop body, so the
+				<code>irqlSource != irqlSink</code> filter rejects these
+				cases before <code>irqlChangesBetween</code> is consulted.
+				Recovering this true positive requires improvements to the
+				IRQL analysis library and not just to this query.
+			</li>
+			<li>
+				<b>Wrapper chains longer than one level.</b> Only one level
+				of wrapping is currently modelled (the helper is called
+				directly from the common caller). Multi-level wrappers
+				require the same annotation hint described above, or a
+				direct call site.
+			</li>
+		</ul>
+	</semmleNotes>
 </qhelp>

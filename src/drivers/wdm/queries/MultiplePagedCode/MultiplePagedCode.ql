@@ -18,19 +18,38 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v1
+ * @query-version v4
  */
 
 import cpp
 import drivers.libraries.Page
 
-// Selects functions that have at least two instances of a PAGED_CODE macro.
-from MacroInvocation mi, MacroInvocation mi2
+// Selects functions that have at least two PAGED_CODE/PAGED_CODE_LOCKED
+// macro invocations on distinct source lines.
+//
+// Implementation note: ranges over the pre-filtered `PagedCodeMacro` class
+// and uses `getEnclosingPagedFunction()` (defined in `Page.qll`), which
+// routes through `MacroInvocation.getStmt().getEnclosingFunction()`. The
+// stock `MacroInvocation.getEnclosingFunction()` is built on
+// `getAnAffectedElement()` and materializes a relation that scales poorly
+// on large codebases, causing analysis timeouts. `getStmt()` uses only the
+// cheaper `inmacroexpansion` relation and returns the unique outermost
+// `Stmt`.
+//
+// The same-file constraint on `mi`, `mi2` and `f` defends against ODR-
+// equivalent template entities that the cpp extractor sometimes
+// consolidates across headers (e.g. two driver-private headers each
+// defining `template<class T> Foo()`); without the constraint, the inner
+// `mi` could match a macro invocation in a sibling header that happens to
+// share the consolidated `Function` entity.
+from PagedCodeMacro mi2, Function f
 where
-  mi.getEnclosingFunction() = mi2.getEnclosingFunction() and
-  mi.getEnclosingFunction() instanceof PagedFunctionDeclaration and
-  mi.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"] and
-  mi2.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"] and
-  mi.getLocation().getStartLine() < mi2.getLocation().getStartLine()
+  f = mi2.getEnclosingPagedFunction() and
+  f.getFile() = mi2.getFile() and
+  exists(PagedCodeMacro mi |
+    mi.getEnclosingPagedFunction() = f and
+    mi.getFile() = mi2.getFile() and
+    mi.getLocation().getStartLine() < mi2.getLocation().getStartLine()
+  )
 select mi2,
   "Functions in a paged section must have exactly one instance of the PAGED_CODE or PAGED_CODE_LOCKED macro"
