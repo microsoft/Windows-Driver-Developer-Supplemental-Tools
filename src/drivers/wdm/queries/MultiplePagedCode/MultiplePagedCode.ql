@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v3
+ * @query-version v4
  */
 
 import cpp
@@ -34,13 +34,21 @@ import drivers.libraries.Page
 // `getAnAffectedElement()` and materializes a relation that scales poorly
 // on large codebases, causing analysis timeouts. `getStmt()` uses only the
 // cheaper `inmacroexpansion` relation and returns the unique outermost
-// `Stmt`, which gives a well-defined enclosing function without fanning
-// out across template instantiations.
+// `Stmt`.
+//
+// The same-file constraint on `mi`, `mi2` and `f` defends against ODR-
+// equivalent template entities that the cpp extractor sometimes
+// consolidates across headers (e.g. two driver-private headers each
+// defining `template<class T> Foo()`); without the constraint, the inner
+// `mi` could match a macro invocation in a sibling header that happens to
+// share the consolidated `Function` entity.
 from PagedCodeMacro mi2, Function f
 where
   f = mi2.getEnclosingPagedFunction() and
+  f.getFile() = mi2.getFile() and
   exists(PagedCodeMacro mi |
     mi.getEnclosingPagedFunction() = f and
+    mi.getFile() = mi2.getFile() and
     mi.getLocation().getStartLine() < mi2.getLocation().getStartLine()
   )
 select mi2,

@@ -118,46 +118,30 @@ class PagedCodeMacro extends MacroInvocation {
   }
 
   /**
-   * Gets the source-level enclosing `PagedFunctionDeclaration` for this
-   * macro invocation, deduplicating across template instantiations so
-   * that each source-level function template body produces a single
-   * match key regardless of how many instantiations the extractor
-   * produced.
+   * Gets a paged enclosing function for this macro invocation, including
+   * `FunctionTemplateInstantiation` results when the macro lives inside a
+   * templated function body. Each instantiation is a distinct `Function`,
+   * so two `PagedCodeMacro` invocations are guaranteed to "share" one of
+   * these results only when they are inside the same instantiation body
+   * (not merely two ODR-equivalent template entities that the extractor
+   * may consolidate).
    *
-   * Three cases:
-   *  - **Non-templated function.** `getStmt().getEnclosingFunction()`
-   *    returns a unique non-instantiation `Function`, which is itself
-   *    the source-level entity.
-   *  - **C++ function template instantiations.** The cpp extractor
-   *    populates `getStmt()` with one expanded `Stmt` per instantiation;
-   *    each instantiation's enclosing function is a distinct
-   *    `FunctionTemplateInstantiation`. We project all of these back
-   *    to their underlying `TemplateFunction` via `getTemplate()`, so
-   *    a single source-level template collapses to one match key.
-   *    `PagedFunctionDeclaration`-ness is checked on the instantiation
-   *    (which has a concrete file location for the page-segment
-   *    heuristics to work against) rather than on the template entity.
-   *  - **Specialisations and non-template-paged functions** are excluded
-   *    by the `PagedFunctionDeclaration` requirement.
-   *
-   * The macro is routed through `getStmt()` rather than the stock
-   * `MacroInvocation.getEnclosingFunction()` because the latter is built
-   * on `getAnAffectedElement` (an expensive `inmacroexpansion ∪
-   * macrolocationbind` join that scales poorly on large codebases).
-   * `getStmt()` uses only the cheap `inmacroexpansion` relation.
-   * `PAGED_CODE` / `PAGED_CODE_LOCKED` always expand to a statement-form
+   * Routed through `getStmt()` rather than the stock
+   * `MacroInvocation.getEnclosingFunction()` to avoid the expensive
+   * `getAnAffectedElement` join on large codebases. `PAGED_CODE` /
+   * `PAGED_CODE_LOCKED` always expand to a statement-form
    * `NT_ASSERT_ASSUME(...)`, so `getStmt()` is well-defined.
+   *
+   * NB: callers that need to compare two macro invocations for "same
+   * source-level function" must also require the macros and the
+   * enclosing function to agree on `getFile()`. The cpp extractor
+   * sometimes consolidates two ODR-equivalent template definitions in
+   * different headers into a single `TemplateFunction` /
+   * `FunctionTemplateInstantiation` entity, which would otherwise allow
+   * a macro in one header to match an enclosing function in another.
    */
   Function getEnclosingPagedFunction() {
-    exists(Function rawEnclosing |
-      rawEnclosing = this.getStmt().getEnclosingFunction() and
-      rawEnclosing instanceof PagedFunctionDeclaration
-    |
-      not rawEnclosing instanceof FunctionTemplateInstantiation and
-      result = rawEnclosing
-      or
-      rawEnclosing instanceof FunctionTemplateInstantiation and
-      result = rawEnclosing.(FunctionTemplateInstantiation).getTemplate()
-    )
+    result = this.getStmt().getEnclosingFunction() and
+    result instanceof PagedFunctionDeclaration
   }
 }
