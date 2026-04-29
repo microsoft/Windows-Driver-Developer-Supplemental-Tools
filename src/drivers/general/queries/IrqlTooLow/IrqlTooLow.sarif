@@ -1,1 +1,776 @@
-{"$schema":"https://json.schemastore.org/sarif-2.1.0.json","version":"2.1.0","runs":[{"tool":{"driver":{"name":"CodeQL","organization":"GitHub","semanticVersion":"2.24.2","notifications":[{"id":"cpp/baseline/expected-extracted-files","name":"cpp/baseline/expected-extracted-files","shortDescription":{"text":"Expected extracted files"},"fullDescription":{"text":"Files appearing in the source archive that are expected to be extracted."},"defaultConfiguration":{"enabled":true},"properties":{"tags":["expected-extracted-files","telemetry"]}},{"id":"cli/file-coverage-baseline","name":"cli/file-coverage-baseline","shortDescription":{"text":"File coverage baseline telemetry"},"fullDescription":{"text":"File coverage baseline telemetry"},"defaultConfiguration":{"enabled":true}},{"id":"cli/platform","name":"cli/platform","shortDescription":{"text":"Platform"},"fullDescription":{"text":"Platform"},"defaultConfiguration":{"enabled":true}},{"id":"cpp/extractor/summary","name":"cpp/extractor/summary","shortDescription":{"text":"C++ extractor telemetry"},"fullDescription":{"text":"C++ extractor telemetry"},"defaultConfiguration":{"enabled":true}}],"rules":[{"id":"cpp/drivers/irql-too-low","name":"cpp/drivers/irql-too-low","shortDescription":{"text":"IRQL too low (C28120)"},"fullDescription":{"text":"A function annotated with IRQL requirements was called at an IRQL too low for the requirements."},"defaultConfiguration":{"enabled":true,"level":"warning"},"help":{"text":"# IRQL too low (C28120)\nThe function is not permitted to be called at the current IRQ level. The current level is too low.\n\n\n## Recommendation\nThe driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.\n\n\n## Example\nIn this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:\n\n```c\n\n\t\t\t// Within a standard thread running at APC_LEVEL:\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\nThe driver should be careful to only call from a DISPATCH_LEVEL context:\n\n```c\n\n\t\t\t// Within a work loop running at DISPATCH_LEVEL\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\n\n## References\n* [ C28120 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low)\n* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)\n\n## Semmle-specific notes\nThis query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.\n\nThis query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.\n\nFor information on how to annotate your functions with information about how they adjust the IRQL, see \"IRQL annotations for drivers\" in the references section.\n\n**Known false negatives.** The query suppresses calls inside an `if (b)` block when `b` is a variable initialized to `FALSE` / `0` with no plain `=` assignment to it visible in the same enclosing function. This suppression is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`, but it is too lax. The following mutations of `b` all bypass the check, so the call inside the branch may be silently dropped even when `b` is in fact true at runtime:\n\n* compound assignments such as `b |= 1`, `b &= mask`, `b += value` (the predicate looks only for `AssignExpr`, which represents plain `=` assignments; compound forms are `AssignOperation`);\n* increment / decrement (`b++`, `--b`) which is `CrementOperation`, not an assignment;\n* pass-by-reference helpers such as `SetFlag(&b)`, where the mutation is invisible to a syntactic scan of the enclosing function;\n* file-scope or global flags whose only mutation lives in a different function (such as a one-time initialization routine).\nIf you rely on a runtime flag to gate IRQL-sensitive code and the call is incorrectly suppressed, work around the limitation by replacing the gated call with a direct, annotated call site or by rewriting the condition so the predicate fails (for example, use `!= 0` against a value the predicate cannot constant-fold).\n\n","markdown":"# IRQL too low (C28120)\nThe function is not permitted to be called at the current IRQ level. The current level is too low.\n\n\n## Recommendation\nThe driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.\n\n\n## Example\nIn this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:\n\n```c\n\n\t\t\t// Within a standard thread running at APC_LEVEL:\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\nThe driver should be careful to only call from a DISPATCH_LEVEL context:\n\n```c\n\n\t\t\t// Within a work loop running at DISPATCH_LEVEL\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\n\n## References\n* [ C28120 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low)\n* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)\n\n## Semmle-specific notes\nThis query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.\n\nThis query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.\n\nFor information on how to annotate your functions with information about how they adjust the IRQL, see \"IRQL annotations for drivers\" in the references section.\n\n**Known false negatives.** The query suppresses calls inside an `if (b)` block when `b` is a variable initialized to `FALSE` / `0` with no plain `=` assignment to it visible in the same enclosing function. This suppression is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`, but it is too lax. The following mutations of `b` all bypass the check, so the call inside the branch may be silently dropped even when `b` is in fact true at runtime:\n\n* compound assignments such as `b |= 1`, `b &= mask`, `b += value` (the predicate looks only for `AssignExpr`, which represents plain `=` assignments; compound forms are `AssignOperation`);\n* increment / decrement (`b++`, `--b`) which is `CrementOperation`, not an assignment;\n* pass-by-reference helpers such as `SetFlag(&b)`, where the mutation is invisible to a syntactic scan of the enclosing function;\n* file-scope or global flags whose only mutation lives in a different function (such as a one-time initialization routine).\nIf you rely on a runtime flag to gate IRQL-sensitive code and the call is incorrectly suppressed, work around the limitation by replacing the gated call with a direct, annotated call site or by rewriting the condition so the predicate fails (for example, use `!= 0` against a value the predicate cannot constant-fold).\n\n"},"properties":{"tags":["correctness","ca_ported","wddst"],"description":"A function annotated with IRQL requirements was called at an IRQL too low for the requirements.","feature.area":"Multiple","id":"cpp/drivers/irql-too-low","impact":"Exploitable Design","kind":"problem","name":"IRQL too low (C28120)","opaqueid":"CQLD-C28120","owner.email":"sdat@microsoft.com","platform":"Desktop","precision":"medium","problem.severity":"warning","query-version":"v6","repro.text":"The following function call is taking place at an IRQL too low for what the call target is annotated as.","scope":"domainspecific","security.severity":"Low"}}]},"extensions":[{"name":"microsoft/windows-drivers","semanticVersion":"1.9.0+2515238ad8912d03a18aab75fcacace2a4f4d307","locations":[{"uri":"file:///F:/source/repos/Windows-Driver-Developer-Supplemental-Tools/src/","description":{"text":"The QL pack root directory."},"properties":{"tags":["CodeQL/LocalPackRoot"]}},{"uri":"file:///F:/source/repos/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml","description":{"text":"The QL pack definition file."},"properties":{"tags":["CodeQL/LocalPackDefinitionFile"]}}]},{"name":"codeql/cpp-all","semanticVersion":"7.0.0+c5329f6f3863621c140ea7abd5954860e96c8bf1","locations":[{"uri":"file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/7.0.0/","description":{"text":"The QL pack root directory."},"properties":{"tags":["CodeQL/LocalPackRoot"]}},{"uri":"file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/7.0.0/qlpack.yml","description":{"text":"The QL pack definition file."},"properties":{"tags":["CodeQL/LocalPackDefinitionFile"]}}]}]},"invocations":[{"toolExecutionNotifications":[{"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0}}}],"message":{"text":""},"level":"none","descriptor":{"id":"cpp/baseline/expected-extracted-files","index":0},"properties":{"formattedMessage":{"text":""}}},{"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/fail_driver1.h","uriBaseId":"%SRCROOT%","index":1}}}],"message":{"text":""},"level":"none","descriptor":{"id":"cpp/baseline/expected-extracted-files","index":0},"properties":{"formattedMessage":{"text":""}}},{"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/fail_driver1.c","uriBaseId":"%SRCROOT%","index":2}}}],"message":{"text":""},"level":"none","descriptor":{"id":"cpp/baseline/expected-extracted-files","index":0},"properties":{"formattedMessage":{"text":""}}},{"message":{"text":""},"level":"none","timeUtc":"2026-04-28T23:23:11.908037200Z","descriptor":{"id":"cli/file-coverage-baseline","index":1},"properties":{"attributes":{"durationMilliseconds":308},"visibility":{"statusPage":false,"telemetry":true}}},{"message":{"text":""},"level":"none","timeUtc":"2026-04-28T23:23:11.915033800Z","descriptor":{"id":"cli/platform","index":2},"properties":{"attributes":{"arch":"amd64","name":"Windows 11","version":"10.0"},"visibility":{"statusPage":false,"telemetry":true}}},{"message":{"text":"Internal telemetry for the C++ extractor.\n\nNo action needed.","markdown":"Internal telemetry for the C++ extractor.\n\nNo action needed."},"level":"note","timeUtc":"2026-04-28T23:23:50.604873300Z","descriptor":{"id":"cpp/extractor/summary","index":3},"properties":{"attributes":{"cache-hits":0,"cache-misses":1,"compilers":[{"program":"cl","version":"Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35724 for x64"}],"extractor-failures":1,"extractor-successes":0,"trap-caching":"disabled"},"visibility":{"statusPage":false,"telemetry":true}}}],"executionSuccessful":true}],"artifacts":[{"location":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0}},{"location":{"uri":"driver/fail_driver1.h","uriBaseId":"%SRCROOT%","index":1}},{"location":{"uri":"driver/fail_driver1.c","uriBaseId":"%SRCROOT%","index":2}}],"results":[{"ruleId":"cpp/drivers/irql-too-low","ruleIndex":0,"rule":{"id":"cpp/drivers/irql-too-low","index":0},"message":{"text":"[failForIrqlTooLow_globalReassigned](1): IRQL potentially too low at call to [DispatchOnly_TooLow](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":113,"startColumn":9,"endColumn":28}}}],"partialFingerprints":{"primaryLocationLineHash":"4e9bf712603567a:1","primaryLocationStartColumnFingerprint":"0"},"relatedLocations":[{"id":1,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":111,"startColumn":6,"endColumn":40}},"message":{"text":"failForIrqlTooLow_globalReassigned"}},{"id":2,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":113,"startColumn":9,"endColumn":28}},"message":{"text":"DispatchOnly_TooLow"}}]},{"ruleId":"cpp/drivers/irql-too-low","ruleIndex":0,"rule":{"id":"cpp/drivers/irql-too-low","index":0},"message":{"text":"[failForIrqlTooLow_byReference](1): IRQL potentially too low at call to [DispatchOnly_TooLow](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":106,"startColumn":9,"endColumn":28}}}],"partialFingerprints":{"primaryLocationLineHash":"30d5b4e4b89956a4:1","primaryLocationStartColumnFingerprint":"0"},"relatedLocations":[{"id":1,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":102,"startColumn":6,"endColumn":35}},"message":{"text":"failForIrqlTooLow_byReference"}},{"id":2,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":106,"startColumn":9,"endColumn":28}},"message":{"text":"DispatchOnly_TooLow"}}]},{"ruleId":"cpp/drivers/irql-too-low","ruleIndex":0,"rule":{"id":"cpp/drivers/irql-too-low","index":0},"message":{"text":"[failForIrqlTooLow_increment](1): IRQL potentially too low at call to [DispatchOnly_TooLow](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":97,"startColumn":9,"endColumn":28}}}],"partialFingerprints":{"primaryLocationLineHash":"dd920dbcc12ad933:1","primaryLocationStartColumnFingerprint":"0"},"relatedLocations":[{"id":1,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":93,"startColumn":6,"endColumn":33}},"message":{"text":"failForIrqlTooLow_increment"}},{"id":2,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":97,"startColumn":9,"endColumn":28}},"message":{"text":"DispatchOnly_TooLow"}}]},{"ruleId":"cpp/drivers/irql-too-low","ruleIndex":0,"rule":{"id":"cpp/drivers/irql-too-low","index":0},"message":{"text":"[failForIrqlTooLow_compoundAssignment](1): IRQL potentially too low at call to [DispatchOnly_TooLow](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":88,"startColumn":9,"endColumn":28}}}],"partialFingerprints":{"primaryLocationLineHash":"d830060d8a1428a7:1","primaryLocationStartColumnFingerprint":"0"},"relatedLocations":[{"id":1,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":84,"startColumn":6,"endColumn":42}},"message":{"text":"failForIrqlTooLow_compoundAssignment"}},{"id":2,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":88,"startColumn":9,"endColumn":28}},"message":{"text":"DispatchOnly_TooLow"}}]},{"ruleId":"cpp/drivers/irql-too-low","ruleIndex":0,"rule":{"id":"cpp/drivers/irql-too-low","index":0},"message":{"text":"[TestInner1](1): IRQL potentially too low at call to [TestInner2](2).  Minimum IRQL for this call: 1, IRQL at preceding node: 0"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":41,"startColumn":12,"endColumn":22}}}],"partialFingerprints":{"primaryLocationLineHash":"1defbc9e59f0310b:1","primaryLocationStartColumnFingerprint":"7"},"relatedLocations":[{"id":1,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":40,"startColumn":10,"endColumn":20}},"message":{"text":"TestInner1"}},{"id":2,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":41,"startColumn":12,"endColumn":22}},"message":{"text":"TestInner2"}}]},{"ruleId":"cpp/drivers/irql-too-low","ruleIndex":0,"rule":{"id":"cpp/drivers/irql-too-low","index":0},"message":{"text":"[someFunc](1): IRQL potentially too low at call to [TestInner3](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"},"locations":[{"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":21,"startColumn":12,"endColumn":22}}}],"partialFingerprints":{"primaryLocationLineHash":"bf32240018f4d9fb:1","primaryLocationStartColumnFingerprint":"7"},"relatedLocations":[{"id":1,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":20,"startColumn":10,"endColumn":18}},"message":{"text":"someFunc"}},{"id":2,"physicalLocation":{"artifactLocation":{"uri":"driver/driver_snippet.c","uriBaseId":"%SRCROOT%","index":0},"region":{"startLine":21,"startColumn":12,"endColumn":22}},"message":{"text":"TestInner3"}}]}],"columnKind":"utf16CodeUnits","properties":{"semmle.formatSpecifier":"sarifv2.1.0"}}]}
+{
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+  "version": "2.1.0",
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "CodeQL",
+          "organization": "GitHub",
+          "semanticVersion": "2.24.2",
+          "notifications": [
+            {
+              "id": "cpp/baseline/expected-extracted-files",
+              "name": "cpp/baseline/expected-extracted-files",
+              "shortDescription": {
+                "text": "Expected extracted files"
+              },
+              "fullDescription": {
+                "text": "Files appearing in the source archive that are expected to be extracted."
+              },
+              "defaultConfiguration": {
+                "enabled": true
+              },
+              "properties": {
+                "tags": [
+                  "expected-extracted-files",
+                  "telemetry"
+                ]
+              }
+            },
+            {
+              "id": "cli/file-coverage-baseline",
+              "name": "cli/file-coverage-baseline",
+              "shortDescription": {
+                "text": "File coverage baseline telemetry"
+              },
+              "fullDescription": {
+                "text": "File coverage baseline telemetry"
+              },
+              "defaultConfiguration": {
+                "enabled": true
+              }
+            },
+            {
+              "id": "cli/platform",
+              "name": "cli/platform",
+              "shortDescription": {
+                "text": "Platform"
+              },
+              "fullDescription": {
+                "text": "Platform"
+              },
+              "defaultConfiguration": {
+                "enabled": true
+              }
+            },
+            {
+              "id": "cpp/extractor/summary",
+              "name": "cpp/extractor/summary",
+              "shortDescription": {
+                "text": "C++ extractor telemetry"
+              },
+              "fullDescription": {
+                "text": "C++ extractor telemetry"
+              },
+              "defaultConfiguration": {
+                "enabled": true
+              }
+            }
+          ],
+          "rules": [
+            {
+              "id": "cpp/drivers/irql-too-low",
+              "name": "cpp/drivers/irql-too-low",
+              "shortDescription": {
+                "text": "IRQL too low (C28120)"
+              },
+              "fullDescription": {
+                "text": "A function annotated with IRQL requirements was called at an IRQL too low for the requirements."
+              },
+              "defaultConfiguration": {
+                "enabled": true,
+                "level": "warning"
+              },
+              "help": {
+                "text": "# IRQL too low (C28120)\nThe function is not permitted to be called at the current IRQ level. The current level is too low.\n\n\n## Recommendation\nThe driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.\n\n\n## Example\nIn this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:\n\n```c\n\n\t\t\t// Within a standard thread running at APC_LEVEL:\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\nThe driver should be careful to only call from a DISPATCH_LEVEL context:\n\n```c\n\n\t\t\t// Within a work loop running at DISPATCH_LEVEL\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\n\n## References\n* [ C28120 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low)\n* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)\n\n## Semmle-specific notes\nThis query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.\n\nThis query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.\n\nFor information on how to annotate your functions with information about how they adjust the IRQL, see \"IRQL annotations for drivers\" in the references section.\n\n**Known false negatives.** The query suppresses calls inside an `if (b)` block when `b` is a variable initialized to `FALSE` / `0` with no plain `=` assignment to it visible in the same enclosing function. This suppression is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`, but it is too lax. The following mutations of `b` all bypass the check, so the call inside the branch may be silently dropped even when `b` is in fact true at runtime:\n\n* compound assignments such as `b |= 1`, `b &= mask`, `b += value` (the predicate looks only for `AssignExpr`, which represents plain `=` assignments; compound forms are `AssignOperation`);\n* increment / decrement (`b++`, `--b`) which is `CrementOperation`, not an assignment;\n* pass-by-reference helpers such as `SetFlag(&b)`, where the mutation is invisible to a syntactic scan of the enclosing function;\n* file-scope or global flags whose only mutation lives in a different function (such as a one-time initialization routine).\nIf you rely on a runtime flag to gate IRQL-sensitive code and the call is incorrectly suppressed, work around the limitation by replacing the gated call with a direct, annotated call site or by rewriting the condition so the predicate fails (for example, use `!= 0` against a value the predicate cannot constant-fold).\n\n",
+                "markdown": "# IRQL too low (C28120)\nThe function is not permitted to be called at the current IRQ level. The current level is too low.\n\n\n## Recommendation\nThe driver is executing at an IRQL that is too low for the function that it is calling. Consult the WDK documentation for the function and verify the IRQL at which the function can be called. If you have applied custom IRQL annotations to your own functions, confirm that they are accurate.\n\n\n## Example\nIn this example, the driver is calling a DDI that must be called at DISPATCH_LEVEL or higher:\n\n```c\n\n\t\t\t// Within a standard thread running at APC_LEVEL:\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\nThe driver should be careful to only call from a DISPATCH_LEVEL context:\n\n```c\n\n\t\t\t// Within a work loop running at DISPATCH_LEVEL\n\t\t\tif (KeShouldYieldProcessor())\n\t\t\t{\n\t\t\t\tKeLowerIrql(PASSIVE_LEVEL);\n\t\t\t}\n\t\t\t\n\t\t\n```\n\n## References\n* [ C28120 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28120-irql-execution-too-low)\n* [ IRQL annotations for drivers ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/irql-annotations-for-drivers)\n\n## Semmle-specific notes\nThis query uses interprocedural data-flow analysis and can take a large amount of CPU time and memory to run.\n\nThis query may provide false positives in cases where functions are not annotated with their expected IRQL ranges or behaviors.\n\nFor information on how to annotate your functions with information about how they adjust the IRQL, see \"IRQL annotations for drivers\" in the references section.\n\n**Known false negatives.** The query suppresses calls inside an `if (b)` block when `b` is a variable initialized to `FALSE` / `0` with no plain `=` assignment to it visible in the same enclosing function. This suppression is intended to silence dead-branch patterns produced by NDIS macros such as `FILTER_ACQUIRE_LOCK(lock, bFalse)`, but it is too lax. The following mutations of `b` all bypass the check, so the call inside the branch may be silently dropped even when `b` is in fact true at runtime:\n\n* compound assignments such as `b |= 1`, `b &= mask`, `b += value` (the predicate looks only for `AssignExpr`, which represents plain `=` assignments; compound forms are `AssignOperation`);\n* increment / decrement (`b++`, `--b`) which is `CrementOperation`, not an assignment;\n* pass-by-reference helpers such as `SetFlag(&b)`, where the mutation is invisible to a syntactic scan of the enclosing function;\n* file-scope or global flags whose only mutation lives in a different function (such as a one-time initialization routine).\nIf you rely on a runtime flag to gate IRQL-sensitive code and the call is incorrectly suppressed, work around the limitation by replacing the gated call with a direct, annotated call site or by rewriting the condition so the predicate fails (for example, use `!= 0` against a value the predicate cannot constant-fold).\n\n"
+              },
+              "properties": {
+                "tags": [
+                  "correctness",
+                  "ca_ported",
+                  "wddst"
+                ],
+                "description": "A function annotated with IRQL requirements was called at an IRQL too low for the requirements.",
+                "feature.area": "Multiple",
+                "id": "cpp/drivers/irql-too-low",
+                "impact": "Exploitable Design",
+                "kind": "problem",
+                "name": "IRQL too low (C28120)",
+                "opaqueid": "CQLD-C28120",
+                "owner.email": "sdat@microsoft.com",
+                "platform": "Desktop",
+                "precision": "medium",
+                "problem.severity": "warning",
+                "query-version": "v6",
+                "repro.text": "The following function call is taking place at an IRQL too low for what the call target is annotated as.",
+                "scope": "domainspecific",
+                "security.severity": "Low"
+              }
+            }
+          ]
+        },
+        "extensions": [
+          {
+            "name": "microsoft/windows-drivers",
+            "semanticVersion": "1.9.0+2515238ad8912d03a18aab75fcacace2a4f4d307",
+            "locations": [
+              {
+                "uri": "file:///F:/source/repos/Windows-Driver-Developer-Supplemental-Tools/src/",
+                "description": {
+                  "text": "The QL pack root directory."
+                },
+                "properties": {
+                  "tags": [
+                    "CodeQL/LocalPackRoot"
+                  ]
+                }
+              },
+              {
+                "uri": "file:///F:/source/repos/Windows-Driver-Developer-Supplemental-Tools/src/qlpack.yml",
+                "description": {
+                  "text": "The QL pack definition file."
+                },
+                "properties": {
+                  "tags": [
+                    "CodeQL/LocalPackDefinitionFile"
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "name": "codeql/cpp-all",
+            "semanticVersion": "7.0.0+c5329f6f3863621c140ea7abd5954860e96c8bf1",
+            "locations": [
+              {
+                "uri": "file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/7.0.0/",
+                "description": {
+                  "text": "The QL pack root directory."
+                },
+                "properties": {
+                  "tags": [
+                    "CodeQL/LocalPackRoot"
+                  ]
+                }
+              },
+              {
+                "uri": "file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/7.0.0/qlpack.yml",
+                "description": {
+                  "text": "The QL pack definition file."
+                },
+                "properties": {
+                  "tags": [
+                    "CodeQL/LocalPackDefinitionFile"
+                  ]
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "invocations": [
+        {
+          "toolExecutionNotifications": [
+            {
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "driver/driver_snippet.c",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 0
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": ""
+              },
+              "level": "none",
+              "descriptor": {
+                "id": "cpp/baseline/expected-extracted-files",
+                "index": 0
+              },
+              "properties": {
+                "formattedMessage": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "driver/fail_driver1.h",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 1
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": ""
+              },
+              "level": "none",
+              "descriptor": {
+                "id": "cpp/baseline/expected-extracted-files",
+                "index": 0
+              },
+              "properties": {
+                "formattedMessage": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "locations": [
+                {
+                  "physicalLocation": {
+                    "artifactLocation": {
+                      "uri": "driver/fail_driver1.c",
+                      "uriBaseId": "%SRCROOT%",
+                      "index": 2
+                    }
+                  }
+                }
+              ],
+              "message": {
+                "text": ""
+              },
+              "level": "none",
+              "descriptor": {
+                "id": "cpp/baseline/expected-extracted-files",
+                "index": 0
+              },
+              "properties": {
+                "formattedMessage": {
+                  "text": ""
+                }
+              }
+            },
+            {
+              "message": {
+                "text": ""
+              },
+              "level": "none",
+              "timeUtc": "2026-04-28T23:23:11.908037200Z",
+              "descriptor": {
+                "id": "cli/file-coverage-baseline",
+                "index": 1
+              },
+              "properties": {
+                "attributes": {
+                  "durationMilliseconds": 308
+                },
+                "visibility": {
+                  "statusPage": false,
+                  "telemetry": true
+                }
+              }
+            },
+            {
+              "message": {
+                "text": ""
+              },
+              "level": "none",
+              "timeUtc": "2026-04-28T23:23:11.915033800Z",
+              "descriptor": {
+                "id": "cli/platform",
+                "index": 2
+              },
+              "properties": {
+                "attributes": {
+                  "arch": "amd64",
+                  "name": "Windows 11",
+                  "version": "10.0"
+                },
+                "visibility": {
+                  "statusPage": false,
+                  "telemetry": true
+                }
+              }
+            },
+            {
+              "message": {
+                "text": "Internal telemetry for the C++ extractor.\n\nNo action needed.",
+                "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
+              },
+              "level": "note",
+              "timeUtc": "2026-04-28T23:23:50.604873300Z",
+              "descriptor": {
+                "id": "cpp/extractor/summary",
+                "index": 3
+              },
+              "properties": {
+                "attributes": {
+                  "cache-hits": 0,
+                  "cache-misses": 1,
+                  "compilers": [
+                    {
+                      "program": "cl",
+                      "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.50.35724 for x64"
+                    }
+                  ],
+                  "extractor-failures": 1,
+                  "extractor-successes": 0,
+                  "trap-caching": "disabled"
+                },
+                "visibility": {
+                  "statusPage": false,
+                  "telemetry": true
+                }
+              }
+            }
+          ],
+          "executionSuccessful": true
+        }
+      ],
+      "artifacts": [
+        {
+          "location": {
+            "uri": "driver/driver_snippet.c",
+            "uriBaseId": "%SRCROOT%",
+            "index": 0
+          }
+        },
+        {
+          "location": {
+            "uri": "driver/fail_driver1.h",
+            "uriBaseId": "%SRCROOT%",
+            "index": 1
+          }
+        },
+        {
+          "location": {
+            "uri": "driver/fail_driver1.c",
+            "uriBaseId": "%SRCROOT%",
+            "index": 2
+          }
+        }
+      ],
+      "results": [
+        {
+          "ruleId": "cpp/drivers/irql-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[failForIrqlTooLow_globalReassigned](1): IRQL potentially too low at call to [DispatchOnly_TooLow](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 113,
+                  "startColumn": 9,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "4e9bf712603567a:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 111,
+                  "startColumn": 6,
+                  "endColumn": 40
+                }
+              },
+              "message": {
+                "text": "failForIrqlTooLow_globalReassigned"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 113,
+                  "startColumn": 9,
+                  "endColumn": 28
+                }
+              },
+              "message": {
+                "text": "DispatchOnly_TooLow"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/drivers/irql-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[failForIrqlTooLow_byReference](1): IRQL potentially too low at call to [DispatchOnly_TooLow](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 106,
+                  "startColumn": 9,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "30d5b4e4b89956a4:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 102,
+                  "startColumn": 6,
+                  "endColumn": 35
+                }
+              },
+              "message": {
+                "text": "failForIrqlTooLow_byReference"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 106,
+                  "startColumn": 9,
+                  "endColumn": 28
+                }
+              },
+              "message": {
+                "text": "DispatchOnly_TooLow"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/drivers/irql-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[failForIrqlTooLow_increment](1): IRQL potentially too low at call to [DispatchOnly_TooLow](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 97,
+                  "startColumn": 9,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "dd920dbcc12ad933:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 93,
+                  "startColumn": 6,
+                  "endColumn": 33
+                }
+              },
+              "message": {
+                "text": "failForIrqlTooLow_increment"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 97,
+                  "startColumn": 9,
+                  "endColumn": 28
+                }
+              },
+              "message": {
+                "text": "DispatchOnly_TooLow"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/drivers/irql-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[failForIrqlTooLow_compoundAssignment](1): IRQL potentially too low at call to [DispatchOnly_TooLow](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 88,
+                  "startColumn": 9,
+                  "endColumn": 28
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "d830060d8a1428a7:1",
+            "primaryLocationStartColumnFingerprint": "0"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 84,
+                  "startColumn": 6,
+                  "endColumn": 42
+                }
+              },
+              "message": {
+                "text": "failForIrqlTooLow_compoundAssignment"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 88,
+                  "startColumn": 9,
+                  "endColumn": 28
+                }
+              },
+              "message": {
+                "text": "DispatchOnly_TooLow"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/drivers/irql-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[TestInner1](1): IRQL potentially too low at call to [TestInner2](2).  Minimum IRQL for this call: 1, IRQL at preceding node: 0"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 12,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "1defbc9e59f0310b:1",
+            "primaryLocationStartColumnFingerprint": "7"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 40,
+                  "startColumn": 10,
+                  "endColumn": 20
+                }
+              },
+              "message": {
+                "text": "TestInner1"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 41,
+                  "startColumn": 12,
+                  "endColumn": 22
+                }
+              },
+              "message": {
+                "text": "TestInner2"
+              }
+            }
+          ]
+        },
+        {
+          "ruleId": "cpp/drivers/irql-too-low",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-too-low",
+            "index": 0
+          },
+          "message": {
+            "text": "[someFunc](1): IRQL potentially too low at call to [TestInner3](2).  Minimum IRQL for this call: 2, IRQL at preceding node: 0"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 12,
+                  "endColumn": 22
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "bf32240018f4d9fb:1",
+            "primaryLocationStartColumnFingerprint": "7"
+          },
+          "relatedLocations": [
+            {
+              "id": 1,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 20,
+                  "startColumn": 10,
+                  "endColumn": 18
+                }
+              },
+              "message": {
+                "text": "someFunc"
+              }
+            },
+            {
+              "id": 2,
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 21,
+                  "startColumn": 12,
+                  "endColumn": 22
+                }
+              },
+              "message": {
+                "text": "TestInner3"
+              }
+            }
+          ]
+        }
+      ],
+      "columnKind": "utf16CodeUnits",
+      "properties": {
+        "semmle.formatSpecifier": "sarifv2.1.0"
+      }
+    }
+  ]
+}
