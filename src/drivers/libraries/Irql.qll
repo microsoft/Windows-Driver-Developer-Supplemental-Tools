@@ -534,13 +534,13 @@
     * "the IRQL before the corresponding save global call."
     */
    int getIrqlLevel() {
-     result = any(getPotentialExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
+     result = any(getPotentialExitIrqlAtCfnRaw(this.getMostRecentRaise().getAPredecessor()))
    }
- 
+
    int getIrqlLevelExplicit() {
      result = any(getExplicitExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
    }
- 
+
    /** Returns the matching call to a function that saved the IRQL. */
    IrqlSaveCall getMostRecentRaise() {
      result =
@@ -614,7 +614,7 @@
     */
    int getIrqlLevel() {
      result =
-       any(getPotentialExitIrqlAtCfn(this.getMostRecentRaiseInterprocedural().getAPredecessor()))
+       any(getPotentialExitIrqlAtCfnRaw(this.getMostRecentRaiseInterprocedural().getAPredecessor()))
    }
  
    int getIrqlLevelExplicit() {
@@ -665,13 +665,13 @@
     * "the IRQL before the corresponding save global call."
     */
    int getIrqlLevel() {
-     result = any(getPotentialExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
+     result = any(getPotentialExitIrqlAtCfnRaw(this.getMostRecentRaise().getAPredecessor()))
    }
- 
+
    int getIrqlLevelExplicit() {
      result = any(getExplicitExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
    }
- 
+
    /**
     * Returns the matching call to a function that saved the IRQL to a global state.
     *
@@ -735,10 +735,17 @@
  /**
   * Pre-computed summary: the potential exit IRQL of function `f`,
   * computed once per function rather than re-discovered per call site.
+  *
+  * Calls the Raw cascade directly rather than the public wrapper so
+  * that this internal building block stays inside a single recursive
+  * stratum with the cascade.  The wrapper layers an AST-level fallback
+  * over Raw using a negation, which would otherwise cycle back through
+  * here.  Equivalent to the historical pre-wrapper behaviour because
+  * the wrapper agrees with Raw on every input where Raw binds.
   */
  pragma[nomagic]
  private int functionExitIrql(Function f) {
-   result = getPotentialExitIrqlAtCfn(getAnExitPointOfFunction(f))
+   result = getPotentialExitIrqlAtCfnRaw(getAnExitPointOfFunction(f))
  }
 
  /**
@@ -765,9 +772,38 @@
   * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations applied to this function.
   * - Failing all this, we set the IRQL to 0.
   *
+  * Layering note: this public predicate wraps the recursive cascade
+  * `getPotentialExitIrqlAtCfnRaw` with a single AST-level fallback
+  * (`astLevelExitIrqlFallback`) that activates only when the cascade
+  * yields no value at all.  The fallback walks one source-line step
+  * back to the closest preceding sibling Stmt and returns the cascade's
+  * IRQL there.  This recovers binding for argument-expression CFNs of
+  * function calls inside loop bodies, where the cpp CFG in some
+  * extracted databases is too sparse for the cascade's predecessor walk
+  * to converge.  The fallback is restricted to CFNs inside loop bodies
+  * (the empirical failure mode), keeping it from over-approximating on
+  * linear branching code where the cascade's silence may be hiding
+  * IRQL-changing work that an AST-level scan cannot see.  When the
+  * cascade already binds, this wrapper returns exactly the cascade's
+  * result set: the fallback never widens an existing binding.
+  *
   * Not implemented: _IRQL_limited_to_
   */
  int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
+   result = getPotentialExitIrqlAtCfnRaw(cfn)
+   or
+   not exists(getPotentialExitIrqlAtCfnRaw(cfn)) and
+   result = astLevelExitIrqlFallback(cfn)
+ }
+
+ /**
+  * Internal recursive cascade for `getPotentialExitIrqlAtCfn`.  Behaves
+  * exactly like the historical `getPotentialExitIrqlAtCfn` did before
+  * the AST fallback wrapper was introduced.  Callers should use
+  * `getPotentialExitIrqlAtCfn` instead, which additionally consults
+  * `astLevelExitIrqlFallback` when this cascade yields no value.
+  */
+ private int getPotentialExitIrqlAtCfnRaw(ControlFlowNode cfn) {
    if cfn instanceof KeRaiseIrqlCall
    then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
    else
@@ -788,24 +824,62 @@
              if
                cfn instanceof FunctionCall and
                cfn.(FunctionCall).getTarget() instanceof IrqlRequiresSameAnnotatedFunction
-             then result = getPotentialExitIrqlAtCfn(cfn.getAPredecessor())
+             then result = getPotentialExitIrqlAtCfnRaw(cfn.getAPredecessor())
              else
                if cfn instanceof FunctionCall
                then result = functionExitIrql(cfn.(FunctionCall).getTarget())
                else
                  if exists(ControlFlowNode cfn2 | cfn2 = cfn.getAPredecessor())
-                 then result = getPotentialExitIrqlAtCfn(cfn.getAPredecessor())
+                 then result = getPotentialExitIrqlAtCfnRaw(cfn.getAPredecessor())
                  else
                    if exists(callerPredecessor(cfn.getControlFlowScope()))
                    then
                      result =
-                       getPotentialExitIrqlAtCfn(callerPredecessor(cfn.getControlFlowScope()))
+                       getPotentialExitIrqlAtCfnRaw(callerPredecessor(cfn.getControlFlowScope()))
                    else
                      if
                        cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
                        getAllowableIrqlLevel(cfn.getControlFlowScope()) != -1
                      then result = getAllowableIrqlLevel(cfn.getControlFlowScope())
                      else result = 0
+ }
+
+ /**
+  * AST-level fallback for `getPotentialExitIrqlAtCfn`.  Walks to the
+  * closest source-line preceding sibling Stmt of `cfn`'s enclosing Stmt
+  * (within the same parent Stmt) and returns the cascade's IRQL there.
+  * Yields no value when there is no preceding sibling at the same
+  * nesting level (e.g. `cfn` is the first stmt in its block) or when
+  * the cascade also yields no value at that sibling.
+  *
+  * Restricted to CFNs whose enclosing Stmt sits inside a loop body.  The
+  * cascade's CFG-predecessor walk is reliable on linear control flow but
+  * empirically can fail to bind on argument-expression CFNs of function
+  * calls reached via a loop back-edge; this fallback exists to recover
+  * binding for that specific case.  Restricting to loops avoids
+  * supplying coarse single-value approximations on linear code where the
+  * cascade's silence (when it does occur) often reflects branching that
+  * the AST-level scan cannot reason about (e.g. an if-stmt whose body
+  * raises and lowers IRQL).
+  *
+  * Consulted by `getPotentialExitIrqlAtCfn` only when the cascade
+  * returns no value at all, so this never widens an existing binding;
+  * it only fills in silence with a single conservative IRQL value
+  * derived from textually-preceding code in the loop body.
+  */
+ private int astLevelExitIrqlFallback(ControlFlowNode cfn) {
+   exists(Stmt cfnStmt, Stmt prev, Loop l |
+     cfnStmt = cfn.getEnclosingStmt() and
+     cfnStmt.getParent+() = l and
+     prev.getParentStmt() = cfnStmt.getParentStmt() and
+     prev.getLocation().getStartLine() < cfnStmt.getLocation().getStartLine() and
+     not exists(Stmt closer |
+       closer.getParentStmt() = cfnStmt.getParentStmt() and
+       closer.getLocation().getStartLine() < cfnStmt.getLocation().getStartLine() and
+       closer.getLocation().getStartLine() > prev.getLocation().getStartLine()
+     ) and
+     result = getPotentialExitIrqlAtCfnRaw(prev)
+   )
  }
 
  /*

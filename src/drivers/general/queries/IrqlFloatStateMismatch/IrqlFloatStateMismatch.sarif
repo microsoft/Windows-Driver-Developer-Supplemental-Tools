@@ -112,7 +112,7 @@
         "extensions": [
           {
             "name": "microsoft/windows-drivers",
-            "semanticVersion": "1.9.0+4cacaf0d92da0d47dab3a6bd6640729cf07eec99",
+            "semanticVersion": "1.9.0+39dd725fc01992bf14a42934229a3cc1fd7bf25b",
             "locations": [
               {
                 "uri": "file:///F:/source/repos/Windows-Driver-Developer-Supplemental-Tools/src/",
@@ -254,14 +254,14 @@
                 "text": ""
               },
               "level": "none",
-              "timeUtc": "2026-04-29T20:06:00.500637300Z",
+              "timeUtc": "2026-04-29T20:46:26.236012500Z",
               "descriptor": {
                 "id": "cli/file-coverage-baseline",
                 "index": 1
               },
               "properties": {
                 "attributes": {
-                  "durationMilliseconds": 197
+                  "durationMilliseconds": 233
                 },
                 "visibility": {
                   "statusPage": false,
@@ -274,7 +274,7 @@
                 "text": ""
               },
               "level": "none",
-              "timeUtc": "2026-04-29T20:06:00.504647400Z",
+              "timeUtc": "2026-04-29T20:46:26.241012400Z",
               "descriptor": {
                 "id": "cli/platform",
                 "index": 2
@@ -297,7 +297,7 @@
                 "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
               },
               "level": "note",
-              "timeUtc": "2026-04-29T20:06:43.926354300Z",
+              "timeUtc": "2026-04-29T20:47:05.794926800Z",
               "descriptor": {
                 "id": "cpp/extractor/summary",
                 "index": 3
@@ -350,6 +350,68 @@
         }
       ],
       "results": [
+        {
+          "ruleId": "cpp/drivers/irql-float-state-mismatch",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-float-state-mismatch",
+            "index": 0
+          },
+          "message": {
+            "text": "The irql level where the floating-point state was saved (0) does not match the irql level for the restore operation (1).\nThe irql level where the floating-point state was saved (2) does not match the irql level for the restore operation (1)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 156,
+                  "startColumn": 38,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "7203877b7e98c247:1",
+            "primaryLocationStartColumnFingerprint": "29"
+          }
+        },
+        {
+          "ruleId": "cpp/drivers/irql-float-state-mismatch",
+          "ruleIndex": 0,
+          "rule": {
+            "id": "cpp/drivers/irql-float-state-mismatch",
+            "index": 0
+          },
+          "message": {
+            "text": "The irql level where the floating-point state was saved (0) does not match the irql level for the restore operation (1).\nThe irql level where the floating-point state was saved (2) does not match the irql level for the restore operation (1)."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "artifactLocation": {
+                  "uri": "driver/driver_snippet.c",
+                  "uriBaseId": "%SRCROOT%",
+                  "index": 0
+                },
+                "region": {
+                  "startLine": 156,
+                  "startColumn": 37,
+                  "endColumn": 46
+                }
+              }
+            }
+          ],
+          "partialFingerprints": {
+            "primaryLocationLineHash": "7203877b7e98c247:1",
+            "primaryLocationStartColumnFingerprint": "28"
+          }
+        },
         {
           "ruleId": "cpp/drivers/irql-float-state-mismatch",
           "ruleIndex": 0,
