@@ -157,7 +157,23 @@ private int anchorLineForCall(Function f, FunctionCall fc) {
  * still be filtered out by the upstream IRQL filter even when this
  * predicate fires; recovering those will require improvements to
  * the IRQL analysis library itself.
+ *
+ * Performance note: `pragma[inline_late]` lets the planner specialize
+ * this predicate at its call site after the dataflow result has bound
+ * `saveCall` and `restoreCall`. Without it, the body would otherwise
+ * be materialized over every (saveCall, restoreCall) pair in the
+ * codebase that satisfies the constraints (millions of tuples on
+ * large drivers), only to be intersected with a much smaller dataflow
+ * result set afterwards. With it, the body is evaluated only for the
+ * dataflow-derived pairs, turning a codebase-wide enumeration into a
+ * per-pair check. The accompanying `bindingset` records the calling
+ * convention required by `inline_late` (both arguments bound at the
+ * call site, which is satisfied by the `from` clause below).
+ * Semantics are unchanged — both annotations are planner hints, not
+ * logical changes.
  */
+bindingset[saveCall, restoreCall]
+pragma[inline_late]
 predicate irqlChangesBetween(FunctionCall saveCall, FunctionCall restoreCall) {
   // Branch 1: source-line bracketing in a function `f` that anchors
   // both calls (directly enclosing or one-level wrapper / common caller).
