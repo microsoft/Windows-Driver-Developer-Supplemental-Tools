@@ -534,7 +534,7 @@
     * "the IRQL before the corresponding save global call."
     */
    int getIrqlLevel() {
-     result = any(getPotentialExitIrqlAtCfnRaw(this.getMostRecentRaise().getAPredecessor()))
+     result = any(getPotentialExitIrqlAtCfnInternal(this.getMostRecentRaise().getAPredecessor()))
    }
 
    int getIrqlLevelExplicit() {
@@ -614,7 +614,7 @@
     */
    int getIrqlLevel() {
      result =
-       any(getPotentialExitIrqlAtCfnRaw(this.getMostRecentRaiseInterprocedural().getAPredecessor()))
+       any(getPotentialExitIrqlAtCfnInternal(this.getMostRecentRaiseInterprocedural().getAPredecessor()))
    }
  
    int getIrqlLevelExplicit() {
@@ -665,7 +665,7 @@
     * "the IRQL before the corresponding save global call."
     */
    int getIrqlLevel() {
-     result = any(getPotentialExitIrqlAtCfnRaw(this.getMostRecentRaise().getAPredecessor()))
+     result = any(getPotentialExitIrqlAtCfnInternal(this.getMostRecentRaise().getAPredecessor()))
    }
 
    int getIrqlLevelExplicit() {
@@ -723,7 +723,7 @@
    )
    or
    not exists(Expr child | child = e1.getAChild() or child = e2.getAChild())
- }
+}
  
  /** Utility function to get all exit points of a function. */
  pragma[nomagic]
@@ -745,7 +745,7 @@
   */
  pragma[nomagic]
  private int functionExitIrql(Function f) {
-   result = getPotentialExitIrqlAtCfnRaw(getAnExitPointOfFunction(f))
+   result = getPotentialExitIrqlAtCfnInternal(getAnExitPointOfFunction(f))
  }
 
  /**
@@ -790,9 +790,9 @@
   * Not implemented: _IRQL_limited_to_
   */
  int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
-   result = getPotentialExitIrqlAtCfnRaw(cfn)
+   result = getPotentialExitIrqlAtCfnInternal(cfn)
    or
-   not exists(getPotentialExitIrqlAtCfnRaw(cfn)) and
+   not exists(getPotentialExitIrqlAtCfnInternal(cfn)) and
    result = astLevelExitIrqlFallback(cfn)
  }
 
@@ -803,7 +803,7 @@
   * `getPotentialExitIrqlAtCfn` instead, which additionally consults
   * `astLevelExitIrqlFallback` when this cascade yields no value.
   */
- private int getPotentialExitIrqlAtCfnRaw(ControlFlowNode cfn) {
+ private int getPotentialExitIrqlAtCfnInternal(ControlFlowNode cfn) {
    if cfn instanceof KeRaiseIrqlCall
    then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
    else
@@ -824,18 +824,18 @@
              if
                cfn instanceof FunctionCall and
                cfn.(FunctionCall).getTarget() instanceof IrqlRequiresSameAnnotatedFunction
-             then result = getPotentialExitIrqlAtCfnRaw(cfn.getAPredecessor())
+             then result = getPotentialExitIrqlAtCfnInternal(cfn.getAPredecessor())
              else
                if cfn instanceof FunctionCall
                then result = functionExitIrql(cfn.(FunctionCall).getTarget())
                else
                  if exists(ControlFlowNode cfn2 | cfn2 = cfn.getAPredecessor())
-                 then result = getPotentialExitIrqlAtCfnRaw(cfn.getAPredecessor())
+                 then result = getPotentialExitIrqlAtCfnInternal(cfn.getAPredecessor())
                  else
                    if exists(callerPredecessor(cfn.getControlFlowScope()))
                    then
                      result =
-                       getPotentialExitIrqlAtCfnRaw(callerPredecessor(cfn.getControlFlowScope()))
+                       getPotentialExitIrqlAtCfnInternal(callerPredecessor(cfn.getControlFlowScope()))
                    else
                      if
                        cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
@@ -878,7 +878,7 @@
        closer.getLocation().getStartLine() < cfnStmt.getLocation().getStartLine() and
        closer.getLocation().getStartLine() > prev.getLocation().getStartLine()
      ) and
-     result = getPotentialExitIrqlAtCfnRaw(prev)
+     result = getPotentialExitIrqlAtCfnInternal(prev)
    )
  }
 
@@ -1061,3 +1061,43 @@
       )
     )
   }
+ /**
+  * Holds if `fc` is a call that may change the IRQL.  This includes the
+  * IRQL primitives (KeRaiseIrql, KeLowerIrql, KfRaiseIrql, KfLowerIrql,
+  * etc., recognized via the `Ke*Irql*Call` and `*GlobalIrqlCall`
+  * classes), functions annotated with `_IRQL_raises_` or
+  * `_IRQL_saves_global_` / `_IRQL_restores_global_`, and functions
+  * whose body itself transitively contains an IRQL-changing call (i.e.,
+  * unannotated wrapper helpers).
+  *
+  * The transitive closure over the call graph is necessary to avoid
+  * false negatives where a driver wraps the IRQL primitives in a helper
+  * function without the appropriate SAL annotations.
+  *
+  * Lifted from `IrqlFloatStateMismatch.ql` so other queries (e.g.
+  * `IrqlInconsistentWithRequired`) can use the same soundness check.
+  */
+ predicate isIrqlChangingCall(FunctionCall fc) {
+   fc instanceof KeRaiseIrqlCall
+   or
+   fc instanceof KeLowerIrqlCall
+   or
+   fc instanceof RestoresGlobalIrqlCall
+   or
+   fc instanceof SavesGlobalIrqlCall
+   or
+   isIrqlChangingFunction(fc.getTarget())
+ }
+
+ /**
+  * Holds if `f` directly or transitively contains an IRQL-changing call.
+  * See `isIrqlChangingCall`.
+  */
+ predicate isIrqlChangingFunction(Function f) {
+   f instanceof IrqlChangesFunction
+   or
+   exists(FunctionCall inner |
+     inner.getEnclosingFunction() = f and
+     isIrqlChangingCall(inner)
+   )
+ }

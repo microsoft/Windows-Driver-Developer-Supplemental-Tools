@@ -43,39 +43,6 @@ module FloatStateFlowConfig implements DataFlow::ConfigSig {
 module FloatStateFlow = DataFlow::Global<FloatStateFlowConfig>;
 
 /**
- * Holds if `fc` is a call that may change the IRQL.  This includes the
- * IRQL primitives (KeRaiseIrql, KeLowerIrql, KfRaiseIrql, KfLowerIrql,
- * etc.), functions annotated with _IRQL_raises_ or
- * _IRQL_saves_global_ / _IRQL_restores_global_, and functions whose
- * body itself transitively contains an IRQL-changing call (i.e.,
- * unannotated wrapper helpers).
- *
- * The transitive closure over the call graph is necessary to avoid
- * false negatives where a driver wraps the IRQL primitives in a helper
- * function without the appropriate SAL annotations.
- */
-predicate isIrqlChangingFunction(Function f) {
-  f instanceof IrqlChangesFunction
-  or
-  exists(FunctionCall inner |
-    inner.getEnclosingFunction() = f and
-    isIrqlChangingCall(inner)
-  )
-}
-
-predicate isIrqlChangingCall(FunctionCall fc) {
-  fc instanceof KeRaiseIrqlCall
-  or
-  fc instanceof KeLowerIrqlCall
-  or
-  fc instanceof RestoresGlobalIrqlCall
-  or
-  fc instanceof SavesGlobalIrqlCall
-  or
-  isIrqlChangingFunction(fc.getTarget())
-}
-
-/**
  * Gets a source line in `f` that anchors `fc` from `f`'s perspective:
  *
  *   - If `fc`'s enclosing function is `f`, the anchor is `fc`'s own
