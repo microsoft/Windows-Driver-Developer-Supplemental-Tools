@@ -733,15 +733,18 @@
  }
 
  /**
+  * --- AI-generated ---
+  *
   * Pre-computed summary: the potential exit IRQL of function `f`,
   * computed once per function rather than re-discovered per call site.
   *
-  * Calls the Raw cascade directly rather than the public wrapper so
-  * that this internal building block stays inside a single recursive
+  * Calls the Internal cascade directly rather than the public wrapper
+  * so that this internal building block stays inside a single recursive
   * stratum with the cascade.  The wrapper layers an AST-level fallback
-  * over Raw using a negation, which would otherwise cycle back through
-  * here.  Equivalent to the historical pre-wrapper behaviour because
-  * the wrapper agrees with Raw on every input where Raw binds.
+  * over Internal using a negation, which would otherwise cycle back
+  * through here.  Equivalent to the historical pre-wrapper behaviour
+  * because the wrapper agrees with Internal on every input where
+  * Internal binds.
   */
  pragma[nomagic]
  private int functionExitIrql(Function f) {
@@ -749,6 +752,8 @@
  }
 
  /**
+  * --- AI-generated ---
+  *
   * Gets the set of predecessor nodes from callers for function `callee`.
   * This pre-computes the reverse call-graph edge for interprocedural analysis
   * and is restricted to actual call sites.
@@ -772,18 +777,14 @@
   * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations applied to this function.
   * - Failing all this, we set the IRQL to 0.
   *
-  * Layering note: this public predicate wraps the recursive cascade
-  * `getPotentialExitIrqlAtCfnRaw` with a single AST-level fallback
-  * (`astLevelExitIrqlFallback`) that activates only when the cascade
-  * yields no value at all.  The fallback walks one source-line step
-  * back to the closest preceding sibling Stmt and returns the cascade's
-  * IRQL there.  This recovers binding for argument-expression CFNs of
-  * function calls inside loop bodies, where the cpp CFG in some
-  * extracted databases is too sparse for the cascade's predecessor walk
-  * to converge.  The fallback is restricted to CFNs inside loop bodies
-  * (the empirical failure mode), keeping it from over-approximating on
-  * linear branching code where the cascade's silence may be hiding
-  * IRQL-changing work that an AST-level scan cannot see.  When the
+  * --- AI-generated (layering note) ---
+  *
+  * Layering: this wraps the recursive cascade
+  * `getPotentialExitIrqlAtCfnInternal` with `astLevelExitIrqlFallback`,
+  * which fires only when the cascade binds nothing. The fallback walks
+  * one source-line step back to the nearest preceding sibling Stmt, and
+  * is restricted to CFNs inside loop bodies (the empirical failure
+  * mode for argument-expression CFNs reached via a back-edge). When the
   * cascade already binds, this wrapper returns exactly the cascade's
   * result set: the fallback never widens an existing binding.
   *
@@ -797,6 +798,8 @@
  }
 
  /**
+  * --- AI-generated ---
+  *
   * Internal recursive cascade for `getPotentialExitIrqlAtCfn`.  Behaves
   * exactly like the historical `getPotentialExitIrqlAtCfn` did before
   * the AST fallback wrapper was introduced.  Callers should use
@@ -845,27 +848,22 @@
  }
 
  /**
-  * AST-level fallback for `getPotentialExitIrqlAtCfn`.  Walks to the
-  * closest source-line preceding sibling Stmt of `cfn`'s enclosing Stmt
-  * (within the same parent Stmt) and returns the cascade's IRQL there.
-  * Yields no value when there is no preceding sibling at the same
-  * nesting level (e.g. `cfn` is the first stmt in its block) or when
-  * the cascade also yields no value at that sibling.
+  * --- AI-generated ---
   *
-  * Restricted to CFNs whose enclosing Stmt sits inside a loop body.  The
-  * cascade's CFG-predecessor walk is reliable on linear control flow but
-  * empirically can fail to bind on argument-expression CFNs of function
-  * calls reached via a loop back-edge; this fallback exists to recover
-  * binding for that specific case.  Restricting to loops avoids
-  * supplying coarse single-value approximations on linear code where the
-  * cascade's silence (when it does occur) often reflects branching that
-  * the AST-level scan cannot reason about (e.g. an if-stmt whose body
-  * raises and lowers IRQL).
+  * AST-level fallback for `getPotentialExitIrqlAtCfn`. Returns the
+  * cascade's IRQL at the closest preceding sibling Stmt of `cfn`'s
+  * enclosing Stmt within the same parent. No value when there is no
+  * preceding sibling, or when the cascade is also silent there.
   *
-  * Consulted by `getPotentialExitIrqlAtCfn` only when the cascade
-  * returns no value at all, so this never widens an existing binding;
-  * it only fills in silence with a single conservative IRQL value
-  * derived from textually-preceding code in the loop body.
+  * Restricted to CFNs inside a loop body — that's the empirical
+  * failure mode where the cascade's predecessor walk doesn't bind on
+  * argument-expression CFNs reached via a loop back-edge. Outside
+  * loops, the cascade's silence often reflects branching the AST scan
+  * can't see (e.g. an if-stmt whose body raises and lowers IRQL), so
+  * we don't fall back there.
+  *
+  * Consulted by `getPotentialExitIrqlAtCfn` only when the cascade is
+  * silent; never widens an existing binding.
   */
  private int astLevelExitIrqlFallback(ControlFlowNode cfn) {
    exists(Stmt cfnStmt, Stmt prev, Loop l |
@@ -1000,38 +998,26 @@
  }
  
   /**
-   * Holds if `call` is located inside the "then" branch of an `if` statement
-   * whose condition is a compile-time-constant `FALSE` (0) value, or a
-   * non-`static` local variable that is initialized to `0` / `FALSE`,
-   * never assigned (with any assignment operator) or incremented /
-   * decremented in the enclosing function, and whose address is never
-   * taken.
+   * --- AI-generated ---
    *
-   * This detects patterns like:
+   * Holds if `call` sits in the "then" branch of an `if` whose
+   * condition is either a compile-time-constant 0/FALSE, or a
+   * non-static local variable initialized to 0/FALSE that is never
+   * reassigned, incremented, or address-taken in the enclosing
+   * function.
+   *
+   * Detects e.g.:
    * ```
    * BOOLEAN bFalse = FALSE;
    * if (bFalse) { KeAcquireSpinLockAtDpcLevel(...); }  // dead branch
    * ```
-   * Common in NDIS macros (FILTER_ACQUIRE_LOCK, NPROT_ACQUIRE_LOCK, etc.).
+   * Common in NDIS macros (FILTER_ACQUIRE_LOCK, NPROT_ACQUIRE_LOCK).
    *
-   * The conservative-by-default conditions on the variable case avoid
-   * silently dropping legitimate findings when the runtime value of the
-   * variable cannot be proven to remain `FALSE`:
-   *
-   *   - `LocalVariable v` excludes file-scope and namespace globals,
-   *     which can be reassigned from any other function in the
-   *     translation unit (or even another TU).
-   *   - `not v.isStatic()` excludes function-static variables, whose
-   *     value persists across calls and could be set by a previous
-   *     invocation.
-   *   - The `Assignment` predicate matches plain `=` (`AssignExpr`) and
-   *     all compound operators (`AssignOperation`: `|=`, `&=`, `+=`,
-   *     etc.); the original `AssignExpr`-only check was too narrow.
-   *   - `CrementOperation` covers `++` and `--`, which are not modeled
-   *     as assignments in the cpp library.
-   *   - Bailing out when the variable's address is taken
-   *     (`AddressOfExpr`) prevents missing mutations performed by
-   *     callees through a pointer (e.g., `SetFlag(&bFalse)`).
+   * The strict mutation checks (LocalVariable, !isStatic, Assignment
+   * matching `=` and compound ops, CrementOperation, no AddressOfExpr)
+   * exist so we don't suppress findings when the variable could
+   * plausibly hold a non-FALSE value at runtime — i.e. globals,
+   * function-statics, or values written through a pointer parameter.
    */
   predicate isInConstantFalseBranch(FunctionCall call) {
     exists(IfStmt ifStmt |
@@ -1062,20 +1048,14 @@
     )
   }
  /**
-  * Holds if `fc` is a call that may change the IRQL.  This includes the
-  * IRQL primitives (KeRaiseIrql, KeLowerIrql, KfRaiseIrql, KfLowerIrql,
-  * etc., recognized via the `Ke*Irql*Call` and `*GlobalIrqlCall`
-  * classes), functions annotated with `_IRQL_raises_` or
-  * `_IRQL_saves_global_` / `_IRQL_restores_global_`, and functions
-  * whose body itself transitively contains an IRQL-changing call (i.e.,
-  * unannotated wrapper helpers).
+  * --- AI-generated ---
   *
-  * The transitive closure over the call graph is necessary to avoid
-  * false negatives where a driver wraps the IRQL primitives in a helper
-  * function without the appropriate SAL annotations.
-  *
-  * Lifted from `IrqlFloatStateMismatch.ql` so other queries (e.g.
-  * `IrqlInconsistentWithRequired`) can use the same soundness check.
+  * Holds if `fc` is a call that may change the IRQL: an IRQL primitive
+  * (`Ke*Irql*Call`, `*GlobalIrqlCall`), a function annotated
+  * `_IRQL_raises_` / `_IRQL_saves_global_` / `_IRQL_restores_global_`,
+  * or any function whose body transitively contains such a call. The
+  * transitive closure catches unannotated wrapper helpers. Lifted from
+  * IFSM.ql so other queries (e.g. IIWR) can use the same soundness check.
   */
  predicate isIrqlChangingCall(FunctionCall fc) {
    fc instanceof KeRaiseIrqlCall
@@ -1090,6 +1070,8 @@
  }
 
  /**
+  * --- AI-generated ---
+  *
   * Holds if `f` directly or transitively contains an IRQL-changing call.
   * See `isIrqlChangingCall`.
   */

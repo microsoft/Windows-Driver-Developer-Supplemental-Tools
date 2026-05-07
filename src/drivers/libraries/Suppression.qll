@@ -3,6 +3,8 @@
 import cpp
 
 /**
+ * --- AI-generated ---
+ *
  * Gets the minimum start line of a non-suppression Locatable in `f` that is
  * strictly after `afterLine`. Pre-computing distinct lines avoids iterating
  * over every Locatable individually in the aggregate.
@@ -22,6 +24,8 @@ private int nextNonSuppressionLine(File f, int afterLine) {
 }
 
 /**
+ * --- AI-generated ---
+ *
  * Holds if `d` is a DisablePragma that falls within SuppressionPushPopSegment `s`.
  */
 pragma[nomagic]
@@ -32,6 +36,8 @@ private predicate disableInSegment(DisablePragma d, SuppressionPushPopSegment s)
 }
 
 /**
+ * --- AI-generated ---
+ *
  * Holds if `d` is a DisablePragma that is inside at least one push/pop segment.
  */
 pragma[nomagic]
@@ -40,6 +46,8 @@ private predicate disableHasSegment(DisablePragma d) {
 }
 
 /**
+ * --- AI-generated ---
+ *
  * Holds if a Location in file `f` spanning `startLine` to `endLine`
  * falls inside at least one push/pop segment.
  */
@@ -75,6 +83,8 @@ abstract class CASuppression extends PreprocessorPragma {
   abstract predicate appliesToLocation(Location l);
 
   /**
+   * --- AI-generated ---
+   *
    * Gets the scope of this suppression as a line range within a file.
    * This is used by `hasLocationInfo` to define where the suppression applies
    * without enumerating every Location in the database.
@@ -177,9 +187,11 @@ abstract class CASuppression extends PreprocessorPragma {
   }
 }
 
-/** Represents the scope covered by a given CA supression. */
+/** Represents the scope covered by a given CA suppression. */
 class CASuppressionScope extends ElementBase instanceof CASuppression {
   /**
+   * --- AI-generated ---
+   *
    * Defines the location range covered by this suppression scope.
    * Instead of iterating all Location objects, this uses pre-computed scope bounds
    * to return the bounding box of the suppression region directly.
@@ -291,6 +303,8 @@ class DisablePragma extends CASuppression {
   }
 
   /**
+   * --- AI-generated ---
+   *
    * The scope of a disable pragma: from the disable line to either the end of the
    * enclosing push/pop segment, or the end of the file.
    * Returns a single bounding range rather than enumerating every Location.

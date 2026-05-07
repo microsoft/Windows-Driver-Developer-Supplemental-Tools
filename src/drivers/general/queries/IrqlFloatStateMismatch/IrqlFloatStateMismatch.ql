@@ -43,6 +43,8 @@ module FloatStateFlowConfig implements DataFlow::ConfigSig {
 module FloatStateFlow = DataFlow::Global<FloatStateFlowConfig>;
 
 /**
+ * --- AI-generated ---
+ *
  * Gets a source line in `f` that anchors `fc` from `f`'s perspective:
  *
  *   - If `fc`'s enclosing function is `f`, the anchor is `fc`'s own
@@ -68,76 +70,53 @@ private int anchorLineForCall(Function f, FunctionCall fc) {
 }
 
 /**
- * Holds if there is an IRQL-changing call between `saveCall` and
- * `restoreCall` in some function `f`. This predicate is a sanity filter
- * applied on top of the dataflow result: dataflow has already shown the
- * floating-point buffer flows from `saveCall` to `restoreCall`, and this
- * predicate ensures there is at least one IRQL transition that could
- * actually run between them.  Without it the query would emit the pure
- * may-analysis artifact where two save / restore sites are compared at
- * different hypothetical entry IRQLs but no IRQL transition can happen
- * between them at runtime.
+ * --- AI-generated ---
  *
- * Two complementary disjuncts cooperate:
+ * Holds if some IRQL-changing call could run between `saveCall` and
+ * `restoreCall` at runtime. Used as a sanity filter on top of the
+ * dataflow result: dataflow already paired save -> restore, but
+ * without this filter we'd flag pairs whose hypothetical entry IRQLs
+ * differ even though no actual IRQL transition runs between them.
  *
- *  1. **Source-position branch.** For some `f`, an IRQL-changing call
- *     `mid` in `f` lies on a source line bracketed by the anchor lines
- *     of `saveCall` and `restoreCall` (see `anchorLineForCall`).  The
- *     anchor mechanism lets `f` be the directly enclosing function of
- *     both calls or a one-level wrapper / common caller, which covers
- *     the cross-function case that intra-procedural CFG cannot reach.
+ * Two additive disjuncts:
  *
- *  2. **AST-loop branch.** All three calls (`saveCall`, `restoreCall`,
- *     `mid`) sit inside the body of the same loop in their common
- *     enclosing function.  The loop back-edge means that at runtime
- *     each iteration's `restoreCall` can be preceded by the previous
- *     iteration's `saveCall` with `mid` between them, so an
- *     IRQL-changing `mid` anywhere in the loop body is a real
- *     transition between save and restore even when `restoreCall` is
- *     textually above `saveCall`.  Source-line position alone cannot
- *     express this: when the restore is textually earlier than the
- *     save the bracketing line range is empty and branch (1) trivially
- *     fails.
+ *  1. **Source-position branch.** A `FunctionCall` `mid` syntactically
+ *     inside some `f` has `isIrqlChangingCall(mid)` and lies on a
+ *     source line bracketed by `anchorLineForCall(f, save/restoreCall)`.
+ *     Two cross-function reach mechanisms with different depth bounds
+ *     cooperate: `anchorLineForCall` walks at most one call-graph edge
+ *     (we need a concrete line in `f` to anchor each endpoint), but
+ *     `isIrqlChangingCall` is transitively recursive through
+ *     `isIrqlChangingFunction`, so `mid`'s target can chain through any
+ *     number of wrappers before reaching a primitive (`KeRaiseIrql`,
+ *     `_IRQL_raises_`, etc.).
  *
- * The two branches are disjoint in spirit: branch (1) handles
- * cross-function and acyclic in-function cases; branch (2) handles
- * intra-function loops and re-entrant patterns.  Combining them is
- * strictly additive (can only enable more findings, never suppress one
- * that branch (1) would have flagged), so existing true positives are
- * preserved.
+ *  2. **AST-loop branch.** All three calls share an enclosing loop body
+ *     in the same function. The back-edge makes any IRQL-changing call
+ *     in the loop a real transition between save and restore on a
+ *     subsequent iteration, including when restore is textually above
+ *     save (which makes branch 1's range empty).
  *
- * Why not full intra-procedural CFG reachability instead of branch (1)?
- * The cpp control-flow graph in some extracted databases does not
- * transitively connect calls across certain statement boundaries (in
- * particular, forward reachability across `if (call(...))` conditions
- * is unreliable in our extracted DBs), which would silently eliminate
- * true positives that branch (1) catches via source-line bracketing.
- * AST-loop containment in branch (2) sidesteps this by relying on the
- * AST `Loop.getStmt().getAChild*()` relation, which is densely
- * populated and reflects the syntactic loop body directly.
+ * We use source-line bracketing rather than CFG reachability because
+ * the extracted cpp CFG can drop forward edges across `if (call(...))`
+ * and similar boundaries, silently losing TPs. The AST relation in
+ * branch 2 is densely populated and avoids that gap.
  *
- * Caveat: branch (2) cooperates with `irqlSource != irqlSink` only when
- * the IRQL-analysis library binds `getPotentialExitIrqlAtCfn` at the
- * argument expression of `KeSaveFloatingPointState`. In our current
- * extracted DBs that binding is not always produced for `save` calls
- * inside loop bodies, so some real-world loop true positives may
- * still be filtered out by the upstream IRQL filter even when this
- * predicate fires; recovering those will require improvements to
- * the IRQL analysis library itself.
+ * Caveat: `getPotentialExitIrqlAtCfn` doesn't always bind at save-call
+ * argument expressions inside loop bodies in current extracted DBs, so
+ * branch 2 can fire correctly while the upstream `irqlSource != irqlSink`
+ * still filters it out. Recovering those needs work in `Irql.qll`.
  *
- * Performance note: `pragma[inline_late]` lets the planner specialize
- * this predicate at its call site after the dataflow result has bound
- * `saveCall` and `restoreCall`. Without it, the body would otherwise
- * be materialized over every (saveCall, restoreCall) pair in the
- * codebase that satisfies the constraints (millions of tuples on
- * large drivers), only to be intersected with a much smaller dataflow
- * result set afterwards. With it, the body is evaluated only for the
- * dataflow-derived pairs, turning a codebase-wide enumeration into a
- * per-pair check. The accompanying `bindingset` records the calling
- * convention required by `inline_late` (both arguments bound at the
- * call site, which is satisfied by the `from` clause below).
- * Semantics are unchanged — both annotations are planner hints, not
- * logical changes.
+ * Performance: `pragma[inline_late]` + `bindingset[saveCall, restoreCall]`
+ * specialize this per call site after dataflow has bound the endpoints,
+ * turning a codebase-wide enumeration of (save, restore) pairs into a
+ * per-pair check. Both annotations are planner hints; semantics unchanged.
+ *
+ * --- Human comments ---
+ * 
+ * Branch (1) wound up like this for perf reasons as well; a transitive 
+ * check across all of the helper's internals gets expensive and in practice
+ * if there are helper functions involved they're pretty shallow.
  */
 bindingset[saveCall, restoreCall]
 pragma[inline_late]
