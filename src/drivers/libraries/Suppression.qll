@@ -5,27 +5,6 @@ import cpp
 /**
  * --- AI-generated ---
  *
- * Gets the minimum start line of a non-suppression Locatable in `f` that is
- * strictly after `afterLine`. Pre-computing distinct lines avoids iterating
- * over every Locatable individually in the aggregate.
- */
-pragma[nomagic]
-private int nextNonSuppressionLine(File f, int afterLine) {
-  afterLine = any(SuppressPragma sp | sp.getFile() = f).getLocation().getEndLine() and
-  result =
-    min(int line |
-      exists(Locatable l |
-        l.getFile() = f and
-        not l instanceof CASuppression and
-        line = l.getLocation().getStartLine() and
-        line > afterLine
-      )
-    )
-}
-
-/**
- * --- AI-generated ---
- *
  * Holds if `d` is a DisablePragma that falls within SuppressionPushPopSegment `s`.
  */
 pragma[nomagic]
@@ -256,9 +235,29 @@ class SuppressPragma extends CASuppression {
   pragma[nomagic]
   int getMinimumLocationOffset() {
     exists(int nextLine |
-      nextLine = nextNonSuppressionLine(this.getFile(), this.getLocation().getEndLine()) and
+      nextLine = nextNonSuppressionLine() and
       result = nextLine - this.getLocation().getEndLine()
     )
+  }
+  
+  /**
+   * --- AI-generated ---
+   *
+   * Gets the minimum start line of a non-suppression Locatable in `f` that is
+   * strictly after `afterLine`. Pre-computing distinct lines avoids iterating
+   * over every Locatable individually in the aggregate.
+   */
+  pragma[nomagic]
+  private int nextNonSuppressionLine() {
+    result =
+      min(int line |
+        exists(Locatable l |
+          l.getFile() = this.getFile() and
+          not l instanceof CASuppression and
+          line = l.getLocation().getStartLine() and
+          line > this.getLocation().getEndLine()
+        )
+      )
   }
 }
 
