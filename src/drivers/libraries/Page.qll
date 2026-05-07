@@ -113,10 +113,16 @@ class PagedFunctionDeclaration extends Function {
  * level (rather than as joined `where`-clause predicates) lets the optimizer
  * materialize a small relation and avoid the full
  * `MacroInvocation x MacroInvocation` Cartesian product on large corpora.
+ *
+ * Routed through `getStmt()` (which always binds for `PAGED_CODE` /
+ * `PAGED_CODE_LOCKED`, since they expand to a stmt-form
+ * `NT_ASSERT_ASSUME`) to avoid the expensive `getAnAffectedElement`
+ * join used by the stock `MacroInvocation.getEnclosingFunction()`.
  */
 class PagedCodeMacro extends MacroInvocation {
   PagedCodeMacro() {
     this.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"]
+    and this.getStmt().getEnclosingFunction() instanceof PagedFunctionDeclaration
   }
 
   /**
@@ -124,11 +130,6 @@ class PagedCodeMacro extends MacroInvocation {
    *
    * Gets the paged enclosing function for this macro invocation,
    * including template instantiations.
-   *
-   * Routed through `getStmt()` (which always binds for `PAGED_CODE` /
-   * `PAGED_CODE_LOCKED`, since they expand to a stmt-form
-   * `NT_ASSERT_ASSUME`) to avoid the expensive `getAnAffectedElement`
-   * join used by the stock `MacroInvocation.getEnclosingFunction()`.
    *
    * NB: to compare two `PagedCodeMacro` invocations for "same
    * source-level function", also require `getFile()` agreement —
@@ -138,7 +139,6 @@ class PagedCodeMacro extends MacroInvocation {
    * function in another.
    */
   Function getEnclosingPagedFunction() {
-    result = this.getStmt().getEnclosingFunction() and
-    result instanceof PagedFunctionDeclaration
+    result = this.getStmt().getEnclosingFunction()
   }
 }

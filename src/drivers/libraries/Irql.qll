@@ -13,7 +13,6 @@
  */
 
  import cpp
- import semmle.code.cpp.controlflow.Dominance
  import drivers.libraries.SAL
  import drivers.wdm.libraries.WdmDrivers
  import drivers.libraries.IrqlDataFlow
