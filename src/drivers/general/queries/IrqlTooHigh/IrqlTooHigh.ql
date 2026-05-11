@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v3
+ * @query-version v5
  */
 
 import cpp
@@ -35,7 +35,8 @@ where
   irqlRequirement = ifa.getIrqlLevel() and
   irqlRequirement != -1 and
   irqlRequirement < min(getPotentialExitIrqlAtCfn(prior)) and
-  not ifa.whenConditionIsFalseAtCallSite(call)
+  not ifa.whenConditionIsFalseAtCallSite(call) and
+  not isInConstantFalseBranch(call)
 select call,
   "$@: IRQL potentially too high at call to $@.  Maximum IRQL for this call: " + irqlRequirement +
     ", IRQL at preceding node: " + min(getPotentialExitIrqlAtCfn(prior)),

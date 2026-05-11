@@ -13,7 +13,7 @@ Remove all but one PAGED_CODE OR PAGED_CODE_LOCKED macro.
 // Licensed under the MIT license.
 
 
-//Macros to enable or disable a code section that may or maynot conflict with this test.
+// Macros to enable or disable a code section that may or may not conflict with this test.
 #define SET_DISPATCH 1
 #define SET_PAGE_CODE 1
 
@@ -72,3 +72,7 @@ DispatchShutdown (
 
 ## References
 * [ C28171 warning - Windows Drivers ](https://docs.microsoft.com/en-us/windows-hardware/drivers/devtest/28171-function-has-more-than-one-page-macro-instance)
+
+## Semmle-specific notes
+**C++ function template support.** When the same source-level `PAGED_CODE` is expanded into multiple template instantiations, the query collapses all instantiations into a single match key (via the underlying `TemplateFunction`) so a duplicate inside a templated paged function body is reported once at the source-level location. Specialisations and non-template paged functions are excluded.
+

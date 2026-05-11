@@ -28,3 +28,5 @@ This query may provide false positives in cases where functions are not annotate
 
 For information on how to annotate your functions with information about how they adjust the IRQL, see "IRQL annotations for drivers" in the references section.
 
+**Lower-on-exit pattern: known false negative.** A function annotated `_IRQL_requires_min_(M)` + `_IRQL_raises_(R)` with `M > R` is treated as "raises only at exit" (e.g. a wrapper around a spin-lock or mutex release that enters at `DISPATCH_LEVEL` and returns at `PASSIVE_LEVEL`): the query suppresses the implicit ceiling so `R` is read as the exit IRQL rather than a body-wide maximum. Consequently a buggy lower-on-exit function whose body raises IRQL above `M` in the middle is not flagged. To enforce a body-wide maximum, declare it explicitly with `_IRQL_always_function_max_(MAX)`.
+
