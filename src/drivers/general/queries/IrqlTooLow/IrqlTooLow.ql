@@ -39,5 +39,6 @@ where
   not isInConstantFalseBranch(call)
 select call,
   "$@: IRQL potentially too low at call to $@.  Minimum IRQL for this call: " + irqlRequirement +
-    ", IRQL at preceding node: " + max(getPotentialExitIrqlAtCfn(prior)), call.getControlFlowScope(),
-  call.getControlFlowScope().getQualifiedName(), call, call.getTarget().toString()
+    ", IRQL at preceding node: " + max(getPotentialExitIrqlAtCfn(prior)),
+  call.getControlFlowScope(), call.getControlFlowScope().getQualifiedName(), call,
+  call.getTarget().toString()

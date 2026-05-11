@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Illegal write to a protected field (C28176)
  * @id cpp/drivers/illegal-field-write

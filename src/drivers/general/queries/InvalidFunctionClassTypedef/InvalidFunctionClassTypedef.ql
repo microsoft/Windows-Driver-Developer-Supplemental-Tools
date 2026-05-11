@@ -79,5 +79,6 @@ where
     or
     funcClass = declTypedef + "_PAGED"
   )
-select af, "The function class " + funcClass + " on the function does not match the function class " +
+select af,
+  "The function class " + funcClass + " on the function does not match the function class " +
     declTypedef + " on the typedef used here"

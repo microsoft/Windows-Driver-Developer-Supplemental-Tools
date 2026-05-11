@@ -14,7 +14,7 @@
  * @problem.severity warning
  * @precision medium
  * @tags correctness
-*        ca_ported
+ *        ca_ported
  * @scope domainspecific
  * @query-version v1
  */
@@ -54,8 +54,8 @@ module DefaultPoolTagFlowConfig implements DataFlow::ConfigSig {
 
   predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::ExprNode }
 }
-module DefaultPoolTagFlow = DataFlow::Global<DefaultPoolTagFlowConfig>;
 
+module DefaultPoolTagFlow = DataFlow::Global<DefaultPoolTagFlowConfig>;
 
 /** An interprocedural data-flow analysis looking for flow from good pool tags. */
 module ValidPoolTagFlowConfig implements DataFlow::ConfigSig {
@@ -66,6 +66,7 @@ module ValidPoolTagFlowConfig implements DataFlow::ConfigSig {
 
   predicate isSink(DataFlow::Node sink) { sink instanceof DataFlow::ExprNode }
 }
+
 module ValidPoolTagFlow = DataFlow::Global<ValidPoolTagFlowConfig>;
 
 from FunctionCall fc, int i, GlobalDefaultPoolTag gdpt

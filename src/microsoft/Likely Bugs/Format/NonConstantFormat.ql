@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Non-constant format string
  * @description Passing a value that is not a string literal 'format' string to a printf-like function can lead

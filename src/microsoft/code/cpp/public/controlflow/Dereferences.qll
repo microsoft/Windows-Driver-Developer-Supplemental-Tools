@@ -7,6 +7,7 @@
  * expression, or as an argument to a library call such as memcpy - as well as dereferences that
  * occur by passing pointer arguments to calls that ultimately dereference the argument.
  */
+
 import cpp
 import semmle.code.cpp.controlflow.Dereferenced
 
@@ -15,17 +16,23 @@ import semmle.code.cpp.controlflow.Dereferenced
  */
 predicate localDereference(Expr op, Expr e) {
   e.getActualType().getUnspecifiedType() instanceof PointerType and
-  not op = any(SizeofExprOperator sizeof).getAChild*() and(
-    e = op.(PointerDereferenceExpr).getOperand() or
-    e = op.(FieldAccess).getQualifier() or
-    e = op.(Call).getQualifier() or
-    e = op.(ArrayExpr).getArrayBase() or
-    e = op.(ArrayExpr).getArrayOffset() or
-    localDereference(op, any(PointerArithmeticOperation pOp | e = pOp.getAnOperand())) or
-    localDereference(op, any(ConditionalExpr c | e = c.getThen() or e = c.getElse())) or
-    exists(int i | op.(Call).getArgument(i) = e |
-      callDereferences(op, i)
-    )
+  not op = any(SizeofExprOperator sizeof).getAChild*() and
+  (
+    e = op.(PointerDereferenceExpr).getOperand()
+    or
+    e = op.(FieldAccess).getQualifier()
+    or
+    e = op.(Call).getQualifier()
+    or
+    e = op.(ArrayExpr).getArrayBase()
+    or
+    e = op.(ArrayExpr).getArrayOffset()
+    or
+    localDereference(op, any(PointerArithmeticOperation pOp | e = pOp.getAnOperand()))
+    or
+    localDereference(op, any(ConditionalExpr c | e = c.getThen() or e = c.getElse()))
+    or
+    exists(int i | op.(Call).getArgument(i) = e | callDereferences(op, i))
   )
 }
 
@@ -37,12 +44,15 @@ predicate localDereference(Expr op, Expr e) {
  * their argument).
  */
 predicate opDereferences(Expr op, Expr e) {
-  not op = any(SizeofExprOperator sizeof).getAChild*() and(
-    localDereference(op, e) or
+  not op = any(SizeofExprOperator sizeof).getAChild*() and
+  (
+    localDereference(op, e)
+    or
     exists(Call call, int i |
-    call = op and
+      call = op and
       not call.passesByReference(i, e) and
-      call.getArgument(i) = e |
+      call.getArgument(i) = e
+    |
       indirectDereference(call, e)
       or
       not call.getTarget().hasEntryPoint() // library call
@@ -53,14 +63,15 @@ predicate opDereferences(Expr op, Expr e) {
 }
 
 predicate indirectDereference(Call call, Expr e) {
-	not call = any(SizeofExprOperator sizeof).getAChild*() and(
-    exists(int i |
-      not call.passesByReference(i, e) and
-      call.getArgument(i) = e |
-      exists(Expr paramUse | parameterUsePair(call.getTarget().getParameter(i), paramUse) |
-        opDereferences(_, paramUse) or
-        exists(Expr step | definitionUsePair(_, paramUse, step) and opDereferences(_, step))
-      )
+  not call = any(SizeofExprOperator sizeof).getAChild*() and
+  exists(int i |
+    not call.passesByReference(i, e) and
+    call.getArgument(i) = e
+  |
+    exists(Expr paramUse | parameterUsePair(call.getTarget().getParameter(i), paramUse) |
+      opDereferences(_, paramUse)
+      or
+      exists(Expr step | definitionUsePair(_, paramUse, step) and opDereferences(_, step))
     )
   )
 }
@@ -71,14 +82,10 @@ predicate indirectDereference(Call call, Expr e) {
  * dereference the argument.
  */
 class Dereference extends Expr {
-  Dereference() {
-    opDereferences(_, this)
-  }
+  Dereference() { opDereferences(_, this) }
 
   /** Gets the operation that is performing the dereference of this pointer expression. */
-  Expr getDereferencingOperation() {
-    opDereferences(result, this)
-  }
+  Expr getDereferencingOperation() { opDereferences(result, this) }
 }
 
 /**
@@ -87,9 +94,7 @@ class Dereference extends Expr {
 class IndirectDereference extends Dereference {
   IndirectDereference() { indirectDereference(_, this) }
 
-  override Expr getDereferencingOperation() {
-    indirectDereference(result, this)
-  }
+  override Expr getDereferencingOperation() { indirectDereference(result, this) }
 }
 
 /**
@@ -105,7 +110,5 @@ class DirectDereference extends Dereference {
 class LocalDereference extends DirectDereference {
   LocalDereference() { localDereference(_, this) }
 
-  override Expr getDereferencingOperation() {
-    localDereference(result, this)
-  }
+  override Expr getDereferencingOperation() { localDereference(result, this) }
 }

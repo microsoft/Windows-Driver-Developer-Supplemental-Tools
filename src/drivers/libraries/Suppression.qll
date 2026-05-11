@@ -239,7 +239,7 @@ class SuppressPragma extends CASuppression {
       result = nextLine - this.getLocation().getEndLine()
     )
   }
-  
+
   /**
    * --- AI-generated ---
    *
@@ -389,7 +389,5 @@ class SuppressionPushPopSegment extends Location {
   }
 
   /** Returns a disable pragma within this push/pop segment. */
-  DisablePragma getADisablePragma() {
-    disableInSegment(result, this)
-  }
+  DisablePragma getADisablePragma() { disableInSegment(result, this) }
 }

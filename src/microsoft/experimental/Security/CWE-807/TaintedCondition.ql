@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Untrusted input for a condition
  * @description Using untrusted inputs in a statement that makes a

@@ -11,7 +11,6 @@
  * @tags security
  *       external/cwe/cwe-476
  * @opaqueid SM02310
- * @owner.email sdat@microsoft.com
  * @microsoft.severity Important
  */
 

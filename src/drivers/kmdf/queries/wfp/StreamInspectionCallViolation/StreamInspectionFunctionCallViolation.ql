@@ -15,80 +15,75 @@
  * @query-version v1
  */
 
-
- // COMPLETED AND FUNCTIONING
+// COMPLETED AND FUNCTIONING
 import cpp
 import drivers.libraries.wfp
 
 predicate matchesStreamInjectApi(string input) {
-    input = any(["FwpsStreamInjectAsync", "FwpsStreamInjectAsync0"])
- }
+  input = any(["FwpsStreamInjectAsync", "FwpsStreamInjectAsync0"])
+}
 
- class FwpsInjectStreamApi extends Function {
-    string name;
-    FwpsInjectStreamApi() {
-        matchesStreamInjectApi(this.getName()) and
-        name = this.getName()
-    }
- }
+class FwpsInjectStreamApi extends Function {
+  string name;
 
- class FwpsInjectStreamApiCall extends FunctionCall {
-    FwpsInjectStreamApiCall(){ this.getTarget() instanceof FwpsInjectStreamApi}
- }
+  FwpsInjectStreamApi() {
+    matchesStreamInjectApi(this.getName()) and
+    name = this.getName()
+  }
+}
 
- class StreamInjectCall extends Element {
-    string name;
-    StreamInjectCall() {
-        name = this.(FwpsInjectStreamApiCall).getTarget().getName()
-    }
- }
+class FwpsInjectStreamApiCall extends FunctionCall {
+  FwpsInjectStreamApiCall() { this.getTarget() instanceof FwpsInjectStreamApi }
+}
 
+class StreamInjectCall extends Element {
+  string name;
 
- predicate matchesStreamContinueApi(string input) {
-    input = any(["FwpsStreamContinue0", "FwpsStreamContinue"])
- }
+  StreamInjectCall() { name = this.(FwpsInjectStreamApiCall).getTarget().getName() }
+}
 
- class FwpsContinueStreamApi extends Function {
-    string name;
-    FwpsContinueStreamApi() {
-        matchesStreamContinueApi(this.getName()) and
-        name = this.getName()
-    }
- }
+predicate matchesStreamContinueApi(string input) {
+  input = any(["FwpsStreamContinue0", "FwpsStreamContinue"])
+}
 
- class FwpsContinueStreamApiCall extends FunctionCall {
-    FwpsContinueStreamApiCall(){ this.getTarget() instanceof FwpsContinueStreamApi}
- }
+class FwpsContinueStreamApi extends Function {
+  string name;
 
- class StreamContinueCall extends Element {
-    string name;
-    StreamContinueCall() {
-        name = this.(FwpsContinueStreamApiCall).getTarget().getName()
-    }
- }
+  FwpsContinueStreamApi() {
+    matchesStreamContinueApi(this.getName()) and
+    name = this.getName()
+  }
+}
 
- /** A function that is annotated with Wfp stream callout annotation. */
+class FwpsContinueStreamApiCall extends FunctionCall {
+  FwpsContinueStreamApiCall() { this.getTarget() instanceof FwpsContinueStreamApi }
+}
+
+class StreamContinueCall extends Element {
+  string name;
+
+  StreamContinueCall() { name = this.(FwpsContinueStreamApiCall).getTarget().getName() }
+}
+
+/** A function that is annotated with Wfp stream callout annotation. */
 class StreamCalloutFunction extends Function {
-   WfpStreamInspection scr;
- 
-   StreamCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
- }
+  WfpStreamInspection scr;
+
+  StreamCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
+}
 
 // Contract
-// For out-of-band stream inspection callouts, FwpsStreamContinue0 
+// For out-of-band stream inspection callouts, FwpsStreamContinue0
 // must not be called while the FwpsStreamInjectAsync0 function is called.
 // ^^ reevaluate on MSDN - to consider
-
 // This query will return TRUE if
-// A stream inspection callout is tagged, FwpsStreamContinue0 is called if 
+// A stream inspection callout is tagged, FwpsStreamContinue0 is called if
 // FwpsStreamInjectAsync0 is called in the same function.
-
 // Denote as out of band if possible
 // Stream Inspection
 from StreamCalloutFunction waf
-where
-   exists(StreamContinueCall continue, StreamInjectCall inject)
+where exists(StreamContinueCall continue, StreamInjectCall inject)
 select waf,
-    "WFP CodeQL found a Stream Inspection Function: " + waf.getName() + 
+  "WFP CodeQL found a Stream Inspection Function: " + waf.getName() +
     "where FwpsStreamContinue is called while FwpsStreamInjectAsync is called." +
     "This is a Stream contract violation."

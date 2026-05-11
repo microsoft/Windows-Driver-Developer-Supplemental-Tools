@@ -83,9 +83,7 @@ class UnguardedNullReturnDereferenceReachability extends StackVariableReachabili
     not exists(FunctionCall fc, int i |
       fc = node.(Dereference).getDereferencingOperation() and
       fc.getArgument(i) = v.getAnAccess() and
-      exists(SALMaybeNull sa |
-        sa.getDeclaration() = fc.getTarget().getParameter(i)
-      )
+      exists(SALMaybeNull sa | sa.getDeclaration() = fc.getTarget().getParameter(i))
     )
   }
 
@@ -105,10 +103,7 @@ class UnguardedNullReturnDereferenceReachability extends StackVariableReachabili
       va = node and
       va = v.getAnAccess()
     |
-      va =
-        any(EqualityOperation o |
-          o.getAnOperand() instanceof NullValue
-        ).getAnOperand() or
+      va = any(EqualityOperation o | o.getAnOperand() instanceof NullValue).getAnOperand() or
       va = any(IfStmt i).getCondition() or
       va.getParent() instanceof LogicalAndExpr or
       va.getParent() instanceof NotExpr or
@@ -135,10 +130,14 @@ class UnguardedNullReturnDereferenceReachability extends StackVariableReachabili
     //            Currently using specific check function names, but this should be replaced with a more general mechanism.
     //            We are currently working on a generic query but it is on hold.
     exists(Call c |
-      c.getTarget().getName() = ["_checked_malloc_impl", "_checked_realloc_impl", "_checked_calloc_impl",
-        "_checked_pointer_impl", "_fail_on_unexpected_null_pointer", "_fail_on_memory_op"]
-      and c.getAnArgument().getAChild*() = v.getAnAccess()
-      and c = node)
+      c.getTarget().getName() =
+        [
+          "_checked_malloc_impl", "_checked_realloc_impl", "_checked_calloc_impl",
+          "_checked_pointer_impl", "_fail_on_unexpected_null_pointer", "_fail_on_memory_op"
+        ] and
+      c.getAnArgument().getAChild*() = v.getAnAccess() and
+      c = node
+    )
     or
     exists(AssumeExpr ae |
       ae = node and

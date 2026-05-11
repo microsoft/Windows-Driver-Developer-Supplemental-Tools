@@ -2,7 +2,7 @@
 // Licensed under the MIT license.
 import cpp
 import drivers.libraries.SAL
-// import drivers.libraries.Irql // TODO: add this back in 
+// import drivers.libraries.Irql // TODO: add this back in
 import drivers.wdm.libraries.WdmDrivers
 import drivers.kmdf.libraries.KmdfDrivers
 import drivers.ndis.libraries.NdisDrivers
@@ -212,13 +212,14 @@ predicate roleTypeAssignment(AssignExpr ae) {
 }
 
 class ImplicitWdmRoutine extends Function {
-  ImplicitWdmRoutine(){
-    this instanceof ImplicitRoleTypeFunction 
-  }
+  ImplicitWdmRoutine() { this instanceof ImplicitRoleTypeFunction }
 }
+
 /** A WDM DriverEntry callback routine. */
 class ImplicitWdmDriverEntry extends ImplicitWdmRoutine {
-  ImplicitWdmDriverEntry() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_INITIALIZE") }
+  ImplicitWdmDriverEntry() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_INITIALIZE")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
@@ -227,7 +228,9 @@ class ImplicitWdmDriverEntry extends ImplicitWdmRoutine {
 
 /** A WDM DrierStartIo callback routine */
 class ImplicitWdmDriverStartIo extends ImplicitWdmRoutine {
-  ImplicitWdmDriverStartIo() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_STARTIO") }
+  ImplicitWdmDriverStartIo() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_STARTIO")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
@@ -238,7 +241,9 @@ class ImplicitWdmDriverStartIo extends ImplicitWdmRoutine {
  * A WDM DriverUnload callback routine.
  */
 class ImplicitWdmDriverUnload extends ImplicitWdmRoutine {
-  ImplicitWdmDriverUnload() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_UNLOAD") }
+  ImplicitWdmDriverUnload() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_UNLOAD")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
@@ -248,14 +253,18 @@ class ImplicitWdmDriverUnload extends ImplicitWdmRoutine {
 // NOTE duplicate for backward compatibility with other query. Remove when other query is updated.
 /** A WDM AddDevice callback routine. */
 class ImplicitWdmAddDevice extends ImplicitWdmRoutine {
-  ImplicitWdmAddDevice() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_ADD_DEVICE") }
+  ImplicitWdmAddDevice() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_ADD_DEVICE")
+  }
 }
 
 /**
  * A WDM DriverAddDevice callback routine.
  */
 class ImplicitWdmDriverAddDevice extends ImplicitWdmRoutine {
-  ImplicitWdmDriverAddDevice() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_ADD_DEVICE") }
+  ImplicitWdmDriverAddDevice() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_ADD_DEVICE")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
@@ -266,7 +275,9 @@ class ImplicitWdmDriverAddDevice extends ImplicitWdmRoutine {
  * A WDM DriverDispatch callback routine.
  */
 class ImplicitWdmDriverDispatch extends ImplicitWdmRoutine {
-  ImplicitWdmDriverDispatch() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_DISPATCH") }
+  ImplicitWdmDriverDispatch() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_DISPATCH")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 
@@ -277,7 +288,9 @@ class ImplicitWdmDriverDispatch extends ImplicitWdmRoutine {
  * A WDM IO completion routine.
  */
 class ImplicitWdmDriverCompletionRoutine extends ImplicitWdmRoutine {
-  ImplicitWdmDriverCompletionRoutine() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("IO_COMPLETION_ROUTINE") }
+  ImplicitWdmDriverCompletionRoutine() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("IO_COMPLETION_ROUTINE")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
@@ -288,20 +301,22 @@ class ImplicitWdmDriverCompletionRoutine extends ImplicitWdmRoutine {
  * A WDM DriverCancel callback routine.
  */
 class ImplicitWdmDriverCancel extends ImplicitWdmRoutine {
-  ImplicitWdmDriverCancel() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_CANCEL") }
+  ImplicitWdmDriverCancel() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("DRIVER_CANCEL")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
-  string getExpectedMinIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
+  string getExpectedMinIrqlLevelString() { result = "DISPATCH_LEVEL" }
 }
 
 /**
  * A WDM DriverDpcRoutine callback routine.
  */
 class ImplicitWdmDriverDpcRoutine extends ImplicitWdmRoutine {
-  ImplicitWdmDriverDpcRoutine() { 
-    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("IO_DPC_ROUTINE") 
-   }
+  ImplicitWdmDriverDpcRoutine() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("IO_DPC_ROUTINE")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
@@ -312,7 +327,9 @@ class ImplicitWdmDriverDpcRoutine extends ImplicitWdmRoutine {
  * A WDM DriverDeferredRoutine callback routine.
  */
 class ImplicitWdmDriverDeferredRoutine extends ImplicitWdmRoutine {
-  ImplicitWdmDriverDeferredRoutine() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("KDEFERRED_ROUTINE") }
+  ImplicitWdmDriverDeferredRoutine() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("KDEFERRED_ROUTINE")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
@@ -323,7 +340,9 @@ class ImplicitWdmDriverDeferredRoutine extends ImplicitWdmRoutine {
  * A WDM DriverServiceRoutine callback routine.
  */
 class ImplicitWdmDriverServiceRoutine extends ImplicitWdmRoutine {
-  ImplicitWdmDriverServiceRoutine() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("KSERVICE_ROUTINE") }
+  ImplicitWdmDriverServiceRoutine() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("KSERVICE_ROUTINE")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "DIRQL" }
 
@@ -334,7 +353,9 @@ class ImplicitWdmDriverServiceRoutine extends ImplicitWdmRoutine {
  * A WDM DriverPowerComplete callback routine.
  */
 class ImplicitWdmDriverPowerComplete extends ImplicitWdmRoutine {
-  ImplicitWdmDriverPowerComplete() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("REQUEST_POWER_COMPLETE") }
+  ImplicitWdmDriverPowerComplete() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("REQUEST_POWER_COMPLETE")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
@@ -345,7 +366,9 @@ class ImplicitWdmDriverPowerComplete extends ImplicitWdmRoutine {
  * A WDM DriverWorkerThreadRoutine callback routine.
  */
 class ImplicitWdmDriverWorkerThreadRoutine extends ImplicitWdmRoutine {
-  ImplicitWdmDriverWorkerThreadRoutine() { this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("WORKER_THREAD_ROUTINE") }
+  ImplicitWdmDriverWorkerThreadRoutine() {
+    this.(ImplicitRoleTypeFunction).getExpectedRoleTypeString().matches("WORKER_THREAD_ROUTINE")
+  }
 
   string getExpectedMaxIrqlLevelString() { result = "PASSIVE_LEVEL" }
 

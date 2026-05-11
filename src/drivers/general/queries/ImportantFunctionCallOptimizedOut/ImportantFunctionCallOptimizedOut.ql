@@ -61,4 +61,4 @@ where
 select call,
   "Call to " + memFunc.getName() +
     " for variable $@ may be deleted by the compiler. Consider using a secure function instead, such as RtlSecureZeroMemory.",
-    acc, acc.getTarget().toString()
+  acc, acc.getTarget().toString()

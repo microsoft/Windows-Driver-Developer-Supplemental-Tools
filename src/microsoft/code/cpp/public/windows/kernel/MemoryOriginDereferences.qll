@@ -18,6 +18,7 @@ class LocalAccess extends Expr {
      * Dereferences that only occur when the memory is guaranteed to be in kernel mode
      * can be ignored.
      */
+
     not inKernelModeIfStmt(this) and
     not this instanceof IgnoredAccess and
     (
@@ -32,15 +33,11 @@ class LocalAccess extends Expr {
 }
 
 private module AccessDataFlowConfig implements DataFlow::ConfigSig {
-
-
   predicate isSource(DataFlow::Node source) {
     source.asExpr() = any(MemoryOrigin origin).getADirectBufferAccess()
   }
 
-  predicate isSink(DataFlow::Node sink) {
-    sink.asExpr() instanceof LocalAccess
-  }
+  predicate isSink(DataFlow::Node sink) { sink.asExpr() instanceof LocalAccess }
 }
 
 private module AccessDataFlow = DataFlow::Global<AccessDataFlowConfig>;
@@ -50,22 +47,16 @@ private module AccessDataFlow = DataFlow::Global<AccessDataFlowConfig>;
  * to local access `access`.
  */
 predicate memoryOriginDataFlow(MemoryOrigin origin, LocalAccess access) {
-  AccessDataFlow::flow(DataFlow::exprNode(origin.getADirectBufferAccess()), DataFlow::exprNode(access))
+  AccessDataFlow::flow(DataFlow::exprNode(origin.getADirectBufferAccess()),
+    DataFlow::exprNode(access))
 }
 
 private module DereferenceDataFlowConfig implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) { memoryOriginDataFlow(_, source.asExpr()) }
 
-  predicate isSource(DataFlow::Node source) {
-    memoryOriginDataFlow(_, source.asExpr())
-  }
+  predicate isSink(DataFlow::Node sink) { sink.asExpr() instanceof LocalDereference }
 
-  predicate isSink(DataFlow::Node sink) {
-    sink.asExpr() instanceof LocalDereference
-  }
-
-  predicate isBarrier(DataFlow::Node barrier) {
-    isSpuriousRead(barrier.asExpr())
-  }
+  predicate isBarrier(DataFlow::Node barrier) { isSpuriousRead(barrier.asExpr()) }
 }
 
 private module DereferenceDataFlow = DataFlow::Global<DereferenceDataFlowConfig>;
@@ -75,7 +66,7 @@ private module DereferenceDataFlow = DataFlow::Global<DereferenceDataFlowConfig>
  * direct dereference `dereference`.
  */
 predicate dereferenceDataFlow(LocalAccess access, DirectDereference dereference) {
-    DereferenceDataFlow::flow(DataFlow::exprNode(access), DataFlow::exprNode(dereference))
+  DereferenceDataFlow::flow(DataFlow::exprNode(access), DataFlow::exprNode(dereference))
 }
 
 /**
@@ -110,19 +101,16 @@ abstract class LocalDereferencingAccess extends VariableAccess { }
  * An access that is considered as directly dereferencing by default.
  */
 class DefaultDereferencingAccess extends LocalDereferencingAccess {
-	DefaultDereferencingAccess() {
-		this instanceof LocalDereference or
-		isInUndefinedCall(this) or
-		isInMemReadWriteCall(this)
-	}
+  DefaultDereferencingAccess() {
+    this instanceof LocalDereference or
+    isInUndefinedCall(this) or
+    isInMemReadWriteCall(this)
+  }
 }
 
 /**
  * Whether `va` is an argument to a call to an undefined function.
  */
 private predicate isInUndefinedCall(VariableAccess va) {
-	exists(FunctionCall fc |
-		fc.getAnArgument() = va |
-		not fc.getTarget().hasDefinition()
-	)
+  exists(FunctionCall fc | fc.getAnArgument() = va | not fc.getTarget().hasDefinition())
 }

@@ -19,15 +19,15 @@ import cpp
 import drivers.libraries.wfp
 
 class RedirectCalloutFunction extends Function {
-    WfpConnectRedirect scr;
-    RedirectCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
+  WfpConnectRedirect scr;
+
+  RedirectCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
 }
 
-// Returns TRUE if the callout function is marked as a connect redirect callout and 
+// Returns TRUE if the callout function is marked as a connect redirect callout and
 // calls FwpsRedirectHandleCreate0 multiple times in the function.
-
 from RedirectCalloutFunction waf
-where
-    exists(RedirectHandleCreateFunctionCall c | c.getNumberOfCalls() > 1)
+where exists(RedirectHandleCreateFunctionCall c | c.getNumberOfCalls() > 1)
 select waf,
-"A connect redirect callout " + waf.getName() + "calls FwpsRedirectHandleCreate0 multiple times this is a contract violation."
+  "A connect redirect callout " + waf.getName() +
+    "calls FwpsRedirectHandleCreate0 multiple times this is a contract violation."

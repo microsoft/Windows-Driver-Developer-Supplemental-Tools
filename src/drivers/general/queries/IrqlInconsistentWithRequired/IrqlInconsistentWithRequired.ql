@@ -32,7 +32,7 @@ where
   irqlLevelExit = getPotentialExitIrqlAtCfn(exitCfn) and
   irqlLevelEntry != irqlLevelExit and
   // Soundness filter: only flag if `f` actually contains an IRQL-changing
-  // call (directly or transitively through a wrapper).  This is necessary 
+  // call (directly or transitively through a wrapper).  This is necessary
   // due to our IRQL CFG analysis producing ranges of potential IRQLs.
   exists(FunctionCall fc |
     fc.getEnclosingFunction() = f and

@@ -38,7 +38,8 @@ where
   (
     i.getDeclaration() instanceof GlobalVariable
     or
-    (i.getDeclaration().isStatic() and i.getDeclaration().(Variable).isConst())
+    i.getDeclaration().isStatic() and i.getDeclaration().(Variable).isConst()
   )
 //global or static const
-select f, "Static initializer causes copy on write pages due to member function pointer(s): $@", f.getTarget(), f.getTarget().getName()
+select f, "Static initializer causes copy on write pages due to member function pointer(s): $@",
+  f.getTarget(), f.getTarget().getName()

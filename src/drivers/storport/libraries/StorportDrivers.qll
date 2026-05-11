@@ -6,13 +6,10 @@
  * The library also includes a typedef for the standard NDIS callback routines.
  */
 
-
 import cpp
 import drivers.libraries.SAL
 
-
 /** Determines if a given assignment, recursively, has a Storport callback routine as the right-hand side. */
-
 private predicate isCallbackRoutineAssignment(AssignExpr ae) {
   exists(FunctionAccess fa |
     ae.getRValue() = fa and
@@ -50,19 +47,17 @@ class StorportRoleTypeType extends TypedefType {
 }
 
 /** A typedef for the standard Storport callback routines. Aka Role Types */
-
 class StorportCallbackRoutineTypedef extends StorportRoleTypeType {
   StorportCallbackRoutineTypedef() { this.getFile().getBaseName().matches("storport.h") }
 }
 
 /**
  * Represents a function implementing a Storport callback routine.
-
+ *
  * Defines a function to be a callback routine iff it has a typedef
  * in its definition which matches the Storport callback typedefs, and it
-
+ *
  * is in a Storport driver (includes wdm.h.)
-
  */
 class StorportCallbackRoutine extends Function {
   /** The callback routine type, i.e. DRIVER_UNLOAD. */

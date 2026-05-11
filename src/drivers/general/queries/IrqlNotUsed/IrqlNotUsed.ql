@@ -62,11 +62,9 @@ class FundamentalIrqlRestoreFunction extends IrqlRestoreFunction {
  * the IRQL.
  */
 module IrqlFlowConfigurationConfig implements DataFlow::ConfigSig {
-   predicate isSource(DataFlow::Node source) {
-    source.asParameter() instanceof IrqlRestoreParameter
-  }
+  predicate isSource(DataFlow::Node source) { source.asParameter() instanceof IrqlRestoreParameter }
 
-   predicate isSink(DataFlow::Node sink) {
+  predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall fc, FundamentalIrqlRestoreFunction firf |
       fc.getTarget() = firf and
       (
@@ -77,9 +75,10 @@ module IrqlFlowConfigurationConfig implements DataFlow::ConfigSig {
     )
   }
 }
+
 module IrqlFlowConfiguration = DataFlow::Global<IrqlFlowConfigurationConfig>;
 
-from IrqlRestoreFunction irf 
+from IrqlRestoreFunction irf
 where
   // Exclude OS functions
   not irf instanceof FundamentalIrqlRestoreFunction and
@@ -91,9 +90,7 @@ where
     )
     or
     // Account for case where parameter is totally untouched
-    not exists(DataFlow::Node source |
-      source.asParameter() = irf.getRestoreParameter()
-    )
+    not exists(DataFlow::Node source | source.asParameter() = irf.getRestoreParameter())
   )
 select irf,
   "This function has annotated the parameter $@ with \"_IRQL_restores_\" but does not use it to restore the IRQL.",

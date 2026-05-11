@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Potential improper null termination
  * @description Using a string that may not be null terminated as an argument

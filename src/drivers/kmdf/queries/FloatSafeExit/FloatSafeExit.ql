@@ -40,7 +40,6 @@ class KernelFloatAnnotatedTypedef extends TypedefType {
 class KernelFloatAnnotatedFunction extends Function {
   KernelFloatFunctionAnnotation kernelFloatAnnotation;
 
-  
   KernelFloatAnnotatedFunction() {
     (
       // this.hasCLinkage() and

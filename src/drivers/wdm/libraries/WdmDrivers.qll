@@ -81,7 +81,6 @@ class WdmCallbackRoutine extends Function {
   }
 }
 
-
 /** A WDM DriverEntry callback routine. */
 class WdmDriverEntry extends WdmCallbackRoutine {
   WdmDriverEntry() { callbackType.getName().matches("DRIVER_INITIALIZE") }
@@ -157,6 +156,7 @@ class WdmDriverCancel extends WdmCallbackRoutine {
   WdmDriverCancel() { callbackType.getName().matches("DRIVER_CANCEL") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
+
   string getExpectedMinIrqlLevelString() { result = "DISPATCH_LEVEL" }
 }
 
@@ -164,9 +164,7 @@ class WdmDriverCancel extends WdmCallbackRoutine {
  * A WDM DriverDpcRoutine callback routine.
  */
 class WdmDriverDpcRoutine extends WdmCallbackRoutine {
-  WdmDriverDpcRoutine() { 
-    callbackType.getName().matches("IO_DPC_ROUTINE") 
-   }
+  WdmDriverDpcRoutine() { callbackType.getName().matches("IO_DPC_ROUTINE") }
 
   string getExpectedMaxIrqlLevelString() { result = "DISPATCH_LEVEL" }
 
@@ -223,7 +221,6 @@ class WdmDriverWorkerThreadRoutine extends WdmCallbackRoutine {
  * an assignment in DriverEntry that assigns the function to
  * the dispatch table.
  */
-
 class WdmDispatchRoutine extends WdmCallbackRoutine {
   /**
    * The IRP type covered by this dispatch routine.
@@ -241,7 +238,6 @@ class WdmDispatchRoutine extends WdmCallbackRoutine {
    * This characteristic predicate thus looks for assignments of this form
    * where the right-side value is a function with the DRIVER_DISPATCH typedef.
    */
-  
   WdmDispatchRoutine() {
     callbackType.getName().matches("DRIVER_DISPATCH") and
     exists(
@@ -259,15 +255,12 @@ class WdmDispatchRoutine extends WdmCallbackRoutine {
   }
 
   /** Gets the IRP type this dispatch routine handles, as a number. */
-  
   Literal getDispatchType() { result = dispatchType }
 
   /** Gets the DriverEntry this dispatch routine was assigned in. */
-  
   WdmDriverEntry getDriverEntry() { result = driverEntry }
 
   /** Returns true if the given SAL annotation matches the dispatch type of this function. */
-  
   abstract predicate matchesAnnotation(DispatchTypeDefinition dtd);
 }
 
@@ -286,7 +279,6 @@ class CallbackRoutineAssignment extends AssignExpr {
   CallbackRoutineAssignment() { isCallbackRoutineAssignment(this) }
 
   /** Gets the callback routine that this dispatch routine assignment is targeting. */
-  
   WdmCallbackRoutine getTarget() {
     if
       exists(FunctionAccess fa |

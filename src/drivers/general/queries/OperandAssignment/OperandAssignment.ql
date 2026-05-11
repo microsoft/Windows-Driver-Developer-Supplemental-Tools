@@ -24,10 +24,11 @@
 import cpp
 
 from FieldAccess fa, Field f
-where 
+where
   f = fa.getTarget() and
   exists(Struct v | fa.getTarget() = v.getAMember() | v.getName() = "_DEVICE_OBJECT") and
-  f.getName() = "Flags" and 
+  f.getName() = "Flags" and
   fa.getParent() instanceof AssignExpr
-
-select fa, "An assignment has been made to an operand $@, which should only be modified using bit sets and clears.", fa, fa.toString()
+select fa,
+  "An assignment has been made to an operand $@, which should only be modified using bit sets and clears.",
+  fa, fa.toString()

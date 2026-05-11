@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Use of extreme values in arithmetic expression
  * @description If a variable is assigned the maximum or minimum value

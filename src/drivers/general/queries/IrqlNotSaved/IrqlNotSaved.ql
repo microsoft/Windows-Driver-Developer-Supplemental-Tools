@@ -31,10 +31,7 @@ import semmle.code.cpp.dataflow.new.DataFlow
  * the IRQL.
  */
 module IrqlFlowConfigurationConfig implements DataFlow::ConfigSig {
-
-  predicate isSource(DataFlow::Node source) {
-    source.asParameter() instanceof IrqlSaveParameter
-  }
+  predicate isSource(DataFlow::Node source) { source.asParameter() instanceof IrqlSaveParameter }
 
   predicate isSink(DataFlow::Node sink) {
     exists(FunctionCall fc, FundamentalIrqlSaveFunction fisf |
@@ -77,10 +74,7 @@ class FundamentalIrqlSaveFunction extends IrqlSavesFunction {
  * A data flow from any IrqlSaveParameter to variables that receive its value.
  */
 module IrqlSaveParameterFlowConfigurationConfig implements DataFlow::ConfigSig {
-
-  predicate isSource(DataFlow::Node source) {
-    source.asParameter() instanceof IrqlSaveParameter
-  }
+  predicate isSource(DataFlow::Node source) { source.asParameter() instanceof IrqlSaveParameter }
 
   predicate isSink(DataFlow::Node sink) {
     // Only track flow to assignment targets or parameters, not every node.
@@ -89,8 +83,9 @@ module IrqlSaveParameterFlowConfigurationConfig implements DataFlow::ConfigSig {
     sink.asParameter() instanceof Parameter
   }
 }
-module IrqlSaveParameterFlowConfiguration = DataFlow::Global<IrqlSaveParameterFlowConfigurationConfig>;
 
+module IrqlSaveParameterFlowConfiguration =
+  DataFlow::Global<IrqlSaveParameterFlowConfigurationConfig>;
 
 /**
  * A data-flow configuration representing flow from an
@@ -98,7 +93,6 @@ module IrqlSaveParameterFlowConfiguration = DataFlow::Global<IrqlSaveParameterFl
  * \_IRQL\_saves\_ (or a variable aliasing that parameter.)
  */
 module IrqlAssignmentFlowConfigurationConfig implements DataFlow::ConfigSig {
-
   predicate isSource(DataFlow::Node source) {
     source.asExpr() instanceof FunctionCall and
     source.asExpr().(FunctionCall).getTarget() instanceof FundamentalIrqlSaveFunction and
@@ -112,7 +106,9 @@ module IrqlAssignmentFlowConfigurationConfig implements DataFlow::ConfigSig {
     )
   }
 }
+
 module IrqlAssignmentFlowConfiguration = DataFlow::Global<IrqlAssignmentFlowConfigurationConfig>;
+
 /**
  * A variable that is either a parameter annotated \_IRQL\_saves\_
  * or a variable which contains the value from a parameter annotated as such.
@@ -121,9 +117,7 @@ class IrqlSaveVariableFlowedTo extends Variable {
   IrqlSaveParameter isp;
 
   IrqlSaveVariableFlowedTo() {
-    exists(
-      DataFlow::Node parameter, DataFlow::Node assignment
-    |
+    exists(DataFlow::Node parameter, DataFlow::Node assignment |
       (
         this.getAnAssignedValue() = assignment.asExpr() or
         this = assignment.asParameter()
@@ -147,9 +141,7 @@ where
    *    directly by calling, for example, KeRaiseIrql?
    */
 
-  not exists(
-    DataFlow::Node node, IrqlSaveVariableFlowedTo isvft
-  |
+  not exists(DataFlow::Node node, IrqlSaveVariableFlowedTo isvft |
     isvft.getSaveParameter() = isp and
     exists(Assignment a |
       a.getLValue().getAChild*().(VariableAccess).getTarget() = isvft and

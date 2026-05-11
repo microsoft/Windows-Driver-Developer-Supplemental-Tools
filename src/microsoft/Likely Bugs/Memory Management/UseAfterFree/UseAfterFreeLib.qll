@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 import cpp
 import semmle.code.cpp.controlflow.StackVariableReachability
 import semmle.code.cpp.controlflow.ControlFlowGraph
@@ -8,37 +7,34 @@ import semmle.code.cpp.controlflow.Guards
 import semmle.code.cpp.controlflow.SSA
 import semmle.code.cpp.dataflow.new.DataFlow
 
-
-/** `e` is an expression that frees the memory pointed to by `v`. 
- *  `va` is the corresponding access to the variable `v`. 
- **/
+/**
+ * `e` is an expression that frees the memory pointed to by `v`.
+ *  `va` is the corresponding access to the variable `v`.
+ */
 predicate isFreeExpr(Expr e, Variable v, Access va) {
-  exists(| va.getTarget() = v or va.getAChild*().(Access).getTarget() = v |
+  exists( | va.getTarget() = v or va.getAChild*().(Access).getTarget() = v |
     exists(FunctionCall fc | fc = e |
       (
-        (
-          fc.getTarget().hasGlobalOrStdName("ExFreePool") or
-          fc.getTarget().hasGlobalOrStdName("ExFreePoolWithTag") or
-          fc.getTarget().hasGlobalOrStdName("IoFreeMdl") or
-          fc.getTarget().hasGlobalOrStdName("IoFreeIrp") or
-          fc.getTarget().hasGlobalOrStdName("NdisFreeMemory") or
-          fc.getTarget().hasGlobalOrStdName("NdisFreeMemoryWithTag") or
-          fc.getTarget().hasGlobalOrStdName("NdisFreeMdl") or
-          fc.getTarget().hasGlobalOrStdName("NdisFreeGenericObject") or
-          fc.getTarget().hasGlobalOrStdName("NdisFreeNetBufferPool") or
-          fc.getTarget().hasGlobalOrStdName("NdisFreeNetBufferListPool") or
-          fc.getTarget().hasGlobalOrStdName("free")
-        ) and
-        va = fc.getArgument(0)
-      ) or
+        fc.getTarget().hasGlobalOrStdName("ExFreePool") or
+        fc.getTarget().hasGlobalOrStdName("ExFreePoolWithTag") or
+        fc.getTarget().hasGlobalOrStdName("IoFreeMdl") or
+        fc.getTarget().hasGlobalOrStdName("IoFreeIrp") or
+        fc.getTarget().hasGlobalOrStdName("NdisFreeMemory") or
+        fc.getTarget().hasGlobalOrStdName("NdisFreeMemoryWithTag") or
+        fc.getTarget().hasGlobalOrStdName("NdisFreeMdl") or
+        fc.getTarget().hasGlobalOrStdName("NdisFreeGenericObject") or
+        fc.getTarget().hasGlobalOrStdName("NdisFreeNetBufferPool") or
+        fc.getTarget().hasGlobalOrStdName("NdisFreeNetBufferListPool") or
+        fc.getTarget().hasGlobalOrStdName("free")
+      ) and
+      va = fc.getArgument(0)
+      or
       (
-        (
-          fc.getTarget().hasGlobalOrStdName("NdisFreeMemoryWithTagPriority") or
-          fc.getTarget().hasGlobalOrStdName("StorPortFreePool") or // (forceinlined)
-          fc.getTarget().hasGlobalOrStdName("StorPortFreeMdl")     // (forceinlined)
-        ) and
-        va = fc.getArgument(1)
-      )
+        fc.getTarget().hasGlobalOrStdName("NdisFreeMemoryWithTagPriority") or
+        fc.getTarget().hasGlobalOrStdName("StorPortFreePool") or // (forceinlined)
+        fc.getTarget().hasGlobalOrStdName("StorPortFreeMdl") // (forceinlined)
+      ) and
+      va = fc.getArgument(1)
     )
     or
     e.(DeleteExpr).getExpr() = va
@@ -47,26 +43,31 @@ predicate isFreeExpr(Expr e, Variable v, Access va) {
   )
 }
 
-/** True if the argument `n` of function `f` may be called in a free (`isFreeExpr`) call **/
-predicate isPotentiallyFreeFunction( Function f, int n )
-{
-	exists( VariableAccess va, Variable v, DataFlow::Node sink, DataFlow::Node source | 
-		ArgumentFLowsToFreeCall::flow(source, sink) and
-		va = source.asExpr() and
-		(va.getTarget() = v or va.getAChild*().(Access).getTarget() = v or va.(PointerFieldAccess).getQualifier() = v.getAnAccess()) and
-		f = va.getEnclosingFunction() and
-		f.getParameter(n) = v
-	)
+/** True if the argument `n` of function `f` may be called in a free (`isFreeExpr`) call * */
+predicate isPotentiallyFreeFunction(Function f, int n) {
+  exists(VariableAccess va, Variable v, DataFlow::Node sink, DataFlow::Node source |
+    ArgumentFLowsToFreeCall::flow(source, sink) and
+    va = source.asExpr() and
+    (
+      va.getTarget() = v or
+      va.getAChild*().(Access).getTarget() = v or
+      va.(PointerFieldAccess).getQualifier() = v.getAnAccess()
+    ) and
+    f = va.getEnclosingFunction() and
+    f.getParameter(n) = v
+  )
 }
 
-/** `e` is an expression that frees the memory pointed to by `v` or that may call a wrapper function. 
- *  `va` is the corresponding access to the variable `v`. 
- **/
+/**
+ * `e` is an expression that frees the memory pointed to by `v` or that may call a wrapper function.
+ *  `va` is the corresponding access to the variable `v`.
+ */
 predicate isPotentiallyFreeExpr(Expr e, Variable v, Access va) {
-  isFreeExpr(e, v, va) or
-  exists(| va.getTarget() = v or va.getAChild*().(Access).getTarget() = v |
+  isFreeExpr(e, v, va)
+  or
+  exists( | va.getTarget() = v or va.getAChild*().(Access).getTarget() = v |
     exists(FunctionCall fc, Function f, int n | fc = e |
-      isPotentiallyFreeFunction( f, n) and 
+      isPotentiallyFreeFunction(f, n) and
       fc.getTarget() = f and
       va = fc.getArgument(n)
     )
@@ -75,33 +76,39 @@ predicate isPotentiallyFreeExpr(Expr e, Variable v, Access va) {
 
 /** source of type `access` flows to the parameter of a `isFreeExpr` */
 module ArgumentFLowsToFreeCallConfiguration implements DataFlow::ConfigSig {
+  predicate isSource(DataFlow::Node source) { source.asExpr() instanceof Access }
 
-   predicate isSource(DataFlow::Node source) {
-    source.asExpr() instanceof Access
-  }
- 
-   predicate isSink(DataFlow::Node sink) {
-  	exists( FunctionCall call, Access a |
-	    ( sink.asExpr() = a or sink.asExpr().getAChild*() = a or sink.asExpr().(PointerFieldAccess).getQualifier() = a ) and  
-	    isFreeExpr( call, _, a ) 
+  predicate isSink(DataFlow::Node sink) {
+    exists(FunctionCall call, Access a |
+      (
+        sink.asExpr() = a or
+        sink.asExpr().getAChild*() = a or
+        sink.asExpr().(PointerFieldAccess).getQualifier() = a
+      ) and
+      isFreeExpr(call, _, a)
     )
   }
 }
+
 module ArgumentFLowsToFreeCall = DataFlow::Global<ArgumentFLowsToFreeCallConfiguration>;
 
 /**
- * Lower precision check if an Expr `e` is a free call using a variable `v` 
- **/
+ * Lower precision check if an Expr `e` is a free call using a variable `v`
+ */
 predicate isPotentiallyFreeExprEx(Expr e, Variable v, Access va, Expr actualFreeArg) {
-	( isPotentiallyFreeExpr(e, v, va) and va = actualFreeArg ) or
-	(
-		exists(  DataFlow::Node source, DataFlow::Node sink |
-			source.asExpr() = va and sink.asExpr() = actualFreeArg |
-			ArgumentFLowsToFreeCall::flow(source, sink) and
-			e.(FunctionCall).getAnArgument() = va and
-			(va.getTarget() = v or va.getAChild*().(Access).getTarget() = v or va.(PointerFieldAccess).getQualifier() = v.getAnAccess())
-		)
-	)
+  isPotentiallyFreeExpr(e, v, va) and va = actualFreeArg
+  or
+  exists(DataFlow::Node source, DataFlow::Node sink |
+    source.asExpr() = va and sink.asExpr() = actualFreeArg
+  |
+    ArgumentFLowsToFreeCall::flow(source, sink) and
+    e.(FunctionCall).getAnArgument() = va and
+    (
+      va.getTarget() = v or
+      va.getAChild*().(Access).getTarget() = v or
+      va.(PointerFieldAccess).getQualifier() = v.getAnAccess()
+    )
+  )
 }
 
 /** `e` is an expression that (may) dereference `v`. */
@@ -125,12 +132,14 @@ predicate isDerefByCallExpr(Call c, int i, Access va, Variable v) {
 }
 
 /**
- * StackVariable `v` is used after a `free` Expr 
+ * StackVariable `v` is used after a `free` Expr
  */
 class UseAfterPotentiallyFreeReachability extends StackVariableReachability {
   UseAfterPotentiallyFreeReachability() { this = "UseAfterFree" }
 
-  override predicate isSource(ControlFlowNode node, StackVariable v) { isPotentiallyFreeExprEx(node, v, _, _) }
+  override predicate isSource(ControlFlowNode node, StackVariable v) {
+    isPotentiallyFreeExprEx(node, v, _, _)
+  }
 
   override predicate isSink(ControlFlowNode node, StackVariable v) { isDerefExpr(node, v) }
 

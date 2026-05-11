@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Uncontrolled data in arithmetic expression
  * @description Arithmetic operations on uncontrolled data that is not

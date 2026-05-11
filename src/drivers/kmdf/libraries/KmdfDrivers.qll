@@ -8,7 +8,6 @@ import cpp
 class KmdfRoleTypeType extends TypedefType {
   /* Callbacks */
   KmdfRoleTypeType() {
-
     this.getName().matches("EVT_WDF_CHILD_LIST_CREATE_DEVICE") or
     this.getName().matches("EVT_WDF_CHILD_LIST_SCAN_FOR_CHILDREN") or
     this.getName().matches("EVT_WDF_CHILD_LIST_IDENTIFICATION_DESCRIPTION_COPY") or
@@ -114,8 +113,7 @@ class KmdfRoleTypeType extends TypedefType {
     this.getName().matches("EVT_WDF_WMI_INSTANCE_SET_ITEM") or
     this.getName().matches("EVT_WDF_WMI_INSTANCE_EXECUTE_METHOD") or
     this.getName().matches("EVT_WDF_WMI_PROVIDER_FUNCTION_CONTROL") or
-    this.getName().matches("EVT_WDF_WORKITEM") 
-
+    this.getName().matches("EVT_WDF_WORKITEM")
   }
 }
 

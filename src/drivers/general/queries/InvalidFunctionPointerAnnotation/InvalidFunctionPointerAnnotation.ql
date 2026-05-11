@@ -61,9 +61,9 @@ class AnnotatedFunction extends Function {
 
 from
   AnnotatedFunction af, FunctionAccess access, FunctionCall callingFunc, int n, string funcClass,
- string expectedFuncClass
+  string expectedFuncClass
 where
-af.getAnAccess() = access and
+  af.getAnAccess() = access and
   callingFunc.getArgument(n) = access and
   funcClass = af.getFuncClassAnnotation().getUnexpandedArgument(0).toString() and
   expectedFuncClass =
@@ -79,5 +79,6 @@ af.getAnAccess() = access and
     baseType = t.getBaseType().toString().replaceAll("*", "").trim() and
     baseType = funcClass.replaceAll("*", "").trim()
   )
-select callingFunc.getArgument(n), "Function pointer annotation mismatch. Function pointer type: "+expectedFuncClass+". Function annotation: "+funcClass
-
+select callingFunc.getArgument(n),
+  "Function pointer annotation mismatch. Function pointer type: " + expectedFuncClass +
+    ". Function annotation: " + funcClass

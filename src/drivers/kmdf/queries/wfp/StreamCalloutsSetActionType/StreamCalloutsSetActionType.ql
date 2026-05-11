@@ -20,19 +20,18 @@ import drivers.libraries.wfp
 
 /** A function that is annotated with Wfp stream callout annotation. */
 class StreamCalloutFunction extends Function {
-   WfpStreamInjection scr;
- 
-   StreamCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
- }
+  WfpStreamInjection scr;
+
+  StreamCalloutFunction() { this.getADeclarationEntry() = scr.getDeclarationEntry() }
+}
 
 // Contract
-// Every non-inspect callout at the stream layer must explicitly assign a value to the 
+// Every non-inspect callout at the stream layer must explicitly assign a value to the
 // actionType member of the classifyOut parameter regardless of what value may have been previously set in that parameter
-
 // Returns TRUE when a non-inspection stream callout is tagged and the function does not
 // set the actionType member of the classifyOut parameter
-
 from StreamCalloutFunction w
-   where not exists(ActionTypeExpr exp)
+where not exists(ActionTypeExpr exp)
 select w,
-   "Found a Stream Injection Classify function that does not properly set an FWP_ACTION_TYPE: " +  w.getName()
+  "Found a Stream Injection Classify function that does not properly set an FWP_ACTION_TYPE: " +
+    w.getName()

@@ -16,7 +16,7 @@
  * @precision medium
  * @tags correctness
  *       wddst
-*        ca_ported
+ *        ca_ported
  * @scope domainspecific
  * @query-version v1
  */
@@ -36,8 +36,8 @@ where
       fa.getTarget() = va.getParent().(AssignExpr).getLValue().(VariableAccess).getTarget() and
       fa.getQualifier().(VariableAccess).getTarget() instanceof LocalVariable
     )
-  )
-  and va.getTarget().getType().toString().matches("PUNICODE_STRING")
+  ) and
+  va.getTarget().getType().toString().matches("PUNICODE_STRING")
 select va,
   "The DriverEntry routine should save a copy of the argument $@, not the pointer, because the I/O Manager frees the buffer",
   va, va.toString()

@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name User-controlled data in arithmetic expression
  * @description Arithmetic operations on user-controlled data that is

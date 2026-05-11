@@ -12,6 +12,7 @@
  * @owner.email sdat@microsoft.com
  * @id cpp/microsoft/public/likely-bugs/memory-management/unprobeddereference
  */
+
 import microsoft.code.cpp.public.windows.kernel.SystemCalls
 import microsoft.code.cpp.public.windows.kernel.MemoryOriginDereferences
 import microsoft.code.cpp.public.controlflow.Reachability
@@ -21,10 +22,13 @@ import microsoft.code.cpp.public.controlflow.Reachability
  * preceded by one.
  */
 class ProbedAccess extends IgnoredAccess {
-	ProbedAccess() {
-		exists(ProbeCallAccess probeAccess | probeAccess = this.getTarget().getAnAccess() and reaches(probeAccess, this)) or
-		this instanceof ProbeCallAccess
-	}
+  ProbedAccess() {
+    exists(ProbeCallAccess probeAccess |
+      probeAccess = this.getTarget().getAnAccess() and reaches(probeAccess, this)
+    )
+    or
+    this instanceof ProbeCallAccess
+  }
 }
 
 /**
@@ -32,15 +36,19 @@ class ProbedAccess extends IgnoredAccess {
  * preceded by one.
  */
 class UMAGuardedAccess extends IgnoredAccess {
-	UMAGuardedAccess() {
-		exists(UMAAccess umaAccess | umaAccess = this.getTarget().getAnAccess() and reaches(umaAccess, this)) or
-		this instanceof UMAAccess
-	}
+  UMAGuardedAccess() {
+    exists(UMAAccess umaAccess |
+      umaAccess = this.getTarget().getAnAccess() and reaches(umaAccess, this)
+    )
+    or
+    this instanceof UMAAccess
+  }
 }
 
 from MemoryOrigin o, VariableAccess va
-where o.originCanUnmap() and
+where
+  o.originCanUnmap() and
   va = getANestedDereference(o) and
-	// And the dereferencing expression is not contained in an undefined call
-	(va.getParent() instanceof Call implies va.getParent().(Call).getTarget().hasDefinition())
+  // And the dereferencing expression is not contained in an undefined call
+  (va.getParent() instanceof Call implies va.getParent().(Call).getTarget().hasDefinition())
 select va, "Variable dereferenced without probe accessing $@", o, o.toString()

@@ -20,7 +20,6 @@
  * @query-version v1
  */
 
-
 import cpp
 import semmle.code.cpp.dataflow.new.DataFlow
 

@@ -28,5 +28,6 @@ where
   irqlRequirement = call.getIrqlLevel() and
   irqlRequirement != -1 and
   irqlRequirement < min(getPotentialExitIrqlAtCfn(prior))
-select call,"$@: The function being called changes the IRQL to below the current IRQL, and the function is not intended for that purpose.",
- call, call.toString()
+select call,
+  "$@: The function being called changes the IRQL to below the current IRQL, and the function is not intended for that purpose.",
+  call, call.toString()

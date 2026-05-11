@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 import cpp
 
 // an expression of the form sizeof(e) or strlen(e)

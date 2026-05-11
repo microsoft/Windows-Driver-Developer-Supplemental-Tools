@@ -24,6 +24,6 @@ import cpp
 from SizeofExprOperator e, VariableAccess va
 where
   va = e.getExprOperand() and
-  va.getTarget().getUnspecifiedType() instanceof PointerType
-  and not va.isAffectedByMacro()
+  va.getTarget().getUnspecifiedType() instanceof PointerType and
+  not va.isAffectedByMacro()
 select e, "Taking the size of a pointer variable, not the size of the value that is pointed to."

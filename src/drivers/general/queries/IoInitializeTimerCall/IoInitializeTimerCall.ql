@@ -8,8 +8,8 @@
  * @platform Desktop
  * @security.severity Low
  * @feature.area Multiple
- * @impact 
- * @repro.text 
+ * @impact
+ * @repro.text
  * @owner.email sdat@microsoft.com
  * @opaqueid CQLD-C28133
  * @problem.severity warning
@@ -25,7 +25,7 @@ import cpp
 import drivers.wdm.libraries.WdmDrivers
 
 from FunctionCall fc, WdmAddDevice wad
-where 
+where
   fc.getTarget().getName() = "IoInitializeTimer" and
   not fc.getEnclosingFunction() = wad
 select fc, "IoInitializeTimer should be called from AddDevice"

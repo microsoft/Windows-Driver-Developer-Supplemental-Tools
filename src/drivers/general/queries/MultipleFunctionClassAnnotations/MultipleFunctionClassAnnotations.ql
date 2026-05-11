@@ -60,6 +60,5 @@ class AnnotatedFunction extends Function {
 }
 
 from AnnotatedFunction f
-where 
-count(f.getFuncClassAnnotation() ) > 1
+where count(f.getFuncClassAnnotation()) > 1
 select f, "Function is annotated with more than one function class. All but one will be ignored."

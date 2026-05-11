@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Suspicious pointer scaling to char
  * @description Implicit scaling of pointer arithmetic expressions

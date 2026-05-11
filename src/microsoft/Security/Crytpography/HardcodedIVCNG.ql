@@ -29,8 +29,10 @@ module CngBCryptEncryptHardcodedIVConfiguration implements DataFlow::ConfigSig {
     )
   }
 }
+
 module CngBCryptEncryptHardcodedIV = DataFlow::Global<CngBCryptEncryptHardcodedIVConfiguration>;
 
 from Expr sl, FunctionCall fc
-where CngBCryptEncryptHardcodedIV::flow(DataFlow::exprNode(sl), DataFlow::exprNode(fc.getArgument(4)))
+where
+  CngBCryptEncryptHardcodedIV::flow(DataFlow::exprNode(sl), DataFlow::exprNode(fc.getArgument(4)))
 select sl, "Calling BCryptEncrypt with a hard-coded IV on function "

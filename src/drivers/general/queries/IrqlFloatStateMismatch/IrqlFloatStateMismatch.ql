@@ -113,8 +113,8 @@ private int anchorLineForCall(Function f, FunctionCall fc) {
  * per-pair check. Both annotations are planner hints; semantics unchanged.
  *
  * --- Human comments ---
- * 
- * Branch (1) wound up like this for perf reasons as well; a transitive 
+ *
+ * Branch (1) wound up like this for perf reasons as well; a transitive
  * check across all of the helper's internals gets expensive and in practice
  * if there are helper functions involved they're pretty shallow.
  */
@@ -153,8 +153,8 @@ predicate irqlChangesBetween(FunctionCall saveCall, FunctionCall restoreCall) {
 }
 
 from
-  DataFlow::Node source, DataFlow::Node sink, int irqlSink, int irqlSource,
-  FunctionCall saveCall, FunctionCall restoreCall
+  DataFlow::Node source, DataFlow::Node sink, int irqlSink, int irqlSource, FunctionCall saveCall,
+  FunctionCall restoreCall
 where
   FloatStateFlow::flow(source, sink) and
   // FloatStateFlow's source/sink predicates already restrict the flow's

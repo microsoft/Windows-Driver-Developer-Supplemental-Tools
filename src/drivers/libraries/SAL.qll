@@ -122,7 +122,7 @@ class SALParameter extends Parameter {
 
   predicate isInOut() { a.getMacroName().toLowerCase().matches("%\\_inout%") }
 
-  SALAnnotation getAnnotation() {result = a}
+  SALAnnotation getAnnotation() { result = a }
 }
 
 ///////////////////////////////////////////////////////////////////////////////

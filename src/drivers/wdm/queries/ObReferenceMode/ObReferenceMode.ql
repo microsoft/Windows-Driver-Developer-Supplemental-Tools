@@ -44,4 +44,5 @@ where
         .getName()
         .matches("Irp")
   )
-select oc, "This call to ObReference* in a dispatch routine does not pass IRP->RequestorMode as the AccessMode argument.  If this is a top-level driver, it should pass this to respect the IRP context."
+select oc,
+  "This call to ObReference* in a dispatch routine does not pass IRP->RequestorMode as the AccessMode argument.  If this is a top-level driver, it should pass this to respect the IRP context."

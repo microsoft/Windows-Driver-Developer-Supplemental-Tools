@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Potentially unsafe use of strcat
  * @description Using 'strcat' without checking the size of the source string

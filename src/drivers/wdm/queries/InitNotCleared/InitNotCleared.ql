@@ -40,10 +40,9 @@ class IoCreateFunction extends Function {
  * a WDM AddDevice function.
  */
 module AddDeviceFlowConfig implements DataFlow::ConfigSig {
-
   predicate isSource(DataFlow::Node node) {
-   exists(WdmAddDevice wad | node.asParameter() = wad.getParameter(0))
- }
+    exists(WdmAddDevice wad | node.asParameter() = wad.getParameter(0))
+  }
 
   predicate isSink(DataFlow::Node node) { any() }
 }
@@ -56,7 +55,6 @@ module AddDeviceFlow = DataFlow::Global<AddDeviceFlowConfig>;
  * the DO_DEVICE_INITIALIZING flag.
  */
 module FdoFlowConfig implements DataFlow::ConfigSig {
-
   predicate isSource(DataFlow::Node node) {
     exists(FunctionCall fc, DataFlow::Node pdo |
       fc.getTarget() instanceof IoCreateFunction and
@@ -76,6 +74,7 @@ module FdoFlowConfig implements DataFlow::ConfigSig {
 }
 
 module FdoFlow = DataFlow::Global<FdoFlowConfig>;
+
 /*
  * We look for any AddDevice routine that does not have a corresponding
  * call to IoCreateDevice where the resulting FDO later has its DO_DEVICE_INITIALIZING
@@ -86,7 +85,8 @@ from WdmAddDevice wad
 where
   not exists(FunctionCall fc |
     fc.getTarget() instanceof IoCreateFunction and
-    AddDeviceFlow::flow(DataFlow::parameterNode(wad.getParameter(0)), DataFlow::exprNode(fc.getArgument(0))) and
+    AddDeviceFlow::flow(DataFlow::parameterNode(wad.getParameter(0)),
+      DataFlow::exprNode(fc.getArgument(0))) and
     FdoFlow::flow(DataFlow::definitionByReferenceNodeFromArgument(fc.getArgument(6)), _)
   )
 select wad,

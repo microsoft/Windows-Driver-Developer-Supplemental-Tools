@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Possibly wrong buffer size in string copy
  * @description Calling 'strncpy' with the size of the source buffer

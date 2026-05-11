@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/null-character-pointer-assignment 
+ * @id cpp/drivers/null-character-pointer-assignment
  * @kind problem
  * @name Null Character Pointer Assignment
  * @description Possible assignment of '\\0' directly to a pointer
@@ -19,13 +19,11 @@
  * @query-version v1
  */
 
-
 import cpp
 
 from CharLiteral s, Assignment a
 where
   s.getCharacter() = "\\0" and
-  a.getRValue() = s and 
+  a.getRValue() = s and
   a.getLValue().getType().getName().matches("% *")
-
-select a,"Possible assignment of '\\0' directly to a pointer"
+select a, "Possible assignment of '\\0' directly to a pointer"

@@ -11,7 +11,6 @@ private import microsoft.code.cpp.public.windows.kernel.SystemCalls
 
 private module NestedBufferDataFlowTrace = DataFlow::Global<NestedBufferDataFlowConfig>;
 
-
 /**
  * A "handle" to an element that in some sense is the origin of a buffer. This
  * handle is used to link buffers together when they are known to be the same
@@ -101,7 +100,7 @@ class MemoryOrigin extends Element {
 abstract class DirectMemoryOrigin extends Element {
   // TODO: should there be both a getADirectBufferSource and a
   // getADirectBufferSink? A function that copies a kernel buffer to a user
-  // buffer is more like a sink. 
+  // buffer is more like a sink.
   /** Gets an access to this buffer. */
   abstract Expr getADirectBufferAccess();
 
@@ -162,20 +161,16 @@ abstract class DirectMemoryOrigin extends Element {
  * than one virtual address space. Typically, this is used for sharing memory
  * between user mode and kernel mode, or between a virtualized guest and its
  * host.
- * 
+ *
  * MDL-mapped memory does not require probing or installing an exception handler
  * before access, but since MDLs are typically used across a trust boundary, it
  * is important to avoid double fetches and information leaks.
  */
 class MdlOrigin extends DirectMemoryOrigin, FunctionCall {
-  MdlOrigin() {
-    this.getTarget().getName() = "MmGetSystemAddressForMdlSafe"
-  }
+  MdlOrigin() { this.getTarget().getName() = "MmGetSystemAddressForMdlSafe" }
 
-  override Expr getADirectBufferAccess() {
-    result = this
-  }
-  
+  override Expr getADirectBufferAccess() { result = this }
+
   override Expr getABufferSizeExpression() { none() }
 }
 
@@ -187,21 +182,15 @@ class AbstractPointerToUserModeSysCallParameterOrigin extends Parameter, DirectM
     this instanceof AbstractPointerToUserModeSysCallParameter
   }
 
-  override Expr getADirectBufferAccess() {
-    parameterUsePair(this, result)
-  }
-  
+  override Expr getADirectBufferAccess() { parameterUsePair(this, result) }
+
   override Expr getABufferSizeExpression() { none() }
 
   override predicate originCanWrite() {
-    this = any(PointerToUserModeSysCallParameter p |
-      not p.isOutParameter()
-    )
+    this = any(PointerToUserModeSysCallParameter p | not p.isOutParameter())
   }
 
-  override predicate originCanUnmap() {
-    this instanceof PointerToUserModeSysCallParameter
-  }
+  override predicate originCanUnmap() { this instanceof PointerToUserModeSysCallParameter }
 
   // This should technically be `any()`, but tracking nested origins within
   // syscall parameters will generate too many results for the subsequent
@@ -213,43 +202,38 @@ class AbstractPointerToUserModeSysCallParameterOrigin extends Parameter, DirectM
  * An `IRP` memory origin.
  */
 class IRPOrigin extends DirectMemoryOrigin {
-  /** Whether this memory origin refers to a system buffer. */
-  private boolean isSystemBuffer;
-  /** The `IRP` parameter this memory origin comes from. */
-  private IRP::Parameter parameter;
+  private /** Whether this memory origin refers to a system buffer. */
+  boolean isSystemBuffer;
+  private /** The `IRP` parameter this memory origin comes from. */
+  IRP::Parameter parameter;
 
   IRPOrigin() {
     (
-      (
-        parameter = this.(IRP::Type3InputBufferAccess).getParameter() and
-        isSystemBuffer = false
-      )
+      parameter = this.(IRP::Type3InputBufferAccess).getParameter() and
+      isSystemBuffer = false
       or
-      (
-        parameter = this.(IRP::UserBufferAccess).getParameter() and
-        isSystemBuffer = false
-      )
+      parameter = this.(IRP::UserBufferAccess).getParameter() and
+      isSystemBuffer = false
       or
-      (
-        parameter = this.(IRP::SystemBufferAccess).getParameter() and
-        isSystemBuffer = true
-      )
+      parameter = this.(IRP::SystemBufferAccess).getParameter() and
+      isSystemBuffer = true
     )
   }
 
-  override Access getADirectBufferAccess() {
-    result = this
-  }
-  
+  override Access getADirectBufferAccess() { result = this }
+
   override Expr getABufferSizeExpression() {
     // the buffer size must come from the same IRP parameter
     result.(IRP::FieldAccess).getParameter() = parameter and
     (
-      (this instanceof IRP::Type3InputBufferAccess and result instanceof IRP::InputBufferLengthAccess) or
-      (this instanceof IRP::UserBufferAccess and result instanceof IRP::OutputBufferLengthAccess) or
+      this instanceof IRP::Type3InputBufferAccess and result instanceof IRP::InputBufferLengthAccess
+      or
+      this instanceof IRP::UserBufferAccess and result instanceof IRP::OutputBufferLengthAccess
+      or
+      this instanceof IRP::SystemBufferAccess and
       (
-        this instanceof IRP::SystemBufferAccess and
-        (result instanceof IRP::InputBufferLengthAccess or result instanceof IRP::OutputBufferLengthAccess)
+        result instanceof IRP::InputBufferLengthAccess or
+        result instanceof IRP::OutputBufferLengthAccess
       )
     )
   }
@@ -276,7 +260,8 @@ private predicate pointerFieldAccess(Expr object, PointerFieldAccess access) {
 
 private module NestedBufferDataFlowConfig implements DataFlow::ConfigSig {
   predicate isSource(DataFlow::Node source) {
-    source.asExpr() = any(DirectMemoryOrigin mo | mo.mayContainNestedOrigins()).getADirectBufferAccess()
+    source.asExpr() =
+      any(DirectMemoryOrigin mo | mo.mayContainNestedOrigins()).getADirectBufferAccess()
   }
 
   // This lets us find origins nested in _nested_ origins.
@@ -284,7 +269,5 @@ private module NestedBufferDataFlowConfig implements DataFlow::ConfigSig {
     pointerFieldAccess(n1.asExpr(), n2.asExpr())
   }
 
-  predicate isSink(DataFlow::Node sink) {
-    pointerFieldAccess(_, sink.asExpr())
-  }
+  predicate isSink(DataFlow::Node sink) { pointerFieldAccess(_, sink.asExpr()) }
 }

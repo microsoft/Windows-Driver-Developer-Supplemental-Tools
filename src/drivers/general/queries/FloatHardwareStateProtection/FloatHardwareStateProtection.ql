@@ -40,7 +40,6 @@ class KernelFloatAnnotatedTypedef extends TypedefType {
 class KernelFloatAnnotatedFunction extends Function {
   KernelFloatFunctionAnnotation kernelFloatAnnotation;
 
-  
   KernelFloatAnnotatedFunction() {
     (
       // this.hasCLinkage() and
@@ -65,17 +64,20 @@ class KernelFloatAnnotatedFunction extends Function {
 
 class FuncWithSafeFloatAccess extends Function {
   FuncWithSafeFloatAccess() {
-    exists(FunctionCall funcCallThatUsesFloat, FunctionCall saveFloat, ControlFlowNode saveFloatBB, Function funcThatUsesFloat, VariableAccess floatAccess|
+    exists(
+      FunctionCall funcCallThatUsesFloat, FunctionCall saveFloat, ControlFlowNode saveFloatBB,
+      Function funcThatUsesFloat, VariableAccess floatAccess
+    |
       (
         saveFloat.getTarget().getName() = ("KeSaveFloatingPointState") or
         saveFloat.getTarget().getName() = ("EngSaveFloatingPointState")
-      )
-      and saveFloatBB = saveFloat.getBasicBlock()
-      and floatAccess.getTarget().getType() instanceof FloatingPointType
-      and funcThatUsesFloat = floatAccess.getEnclosingFunction()
-      and funcCallThatUsesFloat.getTarget() = funcThatUsesFloat
-      and funcCallThatUsesFloat.getBasicBlock().getAPredecessor*() = saveFloatBB
-      and this.calls*(funcThatUsesFloat)
+      ) and
+      saveFloatBB = saveFloat.getBasicBlock() and
+      floatAccess.getTarget().getType() instanceof FloatingPointType and
+      funcThatUsesFloat = floatAccess.getEnclosingFunction() and
+      funcCallThatUsesFloat.getTarget() = funcThatUsesFloat and
+      funcCallThatUsesFloat.getBasicBlock().getAPredecessor*() = saveFloatBB and
+      this.calls*(funcThatUsesFloat)
       // this function can call a function that uses float
     )
   }
@@ -105,8 +107,5 @@ from VariableAccess floatAccess
 where
   floatAccess.getTarget().getType() instanceof FloatingPointType and
   not floatAccess instanceof SafeFloatAccess and
-  not exists(FuncWithSafeFloatAccess safeFunc |
-    safeFunc = floatAccess.getEnclosingFunction())
- 
-select floatAccess,
-  "Use of float detected without protecting floating-point hardware state"
+  not exists(FuncWithSafeFloatAccess safeFunc | safeFunc = floatAccess.getEnclosingFunction())
+select floatAccess, "Use of float detected without protecting floating-point hardware state"

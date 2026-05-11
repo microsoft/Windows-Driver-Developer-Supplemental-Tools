@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Potential integer arithmetic overflow
  * @description A user-controlled integer arithmetic expression

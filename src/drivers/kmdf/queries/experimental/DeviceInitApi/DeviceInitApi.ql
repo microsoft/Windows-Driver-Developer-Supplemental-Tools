@@ -74,7 +74,6 @@ predicate isChildExpr(Expr e, FunctionCall func) {
  * used in an initialization function after WdfDeviceCreate is called.
  */
 module InitAPIDataFlowConfig implements DataFlow::ConfigSig {
-
   predicate isSource(DataFlow::Node source) {
     exists(FunctionCall fc |
       fc.getTarget().getName().matches("WdfDeviceCreate") and
@@ -99,9 +98,10 @@ module InitAPIDataFlowConfig implements DataFlow::ConfigSig {
 }
 
 module InitAPIDataFlow = DataFlow::Global<InitAPIDataFlowConfig>;
+
 import InitAPIDataFlow::PathGraph
 
-from  InitAPIDataFlow::PathNode e1, InitAPIDataFlow::PathNode e2
+from InitAPIDataFlow::PathNode e1, InitAPIDataFlow::PathNode e2
 where
   exists(FunctionCall driverCreateCall, WdfInitiailzationApiCall apiCall |
     driverCreateCall.getAChild*() = e1.getNode().asExpr() and

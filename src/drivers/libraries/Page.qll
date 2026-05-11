@@ -3,9 +3,7 @@
 import cpp
 
 //Represents functions where a function has either PAGED_CODE or PAGED_CODE_LOCKED macro invocations
-
 class PagedFunc extends Function {
-  
   PagedFunc() {
     exists(MacroInvocation mi |
       mi.getEnclosingFunction() = this and
@@ -56,11 +54,9 @@ predicate isPagedSegSetWithMacroAbove(Function f) {
 }
 
 //Represents functions for whom code_seg() is set
-
 class FunctionWithPageReset extends Function {
   DefaultCodeSegPragma dcs;
 
-  
   FunctionWithPageReset() {
     exists(CodeSegPragma csp, DefaultCodeSegPragma dcsp |
       this.getLocation().getStartLine() > csp.getLocation().getStartLine() and
@@ -71,14 +67,11 @@ class FunctionWithPageReset extends Function {
     )
   }
 
-  
   DefaultCodeSegPragma getCodeSeg() { result = dcs }
 }
 
 //Represents functions for whom code_seg("PAGE") is set
-
 class FunctionWithPageSet extends Function {
-  
   FunctionWithPageSet() {
     exists(CodeSegPragma csp |
       this.getLocation().getStartLine() > csp.getLocation().getStartLine() and
@@ -93,9 +86,7 @@ class FunctionWithPageSet extends Function {
 }
 
 //Represents a paged section
-
 class PagedFunctionDeclaration extends Function {
-  
   PagedFunctionDeclaration() {
     isPagedSegSetWithMacroAbove(this)
     or
@@ -121,8 +112,8 @@ class PagedFunctionDeclaration extends Function {
  */
 class PagedCodeMacro extends MacroInvocation {
   PagedCodeMacro() {
-    this.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"]
-    and this.getStmt().getEnclosingFunction() instanceof PagedFunctionDeclaration
+    this.getMacroName() = ["PAGED_CODE", "PAGED_CODE_LOCKED"] and
+    this.getStmt().getEnclosingFunction() instanceof PagedFunctionDeclaration
   }
 
   /**
@@ -138,7 +129,5 @@ class PagedCodeMacro extends MacroInvocation {
    * would otherwise allow a macro in one header to match an enclosing
    * function in another.
    */
-  Function getEnclosingPagedFunction() {
-    result = this.getStmt().getEnclosingFunction()
-  }
+  Function getEnclosingPagedFunction() { result = this.getStmt().getEnclosingFunction() }
 }

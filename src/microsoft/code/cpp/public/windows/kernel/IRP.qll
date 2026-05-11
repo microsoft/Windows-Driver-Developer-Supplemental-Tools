@@ -3,7 +3,6 @@
 /**
  * Provides classes relevant for IRP.
  */
-
 module IRP {
   private import cpp as CPP
   private import semmle.code.cpp.dataflow.new.DataFlow::DataFlow as DataFlow
@@ -19,13 +18,9 @@ module IRP {
     }
 
     /** Gets a use of this `IRP` parameter. */
-    CPP::VariableAccess getAUse() {
-      DefUse::parameterUsePair(this, result)
-    }
+    CPP::VariableAccess getAUse() { DefUse::parameterUsePair(this, result) }
 
-    private DeviceIoControlAccess getADeviceIoControlAccess() {
-      this = result.getParameter()
-    }
+    private DeviceIoControlAccess getADeviceIoControlAccess() { this = result.getParameter() }
 
     private CPP::FieldAccess getADeviceIoControlQualifiedAccess() {
       getASource(result.getQualifier()) = this.getADeviceIoControlAccess()
@@ -41,8 +36,8 @@ module IRP {
      * ```
      */
     CPP::FieldAccess getAnInputBufferLengthAccess() {
-      result = this.getADeviceIoControlQualifiedAccess()
-      and result.getTarget().hasName("InputBufferLength")
+      result = this.getADeviceIoControlQualifiedAccess() and
+      result.getTarget().hasName("InputBufferLength")
     }
 
     /**
@@ -55,8 +50,8 @@ module IRP {
      * ```
      */
     CPP::FieldAccess getAnOutputBufferLengthAccess() {
-      result = this.getADeviceIoControlQualifiedAccess()
-      and result.getTarget().hasName("OutputBufferLength")
+      result = this.getADeviceIoControlQualifiedAccess() and
+      result.getTarget().hasName("OutputBufferLength")
     }
   }
 
@@ -81,13 +76,9 @@ module IRP {
    * ```
    */
   class UserBufferAccess extends FieldAccess {
-    UserBufferAccess() {
-      userBufferAcces(_, this)
-    }
+    UserBufferAccess() { userBufferAcces(_, this) }
 
-    override Parameter getParameter() {
-      userBufferAcces(result, this)
-    }
+    override Parameter getParameter() { userBufferAcces(result, this) }
   }
 
   private predicate userBufferAcces(Parameter p, CPP::FieldAccess fa) {
@@ -99,13 +90,9 @@ module IRP {
    * A call to `IoGetCurrentIrpStackLocation()`.
    */
   class IoGetCurrentIrpStackLocationCall extends CPP::FunctionCall {
-    IoGetCurrentIrpStackLocationCall() {
-      ioGetCurrentIrpStackLocationCall(_, this)
-    }
+    IoGetCurrentIrpStackLocationCall() { ioGetCurrentIrpStackLocationCall(_, this) }
 
-    Parameter getParameter() {
-      ioGetCurrentIrpStackLocationCall(result, this)
-    }
+    Parameter getParameter() { ioGetCurrentIrpStackLocationCall(result, this) }
   }
 
   private predicate ioGetCurrentIrpStackLocationCall(Parameter p, CPP::FunctionCall fc) {
@@ -122,13 +109,9 @@ module IRP {
    * ```
    */
   class DeviceIoControlAccess extends FieldAccess {
-    DeviceIoControlAccess() {
-      deviceIoControlAccess(_, this)
-    }
+    DeviceIoControlAccess() { deviceIoControlAccess(_, this) }
 
-    override Parameter getParameter() {
-      deviceIoControlAccess(result, this)
-    }
+    override Parameter getParameter() { deviceIoControlAccess(result, this) }
   }
 
   private predicate deviceIoControlAccess(Parameter p, CPP::FieldAccess fa) {
@@ -149,13 +132,9 @@ module IRP {
    * ```
    */
   class SystemBufferAccess extends FieldAccess {
-    SystemBufferAccess() {
-      systemBufferAccess(_, this)
-    }
+    SystemBufferAccess() { systemBufferAccess(_, this) }
 
-    override Parameter getParameter() {
-      systemBufferAccess(result, this)
-    }
+    override Parameter getParameter() { systemBufferAccess(result, this) }
   }
 
   private predicate systemBufferAccess(Parameter p, CPP::FieldAccess fa) {
@@ -183,11 +162,9 @@ module IRP {
       )
     }
 
-    override Parameter getParameter() {
-      deviceIoControlAccess(result, this.getQualifier())
-    }
+    override Parameter getParameter() { deviceIoControlAccess(result, this.getQualifier()) }
   }
-  
+
   /**
    * An access to the input buffer length of an `IRP` device IO control, for example
    *
@@ -198,13 +175,10 @@ module IRP {
    */
   class InputBufferLengthAccess extends FieldAccess {
     private Parameter parameter;
-    InputBufferLengthAccess() {
-      this = parameter.getAnInputBufferLengthAccess()
-    }
 
-    override Parameter getParameter() {
-      result = parameter
-    }
+    InputBufferLengthAccess() { this = parameter.getAnInputBufferLengthAccess() }
+
+    override Parameter getParameter() { result = parameter }
   }
 
   /**
@@ -217,12 +191,9 @@ module IRP {
    */
   class OutputBufferLengthAccess extends FieldAccess {
     private Parameter parameter;
-    OutputBufferLengthAccess() {
-      this = parameter.getAnOutputBufferLengthAccess()
-    }
 
-    override Parameter getParameter() {
-      result = parameter
-    }
+    OutputBufferLengthAccess() { this = parameter.getAnOutputBufferLengthAccess() }
+
+    override Parameter getParameter() { result = parameter }
   }
 }

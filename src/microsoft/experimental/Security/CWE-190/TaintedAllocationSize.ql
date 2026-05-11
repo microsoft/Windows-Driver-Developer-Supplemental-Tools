@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Uncontrolled allocation size
  * @description Allocating memory with a size controlled by an external user can result in

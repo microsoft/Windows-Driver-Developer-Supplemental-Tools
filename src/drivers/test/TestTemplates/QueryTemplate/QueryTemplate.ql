@@ -1,9 +1,9 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/TODO 
+ * @id cpp/drivers/TODO
  * @kind problem
- * @name TODO 
+ * @name TODO
  * @description TODO
  * @platform Desktop
  * @feature.area Multiple
@@ -18,10 +18,8 @@
  * @query-version v1
  */
 
-
 import cpp
 
 from Function f
-where
-  f.getName().matches("DriverEntry") 
+where f.getName().matches("DriverEntry")
 select f, "TODO"

@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @id cpp/badoverflowguard
  * @name Bad overflow check
@@ -16,22 +15,22 @@
  *       external/cwe/cwe-191
  * @microsoft.severity Important
  * @opaqueid SM02324
- * 
  */
 
 import cpp
 
 /*
  * Example:
- * 
+ *
  * uint16 v, uint16 b
  * if ((v + b < v) <-- bad check for overflow
  */
 
 from AddExpr a, Variable v, RelationalOperation cmp
-where a.getAnOperand() = v.getAnAccess()
-  and forall(Expr op | op = a.getAnOperand() | op.getType().getSize() < 4)
-  and cmp.getAnOperand() = a
-  and cmp.getAnOperand() = v.getAnAccess()
-  and not a.getExplicitlyConverted().getType().getSize() < 4
+where
+  a.getAnOperand() = v.getAnAccess() and
+  forall(Expr op | op = a.getAnOperand() | op.getType().getSize() < 4) and
+  cmp.getAnOperand() = a and
+  cmp.getAnOperand() = v.getAnAccess() and
+  not a.getExplicitlyConverted().getType().getSize() < 4
 select cmp, "Bad overflow check"

@@ -28,7 +28,7 @@ where
   (
     c.getUnconverted().getType().toString().toLowerCase().matches("boolean") or
     c.getUnconverted().getType().toString().toLowerCase().matches("bool") or
-    c.getUnconverted().getType().toString().matches("VARIANT_BOOL") 
+    c.getUnconverted().getType().toString().matches("VARIANT_BOOL")
   )
 select c.getUnconverted(),
   "Implicit cast between semantically different integer types: Boolean to NTSTATUS"

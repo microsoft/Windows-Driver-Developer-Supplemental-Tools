@@ -34,5 +34,6 @@ where
   entryCfn = f.getBlock() and
   irqlLevelEntry = getPotentialExitIrqlAtCfn(entryCfn) and
   irqlLevelExit = getPotentialExitIrqlAtCfn(exitCfn) and
-  irqlLevelEntry != irqlLevelExit 
-select f, "Function potentially changes the IRQL without restoring it to the original level, however, the function is not annotated to reflect such a change."
+  irqlLevelEntry != irqlLevelExit
+select f,
+  "Function potentially changes the IRQL without restoring it to the original level, however, the function is not annotated to reflect such a change."

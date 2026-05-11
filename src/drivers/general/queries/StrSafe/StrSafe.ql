@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Unsafe string header (C28146)
  * @id cpp/drivers/str-safe

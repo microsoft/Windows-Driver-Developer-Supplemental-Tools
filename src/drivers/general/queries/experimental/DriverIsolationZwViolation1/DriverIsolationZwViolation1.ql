@@ -98,8 +98,13 @@ where
   (
     // non-zw* API calls
     not sourceFuncCall.getTarget() instanceof AllowedHandleDDI and
-    not zwCall(sourceFuncCall)
-    and sourceFuncCall.getTarget().getADeclarationLocation().getFile().toString().matches("%Windows Kits%")
+    not zwCall(sourceFuncCall) and
+    sourceFuncCall
+        .getTarget()
+        .getADeclarationLocation()
+        .getFile()
+        .toString()
+        .matches("%Windows Kits%")
     or
     // zw* function calls
     sourceFuncCall instanceof NotAllowedHandleRegFuncCall

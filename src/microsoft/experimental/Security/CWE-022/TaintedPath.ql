@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * @name Uncontrolled data used in path expression
  * @description Accessing paths influenced by users can allow an

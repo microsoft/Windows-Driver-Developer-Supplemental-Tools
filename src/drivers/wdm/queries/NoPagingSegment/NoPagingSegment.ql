@@ -28,7 +28,6 @@ from PagedFunc pf
 where
   not pf instanceof FunctionWithPageSet and
   not isPagedSegSetWithMacroAbove(pf) and
-  not isAllocUsedToLocatePagedFunc(pf) 
+  not isAllocUsedToLocatePagedFunc(pf)
 select pf,
   "The function has PAGED_CODE or PAGED_CODE_LOCKED but is not declared to be in a paged segment"
- 

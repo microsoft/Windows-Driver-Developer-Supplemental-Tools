@@ -19,14 +19,14 @@
  * @query-version v1
  */
 
- import drivers.libraries.DriverIsolation
+import drivers.libraries.DriverIsolation
 
 predicate rtlViolation1(RegistryIsolationFunctionCall f) {
   f.getTarget().getName().matches("Rtl%") and
   // Violation if RelativeTo parameter is NOT RTL_REGISTRY_DEVICEMAP
   exists(MacroInvocation m |
     f.getArgument(0) = m.getExpr() and
-    not m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP") and 
+    not m.getMacroName().matches("RTL_REGISTRY_DEVICEMAP") and
     not m.getMacroName().matches("RTL_REGISTRY_HANDLE") // These would be caught when the handle is opened
   )
 }
@@ -42,11 +42,10 @@ predicate rtlViolation2(RegistryIsolationFunctionCall f) {
       f.getTarget().getName().matches("RtlQueryRegistryValuesEx%") or
       f.getTarget().getName().matches("RtlCheckRegistryKey%")
     )
-  )
+  ) and
   // Exception: Rtl Writes OK if key is named SERIALCOMM and RelativeTo parameter is RTL_REGISTRY_DEVICEMAP
-  and not exception2(f)
+  not exception2(f)
 }
-
 
 from RegistryIsolationFunctionCall f, string message
 where

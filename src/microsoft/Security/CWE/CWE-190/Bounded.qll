@@ -1,6 +1,5 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
-
 /**
  * This file provides the `bounded` predicate that is used in `cpp/uncontrolled-arithmetic`,
  * `cpp/tainted-arithmetic` and `cpp/uncontrolled-allocation-size`.

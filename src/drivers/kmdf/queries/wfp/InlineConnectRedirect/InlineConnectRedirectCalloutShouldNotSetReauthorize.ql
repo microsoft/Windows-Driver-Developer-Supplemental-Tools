@@ -15,17 +15,15 @@
  * @query-version v1
  */
 
- import cpp
- import drivers.libraries.wfp
+import cpp
+import drivers.libraries.wfp
 
 // Contract
-// Inline callout shouldn’t ask for re-authorization i.e., 
+// Inline callout shouldn’t ask for re-authorization i.e.,
 // shouldn’t set FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS
-
-// Returns TRUE if the callout function is a inline callout in 
-// the connect redirect layers and sets the 
+// Returns TRUE if the callout function is a inline callout in
+// the connect redirect layers and sets the
 // FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS flag
-
 class WfpConnectRedirectInline extends WfpAnnotation {
   WfpConnectRedirectInline() {
     this.getMacro().(WfpMacro).getName() = ["_Wfp_connect_redirect_inline_classify_"]
@@ -33,19 +31,24 @@ class WfpConnectRedirectInline extends WfpAnnotation {
 }
 
 class ConnectRedirectClassifyFunction extends Function {
-    WfpConnectRedirectInline src;
-    ConnectRedirectClassifyFunction() { this.getADeclarationEntry() = src.getDeclarationEntry()}
+  WfpConnectRedirectInline src;
+
+  ConnectRedirectClassifyFunction() { this.getADeclarationEntry() = src.getDeclarationEntry() }
 }
 
 class ClassifyReauthorizeFlag extends AssignExpr {
-    ClassifyReauthorizeFlag(){
-        this.getLValue().getType().getName().matches(["UINT32"]) and
-        this.getRValue().getFullyConverted().getType().getName().matches(["FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS"])
-    }
+  ClassifyReauthorizeFlag() {
+    this.getLValue().getType().getName().matches(["UINT32"]) and
+    this.getRValue()
+        .getFullyConverted()
+        .getType()
+        .getName()
+        .matches(["FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS"])
+  }
 }
 
 from ConnectRedirectClassifyFunction waf
-where
-    exists(ClassifyReauthorizeFlag flag)
+where exists(ClassifyReauthorizeFlag flag)
 select waf,
-"A connect redirect callout " + waf.getName() + " is marked inline and sets FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS. This is a contract violation."
+  "A connect redirect callout " + waf.getName() +
+    " is marked inline and sets FWPS_CLASSIFY_FLAG_REAUTHORIZE_IF_MODIFIED_BY_OTHERS. This is a contract violation."
