@@ -2,6 +2,13 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.10.0] - 2026-05-12
+
+### Fixed
+ - Reduced false positive rate for InvalidFunctionClassTypedef.ql, IrqlAnnotationIssue.ql, IrqlTooHigh.ql, IrqlTooLow.ql, IllegalFieldAccess2.ql, OpaqueMdlUse.ql, OpaqueMdlWrite.ql, and UnguardedNullReturnDereference.ql.  Thanks to zx2c4 for the contribution.
+ - Significantly improved performance for DriverAlertSuppression.ql and MultiplePagedCode.ql.
+ - Moderately improved performance and further reduced false positive rate for all IRQL queries.
+
 ## [1.9.0] - 2026-02-27
 
 ### Added
