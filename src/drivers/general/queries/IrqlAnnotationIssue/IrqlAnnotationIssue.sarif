@@ -1,377 +1,390 @@
 {
-  "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
-  "version": "2.1.0",
-  "runs": [
-      {
-          "tool": {
-              "driver": {
-                  "name": "CodeQL",
-                  "organization": "GitHub",
-                  "semanticVersion": "2.20.3",
-                  "notifications": [
-                      {
-                          "id": "cpp/baseline/expected-extracted-files",
-                          "name": "cpp/baseline/expected-extracted-files",
-                          "shortDescription": {
-                              "text": "Expected extracted files"
-                          },
-                          "fullDescription": {
-                              "text": "Files appearing in the source archive that are expected to be extracted."
-                          },
-                          "defaultConfiguration": {
-                              "enabled": true
-                          },
-                          "properties": {
-                              "tags": [
-                                  "expected-extracted-files",
-                                  "telemetry"
-                              ]
-                          }
-                      },
-                      {
-                          "id": "cpp/extractor/summary",
-                          "name": "cpp/extractor/summary",
-                          "shortDescription": {
-                              "text": "C++ extractor telemetry"
-                          },
-                          "fullDescription": {
-                              "text": "C++ extractor telemetry"
-                          },
-                          "defaultConfiguration": {
-                              "enabled": true
-                          }
-                      }
-                  ],
-                  "rules": [
-                      {
-                          "id": "cpp/drivers/irql-annotation-issue",
-                          "name": "cpp/drivers/irql-annotation-issue",
-                          "shortDescription": {
-                              "text": "Irql Annotation Issue"
-                          },
-                          "fullDescription": {
-                              "text": "The value for an IRQL from annotation could not be evaluated in this context."
-                          },
-                          "defaultConfiguration": {
-                              "enabled": true,
-                              "level": "warning"
-                          },
-                          "properties": {
-                              "tags": [
-                                  "correctness"
-                              ],
-                              "description": "The value for an IRQL from annotation could not be evaluated in this context.",
-                              "feature.area": "Multiple",
-                              "id": "cpp/drivers/irql-annotation-issue",
-                              "impact": "Insecure Coding Practice",
-                              "kind": "problem",
-                              "name": "Irql Annotation Issue",
-                              "opaqueid": "CQLD-C28153",
-                              "owner.email:": "sdat@microsoft.com",
-                              "platform": "Desktop",
-                              "precision": "medium",
-                              "problem.severity": "warning",
-                              "query-version": "v1",
-                              "repro.text": "This warning indicates that the Code Analysis tool cannot interpret the function annotation because the annotation is not\n  coded correctly. As a result, the Code Analysis tool cannot determine the specified IRQL value. This warning can occur with any of\n  the driver-specific annotations that mention an IRQL when the Code Analysis tool cannot evaluate the expression for the IRQL.",
-                              "scope": "domainspecific"
-                          }
-                      }
-                  ]
-              },
-              "extensions": [
-                  {
-                      "name": "microsoft/windows-drivers",
-                      "semanticVersion": "1.3.0+4f62dc40ad4c6e0c3b6d23bddcf5bf13fbdcdc33",
-                      "locations": [
-                          {
-                              "uri": "file:///C:/codeql-home/WDDST/src/",
-                              "description": {
-                                  "text": "The QL pack root directory."
-                              },
-                              "properties": {
-                                  "tags": [
-                                      "CodeQL/LocalPackRoot"
-                                  ]
-                              }
-                          },
-                          {
-                              "uri": "file:///C:/codeql-home/WDDST/src/qlpack.yml",
-                              "description": {
-                                  "text": "The QL pack definition file."
-                              },
-                              "properties": {
-                                  "tags": [
-                                      "CodeQL/LocalPackDefinitionFile"
-                                  ]
-                              }
-                          }
-                      ]
-                  },
-                  {
-                      "name": "codeql/cpp-all",
-                      "semanticVersion": "3.1.0+d42788844f7ec0a6b9832140313cc2318e513987",
-                      "locations": [
-                          {
-                              "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/",
-                              "description": {
-                                  "text": "The QL pack root directory."
-                              },
-                              "properties": {
-                                  "tags": [
-                                      "CodeQL/LocalPackRoot"
-                                  ]
-                              }
-                          },
-                          {
-                              "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/qlpack.yml",
-                              "description": {
-                                  "text": "The QL pack definition file."
-                              },
-                              "properties": {
-                                  "tags": [
-                                      "CodeQL/LocalPackDefinitionFile"
-                                  ]
-                              }
-                          }
-                      ]
-                  }
-              ]
-          },
-          "invocations": [
-              {
-                  "toolExecutionNotifications": [
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "driver/driver_snippet.c",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 0
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "driver/fail_driver1.h",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 1
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "locations": [
-                              {
-                                  "physicalLocation": {
-                                      "artifactLocation": {
-                                          "uri": "driver/fail_driver1.c",
-                                          "uriBaseId": "%SRCROOT%",
-                                          "index": 2
-                                      }
-                                  }
-                              }
-                          ],
-                          "message": {
-                              "text": ""
-                          },
-                          "level": "none",
-                          "descriptor": {
-                              "id": "cpp/baseline/expected-extracted-files",
-                              "index": 0
-                          },
-                          "properties": {
-                              "formattedMessage": {
-                                  "text": ""
-                              }
-                          }
-                      },
-                      {
-                          "message": {
-                              "text": "Internal telemetry for the C++ extractor.\n\nNo action needed.",
-                              "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
-                          },
-                          "level": "note",
-                          "timeUtc": "2025-01-31T03:05:35.226520Z",
-                          "descriptor": {
-                              "id": "cpp/extractor/summary",
-                              "index": 1
-                          },
-                          "properties": {
-                              "attributes": {
-                                  "cache-hits": 0,
-                                  "cache-misses": 1,
-                                  "compilers": [
-                                      {
-                                          "program": "cl",
-                                          "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.42.34436 for x64"
-                                      }
-                                  ],
-                                  "extractor-failures": 1,
-                                  "extractor-successes": 0,
-                                  "trap-caching": "disabled"
-                              },
-                              "visibility": {
-                                  "statusPage": false,
-                                  "telemetry": true
-                              }
-                          }
-                      }
-                  ],
-                  "executionSuccessful": true
-              }
-          ],
-          "artifacts": [
-              {
-                  "location": {
-                      "uri": "driver/driver_snippet.c",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 0
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "driver/fail_driver1.h",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 1
-                  }
-              },
-              {
-                  "location": {
-                      "uri": "driver/fail_driver1.c",
-                      "uriBaseId": "%SRCROOT%",
-                      "index": 2
-                  }
-              }
-          ],
-          "results": [
-              {
-                  "ruleId": "cpp/drivers/irql-annotation-issue",
-                  "ruleIndex": 0,
-                  "rule": {
-                      "id": "cpp/drivers/irql-annotation-issue",
-                      "index": 0
-                  },
-                  "message": {
-                      "text": "Invalid IRQL annotation: -1"
-                  },
-                  "locations": [
-                      {
-                          "physicalLocation": {
-                              "artifactLocation": {
-                                  "uri": "driver/driver_snippet.c",
-                                  "uriBaseId": "%SRCROOT%",
-                                  "index": 0
-                              },
-                              "region": {
-                                  "startLine": 50,
-                                  "endColumn": 33
-                              }
-                          }
-                      }
-                  ],
-                  "partialFingerprints": {
-                      "primaryLocationLineHash": "c485bcb41025b395:1",
-                      "primaryLocationStartColumnFingerprint": "0"
-                  }
-              },
-              {
-                  "ruleId": "cpp/drivers/irql-annotation-issue",
-                  "ruleIndex": 0,
-                  "rule": {
-                      "id": "cpp/drivers/irql-annotation-issue",
-                      "index": 0
-                  },
-                  "message": {
-                      "text": "Invalid IRQL annotation: -1"
-                  },
-                  "locations": [
-                      {
-                          "physicalLocation": {
-                              "artifactLocation": {
-                                  "uri": "driver/driver_snippet.c",
-                                  "uriBaseId": "%SRCROOT%",
-                                  "index": 0
-                              },
-                              "region": {
-                                  "startLine": 42,
-                                  "endColumn": 18
-                              }
-                          }
-                      }
-                  ],
-                  "partialFingerprints": {
-                      "primaryLocationLineHash": "df94724e38a83f68:1",
-                      "primaryLocationStartColumnFingerprint": "0"
-                  }
-              },
-              {
-                  "ruleId": "cpp/drivers/irql-annotation-issue",
-                  "ruleIndex": 0,
-                  "rule": {
-                      "id": "cpp/drivers/irql-annotation-issue",
-                      "index": 0
-                  },
-                  "message": {
-                      "text": "Invalid IRQL annotation: 65"
-                  },
-                  "locations": [
-                      {
-                          "physicalLocation": {
-                              "artifactLocation": {
-                                  "uri": "driver/driver_snippet.c",
-                                  "uriBaseId": "%SRCROOT%",
-                                  "index": 0
-                              },
-                              "region": {
-                                  "startLine": 37,
-                                  "endColumn": 20
-                              }
-                          }
-                      }
-                  ],
-                  "partialFingerprints": {
-                      "primaryLocationLineHash": "d2e3355b345c7d56:1",
-                      "primaryLocationStartColumnFingerprint": "0"
-                  }
-              }
-          ],
-          "columnKind": "utf16CodeUnits",
-          "properties": {
-              "semmle.formatSpecifier": "sarifv2.1.0"
-          }
-      }
-  ]
+    "$schema": "https://json.schemastore.org/sarif-2.1.0.json",
+    "version": "2.1.0",
+    "runs": [
+        {
+            "tool": {
+                "driver": {
+                    "name": "CodeQL",
+                    "organization": "GitHub",
+                    "semanticVersion": "2.25.5",
+                    "notifications": [
+                        {
+                            "id": "cpp/baseline/expected-extracted-files",
+                            "name": "cpp/baseline/expected-extracted-files",
+                            "shortDescription": {
+                                "text": "Expected extracted files"
+                            },
+                            "fullDescription": {
+                                "text": "Files appearing in the source archive that are expected to be extracted."
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true
+                            },
+                            "properties": {
+                                "tags": [
+                                    "expected-extracted-files",
+                                    "telemetry"
+                                ]
+                            }
+                        },
+                        {
+                            "id": "cli/file-coverage-baseline",
+                            "name": "cli/file-coverage-baseline",
+                            "shortDescription": {
+                                "text": "File coverage baseline telemetry"
+                            },
+                            "fullDescription": {
+                                "text": "File coverage baseline telemetry"
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true
+                            }
+                        },
+                        {
+                            "id": "cli/platform",
+                            "name": "cli/platform",
+                            "shortDescription": {
+                                "text": "Platform"
+                            },
+                            "fullDescription": {
+                                "text": "Platform"
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true
+                            }
+                        },
+                        {
+                            "id": "cpp/extractor/summary",
+                            "name": "cpp/extractor/summary",
+                            "shortDescription": {
+                                "text": "C++ extractor telemetry"
+                            },
+                            "fullDescription": {
+                                "text": "C++ extractor telemetry"
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true
+                            }
+                        }
+                    ],
+                    "rules": [
+                        {
+                            "id": "cpp/drivers/irql-annotation-issue",
+                            "name": "cpp/drivers/irql-annotation-issue",
+                            "shortDescription": {
+                                "text": "Irql Annotation Issue"
+                            },
+                            "fullDescription": {
+                                "text": "The value for an IRQL from annotation could not be evaluated in this context."
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true,
+                                "level": "warning"
+                            },
+                            "help": {
+                                "text": "# Irql Annotation Issue\r\nThe value for an IRQL from annotation could not be evaluated in this context.\r\n\r\n\r\n## Recommendation\r\nThis warning indicates that the Code Analysis tool cannot interpret the function annotation because the annotation is not coded correctly. As a result, the Code Analysis tool cannot determine the specified IRQL value. This warning can occur with any of the driver-specific annotations that mention an IRQL when the Code Analysis tool cannot evaluate the expression for the IRQL.\r\n\r\n\r\n## Example\r\nIncorrect IRQL annotation\r\n\r\n```c\r\n \r\n\t\t\t_IRQL_requires_(65)\r\n\t\t\r\n```\r\nIncorrect IRQL annotation\r\n\r\n```c\r\n \r\n\t\t\t_IRQL_always_function_max_(irql_variable)\r\n\t\t\r\n```\r\n\r\n## References\r\n* [ C28153 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28153-irql-annotation-eval-context)\r\n",
+                                "markdown": "# Irql Annotation Issue\r\nThe value for an IRQL from annotation could not be evaluated in this context.\r\n\r\n\r\n## Recommendation\r\nThis warning indicates that the Code Analysis tool cannot interpret the function annotation because the annotation is not coded correctly. As a result, the Code Analysis tool cannot determine the specified IRQL value. This warning can occur with any of the driver-specific annotations that mention an IRQL when the Code Analysis tool cannot evaluate the expression for the IRQL.\r\n\r\n\r\n## Example\r\nIncorrect IRQL annotation\r\n\r\n```c\r\n \r\n\t\t\t_IRQL_requires_(65)\r\n\t\t\r\n```\r\nIncorrect IRQL annotation\r\n\r\n```c\r\n \r\n\t\t\t_IRQL_always_function_max_(irql_variable)\r\n\t\t\r\n```\r\n\r\n## References\r\n* [ C28153 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28153-irql-annotation-eval-context)\r\n"
+                            },
+                            "properties": {
+                                "tags": [
+                                    "correctness",
+                                    "ca_ported"
+                                ],
+                                "description": "The value for an IRQL from annotation could not be evaluated in this context.",
+                                "feature.area": "Multiple",
+                                "id": "cpp/drivers/irql-annotation-issue",
+                                "impact": "Insecure Coding Practice",
+                                "kind": "problem",
+                                "name": "Irql Annotation Issue",
+                                "opaqueid": "CQLD-C28153",
+                                "owner.email": "sdat@microsoft.com",
+                                "platform": "Desktop",
+                                "precision": "medium",
+                                "problem.severity": "warning",
+                                "query-version": "v2",
+                                "repro.text": "This warning indicates that the Code Analysis tool cannot interpret the function annotation because the annotation is not\n  coded correctly. As a result, the Code Analysis tool cannot determine the specified IRQL value. This warning can occur with any of\n  the driver-specific annotations that mention an IRQL when the Code Analysis tool cannot evaluate the expression for the IRQL.",
+                                "scope": "domainspecific"
+                            }
+                        }
+                    ]
+                },
+                "extensions": [
+                    {
+                        "name": "microsoft/windows-drivers",
+                        "semanticVersion": "1.10.0+6af9e601c84a31fd16ec52d95fed345ac5436774",
+                        "locations": [
+                            {
+                                "uri": "file:///F:/source/repos/wddst-2/src/",
+                                "description": {
+                                    "text": "The QL pack root directory."
+                                },
+                                "properties": {
+                                    "tags": [
+                                        "CodeQL/LocalPackRoot"
+                                    ]
+                                }
+                            },
+                            {
+                                "uri": "file:///F:/source/repos/wddst-2/src/qlpack.yml",
+                                "description": {
+                                    "text": "The QL pack definition file."
+                                },
+                                "properties": {
+                                    "tags": [
+                                        "CodeQL/LocalPackDefinitionFile"
+                                    ]
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "name": "codeql/cpp-all",
+                        "semanticVersion": "7.0.0+c5329f6f3863621c140ea7abd5954860e96c8bf1",
+                        "locations": [
+                            {
+                                "uri": "file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/7.0.0/",
+                                "description": {
+                                    "text": "The QL pack root directory."
+                                },
+                                "properties": {
+                                    "tags": [
+                                        "CodeQL/LocalPackRoot"
+                                    ]
+                                }
+                            },
+                            {
+                                "uri": "file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/7.0.0/qlpack.yml",
+                                "description": {
+                                    "text": "The QL pack definition file."
+                                },
+                                "properties": {
+                                    "tags": [
+                                        "CodeQL/LocalPackDefinitionFile"
+                                    ]
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "invocations": [
+                {
+                    "toolExecutionNotifications": [
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "driver/driver_snippet.c",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 0
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "driver/fail_driver1.h",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 1
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "locations": [
+                                {
+                                    "physicalLocation": {
+                                        "artifactLocation": {
+                                            "uri": "driver/fail_driver1.c",
+                                            "uriBaseId": "%SRCROOT%",
+                                            "index": 2
+                                        }
+                                    }
+                                }
+                            ],
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "descriptor": {
+                                "id": "cpp/baseline/expected-extracted-files",
+                                "index": 0
+                            },
+                            "properties": {
+                                "formattedMessage": {
+                                    "text": ""
+                                }
+                            }
+                        },
+                        {
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "timeUtc": "2026-05-28T00:12:28.236475500Z",
+                            "descriptor": {
+                                "id": "cli/file-coverage-baseline",
+                                "index": 1
+                            },
+                            "properties": {
+                                "attributes": {
+                                    "durationMilliseconds": 269
+                                },
+                                "visibility": {
+                                    "statusPage": false,
+                                    "telemetry": true
+                                }
+                            }
+                        },
+                        {
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "timeUtc": "2026-05-28T00:12:28.246246100Z",
+                            "descriptor": {
+                                "id": "cli/platform",
+                                "index": 2
+                            },
+                            "properties": {
+                                "attributes": {
+                                    "arch": "amd64",
+                                    "name": "Windows 11",
+                                    "version": "10.0"
+                                },
+                                "visibility": {
+                                    "statusPage": false,
+                                    "telemetry": true
+                                }
+                            }
+                        },
+                        {
+                            "message": {
+                                "text": "Internal telemetry for the C++ extractor.\n\nNo action needed.",
+                                "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
+                            },
+                            "level": "note",
+                            "timeUtc": "2026-05-28T00:13:04.664357800Z",
+                            "descriptor": {
+                                "id": "cpp/extractor/summary",
+                                "index": 3
+                            },
+                            "properties": {
+                                "attributes": {
+                                    "cache-hits": 0,
+                                    "cache-misses": 1,
+                                    "compilers": [
+                                        {
+                                            "program": "cl",
+                                            "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.51.36244 for x64"
+                                        }
+                                    ],
+                                    "extractor-failures": 1,
+                                    "extractor-successes": 0,
+                                    "trap-caching": "disabled"
+                                },
+                                "visibility": {
+                                    "statusPage": false,
+                                    "telemetry": true
+                                }
+                            }
+                        }
+                    ],
+                    "executionSuccessful": true
+                }
+            ],
+            "artifacts": [
+                {
+                    "location": {
+                        "uri": "driver/driver_snippet.c",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 0
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "driver/fail_driver1.h",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 1
+                    }
+                },
+                {
+                    "location": {
+                        "uri": "driver/fail_driver1.c",
+                        "uriBaseId": "%SRCROOT%",
+                        "index": 2
+                    }
+                }
+            ],
+            "results": [
+                {
+                    "ruleId": "cpp/drivers/irql-annotation-issue",
+                    "ruleIndex": 0,
+                    "rule": {
+                        "id": "cpp/drivers/irql-annotation-issue",
+                        "index": 0
+                    },
+                    "message": {
+                        "text": "Invalid IRQL annotation: 65"
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "driver/driver_snippet.c",
+                                    "uriBaseId": "%SRCROOT%",
+                                    "index": 0
+                                },
+                                "region": {
+                                    "startLine": 37,
+                                    "endColumn": 20
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "primaryLocationLineHash": "d2e3355b345c7d56:1",
+                        "primaryLocationStartColumnFingerprint": "0"
+                    }
+                }
+            ],
+            "columnKind": "utf16CodeUnits",
+            "properties": {
+                "semmle.formatSpecifier": "sarifv2.1.0"
+            }
+        }
+    ]
 }

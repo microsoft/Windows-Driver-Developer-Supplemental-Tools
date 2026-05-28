@@ -7,7 +7,7 @@
                 "driver": {
                     "name": "CodeQL",
                     "organization": "GitHub",
-                    "semanticVersion": "2.20.4",
+                    "semanticVersion": "2.25.5",
                     "notifications": [
                         {
                             "id": "cpp/baseline/expected-extracted-files",
@@ -26,6 +26,32 @@
                                     "expected-extracted-files",
                                     "telemetry"
                                 ]
+                            }
+                        },
+                        {
+                            "id": "cli/file-coverage-baseline",
+                            "name": "cli/file-coverage-baseline",
+                            "shortDescription": {
+                                "text": "File coverage baseline telemetry"
+                            },
+                            "fullDescription": {
+                                "text": "File coverage baseline telemetry"
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true
+                            }
+                        },
+                        {
+                            "id": "cli/platform",
+                            "name": "cli/platform",
+                            "shortDescription": {
+                                "text": "Platform"
+                            },
+                            "fullDescription": {
+                                "text": "Platform"
+                            },
+                            "defaultConfiguration": {
+                                "enabled": true
                             }
                         },
                         {
@@ -56,9 +82,14 @@
                                 "enabled": true,
                                 "level": "warning"
                             },
+                            "help": {
+                                "text": "# UnsafeCallInGlobalInit\r\nWhen using a DLL, it is frequently the case that any static construtors are called from DllMain. There are a number of constraints that apply to calling other functions from DllMain. In particular, it is possible to create memory leaks if the DLL is loaded and unloaded dynamically. SysAllocString is an example of a function that, in this case, could cause a memory leak.\r\n\r\n\r\n## Recommendation\r\nThe ideal DllMain would be just an empty stub. However, given the complexity of many applications, this is generally too restrictive. A good rule of thumb for DllMain is to postpone as much initialization as possible. Lazy initialization increases robustness of the application because this initialization is not performed while the loader lock is held. Also, lazy initialization enables you to safely use much more of the Windows API.\r\n\r\n\r\n## Example\r\nDLLMain function\r\n\r\n```c\r\n \r\n\t\tBOOL WINAPI DllMain(\r\n\t\tHINSTANCE hinstDLL,  // handle to DLL module\r\n\t\tDWORD fdwReason,     // reason for calling function\r\n\t\tLPVOID lpvReserved )  // reserved\r\n\t\t{\r\n\t\t\t// Perform actions based on the reason for calling.\r\n\t\t\tswitch( fdwReason ) \r\n\t\t\t{ \r\n\t\t\t\tcase DLL_PROCESS_ATTACH:\r\n\t\t\t\t// Initialize once for each new process.\r\n\t\t\t\t// Return FALSE to fail DLL load.\r\n\t\t\t\t\tbreak;\r\n\r\n\t\t\t\tcase DLL_THREAD_ATTACH:\r\n\t\t\t\t// Do thread-specific initialization.\r\n\t\t\t\t\tbreak;\r\n\r\n\t\t\t\tcase DLL_THREAD_DETACH:\r\n\t\t\t\t// Do thread-specific cleanup.\r\n\t\t\t\t\tbreak;\r\n\r\n\t\t\t\tcase DLL_PROCESS_DETACH:\r\n\t\t\t\t\r\n\t\t\t\t\tif (lpvReserved != nullptr)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tbreak; // do not do cleanup if process termination scenario\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t// Perform any necessary cleanup.\r\n\t\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\treturn TRUE;  // Successful DLL_PROCESS_ATTACH.\r\n\t\t}\r\n\t\t\r\n```\r\n\r\n## References\r\n* [ C28637 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28637-calling-function-in-a-global-initializer-is-unsafe)\r\n",
+                                "markdown": "# UnsafeCallInGlobalInit\r\nWhen using a DLL, it is frequently the case that any static construtors are called from DllMain. There are a number of constraints that apply to calling other functions from DllMain. In particular, it is possible to create memory leaks if the DLL is loaded and unloaded dynamically. SysAllocString is an example of a function that, in this case, could cause a memory leak.\r\n\r\n\r\n## Recommendation\r\nThe ideal DllMain would be just an empty stub. However, given the complexity of many applications, this is generally too restrictive. A good rule of thumb for DllMain is to postpone as much initialization as possible. Lazy initialization increases robustness of the application because this initialization is not performed while the loader lock is held. Also, lazy initialization enables you to safely use much more of the Windows API.\r\n\r\n\r\n## Example\r\nDLLMain function\r\n\r\n```c\r\n \r\n\t\tBOOL WINAPI DllMain(\r\n\t\tHINSTANCE hinstDLL,  // handle to DLL module\r\n\t\tDWORD fdwReason,     // reason for calling function\r\n\t\tLPVOID lpvReserved )  // reserved\r\n\t\t{\r\n\t\t\t// Perform actions based on the reason for calling.\r\n\t\t\tswitch( fdwReason ) \r\n\t\t\t{ \r\n\t\t\t\tcase DLL_PROCESS_ATTACH:\r\n\t\t\t\t// Initialize once for each new process.\r\n\t\t\t\t// Return FALSE to fail DLL load.\r\n\t\t\t\t\tbreak;\r\n\r\n\t\t\t\tcase DLL_THREAD_ATTACH:\r\n\t\t\t\t// Do thread-specific initialization.\r\n\t\t\t\t\tbreak;\r\n\r\n\t\t\t\tcase DLL_THREAD_DETACH:\r\n\t\t\t\t// Do thread-specific cleanup.\r\n\t\t\t\t\tbreak;\r\n\r\n\t\t\t\tcase DLL_PROCESS_DETACH:\r\n\t\t\t\t\r\n\t\t\t\t\tif (lpvReserved != nullptr)\r\n\t\t\t\t\t{\r\n\t\t\t\t\t\tbreak; // do not do cleanup if process termination scenario\r\n\t\t\t\t\t}\r\n\t\t\t\t\t\r\n\t\t\t\t// Perform any necessary cleanup.\r\n\t\t\t\t\tbreak;\r\n\t\t\t}\r\n\t\t\treturn TRUE;  // Successful DLL_PROCESS_ATTACH.\r\n\t\t}\r\n\t\t\r\n```\r\n\r\n## References\r\n* [ C28637 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28637-calling-function-in-a-global-initializer-is-unsafe)\r\n"
+                            },
                             "properties": {
                                 "tags": [
-                                    "correctness"
+                                    "correctness",
+                                    "ca_ported"
                                 ],
                                 "description": "When using a DLL, it is frequently the case that any\n  static construtors are called from DllMain.\n  There are a number of constraints that apply to calling\n  other functions from DllMain.  In particular, it is\n  possible to create memory leaks if the DLL is loaded\n  and unloaded dynamically.",
                                 "feature.area": "Multiple",
@@ -67,7 +98,7 @@
                                 "kind": "problem",
                                 "name": "UnsafeCallInGlobalInit",
                                 "opaqueid": "CQLD-C28637",
-                                "owner.email:": "sdat@microsoft.com",
+                                "owner.email": "sdat@microsoft.com",
                                 "platform": "Desktop",
                                 "precision": "medium",
                                 "problem.severity": "warning",
@@ -81,10 +112,10 @@
                 "extensions": [
                     {
                         "name": "microsoft/windows-drivers",
-                        "semanticVersion": "1.3.0+b07e02f3113bb2484479302f733f94b124503172",
+                        "semanticVersion": "1.10.0+fbfe122225e35194bef9b7e3c22ca68f420404d5",
                         "locations": [
                             {
-                                "uri": "file:///C:/codeql-home/WDDST/src/",
+                                "uri": "file:///F:/source/repos/wddst-2/src/",
                                 "description": {
                                     "text": "The QL pack root directory."
                                 },
@@ -95,7 +126,7 @@
                                 }
                             },
                             {
-                                "uri": "file:///C:/codeql-home/WDDST/src/qlpack.yml",
+                                "uri": "file:///F:/source/repos/wddst-2/src/qlpack.yml",
                                 "description": {
                                     "text": "The QL pack definition file."
                                 },
@@ -109,10 +140,10 @@
                     },
                     {
                         "name": "codeql/cpp-all",
-                        "semanticVersion": "3.1.0+d42788844f7ec0a6b9832140313cc2318e513987",
+                        "semanticVersion": "7.0.0+c5329f6f3863621c140ea7abd5954860e96c8bf1",
                         "locations": [
                             {
-                                "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/",
+                                "uri": "file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/7.0.0/",
                                 "description": {
                                     "text": "The QL pack root directory."
                                 },
@@ -123,7 +154,7 @@
                                 }
                             },
                             {
-                                "uri": "file:///C:/Users/jronstadt/.codeql/packages/codeql/cpp-all/3.1.0/qlpack.yml",
+                                "uri": "file:///C:/Users/natede/.codeql/packages/codeql/cpp-all/7.0.0/qlpack.yml",
                                 "description": {
                                     "text": "The QL pack definition file."
                                 },
@@ -147,7 +178,7 @@
                                         "artifactLocation": {
                                             "uri": "Source.cpp",
                                             "uriBaseId": "%SRCROOT%",
-                                            "index": 0
+                                            "index": 1
                                         }
                                     }
                                 }
@@ -173,7 +204,7 @@
                                         "artifactLocation": {
                                             "uri": "driver_snippet.c",
                                             "uriBaseId": "%SRCROOT%",
-                                            "index": 1
+                                            "index": 0
                                         }
                                     }
                                 }
@@ -194,14 +225,56 @@
                         },
                         {
                             "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "timeUtc": "2026-05-28T00:58:17.868214700Z",
+                            "descriptor": {
+                                "id": "cli/file-coverage-baseline",
+                                "index": 1
+                            },
+                            "properties": {
+                                "attributes": {
+                                    "durationMilliseconds": 319
+                                },
+                                "visibility": {
+                                    "statusPage": false,
+                                    "telemetry": true
+                                }
+                            }
+                        },
+                        {
+                            "message": {
+                                "text": ""
+                            },
+                            "level": "none",
+                            "timeUtc": "2026-05-28T00:58:17.871691800Z",
+                            "descriptor": {
+                                "id": "cli/platform",
+                                "index": 2
+                            },
+                            "properties": {
+                                "attributes": {
+                                    "arch": "amd64",
+                                    "name": "Windows 11",
+                                    "version": "10.0"
+                                },
+                                "visibility": {
+                                    "statusPage": false,
+                                    "telemetry": true
+                                }
+                            }
+                        },
+                        {
+                            "message": {
                                 "text": "Internal telemetry for the C++ extractor.\n\nNo action needed.",
                                 "markdown": "Internal telemetry for the C++ extractor.\n\nNo action needed."
                             },
                             "level": "note",
-                            "timeUtc": "2025-02-11T03:13:43.543961700Z",
+                            "timeUtc": "2026-05-28T00:58:47.592215400Z",
                             "descriptor": {
                                 "id": "cpp/extractor/summary",
-                                "index": 1
+                                "index": 3
                             },
                             "properties": {
                                 "attributes": {
@@ -210,7 +283,7 @@
                                     "compilers": [
                                         {
                                             "program": "cl",
-                                            "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.42.34436 for x64"
+                                            "version": "Microsoft (R) C/C++ Optimizing Compiler Version 19.51.36244 for x64"
                                         }
                                     ],
                                     "extractor-failures": 0,
@@ -230,20 +303,52 @@
             "artifacts": [
                 {
                     "location": {
-                        "uri": "Source.cpp",
+                        "uri": "driver_snippet.c",
                         "uriBaseId": "%SRCROOT%",
                         "index": 0
                     }
                 },
                 {
                     "location": {
-                        "uri": "driver_snippet.c",
+                        "uri": "Source.cpp",
                         "uriBaseId": "%SRCROOT%",
                         "index": 1
                     }
                 }
             ],
-            "results": [],
+            "results": [
+                {
+                    "ruleId": "cpp/drivers/unsafe-call-in-global-init",
+                    "ruleIndex": 0,
+                    "rule": {
+                        "id": "cpp/drivers/unsafe-call-in-global-init",
+                        "index": 0
+                    },
+                    "message": {
+                        "text": "Unsafe call in DllMain: LoadLibraryW.  Review Dynamic-Link Library Best Practices."
+                    },
+                    "locations": [
+                        {
+                            "physicalLocation": {
+                                "artifactLocation": {
+                                    "uri": "driver_snippet.c",
+                                    "uriBaseId": "%SRCROOT%",
+                                    "index": 0
+                                },
+                                "region": {
+                                    "startLine": 13,
+                                    "startColumn": 24,
+                                    "endColumn": 31
+                                }
+                            }
+                        }
+                    ],
+                    "partialFingerprints": {
+                        "primaryLocationLineHash": "1a32903747849c92:1",
+                        "primaryLocationStartColumnFingerprint": "23"
+                    }
+                }
+            ],
             "columnKind": "utf16CodeUnits",
             "properties": {
                 "semmle.formatSpecifier": "sarifv2.1.0"
