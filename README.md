@@ -15,7 +15,7 @@ Either of the options in the below table is accepted for 26H1.  Please note that
 
 |  CodeQL CLI Version      | microsoft/windows-drivers CodeQL Pack Version | microsoft/cpp-queries CodeQL Pack Version | Associated Repo Branch|
 |--------------------------|------------------------------------------|-------------------------------|-----------------------------|
-|  2.25.5 | [1.10.0](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers/655126590?tag=1.10.0) | 0.0.5 | Main |
+|  2.25.5 | [1.10.0](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers/900152685?tag=1.10.0) | 0.0.5 | Main |
 |  2.24.1 | [1.8.2](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers/655126590?tag=1.8.2) | 0.0.4 | Main |
 
 See appendix for information on CLI+query version combinations for previous Windows releases and WHCP programs.
