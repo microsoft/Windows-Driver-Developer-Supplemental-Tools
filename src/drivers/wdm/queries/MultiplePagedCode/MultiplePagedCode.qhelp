@@ -21,4 +21,17 @@
 			</a>
 		</li>
 	</references>
+	<semmleNotes>
+		<!-- === AI-generated === -->
+		<p>
+			<b>C++ function template support.</b> When the same
+			source-level <code>PAGED_CODE</code> is expanded into multiple
+			template instantiations, the query collapses all
+			instantiations into a single match key (via the underlying
+			<code>TemplateFunction</code>) so a duplicate inside a
+			templated paged function body is reported once at the
+			source-level location. Specialisations and non-template
+			paged functions are excluded.
+		</p>
+	</semmleNotes>
 </qhelp>

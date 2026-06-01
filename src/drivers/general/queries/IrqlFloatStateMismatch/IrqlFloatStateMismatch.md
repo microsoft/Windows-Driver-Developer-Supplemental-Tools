@@ -52,3 +52,13 @@ Correct example
 
 ## References
 * [ C28111 ](https://learn.microsoft.com/en-us/windows-hardware/drivers/devtest/28111-floating-point-irql-mismatch)
+
+## Semmle-specific notes
+**Wrapper / common-caller pattern.** The query searches for IRQL-changing calls between save and restore in either their shared enclosing function, or — when one or both endpoints sit inside a thin one-level helper (e.g. `save_fp_helper` forwarding to `KeSaveFloatingPointState`) — in the common caller of those helpers.
+
+**Known false negatives:**
+
+* **IRQL changes deep inside helper bodies.** If a helper raises/lowers IRQL between its entry and the save/restore primitive it forwards to, that change isn't visible from the common caller. Annotate the helper with `_IRQL_raises_` / `_IRQL_saves_global_` to make its IRQL behavior visible without body inspection.
+* **Indirect calls.** IRQL changes via function pointer or dispatch-table dispatch are not recognized; the predicate inspects only the static call target.
+* **Loops where restore is textually before save.** The AST-loop branch of `irqlChangesBetween` correctly recognizes such patterns, but the upstream IRQL cascade does not always bind at `KeSaveFloatingPointState`'s argument expression inside loop bodies, so the `irqlSource != irqlSink` filter rejects them before this predicate fires. Recovering this case needs work in `Irql.qll`.
+* **Wrapper chains longer than one level.** Only one level of helper wrapping is modelled. Multi-level wrappers need the annotation hint above, or a direct call site.

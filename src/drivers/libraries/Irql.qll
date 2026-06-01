@@ -208,6 +208,54 @@
          then result = this.getIrqlLevelString().toInt()
          else result = -1
    }
+
+   /**
+    * Holds if this is a `_When_` annotation whose condition is demonstrably
+    * false at call site `call`.
+    *
+    * Callers should only pass the annotation that supplied the IRQL
+    * requirement being checked -- otherwise an unrelated `_When_` clause on
+    * the same function (e.g. the `Wait==1` clause when we are evaluating the
+    * `Wait==0` clause on `KeSetEvent`) would suppress legitimate findings.
+    */
+   predicate whenConditionIsFalseAtCallSite(FunctionCall call) {
+     this.getMacroName() = "_When_" and
+     exists(string cond, string paramName, int paramIdx |
+       cond = this.getUnexpandedArgument(0) and
+       call.getTarget().getParameter(paramIdx).getName() = paramName and
+       (
+         // "Param != 0" is false when arg is 0
+         paramName = cond.regexpCapture("(\\w+)\\s*!=\\s*0", 1) and
+         call.getArgument(paramIdx).getValue() = "0"
+         or
+         // "Param == N" (N>0) is false when arg is 0
+         paramName = cond.regexpCapture("(\\w+)\\s*==\\s*([1-9]\\d*)", 1) and
+         call.getArgument(paramIdx).getValue() = "0"
+         or
+         // "Param == 0" is false when arg is nonzero
+         paramName = cond.regexpCapture("(\\w+)\\s*==\\s*0", 1) and
+         call.getArgument(paramIdx).getValue() != "0"
+         or
+         // "Param != NULL" is false when arg is 0/NULL
+         paramName = cond.regexpCapture("(\\w+)\\s*!=\\s*NULL", 1) and
+         call.getArgument(paramIdx).getValue() = "0"
+         or
+         // "((Param & 0x1)) <op> 0" -- bitwise mask check.
+         // False when bit 0 is clear and op is "!=", or bit 0 is set and op is "==".
+         exists(string op, int argVal |
+           paramName =
+             cond.regexpCapture(".*\\(\\s*(\\w+)\\s*&\\s*0x1\\s*\\).*(==|!=)\\s*0.*", 1) and
+           op = cond.regexpCapture(".*\\(\\s*(\\w+)\\s*&\\s*0x1\\s*\\).*(==|!=)\\s*0.*", 2) and
+           argVal = call.getArgument(paramIdx).getValue().toInt() and
+           (
+             op = "!=" and argVal.bitAnd(1) = 0
+             or
+             op = "==" and argVal.bitAnd(1) != 0
+           )
+         )
+       )
+     )
+   }
  }
  
  /** Represents an "\_IRQL\_requires\_same\_" annotation. */
@@ -485,13 +533,13 @@
     * "the IRQL before the corresponding save global call."
     */
    int getIrqlLevel() {
-     result = any(getPotentialExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
+     result = any(getPotentialExitIrqlAtCfnInternal(this.getMostRecentRaise().getAPredecessor()))
    }
- 
+
    int getIrqlLevelExplicit() {
      result = any(getExplicitExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
    }
- 
+
    /** Returns the matching call to a function that saved the IRQL. */
    IrqlSaveCall getMostRecentRaise() {
      result =
@@ -565,7 +613,7 @@
     */
    int getIrqlLevel() {
      result =
-       any(getPotentialExitIrqlAtCfn(this.getMostRecentRaiseInterprocedural().getAPredecessor()))
+       any(getPotentialExitIrqlAtCfnInternal(this.getMostRecentRaiseInterprocedural().getAPredecessor()))
    }
  
    int getIrqlLevelExplicit() {
@@ -616,13 +664,13 @@
     * "the IRQL before the corresponding save global call."
     */
    int getIrqlLevel() {
-     result = any(getPotentialExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
+     result = any(getPotentialExitIrqlAtCfnInternal(this.getMostRecentRaise().getAPredecessor()))
    }
- 
+
    int getIrqlLevelExplicit() {
      result = any(getExplicitExitIrqlAtCfn(this.getMostRecentRaise().getAPredecessor()))
    }
- 
+
    /**
     * Returns the matching call to a function that saved the IRQL to a global state.
     *
@@ -674,8 +722,46 @@
    )
    or
    not exists(Expr child | child = e1.getAChild() or child = e2.getAChild())
- }
+}
  
+ /** Utility function to get all exit points of a function. */
+ pragma[nomagic]
+ private ControlFlowNode getAnExitPointOfFunction(Function f) {
+   result.getControlFlowScope() = f and
+   functionExit(result)
+ }
+
+ /**
+  * --- AI-generated ---
+  *
+  * Pre-computed summary: the potential exit IRQL of function `f`,
+  * computed once per function rather than re-discovered per call site.
+  *
+  * Calls the Internal cascade directly rather than the public wrapper
+  * so that this internal building block stays inside a single recursive
+  * stratum with the cascade.  The wrapper layers an AST-level fallback
+  * over Internal using a negation, which would otherwise cycle back
+  * through here.  Equivalent to the historical pre-wrapper behaviour
+  * because the wrapper agrees with Internal on every input where
+  * Internal binds.
+  */
+ pragma[nomagic]
+ private int functionExitIrql(Function f) {
+   result = getPotentialExitIrqlAtCfnInternal(getAnExitPointOfFunction(f))
+ }
+
+ /**
+  * --- AI-generated ---
+  *
+  * Gets the set of predecessor nodes from callers for function `callee`.
+  * This pre-computes the reverse call-graph edge for interprocedural analysis
+  * and is restricted to actual call sites.
+  */
+ pragma[nomagic]
+ private ControlFlowNode callerPredecessor(Function callee) {
+   result.getASuccessor().(FunctionCall).getTarget() = callee
+ }
+
  /**
   * Attempt to provide the IRQL **once this control flow node exits**, based on annotations and direct calls to raising/lowering functions.
   * This predicate functions as follows:
@@ -684,16 +770,42 @@
   * - If calling a function annotated to restore the IRQL from a previously saved spot, then the result is the IRQL before that save call.
   * - If calling a function annotated to raise the IRQL, then it returns the annotated value (the target IRQL).
   * - If calling a function annotated to maintain the same IRQL, then the result is the IRQL at the previous CFN.
-  * - If this node is calling a function with no annotations, the result is the IRQL that function exits at.
+  * - If this node is calling a function with no annotations, the result is the IRQL that function exits at (pre-computed per function).
   * - If there is a prior CFN in the CFG, the result is the result for that prior CFN.
   * - If there is no prior CFN, then the result is whatever the IRQL was at a statement prior to a function call to this function (a lazy interprocedural analysis.)
   * - If there are no prior CFNs and no calls to this function, then the IRQL is determined by annotations applied to this function.
   * - Failing all this, we set the IRQL to 0.
   *
+  * --- AI-generated (layering note) ---
+  *
+  * Layering: this wraps the recursive cascade
+  * `getPotentialExitIrqlAtCfnInternal` with `astLevelExitIrqlFallback`,
+  * which fires only when the cascade binds nothing. The fallback walks
+  * one source-line step back to the nearest preceding sibling Stmt, and
+  * is restricted to CFNs inside loop bodies (the empirical failure
+  * mode for argument-expression CFNs reached via a back-edge). When the
+  * cascade already binds, this wrapper returns exactly the cascade's
+  * result set: the fallback never widens an existing binding.
+  *
   * Not implemented: _IRQL_limited_to_
   */
- 
  int getPotentialExitIrqlAtCfn(ControlFlowNode cfn) {
+   result = getPotentialExitIrqlAtCfnInternal(cfn)
+   or
+   not exists(getPotentialExitIrqlAtCfnInternal(cfn)) and
+   result = astLevelExitIrqlFallback(cfn)
+ }
+
+ /**
+  * --- AI-generated ---
+  *
+  * Internal recursive cascade for `getPotentialExitIrqlAtCfn`.  Behaves
+  * exactly like the historical `getPotentialExitIrqlAtCfn` did before
+  * the AST fallback wrapper was introduced.  Callers should use
+  * `getPotentialExitIrqlAtCfn` instead, which additionally consults
+  * `astLevelExitIrqlFallback` when this cascade yields no value.
+  */
+ private int getPotentialExitIrqlAtCfnInternal(ControlFlowNode cfn) {
    if cfn instanceof KeRaiseIrqlCall
    then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
    else
@@ -714,33 +826,18 @@
              if
                cfn instanceof FunctionCall and
                cfn.(FunctionCall).getTarget() instanceof IrqlRequiresSameAnnotatedFunction
-             then result = any(getPotentialExitIrqlAtCfn(cfn.getAPredecessor()))
+             then result = getPotentialExitIrqlAtCfnInternal(cfn.getAPredecessor())
              else
                if cfn instanceof FunctionCall
-               then
-                 result =
-                   any(getPotentialExitIrqlAtCfn(getExitPointsOfFunction(cfn.(FunctionCall)
-                               .getTarget()))
-                   )
+               then result = functionExitIrql(cfn.(FunctionCall).getTarget())
                else
                  if exists(ControlFlowNode cfn2 | cfn2 = cfn.getAPredecessor())
-                 then result = any(getPotentialExitIrqlAtCfn(cfn.getAPredecessor()))
+                 then result = getPotentialExitIrqlAtCfnInternal(cfn.getAPredecessor())
                  else
-                   if
-                     exists(FunctionCall fc, ControlFlowNode cfn2 |
-                       fc.getTarget() = cfn.getControlFlowScope() and
-                       cfn2.getASuccessor() = fc
-                     )
+                   if exists(callerPredecessor(cfn.getControlFlowScope()))
                    then
-                     // TODO: Check that this node is actually a function entry point and not just
-                     // an isolated part of the CFN.  Sometimes we get nodes that are "in" a function's
-                     // CFN, but have no predecessors, but are not function entry.  (Why?)
                      result =
-                       any(getPotentialExitIrqlAtCfn(any(ControlFlowNode cfn2 |
-                               cfn2.getASuccessor().(FunctionCall).getTarget() =
-                                 cfn.getControlFlowScope()
-                             ))
-                       )
+                       getPotentialExitIrqlAtCfnInternal(callerPredecessor(cfn.getControlFlowScope()))
                    else
                      if
                        cfn.getControlFlowScope() instanceof IrqlRestrictsFunction and
@@ -748,13 +845,43 @@
                      then result = getAllowableIrqlLevel(cfn.getControlFlowScope())
                      else result = 0
  }
- 
- 
+
+ /**
+  * --- AI-generated ---
+  *
+  * AST-level fallback for `getPotentialExitIrqlAtCfn`. Returns the
+  * cascade's IRQL at the closest preceding sibling Stmt of `cfn`'s
+  * enclosing Stmt within the same parent. No value when there is no
+  * preceding sibling, or when the cascade is also silent there.
+  *
+  * Restricted to CFNs inside a loop body — that's the empirical
+  * failure mode where the cascade's predecessor walk doesn't bind on
+  * argument-expression CFNs reached via a loop back-edge. Outside
+  * loops, the cascade's silence often reflects branching the AST scan
+  * can't see (e.g. an if-stmt whose body raises and lowers IRQL), so
+  * we don't fall back there.
+  *
+  * Consulted by `getPotentialExitIrqlAtCfn` only when the cascade is
+  * silent; never widens an existing binding.
+  */
+ private int astLevelExitIrqlFallback(ControlFlowNode cfn) {
+   exists(Stmt cfnStmt, Stmt prev, Loop l |
+     cfnStmt = cfn.getEnclosingStmt() and
+     cfnStmt.getParent+() = l and
+     prev.getParentStmt() = cfnStmt.getParentStmt() and
+     prev.getLocation().getStartLine() < cfnStmt.getLocation().getStartLine() and
+     not exists(Stmt closer |
+       closer.getParentStmt() = cfnStmt.getParentStmt() and
+       closer.getLocation().getStartLine() < cfnStmt.getLocation().getStartLine() and
+       closer.getLocation().getStartLine() > prev.getLocation().getStartLine()
+     ) and
+     result = getPotentialExitIrqlAtCfnInternal(prev)
+   )
+ }
+
  /*
   * Similar to above, but only exit points where the Irql is explicit
   */
- 
- 
  int getExplicitExitIrqlAtCfn(ControlFlowNode cfn) {
    if cfn instanceof KeRaiseIrqlCall
    then result = cfn.(KeRaiseIrqlCall).getIrqlLevel()
@@ -776,31 +903,16 @@
              if
                cfn instanceof FunctionCall and
                cfn.(FunctionCall).getTarget() instanceof IrqlRequiresSameAnnotatedFunction
-             then result = any(getExplicitExitIrqlAtCfn(cfn.getAPredecessor()))
+             then result = getExplicitExitIrqlAtCfn(cfn.getAPredecessor())
              else (
                if exists(ControlFlowNode cfn2 | cfn2 = cfn.getAPredecessor())
-               then result = any(getExplicitExitIrqlAtCfn(cfn.getAPredecessor()))
+               then result = getExplicitExitIrqlAtCfn(cfn.getAPredecessor())
                else
                  result =
-                   any(getExplicitExitIrqlAtCfn(any(ControlFlowNode cfn2 |
-                           cfn2.getASuccessor().(FunctionCall).getTarget() =
-                             cfn.getControlFlowScope()
-                         ))
-                   )
+                   getExplicitExitIrqlAtCfn(callerPredecessor(cfn.getControlFlowScope()))
              )
  }
- 
- import semmle.code.cpp.controlflow.Dominance
- 
- /** Utility function to get exit points of a function. */
- private ControlFlowNode getExitPointsOfFunction(Function f) {
-   result =
-     any(ControlFlowNode cfn |
-       cfn.getControlFlowScope() = f and
-       functionExit(cfn)
-     )
- }
- 
+
  /**
   * Attempt to find the range of valid IRQL values when **entering** a given IRQL-annotated function.
   * This is used as a heuristic when no other IRQL information is available (i.e. we are at the top
@@ -884,3 +996,89 @@
    )
  }
  
+  /**
+   * --- AI-generated ---
+   *
+   * Holds if `call` sits in the "then" branch of an `if` whose
+   * condition is either a compile-time-constant 0/FALSE, or a
+   * non-static local variable initialized to 0/FALSE that is never
+   * reassigned, incremented, or address-taken in the enclosing
+   * function.
+   *
+   * Detects e.g.:
+   * ```
+   * BOOLEAN bFalse = FALSE;
+   * if (bFalse) { KeAcquireSpinLockAtDpcLevel(...); }  // dead branch
+   * ```
+   * Common in NDIS macros (FILTER_ACQUIRE_LOCK, NPROT_ACQUIRE_LOCK).
+   *
+   * The strict mutation checks (LocalVariable, !isStatic, Assignment
+   * matching `=` and compound ops, CrementOperation, no AddressOfExpr)
+   * exist so we don't suppress findings when the variable could
+   * plausibly hold a non-FALSE value at runtime — i.e. globals,
+   * function-statics, or values written through a pointer parameter.
+   */
+  predicate isInConstantFalseBranch(FunctionCall call) {
+    exists(IfStmt ifStmt |
+      ifStmt.getThen().getAChild*() = call and
+      (
+        // Condition is a literal 0 / false (or any compile-time constant 0).
+        ifStmt.getCondition().getValue() = "0"
+        or
+        // Condition is a variable access to a non-static local variable
+        // that is initialized to 0/FALSE and never mutated.
+        exists(LocalVariable v |
+          ifStmt.getCondition().(VariableAccess).getTarget() = v and
+          not v.isStatic() and
+          v.getInitializer().getExpr().getValue() = "0" and
+          not exists(Assignment a |
+            a.getLValue().(VariableAccess).getTarget() = v and
+            a.getEnclosingFunction() = call.getEnclosingFunction()
+          ) and
+          not exists(CrementOperation co |
+            co.getOperand().(VariableAccess).getTarget() = v and
+            co.getEnclosingFunction() = call.getEnclosingFunction()
+          ) and
+          not exists(AddressOfExpr ao |
+            ao.getOperand().(VariableAccess).getTarget() = v
+          )
+        )
+      )
+    )
+  }
+ /**
+  * --- AI-generated ---
+  *
+  * Holds if `fc` is a call that may change the IRQL: an IRQL primitive
+  * (`Ke*Irql*Call`, `*GlobalIrqlCall`), a function annotated
+  * `_IRQL_raises_` / `_IRQL_saves_global_` / `_IRQL_restores_global_`,
+  * or any function whose body transitively contains such a call. The
+  * transitive closure catches unannotated wrapper helpers. Lifted from
+  * IFSM.ql so other queries (e.g. IIWR) can use the same soundness check.
+  */
+ predicate isIrqlChangingCall(FunctionCall fc) {
+   fc instanceof KeRaiseIrqlCall
+   or
+   fc instanceof KeLowerIrqlCall
+   or
+   fc instanceof RestoresGlobalIrqlCall
+   or
+   fc instanceof SavesGlobalIrqlCall
+   or
+   isIrqlChangingFunction(fc.getTarget())
+ }
+
+ /**
+  * --- AI-generated ---
+  *
+  * Holds if `f` directly or transitively contains an IRQL-changing call.
+  * See `isIrqlChangingCall`.
+  */
+ predicate isIrqlChangingFunction(Function f) {
+   f instanceof IrqlChangesFunction
+   or
+   exists(FunctionCall inner |
+     inner.getEnclosingFunction() = f and
+     isIrqlChangingCall(inner)
+   )
+ }

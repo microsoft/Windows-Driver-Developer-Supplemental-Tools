@@ -1,0 +1,28 @@
+<Project>
+  <!--
+    Auto-imported by MSBuild AFTER each project's main targets (including the
+    WDK targets pulled in by Directory.Build.props), for every project under
+    src\drivers\test\.
+
+    Override the WDK's `ApiValidator` post-build target with an empty target.
+    The WDK NuGet packages restored by the CI workflow do not ship the
+    `ApiValidator.exe` binary even though they reference its path in
+    `WindowsDriver.common.targets`.  Without this override the target fails
+    with:
+
+        error MSB3721: The command "...\ApiValidator.exe -DriverPackagePath:..."
+        exited with code 1
+
+    breaking the `codeql database create` invocation for tests built with the
+    Universal driver target platform (UnsafeCallInGlobalInit,
+    MultithreadedAVCondition, StaticInitializer, DeviceInitApi, FloatSafeExit,
+    FloatUnsafeExit, ...).
+
+    API validation is irrelevant to the CodeQL static analysis these tests
+    perform, so replacing the target with a no-op is safe here.  Setting
+    `ApiValidatorExePath` to an empty value would still leave the target
+    running an empty exec; replacing the target itself is the most reliable
+    suppression.
+  -->
+  <Target Name="ApiValidator" />
+</Project>

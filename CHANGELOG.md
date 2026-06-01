@@ -2,6 +2,22 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.10.0] - 2026-05-12
+
+### Added
+- Added the following recommended rules to our Microsoft subfolder.  These rules are *not* part of our must-run set at this time.
+     - NonConstantFormat.ql: Detects printf-like function calls where the format string argument does not originate from a string literal, which could lead to format string vulnerabilities.
+     - ImproperNullTermination.ql: Detects uses of strings that may not be null-terminated being passed to string functions, which can cause buffer overflows or over-reads.
+     - StrncpyFlippedArgs.ql: Detects calls to strncpy where the size argument is based on the source buffer size instead of the destination, potentially causing buffer overflows.
+     - UnsafeUseOfStrcat.ql: Detects uses of strcat where the source string size is not checked before concatenation, which may result in buffer overflow.
+     - ArithmeticUncontrolled.ql: Detects arithmetic operations on data from random number generators that lack validation, potentially causing integer overflows.
+     - ArithmeticWithExtremeValues.ql: Detects arithmetic operations on variables assigned extreme values (INT_MAX, INT_MIN, etc.) that could cause overflow or underflow.
+
+### Fixed
+ - Reduced false positive rate for InvalidFunctionClassTypedef.ql, IrqlAnnotationIssue.ql, IrqlTooHigh.ql, IrqlTooLow.ql, IllegalFieldAccess2.ql, OpaqueMdlUse.ql, OpaqueMdlWrite.ql, and UnguardedNullReturnDereference.ql.  Thanks to zx2c4 for the contribution.
+ - Significantly improved performance for DriverAlertSuppression.ql and MultiplePagedCode.ql.
+ - Moderately improved performance and further reduced false positive rate for all IRQL queries.
+
 ## [1.9.0] - 2026-02-27
 
 ### Added

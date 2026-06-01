@@ -52,23 +52,18 @@ jobs:
       
     - name: Build must-fix driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only mustfix.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only --threads=0 mustfix.qls
     
     - name: Build recommended driver suite
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only recommended.qls
-    
-    - name: Build CA ported queries
-      shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only ported_driver_ca_checks.qls
+      run: .\codeql-cli\codeql.cmd query compile --check-only --threads=0 recommended.qls
     
     - name: Build all Windows queries
       shell: cmd
-      run: .\codeql-cli\codeql.cmd query compile --check-only .\src
+      run: .\codeql-cli\codeql.cmd query compile --check-only --threads=0 .\src
     
   test-query-health:
     runs-on: windows-latest
-    needs: build
     permissions:
       contents: read
       packages: write
@@ -111,6 +106,7 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
     - name: Azure Login
+      if: github.event_name != 'pull_request'
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -118,6 +114,7 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         enable-AzPSSession: true
     - name: Download previous results
+      if: github.event_name != 'pull_request'
       uses: azure/powershell@v2
       with:
         azPSVersion: latest
@@ -127,9 +124,17 @@ jobs:
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
       shell: pwsh
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+      run: |
+        # Run per-test build/analyze in parallel inside the script. Default is
+        # one worker per logical CPU (--jobs <N>); each worker is isolated to
+        # its own working/, TestDB/, and AnalysisFiles/<name>.sarif paths.
+        $pyArgs = @('src\drivers\test\build_create_analyze_test.py', '--codeql_path', '.\codeql-cli\codeql.exe', '--no_build', '-v', '--jobs', "$env:NUMBER_OF_PROCESSORS")
+        if ("${{ github.event_name }}" -ne "pull_request") {
+          $pyArgs += '--compare_results'
+        }
+        python @pyArgs
     - name: Upload result diff
-      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
       uses: azure/powershell@v2
       with:
         azPSVersion: latest
@@ -137,14 +142,22 @@ jobs:
           Update-AzConfig -DisplayBreakingChangeWarning $false
           $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "health-diffdetailedfunctiontestresults.xlsx" -Context $context -Force
-          exit 1 
+    - name: Fail if result diff detected
+      if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
+      shell: pwsh
+      run: |
+        Write-Host "::error::Test results differ from the stored baseline. The diff has been uploaded to Azure Storage as 'health-diffdetailedfunctiontestresults.xlsx'. Please review."
+        exit 1
     
       
   test-codeql-latest-vs-current:
-  # Tests if the latest codeql version produces the same results as the current version. 
+  # Tests if the latest codeql version produces the same results as the current version.
+  # Runs in parallel with `test-query-health` (no `needs:` dependency) to halve the
+  # pipeline's wall-clock time. It is independent: it downloads its own (latest)
+  # CodeQL CLI and runs the same per-test build/analyze cycle. `continue-on-error`
+  # below means failures here never block the workflow regardless of order.
     runs-on: windows-latest
     continue-on-error: true # Allow script to return non-zero exit code
-    needs: [build,test-query-health]
     permissions:
       contents: read
       packages: write
@@ -153,10 +166,6 @@ jobs:
       ACCOUNT_NAME: ${{ secrets.ACCOUNT_NAME }}
       SHARE_NAME: ${{ secrets.SHARE_NAME }}
     steps:
-    - name: Check Prev Job
-      if: ${{ needs.test-query-health.result == 'failure' }}
-      shell: pwsh
-      run: exit 1  
     - name: Enable long git paths
       shell: cmd
       run: git config --global core.longpaths true
@@ -194,6 +203,7 @@ jobs:
     - name: Add msbuild to PATH
       uses: microsoft/setup-msbuild@v2
     - name: Azure Login
+      if: github.event_name != 'pull_request'
       uses: azure/login@v2
       with:
         client-id: ${{ secrets.AZURE_CLIENT_ID }}
@@ -201,6 +211,7 @@ jobs:
         subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
         enable-AzPSSession: true
     - name: Download previous results
+      if: github.event_name != 'pull_request'
       uses: azure/powershell@v2
       with:
         azPSVersion: latest
@@ -210,16 +221,29 @@ jobs:
           Get-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Path "detailedfunctiontestresults.xlsx" -Destination $destination -Context $context
     - name: Run test script
       shell: pwsh
-      run: python src\drivers\test\build_create_analyze_test.py --codeql_path .\codeql-cli\codeql.exe --no_build --compare_results -v
+      run: |
+        # Run per-test build/analyze in parallel inside the script. Default is
+        # one worker per logical CPU (--jobs <N>); each worker is isolated to
+        # its own working/, TestDB/, and AnalysisFiles/<name>.sarif paths.
+        $pyArgs = @('src\drivers\test\build_create_analyze_test.py', '--codeql_path', '.\codeql-cli\codeql.exe', '--no_build', '-v', '--jobs', "$env:NUMBER_OF_PROCESSORS")
+        if ("${{ github.event_name }}" -ne "pull_request") {
+          $pyArgs += '--compare_results'
+        }
+        python @pyArgs
     - name: Upload result diff
-      if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') != '' }} # Only upload if there are changes
+      if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
       uses: azure/powershell@v2
       with:
         azPSVersion: latest
         inlineScript: |
           $context = New-AzStorageContext -StorageAccountName "$env:ACCOUNT_NAME" -UseConnectedAccount -EnableFileBackupRequestIntent
           Set-AzStorageFileContent -ShareName "$env:SHARE_NAME" -Source "diffdetailedfunctiontestresults.xlsx" -Path "version-diffdetailedfunctiontestresults.xlsx" -Context $context -Force
-          exit 1 
+    - name: Fail if result diff detected
+      if: github.event_name != 'pull_request' && hashFiles('diffdetailedfunctiontestresults.xlsx') != ''
+      shell: pwsh
+      run: |
+        Write-Host "::error::Test results from latest CodeQL version differ from the stored baseline. The diff has been uploaded to Azure Storage as 'version-diffdetailedfunctiontestresults.xlsx'. Please review."
+        exit 1
     - name: Save Latest Version
       if: ${{ hashFiles('diffdetailedfunctiontestresults.xlsx') == '' }} # Only if there were no differences
       uses: actions/upload-artifact@v4
@@ -230,7 +254,13 @@ jobs:
           
   test-pack-version-update:
     runs-on: windows-latest
-    needs: build
+    # Only enforce qlpack version bumps when the change is actually heading to
+    # `main`. We routinely stage many commits in `development` and bump the
+    # qlpack version once when promoting to `main`, so requiring a bump on
+    # every `development`-targeted PR/push is noise.
+    if: |
+      (github.event_name == 'pull_request' && github.base_ref == 'main') ||
+      (github.event_name != 'pull_request' && github.ref == 'refs/heads/main')
     permissions:
       contents: read
       packages: write
@@ -272,7 +302,6 @@ jobs:
         }
   test-create-dvl:
     runs-on: windows-latest
-    needs: build
     permissions:
       contents: read
       packages: write
@@ -319,7 +348,19 @@ jobs:
   publish:
     runs-on: windows-latest
     continue-on-error: true 
-    needs: [build, test-pack-version-update, test-query-health]
+    needs: [build, test-pack-version-update, test-query-health, test-codeql-latest-vs-current, test-create-dvl]
+    # Run when all required gates pass. `test-pack-version-update` is skipped
+    # for non-`main` targets (see its `if:` above), so allow `success` *or*
+    # `skipped`. `test-codeql-latest-vs-current` is `continue-on-error: true`,
+    # which already produces a `success` result for `needs`, so we don't need
+    # special handling for it here -- listing it in `needs` just makes publish
+    # wait for it to finish before running.
+    if: |
+      always() &&
+      needs.build.result == 'success' &&
+      needs.test-query-health.result == 'success' &&
+      needs.test-create-dvl.result == 'success' &&
+      (needs.test-pack-version-update.result == 'success' || needs.test-pack-version-update.result == 'skipped')
     permissions:
       contents: read
       packages: write

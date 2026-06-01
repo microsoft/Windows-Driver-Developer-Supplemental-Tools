@@ -30,7 +30,14 @@ where
   entryCfn = f.getBlock() and
   irqlLevelEntry = getPotentialExitIrqlAtCfn(entryCfn) and
   irqlLevelExit = getPotentialExitIrqlAtCfn(exitCfn) and
-  irqlLevelEntry != irqlLevelExit
+  irqlLevelEntry != irqlLevelExit and
+  // Soundness filter: only flag if `f` actually contains an IRQL-changing
+  // call (directly or transitively through a wrapper).  This is necessary 
+  // due to our IRQL CFG analysis producing ranges of potential IRQLs.
+  exists(FunctionCall fc |
+    fc.getEnclosingFunction() = f and
+    isIrqlChangingCall(fc)
+  )
 select f,
   "Possible IRQL level at function completion inconsistent with the required IRQL level for some path. Irql level expected: "
     + irqlLevelEntry + ". Irql level found: " + irqlLevelExit +

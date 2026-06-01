@@ -22,8 +22,63 @@ except ImportError as e:
 
 
 print_mutex = threading.Lock()
+results_mutex = threading.Lock()
 health_df = pd.DataFrame()
 detailed_health_df = pd.DataFrame()
+
+# Progress reporting for run_tests().  ``_progress_total`` is the total number
+# of tests being executed in the current run; ``_progress_started`` is the
+# number of tests for which a worker has begun execution.  Both are guarded by
+# ``_progress_mutex`` so the "[N/total]" prefix is consistent across parallel
+# workers.
+_progress_mutex = threading.Lock()
+_progress_started = 0
+_progress_total = 0
+
+
+def _next_progress_label():
+    """Return a "[N/total]" string and atomically advance the counter."""
+    global _progress_started
+    with _progress_mutex:
+        _progress_started += 1
+        return "[{}/{}]".format(_progress_started, _progress_total)
+
+# Names of tests for which `codeql database create` failed. Tracked here
+# (rather than only in `run_tests`) so failures are still surfaced when the
+# script is invoked with --build_database_only, which legitimately returns
+# None from `run_test` on success.
+db_create_failures = []
+
+
+def _build_subprocess_env():
+    """
+    Build an environment dict for subprocess invocations of msbuild/link.exe so
+    that each concurrent invocation talks to its own private ``mspdbsrv.exe``
+    PDB server.
+
+    When the parallel test runner spawns multiple `codeql database create` ->
+    `msbuild` -> `link.exe` chains concurrently, all link.exe processes
+    inherit the same per-user `_MSPDBSRV_ENDPOINT_` and contend on a single
+    `mspdbsrv.exe` for PDB RPC. Under load this races and the RPC server
+    occasionally becomes unavailable, producing:
+
+        LINK : fatal error LNK1318: Unexpected PDB error; RPC (23) '(0x000006BA)'
+
+    Setting a unique `_MSPDBSRV_ENDPOINT_` per invocation makes link.exe
+    spawn its own dedicated mspdbsrv with a unique RPC endpoint, eliminating
+    cross-worker contention. This is the Microsoft-recommended fix for parallel
+    MSVC builds. See https://learn.microsoft.com/cpp/error-messages/tool-errors/linker-tools-error-lnk1318.
+    """
+    env = os.environ.copy()
+    env["_MSPDBSRV_ENDPOINT_"] = "wddst_{pid}_{tid}_{n}".format(
+        pid=os.getpid(),
+        tid=threading.get_ident(),
+        n=next(_endpoint_counter),
+    )
+    return env
+
+
+_endpoint_counter = itertools.count()
 
 
 def print_conditionally(*message):
@@ -363,13 +418,18 @@ def db_create_for_external_driver(sln_file, config, platform):
     out2 = subprocess.run([codeql_path, "database", "create", db_loc, "--overwrite", "-l", "cpp", "--source-root="+workdir,
                            "--command=msbuild "+ sln_file+ " -clp:Verbosity=m -t:clean,build -property:Configuration="+config+" -property:Platform="+platform + " -p:TargetVersion=Windows10 -p:SignToolWS=/fdws -p:DriverCFlagAddOn=/wd4996 -noLogo" ], 
             cwd=workdir, 
-            shell=True, capture_output=no_output  )
+            shell=True, capture_output=True, env=_build_subprocess_env()  )
     if out2.returncode != 0:
         print("Error in codeql database create: " + db_loc)
+        print("Return code: " + str(out2.returncode))
         try:
-            print(out2.stderr.decode())
-        except:
-            print(out2.stderr)
+            print("STDOUT:\n" + out2.stdout.decode(errors="replace"))
+        except Exception:
+            print("STDOUT:", out2.stdout)
+        try:
+            print("STDERR:\n" + out2.stderr.decode(errors="replace"))
+        except Exception:
+            print("STDERR:", out2.stderr)
 
         return None
     else:
@@ -405,16 +465,34 @@ def create_codeql_test_database(ql_test):
     print_conditionally(" - Database location: " + db_loc)
     print_conditionally(" - Source directory: " + source_dir)
     print_conditionally(" - Command to run: " + str(codeql_command))
+    # Always capture output so that on failure we can surface the underlying
+    # msbuild / tracer diagnostics (which CodeQL writes mostly to stdout).
+    # ``env=`` injects a unique ``_MSPDBSRV_ENDPOINT_`` so concurrent workers
+    # do not race on a shared mspdbsrv.exe (LNK1318 RPC errors).
     out2 = subprocess.run(codeql_command,
-                            shell=True, capture_output=no_output  ) 
+                            shell=True, capture_output=True, env=_build_subprocess_env()  )
     if out2.returncode != 0:
         print("Error in codeql database create: " + ql_test.get_ql_name())
+        print("Command: " + str(codeql_command))
+        print("Return code: " + str(out2.returncode))
         try:
-            print("ERROR MESSAGE:", out2.stderr.decode()  )
-        except:
-            print("ERROR MESSAGE:", out2.stderr)
+            print("STDOUT:\n" + out2.stdout.decode(errors="replace"))
+        except Exception:
+            print("STDOUT:", out2.stdout)
+        try:
+            print("STDERR:\n" + out2.stderr.decode(errors="replace"))
+        except Exception:
+            print("STDERR:", out2.stderr)
 
+        db_create_failures.append(ql_test.get_ql_name())
         return None
+    elif not no_output:
+        # In more_verbose mode, still echo the captured output for parity
+        # with previous behaviour.
+        try:
+            print(out2.stdout.decode(errors="replace"))
+        except Exception:
+            pass
     return db_loc
 
 
@@ -537,7 +615,7 @@ def run_test(ql_test):
   
     # Print test attributes
     print_mutex.acquire()
-    print("\nRunning test: " + ql_test.get_ql_name())
+    print("\n" + _next_progress_label() + " Running test: " + ql_test.get_ql_name())
     
     print_conditionally(" - Template: ", ql_test.get_template(), "\n",  
           "- Driver Framework: ", ql_test.get_ql_type(), "\n",  
@@ -803,6 +881,36 @@ def compare_health_results(curr_results_path):
         os.remove(prev_results)
         exit(0)
     
+def _run_single_test(ql_test):
+    """
+    Run a single ql_test and update the shared results DataFrames.
+    Returns the test name on failure, or None on success.  Designed to be
+    safe to invoke concurrently from a thread pool: each ql_test uses its
+    own working/, TestDB/, and AnalysisFiles/<name>.sarif paths, and shared
+    DataFrame mutations are guarded by ``results_mutex``.
+    """
+    result_sarif = run_test(ql_test)
+    if args.build_database_only:
+        return None
+    if not result_sarif:
+        with print_mutex:
+            print("Error running test: " + ql_test.get_ql_name(), "Skipping...")
+        return ql_test.get_ql_name()
+    try:
+        analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
+    except Exception as e:
+        with print_mutex:
+            print("Error reading sarif results for " + ql_test.get_ql_name() + ": " + str(e))
+        return ql_test.get_ql_name()
+    with results_mutex:
+        health_df.at[ql_test.get_ql_name(), "Result"] = str(
+            int(analysis_results['error']) +
+            int(analysis_results['warning']) +
+            int(analysis_results['note']))
+        detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results)
+    return None
+
+
 def run_tests(ql_tests_dict):
     """
     Run the given CodeQL tests.
@@ -814,16 +922,40 @@ def run_tests(ql_tests_dict):
         None
     """
     ql_tests_with_attributes = parse_attributes(ql_tests_dict)
-    
-    for ql_test in ql_tests_with_attributes:
-        result_sarif = run_test(ql_test)
-        if not args.build_database_only:
-            if not result_sarif:
-                print("Error running test: " + ql_test.get_ql_name(),"Skipping...")
-                continue
-            analysis_results, detailed_analysis_results = sarif_results(ql_test, result_sarif)
-            health_df.at[ql_test.get_ql_name(), "Result"] = str(int(analysis_results['error'])+int(analysis_results['warning'])+int(analysis_results['note']))
-            detailed_health_df.at[ql_test.get_ql_name(), "Result"] = str(detailed_analysis_results) 
+
+    total_tests = len(ql_tests_with_attributes)
+    failed_tests = []
+
+    # Reset the shared "[N/total]" progress counter for this run so each
+    # invocation of run_tests starts at [1/total].
+    global _progress_started, _progress_total
+    with _progress_mutex:
+        _progress_started = 0
+        _progress_total = total_tests
+
+    # Each ql_test runs against its own isolated working/, TestDB/, and
+    # AnalysisFiles/<name>.sarif paths, so it is safe to execute multiple
+    # tests concurrently.  ``--jobs`` controls the worker count; the default
+    # of ``os.cpu_count()`` mirrors what `msbuild` and `codeql` do internally
+    # for their own parallelism.  Use jobs=1 to fall back to the legacy
+    # sequential behaviour (useful when debugging a single test).
+    jobs = max(1, args.jobs) if args.jobs is not None else (os.cpu_count() or 1)
+    if jobs == 1:
+        for ql_test in ql_tests_with_attributes:
+            failed = _run_single_test(ql_test)
+            if failed is not None:
+                failed_tests.append(failed)
+    else:
+        with print_mutex:
+            print("Running " + str(total_tests) + " tests with " + str(jobs) + " parallel workers")
+        pool = ThreadPool(jobs)
+        try:
+            for failed in pool.imap_unordered(_run_single_test, ql_tests_with_attributes):
+                if failed is not None:
+                    failed_tests.append(failed)
+        finally:
+            pool.close()
+            pool.join()
       
     # save results
     result_file = "functiontestresults.xlsx"
@@ -839,7 +971,31 @@ def run_tests(ql_tests_dict):
         local_system_info_df.to_excel(writer, sheet_name="Local System Info")
     if args.compare_results:
         compare_health_results("detailed"+result_file)
-    
+
+    # Surface failures so the CI job no longer reports green when nothing
+    # actually ran. Database-creation failures are tracked globally so they
+    # are reported even in --build_database_only mode where `run_test`
+    # legitimately returns None on success.
+    if not args.build_database_only and failed_tests:
+        print("\n==== Test summary ====")
+        print("Total tests:   " + str(total_tests))
+        print("Failed tests:  " + str(len(failed_tests)))
+        for name in failed_tests:
+            print("  - " + name)
+        if len(failed_tests) == total_tests:
+            print("ERROR: All tests failed or were skipped. Failing the job.")
+        else:
+            print("ERROR: One or more tests failed or were skipped. Failing the job.")
+        sys.exit(1)
+
+    if db_create_failures:
+        print("\n==== Database creation summary ====")
+        print("Failed database creations: " + str(len(db_create_failures)))
+        for name in db_create_failures:
+            print("  - " + name)
+        print("ERROR: One or more `codeql database create` invocations failed. Failing the job.")
+        sys.exit(1)
+
 def find_g_template_dir(template):
     """
     Finds the directory of the given template.
@@ -894,6 +1050,7 @@ if __name__ == "__main__":
     parser.add_argument('--compare_results_no_build',help='Compare results to previous run',type=str,required=False,)
     parser.add_argument('--codeql_path', help='Path to the codeql executable',type=str,required=False,)
     parser.add_argument('--build_database_only', help='Build database only',action='store_true',required=False,)
+    parser.add_argument('-j', '--jobs', help='Number of tests to run in parallel (default: number of CPU cores). Use 1 to disable parallelism.', type=int, required=False)
     args = parser.parse_args()
            
     if args.codeql_path:

@@ -60,4 +60,51 @@
 			</a>
 		</li>
 	</references>
+	<semmleNotes>
+		<!-- === AI-generated === -->
+		<p>
+			<b>Wrapper / common-caller pattern.</b> The query searches for
+			IRQL-changing calls between save and restore in either their
+			shared enclosing function, or &#8212; when one or both endpoints
+			sit inside a thin one-level helper (e.g.
+			<code>save_fp_helper</code> forwarding to
+			<code>KeSaveFloatingPointState</code>) &#8212; in the common
+			caller of those helpers.
+		</p>
+		<p>
+			<b>Known false negatives:</b>
+		</p>
+		<ul>
+			<li>
+				<b>IRQL changes deep inside helper bodies.</b> If a helper
+				raises/lowers IRQL between its entry and the save/restore
+				primitive it forwards to, that change isn't visible from
+				the common caller. Annotate the helper with
+				<code>_IRQL_raises_</code> /
+				<code>_IRQL_saves_global_</code> to make its IRQL behavior
+				visible without body inspection.
+			</li>
+			<li>
+				<b>Indirect calls.</b> IRQL changes via function pointer or
+				dispatch-table dispatch are not recognized; the predicate
+				inspects only the static call target.
+			</li>
+			<li>
+				<b>Loops where restore is textually before save.</b> The
+				AST-loop branch of <code>irqlChangesBetween</code>
+				correctly recognizes such patterns, but the upstream IRQL
+				cascade does not always bind at
+				<code>KeSaveFloatingPointState</code>'s argument expression
+				inside loop bodies, so the
+				<code>irqlSource != irqlSink</code> filter rejects them
+				before this predicate fires. Recovering this case needs
+				work in <code>Irql.qll</code>.
+			</li>
+			<li>
+				<b>Wrapper chains longer than one level.</b> Only one level
+				of helper wrapping is modelled. Multi-level wrappers need
+				the annotation hint above, or a direct call site.
+			</li>
+		</ul>
+	</semmleNotes>
 </qhelp>

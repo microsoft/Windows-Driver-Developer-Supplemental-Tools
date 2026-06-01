@@ -79,7 +79,14 @@ class UnguardedNullReturnDereferenceReachability extends StackVariableReachabili
         .getDereferencingOperation()
         .(FunctionCall)
         .getTarget()
-        .hasGlobalName("free")
+        .hasGlobalName("free") and
+    not exists(FunctionCall fc, int i |
+      fc = node.(Dereference).getDereferencingOperation() and
+      fc.getArgument(i) = v.getAnAccess() and
+      exists(SALMaybeNull sa |
+        sa.getDeclaration() = fc.getTarget().getParameter(i)
+      )
+    )
   }
 
   override predicate isBarrier(ControlFlowNode node, StackVariable v) {
@@ -132,6 +139,19 @@ class UnguardedNullReturnDereferenceReachability extends StackVariableReachabili
         "_checked_pointer_impl", "_fail_on_unexpected_null_pointer", "_fail_on_memory_op"]
       and c.getAnArgument().getAChild*() = v.getAnAccess()
       and c = node)
+    or
+    exists(AssumeExpr ae |
+      ae = node and
+      ae.getOperand().getAChild*() = v.getAnAccess()
+    )
+    or
+    exists(MacroInvocation mi |
+      mi.getMacroName() = "_Analysis_assume_" and
+      mi.getUnexpandedArgument(0) = v.getName() and
+      node.getLocation().getFile() = mi.getLocation().getFile() and
+      node.getLocation().getStartLine() = mi.getLocation().getStartLine() and
+      node instanceof EmptyStmt
+    )
   }
 }
 
