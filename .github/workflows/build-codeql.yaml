@@ -63,7 +63,7 @@ jobs:
       run: .\codeql-cli\codeql.cmd query compile --check-only --threads=0 .\src
     
   test-query-health:
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     permissions:
       contents: read
       packages: write
@@ -156,7 +156,7 @@ jobs:
   # pipeline's wall-clock time. It is independent: it downloads its own (latest)
   # CodeQL CLI and runs the same per-test build/analyze cycle. `continue-on-error`
   # below means failures here never block the workflow regardless of order.
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     continue-on-error: true # Allow script to return non-zero exit code
     permissions:
       contents: read
@@ -301,7 +301,7 @@ jobs:
           if ($new_qlpack_version -gt $old_qlpack_version) { exit 0 } else { "qlpack.yml version not incremented. Previously updated to version $old_qlpack_version, current version $new_qlpack_version"; exit 7 }
         }
   test-create-dvl:
-    runs-on: windows-latest
+    runs-on: windows-2025-vs2026
     permissions:
       contents: read
       packages: write

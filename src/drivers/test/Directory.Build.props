@@ -14,10 +14,12 @@
   -->
   <PropertyGroup>
     <WdkNuGetPackagesDir>$(MSBuildThisFileDirectory)..\..\..\packages\</WdkNuGetPackagesDir>
+    <!-- Preserve the Windows 11 24H2/25H2 library target while building with the VS 2026 WDK. -->
+    <_NT_TARGET_VERSION Condition="'$(_NT_TARGET_VERSION)' == ''">0xA000010</_NT_TARGET_VERSION>
   </PropertyGroup>
-  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.x64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.x64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.x64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.x64.props') and '$(Platform)' == 'x64'" />
-  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.arm64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.arm64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.arm64.10.0.26100.6584\build\native\Microsoft.Windows.WDK.arm64.props') and '$(Platform)' == 'ARM64'" />
-  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.x64.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.x64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.x64.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.x64.props') and '$(Platform)' == 'x64'" />
-  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.arm64.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.arm64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.arm64.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.arm64.props') and '$(Platform)' == 'ARM64'" />
-  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.10.0.26100.6584\build\native\Microsoft.Windows.SDK.cpp.props')" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.x64.10.0.28000.2526\build\native\Microsoft.Windows.WDK.x64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.x64.10.0.28000.2526\build\native\Microsoft.Windows.WDK.x64.props') and '$(Platform)' == 'x64'" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.arm64.10.0.28000.2526\build\native\Microsoft.Windows.WDK.arm64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.WDK.arm64.10.0.28000.2526\build\native\Microsoft.Windows.WDK.arm64.props') and '$(Platform)' == 'ARM64'" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.x64.10.0.28000.2526\build\native\Microsoft.Windows.SDK.cpp.x64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.x64.10.0.28000.2526\build\native\Microsoft.Windows.SDK.cpp.x64.props') and '$(Platform)' == 'x64'" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.arm64.10.0.28000.2526\build\native\Microsoft.Windows.SDK.cpp.arm64.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.arm64.10.0.28000.2526\build\native\Microsoft.Windows.SDK.cpp.arm64.props') and '$(Platform)' == 'ARM64'" />
+  <Import Project="$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.10.0.28000.2526\build\native\Microsoft.Windows.SDK.cpp.props" Condition="Exists('$(WdkNuGetPackagesDir)Microsoft.Windows.SDK.CPP.10.0.28000.2526\build\native\Microsoft.Windows.SDK.cpp.props')" />
 </Project>
