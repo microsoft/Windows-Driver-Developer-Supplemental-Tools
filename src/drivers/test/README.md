@@ -61,7 +61,11 @@ To run CodeQl queries on source files, a query, a CodeQL CLI and a CodeQL CLI ge
 
 ### Dependencies
 
-* This repository uses CodeQL version 2.6.3.
+* Visual Studio 2026 with the Desktop development with C++ workload.
+* Windows SDK/WDK NuGet packages version 10.0.28000.2526. The test projects
+  continue to target Windows build 26100 libraries through
+  `_NT_TARGET_VERSION=0xA000010`.
+* A supported CodeQL CLI.
 * Python 3.
 * sarif-tools 1.0.0. Install sarif-tools using pip command.  If you see errors related to the installation of "lxml", install a version of lxml for Windows matching your Python environment from here: https://www.lfd.uci.edu/~gohlke/pythonlibs/#lxml
 
