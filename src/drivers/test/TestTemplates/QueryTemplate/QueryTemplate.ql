@@ -1,7 +1,7 @@
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT license.
 /**
- * @id cpp/drivers/TODO 
+ * @id cpp/drivers/query-template
  * @kind problem
  * @name TODO 
  * @description TODO
@@ -15,7 +15,7 @@
  * @precision medium
  * @tags correctness
  * @scope domainspecific
- * @query-version v1
+ * @query-version v2
  */
 
 

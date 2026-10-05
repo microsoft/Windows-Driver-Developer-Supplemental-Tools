@@ -2,6 +2,17 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+ - Updated the C/C++ CodeQL libraries we depend on to version 12.1.0.
+ - Updated the cpp-queries pack we depend on to version 0.0.6.
+ - Updated the CI CodeQL CLI version to 2.26.3.
+
+### Fixed
+ - Removed redundant type checks in IrqlNotSaved.ql and IllegalFieldAccess2.ql without changing their findings.
+ - Corrected the query template's identifier to satisfy query metadata validation.
+
 ## [1.10.0] - 2026-05-12
 
 ### Added

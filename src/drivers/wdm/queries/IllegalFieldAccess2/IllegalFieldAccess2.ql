@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v2
+ * @query-version v3
  */
 
 import cpp
@@ -160,10 +160,7 @@ class IllegalDriverExtensionFieldAccess extends FieldAccess, PotentiallyIllegalF
         " struct cannot be accessed by a driver."
   }
 
-  override predicate isIllegalAccess() {
-    // This is always true for this class, as we filtered out on AddDevice in the characteristic predicate.
-    this instanceof IllegalDriverExtensionFieldAccess
-  }
+  override predicate isIllegalAccess() { any() }
 }
 
 from PotentiallyIllegalFieldAccess ifa

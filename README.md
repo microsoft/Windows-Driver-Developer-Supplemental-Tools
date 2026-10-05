@@ -26,6 +26,8 @@ See appendix for information on CLI+query version combinations for previous Wind
 |--------------------------|------------------------------------------|-------------------------------|-----------------------------|
 | [Latest](https://github.com/github/codeql-cli-binaries/releases/latest) | [Latest Beta Version](https://github.com/microsoft/Windows-Driver-Developer-Supplemental-Tools/pkgs/container/windows-drivers)             | [Latest](https://github.com/orgs/microsoft/packages/container/package/cpp-queries)                                             | Development |
 
+The development source pack depends on `microsoft/cpp-queries` 0.0.6 and `codeql/cpp-all` 12.1.0. Use CodeQL CLI 2.26.3 or later to install its dependencies and build the queries.
+
 ## Quickstart
 1. Create a directory where you can place the CodeQL CLI and the queries you want to use:
     ```

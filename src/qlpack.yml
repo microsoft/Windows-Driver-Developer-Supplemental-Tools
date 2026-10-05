@@ -8,8 +8,8 @@ name: microsoft/windows-drivers
 version: 1.10.0
 description: CodeQL queries designed for Windows device driver development.
 dependencies:
-  codeql/cpp-all: ^7.0.0
-  microsoft/cpp-queries: ^0.0.5
+  codeql/cpp-all: ^12.1.0
+  microsoft/cpp-queries: ^0.0.6
 suites: windows-driver-suites
 extractor: cpp
 defaultSuiteFile: windows-driver-suites/recommended.qls
