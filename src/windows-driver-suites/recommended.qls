@@ -70,7 +70,7 @@
       - microsoft/Security/CWE/CWE-190/ArithmeticWithExtremeValues.ql
 - queries: . 
   from: microsoft/cpp-queries 
-  version: 0.0.5
+  version: 0.0.6
 - include:
     query path: 
      - Best Practices/Likely Errors/OffsetUseBeforeRangeCheck.ql

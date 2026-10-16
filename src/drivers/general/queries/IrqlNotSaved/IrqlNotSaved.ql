@@ -18,7 +18,7 @@
  *       ca_ported
  *       wddst
  * @scope domainspecific
- * @query-version v2
+ * @query-version v3
  */
 
 import cpp
@@ -86,7 +86,7 @@ module IrqlSaveParameterFlowConfigurationConfig implements DataFlow::ConfigSig {
     // Only track flow to assignment targets or parameters, not every node.
     exists(Variable v | v.getAnAssignedValue() = sink.asExpr())
     or
-    sink.asParameter() instanceof Parameter
+    exists(sink.asParameter())
   }
 }
 module IrqlSaveParameterFlowConfiguration = DataFlow::Global<IrqlSaveParameterFlowConfigurationConfig>;
